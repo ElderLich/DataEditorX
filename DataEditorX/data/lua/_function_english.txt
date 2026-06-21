@@ -7662,7 +7662,7 @@ Parameters:
 Source: Utilities/utility.lua:1594
 
 ●void Auxiliary.ThisCardMovedToPublicResetCheck_ToSingleCard(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Reset check used by single-card merged delayed events. If the owner card is now face-up or public, it clears the stored event group.
 Parameters:
   e: Effect
   tp: int
@@ -7674,11 +7674,13 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:1744
 
-●void Auxiliary.tkfcon(Effect e, int tp)
-TODO document.
+●bool Auxiliary.tkfcon([Effect|nil e], [int|nil tp])
+Returns true if tp controls a Token on the field. If tp is omitted and e is provided, tp defaults to e's handler player.
 Parameters:
-  e: Effect
-  tp: int
+  e: Effect|nil optional
+  tp: int|nil optional
+Returns:
+  bool - true if tp controls a Token on the field.
 Source: Utilities/utility.lua:874
 
 ●bool Auxiliary.TriamidSpSummonType(Card c)
@@ -7689,49 +7691,63 @@ Returns:
   bool
 Source: Utilities/utility.lua:1092
 
-●void Auxiliary.TRUE()
-TODO document.
+●bool Auxiliary.TRUE()
+Returns true.
+Returns:
+  bool - Always true.
 Source: Utilities/utility.lua:91
 
-●void Auxiliary.TurnPlayers()
-TODO document.
+●function Auxiliary.TurnPlayers()
+Returns an iterator that yields the current turn player first, then the other player.
+Returns:
+  function - Iterator that yields the turn player, then the other player.
 Source: Utilities/utility.lua:68
 
-●void Auxiliary.UnionEquipFilter(function filter)
-TODO document.
+●function Auxiliary.UnionEquipFilter(function filter)
+Returns a filter for modern Union equip effects. The target must be face-up, controlled by tp, have no modern Union monster equipped, and satisfy filter.
 Parameters:
   filter: function
+Returns:
+  function - Filter function taking Card c and int tp.
 Source: Utilities/utility.lua:385
 
-●void Auxiliary.UnionEquipLimit(function filter)
-TODO document.
+●function Auxiliary.UnionEquipLimit(function filter)
+Returns an Equip Limit value function for modern Union monsters. It allows cards controlled by the handler's player that satisfy filter, and also keeps the current equip target legal.
 Parameters:
   filter: function
+Returns:
+  function - Equip Limit value function.
 Source: Utilities/utility.lua:391
 
-●void Auxiliary.UnionEquipOperation(any equip_filter)
-TODO document.
+●function Auxiliary.UnionEquipOperation(function equip_filter)
+Returns the operation function for the shared modern Union equip effect. It equips the handler to the selected target, or sends the handler to the Graveyard by rule if the target is no longer valid.
 Parameters:
-  equip_filter: any
+  equip_filter: function
+Returns:
+  function - Operation function for the shared Union equip effect.
 Source: Utilities/utility.lua:408
 
-●void Auxiliary.UnionEquipTarget(any equip_filter)
-TODO document.
+●function Auxiliary.UnionEquipTarget(function equip_filter)
+Returns the target function for the shared modern Union equip effect. It checks the once-per-turn Union flag, requires an open Spell & Trap Zone, selects a valid target, and registers equip operation info.
 Parameters:
-  equip_filter: any
+  equip_filter: function
+Returns:
+  function - Target function for the shared Union equip effect.
 Source: Utilities/utility.lua:396
 
-●void Auxiliary.UnionReplaceFilter(Effect e, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.UnionReplaceFilter(Effect e, Effect re, int r, int rp)
+Destroy-substitute value function for modern Union monsters; returns true for destruction by battle or card effect.
 Parameters:
   e: Effect
   re: Effect
-  r: any
+  r: int
   rp: int
+Returns:
+  bool - true for destruction by battle or card effect.
 Source: Utilities/utility.lua:342
 
 ●void Auxiliary.UnionUnequipOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Operation for the shared modern Union unequip effect; Special Summons the handler in face-up position if it is still related to the effect.
 Parameters:
   e: Effect
   tp: int
@@ -7743,8 +7759,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:428
 
-●void Auxiliary.UnionUnequipTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.UnionUnequipTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+Target function for the shared modern Union unequip effect. It checks the Union flag, available Monster Zone, current equip target, and whether the handler can be Special Summoned.
 Parameters:
   e: Effect
   tp: int
@@ -7755,6 +7771,8 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:421
 
 ●void Auxiliary.UrsarcticExCostFilter(Card c, int tp)

@@ -7548,7 +7548,7 @@ Parameters:
 Source: Utilities/utility.lua:1594
 
 ●void Auxiliary.ThisCardMovedToPublicResetCheck_ToSingleCard(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+单卡合并延迟事件使用的重置检查；若持有者已经表侧表示或处于公开状态，则清空保存的事件Group。
 Parameters:
   e: Effect
   tp: int
@@ -7560,11 +7560,13 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:1744
 
-●void Auxiliary.tkfcon(Effect e, int tp)
-TODO document.
+●bool Auxiliary.tkfcon([Effect|nil e], [int|nil tp])
+判断tp场上是否存在衍生物。省略tp且提供e时，tp默认使用e的持有者玩家。
 Parameters:
-  e: Effect
-  tp: int
+  e: Effect|nil optional
+  tp: int|nil optional
+Returns:
+  bool - true if tp controls a Token on the field.
 Source: Utilities/utility.lua:874
 
 ●bool Auxiliary.TriamidSpSummonType(Card c)
@@ -7575,49 +7577,63 @@ Returns:
   bool
 Source: Utilities/utility.lua:1092
 
-●void Auxiliary.TRUE()
-TODO document.
+●bool Auxiliary.TRUE()
+返回true。
+Returns:
+  bool - Always true.
 Source: Utilities/utility.lua:91
 
-●void Auxiliary.TurnPlayers()
-TODO document.
+●function Auxiliary.TurnPlayers()
+返回一个迭代器，先返回当前回合玩家，再返回另一名玩家。
+Returns:
+  function - Iterator that yields the turn player, then the other player.
 Source: Utilities/utility.lua:68
 
-●void Auxiliary.UnionEquipFilter(function filter)
-TODO document.
+●function Auxiliary.UnionEquipFilter(function filter)
+返回现代同盟怪兽装备效果使用的筛选函数；对象必须表侧表示、由tp控制、没有装备现代同盟怪兽，并满足filter。
 Parameters:
   filter: function
+Returns:
+  function - Filter function taking Card c and int tp.
 Source: Utilities/utility.lua:385
 
-●void Auxiliary.UnionEquipLimit(function filter)
-TODO document.
+●function Auxiliary.UnionEquipLimit(function filter)
+返回现代同盟怪兽使用的装备限制Value函数；允许处理者玩家控制且满足filter的卡，并保持当前装备对象合法。
 Parameters:
   filter: function
+Returns:
+  function - Equip Limit value function.
 Source: Utilities/utility.lua:391
 
-●void Auxiliary.UnionEquipOperation(any equip_filter)
-TODO document.
+●function Auxiliary.UnionEquipOperation(function equip_filter)
+返回现代同盟怪兽共通装备效果的操作函数；将处理对象装备给选中的目标，若目标不再有效则因规则把处理对象送去墓地。
 Parameters:
-  equip_filter: any
+  equip_filter: function
+Returns:
+  function - Operation function for the shared Union equip effect.
 Source: Utilities/utility.lua:408
 
-●void Auxiliary.UnionEquipTarget(any equip_filter)
-TODO document.
+●function Auxiliary.UnionEquipTarget(function equip_filter)
+返回现代同盟怪兽共通装备效果的目标函数；检查同盟次数标记、可用魔法与陷阱区域，选择有效目标，并登记装备操作信息。
 Parameters:
-  equip_filter: any
+  equip_filter: function
+Returns:
+  function - Target function for the shared Union equip effect.
 Source: Utilities/utility.lua:396
 
-●void Auxiliary.UnionReplaceFilter(Effect e, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.UnionReplaceFilter(Effect e, Effect re, int r, int rp)
+现代同盟怪兽的破坏代替Value函数；因战斗或卡片效果将被破坏时返回true。
 Parameters:
   e: Effect
   re: Effect
-  r: any
+  r: int
   rp: int
+Returns:
+  bool - true for destruction by battle or card effect.
 Source: Utilities/utility.lua:342
 
 ●void Auxiliary.UnionUnequipOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+现代同盟怪兽共通解除装备效果的操作；处理对象仍与效果关联时，将其表侧表示特殊召唤。
 Parameters:
   e: Effect
   tp: int
@@ -7629,8 +7645,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:428
 
-●void Auxiliary.UnionUnequipTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.UnionUnequipTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+现代同盟怪兽共通解除装备效果的目标函数；检查同盟次数标记、可用怪兽区域、当前装备对象，以及处理对象能否特殊召唤。
 Parameters:
   e: Effect
   tp: int
@@ -7641,6 +7657,8 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:421
 
 ●void Auxiliary.UrsarcticExCostFilter(Card c, int tp)
