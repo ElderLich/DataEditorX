@@ -6673,46 +6673,59 @@ Returns:
   int
 Source: Utilities/utility.lua:670
 
-●void Auxiliary.GetGlobalColumn(any p, int location, int sequence)
-TODO document.
+●int Auxiliary.GetGlobalColumn(int p, int location, int sequence)
+从玩家0视角返回location和sequence对应的列编号。若p为玩家1，则会把本地列镜像；无效位置或序号返回NULL_VALUE。
 Parameters:
-  p: any
+  p: int
   location: int
   sequence: int
+Returns:
+  int - The global column index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:655
 
-●void Auxiliary.GetGlobalRow(any p, int location, int sequence)
-TODO document.
+●int Auxiliary.GetGlobalRow(int p, int location, int sequence)
+从玩家0视角返回location和sequence对应的行编号。若p为玩家1，则会把本地行镜像；无效位置或序号返回NULL_VALUE。
 Parameters:
-  p: any
+  p: int
   location: int
   sequence: int
+Returns:
+  int - The global row index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:621
 
-●void Auxiliary.GetLocalColumn(int location, int sequence)
-TODO document.
+●int Auxiliary.GetLocalColumn(int location, int sequence)
+返回魔法与陷阱区域或怪兽区域序号对应的本地列编号。额外怪兽区域序号5和6分别对应列1和列3；无效输入返回NULL_VALUE。
 Parameters:
   location: int
   sequence: int
+Returns:
+  int - The local column index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:633
 
-●void Auxiliary.GetLocalRow(int location, int sequence)
-TODO document.
+●int Auxiliary.GetLocalRow(int location, int sequence)
+返回魔法与陷阱区域或怪兽区域序号对应的本地行编号。主要怪兽区域为行1，额外怪兽区域为行2；无效输入返回NULL_VALUE。
 Parameters:
   location: int
   sequence: int
+Returns:
+  int - The local row index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:601
 
-●void Auxiliary.GetMaterialListCount(Card c)
-TODO document.
+●int,int Auxiliary.GetMaterialListCount(Card c)
+返回c登记的素材数量下限和上限。若c没有material_count表，则返回0,0。
 Parameters:
   c: Card
+Returns:
+  int - Minimum material count.
+  int - Maximum material count.
 Source: Utilities/utility.lua:529
 
-●void Auxiliary.GetMultiLinkedZone(int tp)
-TODO document.
+●int Auxiliary.GetMultiLinkedZone(int tp)
+返回tp的怪兽区域中，被任意场上至少2只表侧连接怪兽连接到的区域掩码。
 Parameters:
   tp: int
+Returns:
+  int - Zone mask for zones linked by at least two Link Monsters.
 Source: Utilities/utility.lua:1181
 
 ●void Auxiliary.GetValueType(any v)
@@ -6721,33 +6734,39 @@ Parameters:
   v: any
 Source: Utilities/utility.lua:472
 
-●void Auxiliary.GetXyzNumber(any v)
-TODO document.
+●int|nil Auxiliary.GetXyzNumber(any v)
+返回v对应的已登记「No.」数值；v可以是Card或数字卡名编号。未登记时返回nil。
 Parameters:
   v: any
+Returns:
+  int|nil - Registered Xyz Number value, if any.
 Source: Utilities/utility.lua:60
 
-●void Auxiliary.gfcheck(Group g, function f, any a1, any a2)
-TODO document.
+●bool Auxiliary.gfcheck(Group g, function f, any a1, any a2)
+检查2张卡的Group是否能按任意顺序满足同一个筛选：一张满足f(c,a1)，另一张满足f(c,a2)。
 Parameters:
   g: Group
   f: function
   a1: any
   a2: any
+Returns:
+  bool - true if the two cards satisfy the filter in either order.
 Source: Utilities/utility.lua:1150
 
-●void Auxiliary.gffcheck(Group g, any f1, any a1, any f2, any a2)
-TODO document.
+●bool Auxiliary.gffcheck(Group g, function f1, any a1, function f2, any a2)
+检查2张卡的Group是否能按任意顺序满足两个筛选：一张满足f1(c,a1)，另一张满足f2(c,a2)。
 Parameters:
   g: Group
-  f1: any
+  f1: function
   a1: any
-  f2: any
+  f2: function
   a2: any
+Returns:
+  bool - true if the two cards satisfy both filters in either order.
 Source: Utilities/utility.lua:1157
 
 ●void Auxiliary.GiveUpNormalDraw(Effect e, int tp, [int property])
-TODO document.
+让tp放弃当前抽卡阶段的通常抽卡：登记EFFECT_DRAW_COUNT为0，并登记FLAG_ID_NO_NORMAL_DRAW。
 Parameters:
   e: Effect
   tp: int
@@ -6802,25 +6821,31 @@ Parameters:
   code: int
 Source: Utilities/utility.lua:547
 
-●void Auxiliary.IsCodeOrListed(Card c, int code)
-TODO document.
+●bool Auxiliary.IsCodeOrListed(Card c, int code)
+判断c的当前卡名是否为code，或code是否已登记在c的列名编号表中。
 Parameters:
   c: Card
   code: int
+Returns:
+  bool - true if c has or lists code.
 Source: Utilities/utility.lua:550
 
-●void Auxiliary.IsCounterAdded(Card c, any counter)
-TODO document.
+●bool Auxiliary.IsCounterAdded(Card c, int counter)
+判断counter是否已登记在c.counter_add_list中。
 Parameters:
   c: Card
-  counter: any
+  counter: int
+Returns:
+  bool - true if counter is registered on c.
 Source: Utilities/utility.lua:574
 
-●void Auxiliary.IsInGroup(Card c, Group g)
-TODO document.
+●bool Auxiliary.IsInGroup(Card c, Group g)
+判断g是否包含c。
 Parameters:
   c: Card
   g: Group
+Returns:
+  bool - true if g contains c.
 Source: Utilities/utility.lua:597
 
 ●void Auxiliary.IsMaterialListCode(Card c, int code)
@@ -6837,15 +6862,17 @@ Parameters:
   setcode: int
 Source: Utilities/utility.lua:515
 
-●void Auxiliary.IsMaterialListType(Card c, int type)
-TODO document.
+●bool Auxiliary.IsMaterialListType(Card c, int type)
+判断c登记的素材种类掩码是否包含type。
 Parameters:
   c: Card
   type: int
+Returns:
+  bool - true if c's material type mask contains type.
 Source: Utilities/utility.lua:526
 
 ●bool Auxiliary.IsPlayerCanNormalDraw(int tp)
-TODO document.
+判断tp是否可以进行通常抽卡：抽卡数量大于0，卡组不为空，且没有FLAG_ID_NO_NORMAL_DRAW。
 Parameters:
   tp: int
 Returns:
@@ -6861,18 +6888,22 @@ Returns:
   bool
 Source: Utilities/utility.lua:1953
 
-●void Auxiliary.IsSetNameMonsterListed(Card c, int setcode)
-TODO document.
+●bool Auxiliary.IsSetNameMonsterListed(Card c, int setcode)
+判断setcode是否匹配c登记的怪兽系列编号；比较规则与系列判断辅助函数一致。
 Parameters:
   c: Card
   setcode: int
+Returns:
+  bool - true if c lists a matching monster set code.
 Source: Utilities/utility.lua:567
 
-●void Auxiliary.IsTypeInText(Card c, int type)
-TODO document.
+●bool Auxiliary.IsTypeInText(Card c, int type)
+判断c文本登记的种类掩码是否包含type。
 Parameters:
   c: Card
   type: int
+Returns:
+  bool - true if c's text type mask contains type.
 Source: Utilities/utility.lua:581
 
 ●void Auxiliary.IsUnionState(Effect effect)
@@ -6882,7 +6913,7 @@ Parameters:
 Source: Utilities/utility.lua:307
 
 ●void Auxiliary.LabrynthDestroyOp(Effect e, int tp, any res)
-TODO document.
+「白银之迷宫城」共通的追加破坏处理；非从手牌发动的「拉比林斯迷宫欢迎」通常陷阱处理后，可破坏场上1张卡，并使用场地效果的次数限制。
 Parameters:
   e: Effect
   tp: int
@@ -6890,7 +6921,7 @@ Parameters:
 Source: Utilities/utility.lua:1096
 
 ●void Auxiliary.MaterialReasonCardReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Auxiliary.CreateMaterialReasonCardRelation使用的EVENT_BE_MATERIAL回调；让召唤出的怪兽与保存的效果对象建立效果关联。
 Parameters:
   e: Effect
   tp: int
@@ -6903,7 +6934,7 @@ Parameters:
 Source: Utilities/utility.lua:868
 
 ●void Auxiliary.MergedDelayEventCheck1(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Auxiliary.RegisterMergedDelayedEvent使用的内部回调；收集事件卡，若当前不在连锁中，则立刻触发EVENT_CUSTOM加保存编号的事件。
 Parameters:
   e: Effect
   tp: int
@@ -6916,7 +6947,7 @@ Parameters:
 Source: Utilities/utility.lua:1665
 
 ●void Auxiliary.MergedDelayEventCheck1_ToSingleCard(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+单卡合并延迟事件使用的内部回调；收集事件卡，若持有者自身移动则清空，并在可立即处理时触发保存的自定义事件。
 Parameters:
   e: Effect
   tp: int
@@ -6929,7 +6960,7 @@ Parameters:
 Source: Utilities/utility.lua:1751
 
 ●void Auxiliary.MergedDelayEventCheck2(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Auxiliary.RegisterMergedDelayedEvent使用的内部回调；在连锁结束时，对已收集的卡只触发1次合并后的自定义事件，然后清空保存的Group。
 Parameters:
   e: Effect
   tp: int
@@ -6942,7 +6973,7 @@ Parameters:
 Source: Utilities/utility.lua:1674
 
 ●void Auxiliary.MergedDelayEventCheck2_ToSingleCard(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+单卡合并延迟事件使用的连锁结束内部回调；清理因公开移动而失效的记录，对收集到的卡触发保存的自定义事件，然后清空Group。
 Parameters:
   e: Effect
   tp: int
@@ -6954,8 +6985,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:1766
 
-●void Auxiliary.MimighoulFlipCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.MimighoulFlipCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+当前处于任一主要阶段时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -6965,21 +6996,25 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true during either Main Phase.
 Source: Utilities/utility.lua:1990
 
 ●function Auxiliary.MonsterEffectPropertyFilter(int flag)
-TODO document.
+返回谓词函数，用于判断Effect是否包含flag属性，且效果范围不在灵摆区域。
 Parameters:
   flag: int
 Returns:
   function
 Source: Utilities/utility.lua:2028
 
-●void Auxiliary.mzctcheck(Group g, int tp)
-TODO document.
+●bool Auxiliary.mzctcheck(Group g, int tp)
+判断tp在解放g之后是否会有可用怪兽区域。
 Parameters:
   g: Group
   tp: int
+Returns:
+  bool - true if tp has an open Monster Zone after releasing g.
 Source: Utilities/utility.lua:1163
 
 ●bool Auxiliary.mzctcheckrel(Group g, int tp, [int reason])
@@ -7148,18 +7183,18 @@ Returns:
   bool
 Source: Utilities/utility.lua:2037
 
-●void Auxiliary.PlaceCardsOnDeckBottom(any p, Group g, any reason)
+●void Auxiliary.PlaceCardsOnDeckBottom(int p, Group g, any reason)
 TODO document.
 Parameters:
-  p: any
+  p: int
   g: Group
   reason: any
 Source: Utilities/utility.lua:1617
 
-●void Auxiliary.PlaceCardsOnDeckTop(any p, Group g, any reason)
+●void Auxiliary.PlaceCardsOnDeckTop(int p, Group g, any reason)
 TODO document.
 Parameters:
-  p: any
+  p: int
   g: Group
   reason: any
 Source: Utilities/utility.lua:1601
@@ -7284,10 +7319,10 @@ Parameters:
   id: int
 Source: Utilities/utility.lua:1956
 
-●void Auxiliary.SequenceToGlobal(any p, int loc, int seq)
+●void Auxiliary.SequenceToGlobal(int p, int loc, int seq)
 TODO document.
 Parameters:
-  p: any
+  p: int
   loc: int
   seq: int
 Source: Utilities/utility.lua:1487

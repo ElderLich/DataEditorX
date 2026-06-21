@@ -6712,46 +6712,59 @@ Returns:
   int
 Source: Utilities/utility.lua:670
 
-●void Auxiliary.GetGlobalColumn(any p, int location, int sequence)
-TODO document.
+●int Auxiliary.GetGlobalColumn(int p, int location, int sequence)
+Returns the column index for location and sequence from player 0's viewpoint. For player 1, the local column is mirrored. Invalid locations/sequences return NULL_VALUE.
 Parameters:
-  p: any
+  p: int
   location: int
   sequence: int
+Returns:
+  int - The global column index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:655
 
-●void Auxiliary.GetGlobalRow(any p, int location, int sequence)
-TODO document.
+●int Auxiliary.GetGlobalRow(int p, int location, int sequence)
+Returns the row index for location and sequence from player 0's viewpoint. For player 1, the local row is mirrored. Invalid locations/sequences return NULL_VALUE.
 Parameters:
-  p: any
+  p: int
   location: int
   sequence: int
+Returns:
+  int - The global row index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:621
 
-●void Auxiliary.GetLocalColumn(int location, int sequence)
-TODO document.
+●int Auxiliary.GetLocalColumn(int location, int sequence)
+Returns the local column index for a Spell & Trap Zone or Monster Zone sequence. Extra Monster Zone sequences 5 and 6 map to columns 1 and 3; invalid inputs return NULL_VALUE.
 Parameters:
   location: int
   sequence: int
+Returns:
+  int - The local column index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:633
 
-●void Auxiliary.GetLocalRow(int location, int sequence)
-TODO document.
+●int Auxiliary.GetLocalRow(int location, int sequence)
+Returns the local row index for a Spell & Trap Zone or Monster Zone sequence. Main Monster Zones are row 1, Extra Monster Zones are row 2, and invalid inputs return NULL_VALUE.
 Parameters:
   location: int
   sequence: int
+Returns:
+  int - The local row index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:601
 
-●void Auxiliary.GetMaterialListCount(Card c)
-TODO document.
+●int,int Auxiliary.GetMaterialListCount(Card c)
+Returns c's stored minimum and maximum material counts. If c has no material_count table, returns 0,0.
 Parameters:
   c: Card
+Returns:
+  int - Minimum material count.
+  int - Maximum material count.
 Source: Utilities/utility.lua:529
 
-●void Auxiliary.GetMultiLinkedZone(int tp)
-TODO document.
+●int Auxiliary.GetMultiLinkedZone(int tp)
+Returns the zone mask of tp's Monster Zones that are linked by at least two face-up Link Monsters on either field.
 Parameters:
   tp: int
+Returns:
+  int - Zone mask for zones linked by at least two Link Monsters.
 Source: Utilities/utility.lua:1181
 
 ●void Auxiliary.GetValueType(any v)
@@ -6760,33 +6773,39 @@ Parameters:
   v: any
 Source: Utilities/utility.lua:472
 
-●void Auxiliary.GetXyzNumber(any v)
-TODO document.
+●int|nil Auxiliary.GetXyzNumber(any v)
+Returns the stored Xyz Number value for v, where v can be a Card or a numeric card code. Returns nil when no value is registered.
 Parameters:
   v: any
+Returns:
+  int|nil - Registered Xyz Number value, if any.
 Source: Utilities/utility.lua:60
 
-●void Auxiliary.gfcheck(Group g, function f, any a1, any a2)
-TODO document.
+●bool Auxiliary.gfcheck(Group g, function f, any a1, any a2)
+Checks a 2-card group against one filter in either order: one card must satisfy f(c,a1) and the other f(c,a2).
 Parameters:
   g: Group
   f: function
   a1: any
   a2: any
+Returns:
+  bool - true if the two cards satisfy the filter in either order.
 Source: Utilities/utility.lua:1150
 
-●void Auxiliary.gffcheck(Group g, any f1, any a1, any f2, any a2)
-TODO document.
+●bool Auxiliary.gffcheck(Group g, function f1, any a1, function f2, any a2)
+Checks a 2-card group against two filters in either order: one card must satisfy f1(c,a1) and the other f2(c,a2).
 Parameters:
   g: Group
-  f1: any
+  f1: function
   a1: any
-  f2: any
+  f2: function
   a2: any
+Returns:
+  bool - true if the two cards satisfy both filters in either order.
 Source: Utilities/utility.lua:1157
 
 ●void Auxiliary.GiveUpNormalDraw(Effect e, int tp, [int property])
-TODO document.
+Makes tp give up the normal draw for the current Draw Phase by setting EFFECT_DRAW_COUNT to 0 and registering FLAG_ID_NO_NORMAL_DRAW.
 Parameters:
   e: Effect
   tp: int
@@ -6850,25 +6869,31 @@ Parameters:
   code: int
 Source: Utilities/utility.lua:547
 
-●void Auxiliary.IsCodeOrListed(Card c, int code)
-TODO document.
+●bool Auxiliary.IsCodeOrListed(Card c, int code)
+Returns true if c's current code matches code or code is registered in c's listed-code table.
 Parameters:
   c: Card
   code: int
+Returns:
+  bool - true if c has or lists code.
 Source: Utilities/utility.lua:550
 
-●void Auxiliary.IsCounterAdded(Card c, any counter)
-TODO document.
+●bool Auxiliary.IsCounterAdded(Card c, int counter)
+Returns true if counter is registered in c.counter_add_list.
 Parameters:
   c: Card
-  counter: any
+  counter: int
+Returns:
+  bool - true if counter is registered on c.
 Source: Utilities/utility.lua:574
 
-●void Auxiliary.IsInGroup(Card c, Group g)
-TODO document.
+●bool Auxiliary.IsInGroup(Card c, Group g)
+Returns true if g contains c.
 Parameters:
   c: Card
   g: Group
+Returns:
+  bool - true if g contains c.
 Source: Utilities/utility.lua:597
 
 ●void Auxiliary.IsMaterialListCode(Card c, int code)
@@ -6885,15 +6910,17 @@ Parameters:
   setcode: int
 Source: Utilities/utility.lua:515
 
-●void Auxiliary.IsMaterialListType(Card c, int type)
-TODO document.
+●bool Auxiliary.IsMaterialListType(Card c, int type)
+Returns true if c's stored material type mask contains type.
 Parameters:
   c: Card
   type: int
+Returns:
+  bool - true if c's material type mask contains type.
 Source: Utilities/utility.lua:526
 
 ●bool Auxiliary.IsPlayerCanNormalDraw(int tp)
-TODO document.
+Checks whether tp can perform a normal draw: draw count is positive, the Deck is not empty, and FLAG_ID_NO_NORMAL_DRAW is not set.
 Parameters:
   tp: int
 Returns:
@@ -6909,18 +6936,22 @@ Returns:
   bool
 Source: Utilities/utility.lua:1953
 
-●void Auxiliary.IsSetNameMonsterListed(Card c, int setcode)
-TODO document.
+●bool Auxiliary.IsSetNameMonsterListed(Card c, int setcode)
+Returns true if setcode matches one of the monster set codes registered for c, using the same set-code comparison rules as set membership helpers.
 Parameters:
   c: Card
   setcode: int
+Returns:
+  bool - true if c lists a matching monster set code.
 Source: Utilities/utility.lua:567
 
-●void Auxiliary.IsTypeInText(Card c, int type)
-TODO document.
+●bool Auxiliary.IsTypeInText(Card c, int type)
+Returns true if c's text-registered type mask contains type.
 Parameters:
   c: Card
   type: int
+Returns:
+  bool - true if c's text type mask contains type.
 Source: Utilities/utility.lua:581
 
 ●void Auxiliary.IsUnionState(Effect effect)
@@ -6930,7 +6961,7 @@ Parameters:
 Source: Utilities/utility.lua:307
 
 ●void Auxiliary.LabrynthDestroyOp(Effect e, int tp, any res)
-TODO document.
+Shared extra destroy operation for the Labrynth field effect. After a non-hand-activated Welcome Labrynth Normal Trap resolves, it can destroy one card on the field and consumes the field effect's count limit.
 Parameters:
   e: Effect
   tp: int
@@ -6938,7 +6969,7 @@ Parameters:
 Source: Utilities/utility.lua:1096
 
 ●void Auxiliary.MaterialReasonCardReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+EVENT_BE_MATERIAL callback used by Auxiliary.CreateMaterialReasonCardRelation. It creates an effect relation between the Summoned monster and the stored effect object.
 Parameters:
   e: Effect
   tp: int
@@ -6951,7 +6982,7 @@ Parameters:
 Source: Utilities/utility.lua:868
 
 ●void Auxiliary.MergedDelayEventCheck1(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Internal callback for Auxiliary.RegisterMergedDelayedEvent. It collects event cards and, if not inside a Chain, raises EVENT_CUSTOM plus the stored code immediately.
 Parameters:
   e: Effect
   tp: int
@@ -6964,7 +6995,7 @@ Parameters:
 Source: Utilities/utility.lua:1665
 
 ●void Auxiliary.MergedDelayEventCheck1_ToSingleCard(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Internal callback for single-card merged delayed events. It collects event cards, clears them if the owner card moved, and raises the stored custom event immediately when possible.
 Parameters:
   e: Effect
   tp: int
@@ -6977,7 +7008,7 @@ Parameters:
 Source: Utilities/utility.lua:1751
 
 ●void Auxiliary.MergedDelayEventCheck2(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Internal callback for Auxiliary.RegisterMergedDelayedEvent. At Chain End, it raises one merged custom event for all collected cards, then clears the stored group.
 Parameters:
   e: Effect
   tp: int
@@ -6990,7 +7021,7 @@ Parameters:
 Source: Utilities/utility.lua:1674
 
 ●void Auxiliary.MergedDelayEventCheck2_ToSingleCard(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Internal Chain End callback for single-card merged delayed events. It clears stale public-move entries, raises the stored custom event for collected cards, then clears the group.
 Parameters:
   e: Effect
   tp: int
@@ -7002,8 +7033,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:1766
 
-●void Auxiliary.MimighoulFlipCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.MimighoulFlipCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Returns true during either Main Phase.
 Parameters:
   e: Effect
   tp: int
@@ -7013,21 +7044,25 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true during either Main Phase.
 Source: Utilities/utility.lua:1990
 
 ●function Auxiliary.MonsterEffectPropertyFilter(int flag)
-TODO document.
+Returns a predicate that checks whether an Effect has property flag and is not ranged to the Pendulum Zone.
 Parameters:
   flag: int
 Returns:
   function
 Source: Utilities/utility.lua:2028
 
-●void Auxiliary.mzctcheck(Group g, int tp)
-TODO document.
+●bool Auxiliary.mzctcheck(Group g, int tp)
+Returns true if tp would have an open Monster Zone after releasing g.
 Parameters:
   g: Group
   tp: int
+Returns:
+  bool - true if tp has an open Monster Zone after releasing g.
 Source: Utilities/utility.lua:1163
 
 ●bool Auxiliary.mzctcheckrel(Group g, int tp, [int reason])
@@ -7217,18 +7252,18 @@ Returns:
   bool
 Source: Utilities/utility.lua:2037
 
-●void Auxiliary.PlaceCardsOnDeckBottom(any p, Group g, any reason)
+●void Auxiliary.PlaceCardsOnDeckBottom(int p, Group g, any reason)
 TODO document.
 Parameters:
-  p: any
+  p: int
   g: Group
   reason: any
 Source: Utilities/utility.lua:1617
 
-●void Auxiliary.PlaceCardsOnDeckTop(any p, Group g, any reason)
+●void Auxiliary.PlaceCardsOnDeckTop(int p, Group g, any reason)
 TODO document.
 Parameters:
-  p: any
+  p: int
   g: Group
   reason: any
 Source: Utilities/utility.lua:1601
@@ -7369,10 +7404,10 @@ Parameters:
   id: int
 Source: Utilities/utility.lua:1956
 
-●void Auxiliary.SequenceToGlobal(any p, int loc, int seq)
+●void Auxiliary.SequenceToGlobal(int p, int loc, int seq)
 TODO document.
 Parameters:
-  p: any
+  p: int
   loc: int
   seq: int
 Source: Utilities/utility.lua:1487
