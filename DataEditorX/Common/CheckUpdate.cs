@@ -179,13 +179,33 @@ namespace DataEditorX.Common
                 string appDir = Application.StartupPath;
                 string exe = Application.ExecutablePath;
                 string script = Path.Combine(Path.GetTempPath(), $"DataEditorX_Update_{Guid.NewGuid():N}.ps1");
-                string content = $"""
+                string content = $$"""
 $ErrorActionPreference = 'Stop'
-Wait-Process -Id {Environment.ProcessId} -ErrorAction SilentlyContinue
+Wait-Process -Id {{Environment.ProcessId}} -ErrorAction SilentlyContinue
 Start-Sleep -Milliseconds 500
-Expand-Archive -LiteralPath '{EscapePowerShell(zipFile)}' -DestinationPath '{EscapePowerShell(appDir)}' -Force
-Remove-Item -LiteralPath '{EscapePowerShell(zipFile)}' -Force -ErrorAction SilentlyContinue
-Start-Process -FilePath '{EscapePowerShell(exe)}' -WorkingDirectory '{EscapePowerShell(appDir)}'
+$cleanupFiles = @(
+    'DataEditorX.deps.json',
+    'DataEditorX.dll',
+    'DataEditorX.pdb',
+    'DataEditorX.runtimeconfig.json',
+    'e_sqlite3.dll',
+    'FastColoredTextBox.dll',
+    'Microsoft.Data.Sqlite.dll',
+    'Neo.Lua.dll',
+    'Newtonsoft.Json.dll',
+    'SQLitePCLRaw.batteries_v2.dll',
+    'SQLitePCLRaw.core.dll',
+    'SQLitePCLRaw.provider.e_sqlite3.dll',
+    'WeifenLuo.WinFormsUI.Docking.dll',
+    'WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll'
+)
+foreach ($file in $cleanupFiles) {
+    Remove-Item -LiteralPath (Join-Path '{{EscapePowerShell(appDir)}}' $file) -Force -ErrorAction SilentlyContinue
+}
+Remove-Item -LiteralPath (Join-Path '{{EscapePowerShell(appDir)}}' 'de') -Recurse -Force -ErrorAction SilentlyContinue
+Expand-Archive -LiteralPath '{{EscapePowerShell(zipFile)}}' -DestinationPath '{{EscapePowerShell(appDir)}}' -Force
+Remove-Item -LiteralPath '{{EscapePowerShell(zipFile)}}' -Force -ErrorAction SilentlyContinue
+Start-Process -FilePath '{{EscapePowerShell(exe)}}' -WorkingDirectory '{{EscapePowerShell(appDir)}}'
 Remove-Item -LiteralPath $PSCommandPath -Force -ErrorAction SilentlyContinue
 """;
                 File.WriteAllText(script, content, new UTF8Encoding(false));

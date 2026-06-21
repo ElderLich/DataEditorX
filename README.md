@@ -77,6 +77,7 @@ Upload uses the GitHub CLI, so run `gh auth login` first. The script creates or 
 * `DataEditorX_win64.zip`
 
 Release zips omit `.pdb` debug symbol files by default. Add `--include-symbols` only when preparing a build for debugging.
+Release builds also bundle managed dependencies into `DataEditorX.exe` by default, keeping the extracted folder close to the original layout. Add `--multi-file` only when you need separate dependency DLLs for troubleshooting.
 
 ## Special Features of KoishiDEX
 1. The format of scripts will be in Koishi-Style when creating new scripts. Also the module script to be required will be adjustable, and will be packed when exporting zip files.
