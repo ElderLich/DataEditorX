@@ -1486,8 +1486,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3641
 
 ●bool Card.IsCanBeSpecialSummoned(Card c, Effect e, int sumtype, int sumplayer, bool nocheck, bool nolimit, [int sumpos], [int toplayer], [int zone])
-检查c是否可以被玩家sumplayer用效果e[以sumtype方式和sumpos表示形式]特殊召唤[到玩家 toplayer 的区域zone]
-如果nocheck是true则不检查c的召唤条件，如果nolimit是true则不检查c的苏生限制
+检查c是否可以用效果e和给定的召唤参数进行特殊召唤。
 Parameters:
   c: Card
   e: Effect
@@ -1580,7 +1579,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3599
 
 ●bool Card.IsCode(Card c, int code1, [int code2], [... int])
-检查c的卡号是否是 code1[, 或者为 code2...]
+检查c的卡号是否匹配任意给定的卡号。
 Parameters:
   c: Card
   code1: int
@@ -3430,12 +3429,10 @@ Returns:
   Card
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4971
 
-●Card,... Duel.GetFirstTarget()
-返回当前连锁的所有的对象卡，一般只有一个对象时使用
-##多个对象也能使用，剩下的对象依次按顺序返回，但是很容易记错对象的顺序，所以不建议对多个对象使用
+●Card|nil Duel.GetFirstTarget()
+返回当前连锁登记的对象卡。
 Returns:
-  Card
-  ... - Card
+  Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4949
 
 ●int Duel.GetFlagEffect(int player, int code)
@@ -3537,9 +3534,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4846
 
 ●Group Duel.GetMatchingGroup([function|nil f], int player, int s, int o, [Card|Group|nil ex], ... any)
-过滤函数，返回以player来看的指定位置满足过滤条件f并且不等于ex的卡
-s代表以player来看的自己的位置，o代表以player来看的对方的位置
-第6个参数开始为额外参数
+返回以player来看指定位置中满足f且不等于ex的卡组成的Group。
 Parameters:
   f: function|nil optional
   player: int
@@ -3896,7 +3891,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4972
 
 ●bool Duel.IsExistingTarget([function|nil f], int player, int s, int o, int count, [Card|Group|nil ex], ... any)
-基本同Duel.IsExistingMatchingCard ，不同之处在于需要追加判定卡片是否能成为当前正在处理的效果的对象
+检查指定位置是否存在足够数量、满足f且可以成为当前效果对象的卡。
 Parameters:
   f: function|nil optional
   player: int
@@ -4523,7 +4518,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4993
 
 ●Group Duel.SelectTarget(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
-基本同Duel.SelectMatchingCard ，不同之处在于此函数会同时将当前正在处理的连锁的对象设置成选择的卡
+选择满足条件的对象卡，并把选择结果登记为当前连锁的对象。
 Parameters:
   sel_player: int
   f: function|nil optional
@@ -4800,9 +4795,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4893
 
 ●int Duel.SpecialSummon(Card|Group targets, int sumtype, int sumplayer, int target_player, bool nocheck, bool nolimit, int pos, [int zone])
-让玩家 sumplayer 以sumtype方式，pos表示形式把targets特殊召唤到target_player场上[的区域 zone]
-如果nocheck为true则无视卡的召唤条件，如果nolimit为true则无视卡的苏生限制
-返回值是特殊召唤成功的卡的数量
+把targets特殊召唤到target_player场上，并返回成功特殊召唤的数量。
 Parameters:
   targets: Card|Group
   sumtype: int
@@ -5263,7 +5256,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:625
 
 ●void Effect.SetCost(Effect e, function cost_func)
-设置Cost属性
+设置效果e的Cost函数。
 Parameters:
   e: Effect
   cost_func: function
@@ -5358,16 +5351,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:626
 
 ●void Effect.SetTargetRange(Effect e, int s_range, int o_range)
-为效果e设置Target Range属性
-s_range指影响的我方区域
-o_range值影响的对方区域
-如果property属性中指定了EFFECT_FLAG_ABSOLUTE_RANGE标志，
-那么s_range指玩家1受到影响的区域，o_range指玩家2受到影响的区域
-如果这是一个召唤(覆盖)/限制召唤(覆盖)/特殊召唤手续
-(EFFECT_SUMMON_PROC/EFFECT_LIMIT_SUMMON_PROC/EFFECT_SPSUMMON_PROC等)的效果，
-并且property指定了EFFECT_FLAG_SPSUM_PARAM标志，
-那么s_range表示特殊召唤到的哪个玩家的场地，
-o_range表示可选择的表示形式
+设置效果e的Target Range属性。
 Parameters:
   e: Effect
   s_range: int
@@ -5538,8 +5522,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:931
 
 ●Group Group.Filter(Group g, function f, [Card|Group|nil ex], ... any)
-过滤函数，从g中筛选满足筛选条件f并且不等于ex的卡
-从第4个参数开始为额外参数
+从g中筛选满足f且不等于ex的卡，并返回新的Group。
 Parameters:
   g: Group
   f: function
@@ -5613,13 +5596,12 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:910
 
-●Card Group.GetFirst(Group g)
-返回g中第一张卡，并重置当前指针到g中第一张卡
-如果g中不存在卡则返回nil
+●Card|nil Group.GetFirst(Group g)
+返回g中的第一张卡，并把g的迭代指针重置到第一张卡。
 Parameters:
   g: Group
 Returns:
-  Card
+  Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:909
 
 ●Group,int Group.GetMaxGroup(Group g, function f, ... any)
@@ -5648,12 +5630,12 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:924
 
-●Card Group.GetNext(Group g)
-使指针指向下一张卡并返回这张卡，如果不存在则返回nil
+●Card|nil Group.GetNext(Group g)
+把g的迭代指针移动到下一张卡并返回该卡。
 Parameters:
   g: Group
 Returns:
-  Card
+  Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:908
 
 ●int Group.GetSum(Group g, function f, ... any)
@@ -5676,8 +5658,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:932
 
 ●bool Group.IsExists(Group g, function f, int count, [Card|Group|nil ex], ... any)
-过滤函数，检查g中是否存在至少count张满足筛选条件f并且不等于ex的卡
-从第5个参数开始为额外参数
+检查g中是否存在至少count张满足f且不等于ex的卡。
 Parameters:
   g: Group
   f: function
@@ -5740,7 +5721,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:933
 
 ●Group Group.Select(Group g, int player, int min, int max, [Card|Group|nil ex])
-让玩家player从g中选择min-max张不等于ex的卡
+让玩家player从g中选择min到max张卡。
 Parameters:
   g: Group
   player: int
