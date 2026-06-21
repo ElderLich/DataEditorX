@@ -125,9 +125,9 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3651
 
 ●Effect,Group|nil,int|nil,int|nil,Effect|nil,int|nil,int|nil Card.CheckActivateEffect(Card c, bool neglect_con, bool neglect_cost, bool copy_info)
-Return to the timing of the launch of the correct c "card launch" effect, ignored_con = true ignoring the launch conditions, ignored_cost = true ignoring the launch cost
-Copy_info = false or the free-time effect only returns the effect
-Otherwise return the effect of the time point for the code when the trigger point information eg, ep, ev, re, r, rp
+Checks whether c has an activation effect that can currently be activated.
+If neglect_con is true, condition checks are skipped. If neglect_cost is true, cost checks are skipped.
+When copy_info is true, the returned values include the triggering event information: eg, ep, ev, re, r, and rp.
 Parameters:
   c: Card
   neglect_con: bool
@@ -266,8 +266,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3568
 
 ●Effect,...? Card.GetActivateEffect(Card c)
-Returns the effect of the "card firing" of c, that is, the effect of type EFFECT_TYPE_ACTIVATE
-Only for magic and traps
+Returns c's activation effect, the effect with type EFFECT_TYPE_ACTIVATE. This is mainly used for Spell/Trap Cards.
 Parameters:
   c: Card
 Returns:
@@ -986,8 +985,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3447
 
 ●int Card.GetRace(Card c)
-Returns the current race of c
-Note: For some multi-ethnic monsters such as animation effects of the magic ape, the function of the return value may be a combination of several racial values
+Returns c's current Race value. Cards with multiple Races can return a bitmask containing more than one Race.
 Parameters:
   c: Card
 Returns:
@@ -1072,9 +1070,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3409
 
 ●int Card.GetSequence(Card c)
-Returns the serial number of the current position
-In the field, the sequence number on behalf of the grid, from left to right are 0-4, the venue magic number is 5, left and right pendulum area is 6-7
-In other places, the serial number represents the first card, the lowest card number is 0
+Returns c's sequence within its current location.
+For field zones, Main Monster Zones and Spell & Trap Zones use 0-4 from left to right, the Field Zone uses 5, and Pendulum Zones use 6-7.
+For other locations, sequence is the card's position in that location, starting from 0.
 Parameters:
   c: Card
 Returns:
@@ -1221,7 +1219,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3626
 
 ●bool Card.IsAbleToDeck(Card c)
-Check whether c can be sent to the card group
+Checks whether c can be returned to the Deck.
 Parameters:
   c: Card
 Returns:
@@ -1229,7 +1227,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3585
 
 ●bool Card.IsAbleToDeckAsCost(Card c)
-Check whether c can be sent to the card as a cost group
+Checks whether c can be returned to the Deck as a cost.
 Parameters:
   c: Card
 Returns:
@@ -1237,7 +1235,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3590
 
 ●bool Card.IsAbleToDeckOrExtraAsCost(Card c)
-Check whether c can be sent as a cost card group or additional card group (for the new Yu-xia, sword fighting beast fusion call monster detection procedures)
+Checks whether c can be returned to the Deck or Extra Deck as a cost.
 Parameters:
   c: Card
 Returns:
@@ -1254,7 +1252,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3586
 
 ●bool Card.IsAbleToExtraAsCost(Card c)
-Check whether c can be sent as an additional cost card group
+Checks whether c can be returned to the Extra Deck as a cost.
 Parameters:
   c: Card
 Returns:
@@ -1287,9 +1285,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3584
 
 ●bool Card.IsAbleToHandAsCost(Card c)
-Check whether c can be sent as the cost of hand cards
-Note: This function appends the actual destination of c to Card.IsAbleToHand
-This function returns false when c is sent to the other hand (if the retraction loop is applicable, or c is a blend, cohomology, and oversize)
+Checks whether c can be returned to the hand as a cost.
+This uses c's actual return destination and returns false when the card would go somewhere other than the player's hand, such as the Extra Deck.
 Parameters:
   c: Card
 Returns:
@@ -1308,7 +1305,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3588
 
 ●bool Card.IsAbleToRemoveAsCost(Card c)
-Check whether c can be excluded as a cost
+Checks whether c can be banished as a cost.
 Parameters:
   c: Card
 Returns:
@@ -2170,10 +2167,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3564
 
 ●bool Card.IsRelateToChain(Card c, [int chainc])
-Check if c is linked to chained chainc
-Note: Each launch into the effect of chain, the effect of launching the card, and the effect of the specified object
-(With Duel.SetTargetCard or Duel.SelectTarget specified, including the take and not take objects)
-Will automatically establish contact with that effect, once the departure, contact will be reset
+Checks whether c is still related to chainc.
+The activating card and cards selected as targets with Duel.SetTargetCard or Duel.SelectTarget automatically become related to that Chain. The relation is lost when the card leaves the expected place.
 Parameters:
   c: Card
   chainc: int optional - default: 0
@@ -2246,7 +2241,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3398
 
 ●bool Card.IsSSetable(Card c, [bool ignore_field])
-Check whether c can be set to the magic trap area, ignore_field = true is disregard of the trap area trap trap
+Checks whether c can be Set in a Spell & Trap Zone. If ignore_field is true, available zone checks are ignored.
 Parameters:
   c: Card
   ignore_field: bool optional - default: false
@@ -2576,8 +2571,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3512
 
 ●void Card.SetUniqueOnField(Card c, int s, int o, function|int unique_code, [int unique_location])
-Set c to unique_code only in the field [or monster area or magic trap area, determined by the unique_location] can only exist one
-S is not 0 will check the uniqueness of their field, o is not 0 check the other field uniqueness
+Sets a uniqueness rule for c so only one card with unique_code can exist on the checked field, Monster Zone, or Spell & Trap Zone range.
 Parameters:
   c: Card
   s: int
@@ -2659,8 +2653,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libdebug.cpp:211
 
 ●void Debug.SetPlayerInfo(int playerid, int lp, int startcount, int drawcount)
-Set the player information, divided into lp, the initial hand card for the startcount Zhang, drawcount each round of pumping
-Playerid below 0, top 1
+Sets a player's LP, starting hand count, and cards drawn each Draw Phase.
 Parameters:
   playerid: int
   lp: int
@@ -2867,7 +2860,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4925
 
 ●bool Duel.CheckChainTarget(int chainc, Card c)
-Check whether c is the correct object for chained chainc effects
+Checks whether c is a valid card related to chainc.
 Parameters:
   chainc: int
   c: Card
@@ -2908,7 +2901,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4944
 
 ●bool Duel.CheckLPCost(int player, int cost, [bool must_pay])
-Check player player can pay cost point lp
+Checks whether player can pay the specified LP cost.
 Parameters:
   player: int
   cost: int
@@ -3118,12 +3111,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4913
 
 ●void Duel.DisableShuffleCheck([bool disable])
-So that the next operation does not check for the need for a wash card set or a hand card
-Note: If you do not call this function,
-In addition to calling Duel.DiscardDeck and Duel.Draw remove the card from the card group or add the card to the card
-Or the card is added to the deck (not the top or bottom), the system automatically cleans the card group or the hand card at the end of the effect process
-If you do not want to do so, for example, from the top of the card group, except for a card and other operations, you need to call this function
-This function only ensures that no subsequent scrub detection is performed in the next operation
+Disables the automatic shuffle check for the next Deck or hand operation.
+Use this before operations that intentionally preserve Deck order or hand order.
 Parameters:
   disable: bool optional - default: true
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4912
@@ -3602,7 +3591,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4864
 
 ●int Duel.GetOperationCount(int chainc)
-Returns the number of operational classifications contained in chained chainc
+Returns the number of operation categories recorded for chainc.
 Parameters:
   chainc: int
 Returns:
@@ -3610,9 +3599,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5010
 
 ●bool,Group,int,int,int Duel.GetOperationInfo(int chainc, int category)
-Returns the operation information of the chained chainc category, with a return value of 5,
-The first return value is false to indicate that the class does not exist
-The last four return values ​​correspond to the last four parameters of Duel.SetOperationInfo: Card|Group targets, int count, int target_player, int target_param
+Returns operation information recorded for category on chainc.
+The first return value is false when that category is not recorded. Otherwise, the remaining values correspond to Duel.SetOperationInfo: targets, count, target_player, and target_param.
 Parameters:
   chainc: int
   category: int
@@ -3651,7 +3639,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4946
 
 ●Group Duel.GetReleaseGroup(int player, [bool use_hand], [int reason])
-Return to the player player can be liberated (non-superior summoned use) of the deck, use_hand is true, including the hand card
+Returns the cards player can Tribute/Release for effect purposes. If use_hand is true, valid cards in the hand are included.
 Parameters:
   player: int
   use_hand: bool optional - default: false
@@ -3661,7 +3649,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4974
 
 ●int Duel.GetReleaseGroupCount(int player, [bool use_hand], [int reason])
-Return player player can be liberated (non-superior summoned with) the number of cards, use_hand is true, including the hand card
+Returns the number of cards player can Tribute/Release for effect purposes. If use_hand is true, valid cards in the hand are included.
 Parameters:
   player: int
   use_hand: bool optional - default: false
@@ -3965,7 +3953,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5046
 
 ●bool Duel.IsPlayerCanDraw(int player, [int count])
-Check the player player can effect pumping [count Zhang] card
+Checks whether player can draw count cards.
 Parameters:
   player: int
   count: int optional - default: 0
@@ -4216,7 +4204,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5014
 
 ●void Duel.PayLPCost(int player, int cost, [bool must_pay])
-Allow players to pay cost point player lp
+Makes player pay the specified LP cost.
 Parameters:
   player: int
   cost: int
@@ -4482,7 +4470,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4977
 
 ●Group Duel.SelectReleaseGroupEx(int player, [function|nil f], int min, int max, int reason, bool use_hand, [Card|Group|nil ex], ... any)
-Filter function, allowing the player player from the field · hand card selection min-max Zhang does not equal ex to meet the conditions of f can be liberated card (non-superior call)
+Lets player select min to max cards that can be Tributed/Released for effect purposes, optionally excluding ex and applying filter f.
 Parameters:
   player: int
   f: function|nil optional
@@ -4588,10 +4576,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5023
 
 ●int Duel.SendtoDeck(Card|Group targets, [int|nil player], int seq, int reason, [int reason_player], [bool send_activating])
-The reason for the targets sent to the players player card group, the return value is the actual number of operations
-If player is nil, the card holder of the card is returned
-If seq = 0, it is the top of the returned card group; seq = 1 is the bottom of the returned card group;
-The rest of the case is to return to the top and mark the need to wash the card group
+Returns targets to the Deck or Extra Deck for reason and returns the number of cards moved.
+If player is nil, each card returns to its owner. seq=0 places cards on top of the Deck, seq=1 places them on the bottom, and other values use the default shuffle/return handling.
 Parameters:
   targets: Card|Group
   player: int|nil optional
@@ -4691,19 +4677,9 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4847
 
 ●void Duel.SetOperationInfo(int chainc, int category, [Card|Group|nil|0 targets], int count, int target_player, int target_param)
-Sets the operation information of the currently processed chain This operation information contains the effect classification determined in the effect processing to be processed
-For example, stealth snipers need to set CATEGORY_DICE, but can not set CATEGORY_DESTROY, because not sure
-For destructive effects, targets need to be set to launch the object may become the impact of chain card,
-And sets count to the number of cards to be processed as determined at launch
-For example, when the black hole launched, targets need to be set to all the monsters on the field, count to set the number of strange field
-For CATEGORY_SPECIAL_SUMMON, CATEGORY_TOHAND, CATEGORY_TODECK, etc., which need to move the card position,
-If the card to be processed is deterministic (such as fetching objects), set targets for these cards, count for the number,
-If the card to be processed is uncertain (the effect can be determined when processing, is generally not take the effect of the object)
-Set the targets to nil, count is expected to deal with the number of cards,
-Target_player is expected to be handled by the holder of the card (not sure to 0)
-Target_param is the location of the card expected to be processed
-For example: SetOperationInfo (0, CATEGORY_TOHAND, nil, 1, tp, LOCATION_DECK)
-Operational information is used to initiate detection of many effects, such as Stardust Dragon, Royal Valley
+Records operation information for category on chainc.
+Use concrete targets and count when the affected cards are known. For unresolved non-targeting movement effects, pass nil targets with the expected count, target player, and target location.
+This information is used by response checks such as Stardust Dragon-style effects.
 Parameters:
   chainc: int
   category: int
@@ -4745,8 +4721,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5006
 
 ●void Duel.ShuffleDeck(int player)
-Manually cleans the player group
-NOTE: The status of the wash detection is reset
+Shuffles player's Deck and resets shuffle-check state.
 Parameters:
   player: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4915
@@ -4758,14 +4733,13 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4916
 
 ●void Duel.ShuffleHand(int player)
-Manual wash player player's hand card
-NOTE: The status of the wash detection is reset
+Shuffles player's hand and resets shuffle-check state.
 Parameters:
   player: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4917
 
 ●void Duel.ShuffleSetCard(Group g)
-Cut the card (magic hat) over the monster area
+Randomly reorders the Set cards in g, used for effects such as Magical Hats.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4918
@@ -4838,8 +4812,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4874
 
 ●int Duel.SSet(int player, Card|Group targets, [int target_player], [bool confirm])
-Let the player player place the targets into the target trap's magic trap
-If targets is Group, the number of successful operations is returned
+Makes player Set targets to target_player's Spell & Trap Zone. If targets is a Group, returns the number of cards successfully Set.
 Parameters:
   player: int
   targets: Card|Group
@@ -5582,7 +5555,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:934
 
 ●int Group.GetClassCount(Group g, function f, ... any)
-Calculate the number of all cards in g, f is the basis of the classification, return the same value as the same category, starting from the first three parameters for additional parameters
+Counts distinct classes among cards in g according to f. Cards with the same return value from f count as the same class; extra arguments are passed to f.
 Parameters:
   g: Group
   f: function

@@ -112,6 +112,9 @@ TYPE_SYSTEM_IDS = {
 CATEGORY_SYSTEM_IDS = {1 << index: 1100 + index for index in range(32)}
 
 RACE_ORDER = list(RACE_SYSTEM_IDS)
+GENERATED_CARDINFO_MARKER = "# Generated from MDPro3 locale strings.conf"
+
+
 TYPE_ORDER = [
     0x1,
     0x2,
@@ -213,6 +216,8 @@ def parse_cardinfo(path: Path) -> CardInfo:
             continue
 
         if current_name is None:
+            if line == GENERATED_CARDINFO_MARKER:
+                continue
             preamble.append(line)
             continue
 
@@ -291,8 +296,7 @@ def build_cardinfo(base: CardInfo, systems: dict[int, str], md_setnames: list[tu
     attribute_label = clean_label(systems.get(1319, "Attribute"))
     race_label = clean_label(systems.get(1321, "Race"))
 
-    lines = list(base.preamble)
-    lines.append("# Generated from MDPro3 locale strings.conf")
+    lines = [GENERATED_CARDINFO_MARKER, *base.preamble]
 
     for section_name, entries in base.sections:
         lowered = section_name.lower()
