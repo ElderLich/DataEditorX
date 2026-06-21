@@ -7458,8 +7458,8 @@ Parameters:
   c: Card
 Source: Utilities/utility.lua:312
 
-●void Auxiliary.SpiritReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.SpiritReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Condition for the mandatory Spirit Monster End Phase return effect. It returns true while the handler is not prevented from returning and does not have the optional-return permission effect.
 Parameters:
   e: Effect
   tp: int
@@ -7469,10 +7469,12 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the mandatory Spirit return effect should apply.
 Source: Utilities/utility.lua:200
 
-●void Auxiliary.SpiritReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.SpiritReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Condition for the optional Spirit Monster End Phase return effect. It returns true while the handler is not prevented from returning and does have the optional-return permission effect.
 Parameters:
   e: Effect
   tp: int
@@ -7482,10 +7484,12 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the optional Spirit return effect should apply.
 Source: Utilities/utility.lua:208
 
 ●void Auxiliary.SpiritReturnOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Operation for the shared Spirit Monster End Phase return effect. If the handler is still related to the effect, it returns that card to the hand.
 Parameters:
   e: Effect
   tp: int
@@ -7498,7 +7502,7 @@ Parameters:
 Source: Utilities/utility.lua:216
 
 ●void Auxiliary.SpiritReturnReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Registers the temporary End Phase return effects created by Auxiliary.EnableSpiritReturn: one mandatory trigger and one optional trigger.
 Parameters:
   e: Effect
   tp: int
@@ -7510,8 +7514,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:180
 
-●void Auxiliary.SpiritReturnTargetForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.SpiritReturnTargetForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+Target function for the mandatory Spirit Monster End Phase return effect. During the check step it always returns true, then registers return-to-hand operation info.
 Parameters:
   e: Effect
   tp: int
@@ -7522,10 +7526,12 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:204
 
-●void Auxiliary.SpiritReturnTargetOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.SpiritReturnTargetOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+Target function for the optional Spirit Monster End Phase return effect. During the check step it requires the handler to be able to return to the hand, then registers return-to-hand operation info.
 Parameters:
   e: Effect
   tp: int
@@ -7536,6 +7542,8 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:212
 
 ●void Auxiliary.Stringid(int code, int id)
@@ -7569,10 +7577,12 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:848
 
-●void Auxiliary.SZoneSequence(int seq)
-TODO document.
+●int Auxiliary.SZoneSequence(int seq)
+Returns the local column for a Spell & Trap Zone sequence from the controller's viewpoint.
 Parameters:
   seq: int
+Returns:
+  int - The local column index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:722
 
 ●void Auxiliary.TargetBoolFunction(function f, ... any)
@@ -7624,8 +7634,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:832
 
-●void Auxiliary.ThisCardInGraveAlreadyCheckReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.ThisCardInGraveAlreadyCheckReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Condition callback used by Auxiliary.AddThisCardInGraveAlreadyCheck. When this card is sent to the Graveyard by an effect, material use, or non-activated cost, it stores the responsible effect and installs reset effects; it then returns false so no separate effect operation runs.
 Parameters:
   e: Effect
   tp: int
@@ -7635,16 +7645,18 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - Always false after any tracking setup is done.
 Source: Utilities/utility.lua:1556
 
 ●void Auxiliary.ThisCardInGraveAlreadyReset1(Effect e)
-TODO document.
+Clears the stored responsible effect from the tracking effect and resets this temporary reset effect.
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:1589
 
 ●void Auxiliary.ThisCardInGraveAlreadyReset2(Effect e)
-TODO document.
+Clears the stored responsible effect through the paired reset effect, then resets both temporary reset effects.
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:1594

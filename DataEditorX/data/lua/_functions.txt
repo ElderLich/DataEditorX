@@ -7373,8 +7373,8 @@ Parameters:
   c: Card
 Source: Utilities/utility.lua:312
 
-●void Auxiliary.SpiritReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.SpiritReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+灵魂怪兽结束阶段强制回到手牌效果的条件；处理对象没有禁止回手效果，且没有可选择不回手效果时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -7384,10 +7384,12 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the mandatory Spirit return effect should apply.
 Source: Utilities/utility.lua:200
 
-●void Auxiliary.SpiritReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.SpiritReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+灵魂怪兽结束阶段可选回到手牌效果的条件；处理对象没有禁止回手效果，且具有可选择不回手效果时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -7397,10 +7399,12 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the optional Spirit return effect should apply.
 Source: Utilities/utility.lua:208
 
 ●void Auxiliary.SpiritReturnOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+灵魂怪兽共通结束阶段回到手牌效果的操作；处理对象仍与效果关联时，将其回到手牌。
 Parameters:
   e: Effect
   tp: int
@@ -7413,7 +7417,7 @@ Parameters:
 Source: Utilities/utility.lua:216
 
 ●void Auxiliary.SpiritReturnReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+登记Auxiliary.EnableSpiritReturn创建的临时结束阶段回手效果：1个强制触发效果和1个可选触发效果。
 Parameters:
   e: Effect
   tp: int
@@ -7425,8 +7429,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:180
 
-●void Auxiliary.SpiritReturnTargetForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.SpiritReturnTargetForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+灵魂怪兽结束阶段强制回到手牌效果的目标函数；检查阶段始终返回true，之后登记回到手牌的操作信息。
 Parameters:
   e: Effect
   tp: int
@@ -7437,10 +7441,12 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:204
 
-●void Auxiliary.SpiritReturnTargetOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.SpiritReturnTargetOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+灵魂怪兽结束阶段可选回到手牌效果的目标函数；检查阶段要求处理对象可以回到手牌，之后登记回到手牌的操作信息。
 Parameters:
   e: Effect
   tp: int
@@ -7451,6 +7457,8 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:212
 
 ●void Auxiliary.Stringid(int code, int id)
@@ -7473,10 +7481,12 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:848
 
-●void Auxiliary.SZoneSequence(int seq)
-TODO document.
+●int Auxiliary.SZoneSequence(int seq)
+从控制者视角返回魔法与陷阱区域序号对应的本地列编号。
 Parameters:
   seq: int
+Returns:
+  int - The local column index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:722
 
 ●void Auxiliary.TargetBoolFunction(function f, ... any)
@@ -7510,8 +7520,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:832
 
-●void Auxiliary.ThisCardInGraveAlreadyCheckReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.ThisCardInGraveAlreadyCheckReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Auxiliary.AddThisCardInGraveAlreadyCheck使用的条件回调；当此卡因效果、作为素材或未发动的费用送去墓地时，保存相关效果并登记重置效果，随后返回false让自身不再执行操作。
 Parameters:
   e: Effect
   tp: int
@@ -7521,16 +7531,18 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - Always false after any tracking setup is done.
 Source: Utilities/utility.lua:1556
 
 ●void Auxiliary.ThisCardInGraveAlreadyReset1(Effect e)
-TODO document.
+清除跟踪效果保存的相关效果，并重置这个临时重置效果。
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:1589
 
 ●void Auxiliary.ThisCardInGraveAlreadyReset2(Effect e)
-TODO document.
+通过配对的重置效果清除保存的相关效果，并重置两个临时重置效果。
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:1594
