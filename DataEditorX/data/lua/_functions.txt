@@ -8414,137 +8414,157 @@ Parameters:
   loc: int
 Source: Utilities/procedure.lua:2097
 
-●void Auxiliary.FCheckMix(Card c, Group mg, Group sg, Card fc, any sub, any fun1, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckMix(Card c, Group mg, Group sg, Card fc, bool sub, function fun1, [function|nil fun2], ... function)
+混合融合素材递归检查；按顺序检查每个必需素材函数，把已选素材记录在sg中，并在需要时消耗代替融合素材许可。
 Parameters:
   c: Card
   mg: Group
   sg: Group
   fc: Card
-  sub: any
-  fun1: any
-  fun2: any
-  ...: any
+  sub: bool
+  fun1: function
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if the remaining mixed Fusion Material functions can be satisfied.
 Source: Utilities/procedure.lua:956
 
-●void Auxiliary.FCheckMixGoal(Group sg, int tp, Card fc, any sub, any chkfnf, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixGoal(Group sg, int tp, Card fc, bool sub, int chkfnf, ... function)
+混合融合素材的最终组检查；验证必须使用的融合素材、EFFECT_TUNE_MAGICIAN_F限制、额外怪兽区域可用性以及额外融合目标检查。
 Parameters:
   sg: Group
   tp: int
   fc: Card
-  sub: any
-  chkfnf: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  ...: function
+Returns:
+  bool - true if sg is a valid mixed Fusion Material group.
 Source: Utilities/procedure.lua:972
 
-●void Auxiliary.FCheckMixRep(Group sg, Group g, Card fc, any sub, any chkf, any fun1, any minc, any maxc, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRep(Group sg, Group g, Card fc, bool sub, int chkf, function fun1, int minc, int maxc, [function|nil fun2], ... function)
+检查已选择的重复混合融合素材组；可重复素材函数负责可变数量素材，其余每个素材函数各满足1次。
 Parameters:
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkf: any
-  fun1: any
-  minc: any
-  maxc: any
-  fun2: any
-  ...: any
+  sub: bool
+  chkf: int
+  fun1: function
+  minc: int
+  maxc: int
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if the mixed-repeat material requirements can be satisfied.
 Source: Utilities/procedure.lua:1088
 
-●void Auxiliary.FCheckMixRepFilter(Card c, Group sg, Group g, Card fc, any sub, any chkf, any fun1, any minc, any maxc, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepFilter(Card c, Group sg, Group g, Card fc, bool sub, int chkf, function fun1, int minc, int maxc, [function|nil fun2], ... function)
+Auxiliary.FCheckMixRep使用的递归辅助函数；临时把c分配给剩余的一个固定素材函数，并继续检查其余要求。
 Parameters:
   c: Card
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkf: any
-  fun1: any
-  minc: any
-  maxc: any
-  fun2: any
-  ...: any
+  sub: bool
+  chkf: int
+  fun1: function
+  minc: int
+  maxc: int
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if c can satisfy this fixed material slot and the rest can be completed.
 Source: Utilities/procedure.lua:1097
 
-●void Auxiliary.FCheckMixRepGoal(int tp, Group sg, Card fc, any sub, any chkfnf, any fun1, any minc, any maxc, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepGoal(int tp, Group sg, Card fc, bool sub, int chkfnf, function fun1, int minc, int maxc, ... function)
+重复混合融合素材的最终目标检查；验证已选数量限制、额外怪兽区域可用性、额外融合检查以及固定/重复素材要求。
 Parameters:
   tp: int
   sg: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  bool - true if sg is a valid mixed-repeat Fusion Material group.
 Source: Utilities/procedure.lua:1114
 
-●void Auxiliary.FCheckMixRepGoalCheck(int tp, Group sg, Card fc, any chkfnf)
-TODO document.
+●bool Auxiliary.FCheckMixRepGoalCheck(int tp, Group sg, Card fc, int chkfnf)
+重复混合融合素材目标的共通预检查；排除无效的EFFECT_TUNE_MAGICIAN_F组合、缺少必须融合素材以及额外目标检查失败的情况。
 Parameters:
   tp: int
   sg: Group
   fc: Card
-  chkfnf: any
+  chkfnf: int
+Returns:
+  bool - true if shared mixed-repeat goal prechecks pass.
 Source: Utilities/procedure.lua:1107
 
-●void Auxiliary.FCheckMixRepSelected(Card c, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepSelected(Card c, ... any)
+重复混合融合素材选择递归辅助函数；使用已选择素材条件转交Auxiliary.FCheckMixRepTemplate处理。
 Parameters:
   c: Card
   ...: any
+Returns:
+  bool - true if the selected-material recursion can succeed.
 Source: Utilities/procedure.lua:1153
 
-●void Auxiliary.FCheckMixRepSelectedCond(int tp, Group mg, Group sg, Group g, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepSelectedCond(int tp, Group mg, Group sg, Group g, ... any)
+判断当前重复混合融合素材选择是否可以继续递归，或是否可以通过Auxiliary.FCheckSelectMixRep完成。
 Parameters:
   tp: int
   mg: Group
   sg: Group
   g: Group
   ...: any
+Returns:
+  bool - true if the current mixed-repeat selection can continue or finish.
 Source: Utilities/procedure.lua:1146
 
-●void Auxiliary.FCheckMixRepTemplate(Card c, any cond, int tp, Group mg, Group sg, Group g, Card fc, any sub, any chkfnf, any fun1, any minc, any maxc, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepTemplate(Card c, function cond, int tp, Group mg, Group sg, Group g, Card fc, bool sub, int chkfnf, function fun1, int minc, int maxc, ... function)
+重复混合融合素材检查的通用递归模板；尝试把c分配给每个固定素材函数，或分配给可重复素材位置。
 Parameters:
   c: Card
-  cond: any
+  cond: function
   tp: int
   mg: Group
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  bool - true if c can be assigned to a fixed or repeated material slot.
 Source: Utilities/procedure.lua:1123
 
-●void Auxiliary.FCheckSelectMixRep(int tp, Group mg, Group sg, Group g, Card fc, any sub, any chkfnf, any fun1, any minc, any maxc, ... any)
-TODO document.
+●bool Auxiliary.FCheckSelectMixRep(int tp, Group mg, Group sg, Group g, Card fc, bool sub, int chkfnf, function fun1, int minc, int maxc, ... function)
+检查当前重复混合融合素材选择是否可以从已选Group继续完成。
 Parameters:
   tp: int
   mg: Group
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  bool - true if the current selection can be completed.
 Source: Utilities/procedure.lua:1156
 
-●void Auxiliary.FCheckSelectMixRepAll(Card c, int tp, Group mg, Group sg, Group g, Card fc, any sub, any chkf, any fun1, any minc, any maxc, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckSelectMixRepAll(Card c, int tp, Group mg, Group sg, Group g, Card fc, bool sub, int chkf, function fun1, int minc, int maxc, [function|nil fun2], ... function)
+重复混合融合选择使用的递归辅助函数；用于场地空间限制已经满足或不需要检查的情况。
 Parameters:
   c: Card
   tp: int
@@ -8552,169 +8572,203 @@ Parameters:
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkf: any
-  fun1: any
-  minc: any
-  maxc: any
-  fun2: any
-  ...: any
+  sub: bool
+  chkf: int
+  fun1: function
+  minc: int
+  maxc: int
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if the selection can be completed through c.
 Source: Utilities/procedure.lua:1166
 
-●void Auxiliary.FCheckSelectMixRepM(Card c, int tp, ... any)
-TODO document.
+●bool Auxiliary.FCheckSelectMixRepM(Card c, int tp, ... any)
+重复混合融合选择使用的递归辅助函数；要求下一个候选素材由tp控制且位于怪兽区域。
 Parameters:
   c: Card
   tp: int
   ...: any
+Returns:
+  bool - true if c is a valid Monster Zone candidate and the selection can be completed.
 Source: Utilities/procedure.lua:1184
 
-●void Auxiliary.FConditionFilterMix(Card c, Card fc, any sub, any notfusion, ... any)
-TODO document.
+●bool Auxiliary.FConditionFilterMix(Card c, Card fc, bool sub, bool notfusion, ... function)
+混合融合手续使用的素材筛选；检查c是否可以作为fc的融合素材，并满足至少1个必需素材函数。
 Parameters:
   c: Card
   fc: Card
-  sub: any
-  notfusion: any
-  ...: any
+  sub: bool
+  notfusion: bool
+  ...: function
+Returns:
+  bool - true if c is valid material and satisfies any required material function.
 Source: Utilities/procedure.lua:948
 
-●void Auxiliary.FConditionMix(any insf, any sub, ... any)
-TODO document.
+●function Auxiliary.FConditionMix(bool insf, bool sub, ... function)
+返回固定混合融合素材手续的条件函数。
 Parameters:
-  insf: any
-  sub: any
-  ...: any
+  insf: bool
+  sub: bool
+  ...: function
+Returns:
+  function - Condition function for a fixed mixed Fusion Material procedure.
 Source: Utilities/procedure.lua:907
 
-●void Auxiliary.FConditionMixRep(any insf, any sub, any fun1, any minc, any maxc, ... any)
-TODO document.
+●function Auxiliary.FConditionMixRep(bool insf, bool sub, function fun1, int minc, int maxc, ... function)
+返回带可重复素材位置的混合融合素材手续的条件函数。
 Parameters:
-  insf: any
-  sub: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  insf: bool
+  sub: bool
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  function - Condition function for a mixed-repeat Fusion Material procedure.
 Source: Utilities/procedure.lua:1036
 
-●void Auxiliary.FMaterialFilter(Card c, Effect e, int tp)
-TODO document.
+●bool Auxiliary.FMaterialFilter(Card c, Effect e, int tp)
+融合效果的默认融合素材筛选；判断c是否可以作为融合素材。
 Parameters:
   c: Card
   e: Effect
   tp: int
+Returns:
+  bool - true if c can be used as Fusion Material.
 Source: Utilities/procedure.lua:1431
 
-●void Auxiliary.FMaterialRemove(any mat)
-TODO document.
+●void Auxiliary.FMaterialRemove(Group|Card mat)
+把融合素材以融合相关原因标记除外的默认操作。
 Parameters:
-  mat: any
+  mat: Group|Card
 Source: Utilities/procedure.lua:1443
 
-●void Auxiliary.FMaterialRemoveFilter(Card c, Effect e, int tp)
-TODO document.
+●bool Auxiliary.FMaterialRemoveFilter(Card c, Effect e, int tp)
+会除外素材的融合效果使用的默认墓地素材筛选；判断c是否可以除外。
 Parameters:
   c: Card
   e: Effect
   tp: int
+Returns:
+  bool - true if c can be banished.
 Source: Utilities/procedure.lua:1434
 
-●void Auxiliary.FMaterialToDeck(any mat)
-TODO document.
+●void Auxiliary.FMaterialToDeck(Group|Card mat)
+把融合素材以融合相关原因标记回到卡组的默认操作。
 Parameters:
-  mat: any
+  mat: Group|Card
 Source: Utilities/procedure.lua:1446
 
-●void Auxiliary.FMaterialToGrave(any mat)
-TODO document.
+●void Auxiliary.FMaterialToGrave(Group|Card mat)
+把融合素材以融合相关原因标记送去墓地的默认操作。
 Parameters:
-  mat: any
+  mat: Group|Card
 Source: Utilities/procedure.lua:1440
 
-●void Auxiliary.FMaterialToGraveFilter(Card c, Effect e, int tp)
-TODO document.
+●bool Auxiliary.FMaterialToGraveFilter(Card c, Effect e, int tp)
+会把素材送去墓地的融合效果使用的默认素材筛选；判断c是否可以送去墓地。
 Parameters:
   c: Card
   e: Effect
   tp: int
+Returns:
+  bool - true if c can be sent to the Graveyard.
 Source: Utilities/procedure.lua:1437
 
-●void Auxiliary.FOperationMix(any insf, any sub, ... any)
-TODO document.
+●function Auxiliary.FOperationMix(bool insf, bool sub, ... function)
+返回固定混合融合素材手续的操作函数；选择有效融合素材并通过Duel.SetFusionMaterial保存。
 Parameters:
-  insf: any
-  sub: any
-  ...: any
+  insf: bool
+  sub: bool
+  ...: function
+Returns:
+  function - Operation function for a fixed mixed Fusion Material procedure.
 Source: Utilities/procedure.lua:929
 
-●void Auxiliary.FOperationMixRep(any insf, any sub, any fun1, any minc, any maxc, ... any)
-TODO document.
+●function Auxiliary.FOperationMixRep(bool insf, bool sub, function fun1, int minc, int maxc, ... function)
+返回带可重复素材位置的混合融合素材手续的操作函数；让玩家构建有效素材组并保存。
 Parameters:
-  insf: any
-  sub: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  insf: bool
+  sub: bool
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  function - Operation function for a mixed-repeat Fusion Material procedure.
 Source: Utilities/procedure.lua:1055
 
-●void Auxiliary.FossilFusionLimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.FossilFusionLimit(Effect e, Effect se, int sp, int st)
+化石融合类效果的特殊召唤限制Value函数；允许化石融合召唤值、「化石融合」本身，或处理对象不在额外卡组。
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool - true if the Summon matches Fossil Fusion conditions.
 Source: Utilities/procedure.lua:2327
 
-●void Auxiliary.FSelectMixRep(Card c, int tp, Group mg, Group sg, Card fc, any sub, any chkfnf, ... any)
-TODO document.
+●bool Auxiliary.FSelectMixRep(Card c, int tp, Group mg, Group sg, Card fc, bool sub, int chkfnf, ... function)
+重复混合融合选择的候选检查；临时把c加入sg，并返回当前选择是否已经有效或仍可完成。
 Parameters:
   c: Card
   tp: int
   mg: Group
   sg: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  ...: function
+Returns:
+  bool - true if adding c can complete or continue the selection.
 Source: Utilities/procedure.lua:1188
 
-●void Auxiliary.FShaddollCondition(any attr)
-TODO document.
+●function Auxiliary.FShaddollCondition(int attr)
+返回「影依」融合手续的条件函数；检查1个「影依」素材和1个指定属性素材，并支持场地效果使用对方怪兽作为素材。
 Parameters:
-  attr: any
+  attr: int
+Returns:
+  function - Condition function for a Shaddoll Fusion procedure.
 Source: Utilities/procedure.lua:1377
 
-●void Auxiliary.FShaddollExFilter(Card c, Card fc, any attr, Effect fe)
-TODO document.
+●bool Auxiliary.FShaddollExFilter(Card c, Card fc, int attr, Effect fe)
+配合编号81788994效果使用的对方场上「影依」融合素材筛选；c必须表侧表示、受该场地效果影响，并满足标准「影依」素材筛选。
 Parameters:
   c: Card
   fc: Card
-  attr: any
+  attr: int
   fe: Effect
+Returns:
+  bool - true if c is a valid opponent-field Shaddoll Fusion Material.
 Source: Utilities/procedure.lua:1354
 
-●void Auxiliary.FShaddollFilter(Card c, Card fc, any attr)
-TODO document.
+●bool Auxiliary.FShaddollFilter(Card c, Card fc, int attr)
+标准「影依」融合素材筛选；该卡必须是「影依」怪兽或匹配指定属性，可以作为融合素材，且未被编号6205579效果阻止。
 Parameters:
   c: Card
   fc: Card
-  attr: any
+  attr: int
+Returns:
+  bool - true if c is valid Shaddoll Fusion Material.
 Source: Utilities/procedure.lua:1351
 
-●void Auxiliary.FShaddollFilter1(Card c)
-TODO document.
+●bool Auxiliary.FShaddollFilter1(Card c)
+c属于「影依」融合系列0x9d时返回true。
 Parameters:
   c: Card
+Returns:
+  bool - true if c belongs to Shaddoll Fusion set 0x9d.
 Source: Utilities/procedure.lua:1357
 
-●void Auxiliary.FShaddollFilter2(Card c, any attr)
-TODO document.
+●bool Auxiliary.FShaddollFilter2(Card c, int attr)
+c具有指定融合属性，或具有编号4904633效果时返回true。
 Parameters:
   c: Card
-  attr: any
+  attr: int
+Returns:
+  bool - true if c has attr as Fusion Attribute or effect code 4904633.
 Source: Utilities/procedure.lua:1360
 
 ●void Auxiliary.FShaddollOperation(any attr)

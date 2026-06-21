@@ -8572,137 +8572,157 @@ Parameters:
   loc: int
 Source: Utilities/procedure.lua:2097
 
-●void Auxiliary.FCheckMix(Card c, Group mg, Group sg, Card fc, any sub, any fun1, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckMix(Card c, Group mg, Group sg, Card fc, bool sub, function fun1, [function|nil fun2], ... function)
+Recursive mixed Fusion Material checker. It tests one required material function at a time, tracks selected materials in sg, and consumes the substitute-material allowance when needed.
 Parameters:
   c: Card
   mg: Group
   sg: Group
   fc: Card
-  sub: any
-  fun1: any
-  fun2: any
-  ...: any
+  sub: bool
+  fun1: function
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if the remaining mixed Fusion Material functions can be satisfied.
 Source: Utilities/procedure.lua:956
 
-●void Auxiliary.FCheckMixGoal(Group sg, int tp, Card fc, any sub, any chkfnf, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixGoal(Group sg, int tp, Card fc, bool sub, int chkfnf, ... function)
+Final group check for mixed Fusion Materials. It validates mandatory Fusion Materials, Tune Magician restrictions, Extra Monster Zone availability, and additional Fusion goal hooks.
 Parameters:
   sg: Group
   tp: int
   fc: Card
-  sub: any
-  chkfnf: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  ...: function
+Returns:
+  bool - true if sg is a valid mixed Fusion Material group.
 Source: Utilities/procedure.lua:972
 
-●void Auxiliary.FCheckMixRep(Group sg, Group g, Card fc, any sub, any chkf, any fun1, any minc, any maxc, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRep(Group sg, Group g, Card fc, bool sub, int chkf, function fun1, int minc, int maxc, [function|nil fun2], ... function)
+Checks a selected mixed-repeat Fusion Material group. The repeated material function must cover the variable-count materials, while each remaining function is satisfied once.
 Parameters:
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkf: any
-  fun1: any
-  minc: any
-  maxc: any
-  fun2: any
-  ...: any
+  sub: bool
+  chkf: int
+  fun1: function
+  minc: int
+  maxc: int
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if the mixed-repeat material requirements can be satisfied.
 Source: Utilities/procedure.lua:1088
 
-●void Auxiliary.FCheckMixRepFilter(Card c, Group sg, Group g, Card fc, any sub, any chkf, any fun1, any minc, any maxc, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepFilter(Card c, Group sg, Group g, Card fc, bool sub, int chkf, function fun1, int minc, int maxc, [function|nil fun2], ... function)
+Recursive helper for Auxiliary.FCheckMixRep. It temporarily assigns c to one remaining fixed material function and continues checking the rest.
 Parameters:
   c: Card
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkf: any
-  fun1: any
-  minc: any
-  maxc: any
-  fun2: any
-  ...: any
+  sub: bool
+  chkf: int
+  fun1: function
+  minc: int
+  maxc: int
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if c can satisfy this fixed material slot and the rest can be completed.
 Source: Utilities/procedure.lua:1097
 
-●void Auxiliary.FCheckMixRepGoal(int tp, Group sg, Card fc, any sub, any chkfnf, any fun1, any minc, any maxc, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepGoal(int tp, Group sg, Card fc, bool sub, int chkfnf, function fun1, int minc, int maxc, ... function)
+Final goal check for mixed-repeat Fusion Materials. It validates selected count limits, Extra Monster Zone availability, additional Fusion hooks, and fixed/repeated material requirements.
 Parameters:
   tp: int
   sg: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  bool - true if sg is a valid mixed-repeat Fusion Material group.
 Source: Utilities/procedure.lua:1114
 
-●void Auxiliary.FCheckMixRepGoalCheck(int tp, Group sg, Card fc, any chkfnf)
-TODO document.
+●bool Auxiliary.FCheckMixRepGoalCheck(int tp, Group sg, Card fc, int chkfnf)
+Shared precheck for mixed-repeat Fusion Material goals. It rejects invalid Tune Magician combinations, missing mandatory Fusion Materials, and failed goal hooks.
 Parameters:
   tp: int
   sg: Group
   fc: Card
-  chkfnf: any
+  chkfnf: int
+Returns:
+  bool - true if shared mixed-repeat goal prechecks pass.
 Source: Utilities/procedure.lua:1107
 
-●void Auxiliary.FCheckMixRepSelected(Card c, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepSelected(Card c, ... any)
+Selection-recursion helper for mixed-repeat Fusion Materials; it delegates to Auxiliary.FCheckMixRepTemplate using the selected-material condition.
 Parameters:
   c: Card
   ...: any
+Returns:
+  bool - true if the selected-material recursion can succeed.
 Source: Utilities/procedure.lua:1153
 
-●void Auxiliary.FCheckMixRepSelectedCond(int tp, Group mg, Group sg, Group g, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepSelectedCond(int tp, Group mg, Group sg, Group g, ... any)
+Checks whether the recursive mixed-repeat selection can continue from the currently selected group, or can finish through Auxiliary.FCheckSelectMixRep.
 Parameters:
   tp: int
   mg: Group
   sg: Group
   g: Group
   ...: any
+Returns:
+  bool - true if the current mixed-repeat selection can continue or finish.
 Source: Utilities/procedure.lua:1146
 
-●void Auxiliary.FCheckMixRepTemplate(Card c, any cond, int tp, Group mg, Group sg, Group g, Card fc, any sub, any chkfnf, any fun1, any minc, any maxc, ... any)
-TODO document.
+●bool Auxiliary.FCheckMixRepTemplate(Card c, function cond, int tp, Group mg, Group sg, Group g, Card fc, bool sub, int chkfnf, function fun1, int minc, int maxc, ... function)
+Generic recursive template for mixed-repeat Fusion Material checks. It tries assigning c to each fixed material function or to the repeated material slot.
 Parameters:
   c: Card
-  cond: any
+  cond: function
   tp: int
   mg: Group
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  bool - true if c can be assigned to a fixed or repeated material slot.
 Source: Utilities/procedure.lua:1123
 
-●void Auxiliary.FCheckSelectMixRep(int tp, Group mg, Group sg, Group g, Card fc, any sub, any chkfnf, any fun1, any minc, any maxc, ... any)
-TODO document.
+●bool Auxiliary.FCheckSelectMixRep(int tp, Group mg, Group sg, Group g, Card fc, bool sub, int chkfnf, function fun1, int minc, int maxc, ... function)
+Checks whether a mixed-repeat Fusion Material selection can be completed from the current chosen group.
 Parameters:
   tp: int
   mg: Group
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  bool - true if the current selection can be completed.
 Source: Utilities/procedure.lua:1156
 
-●void Auxiliary.FCheckSelectMixRepAll(Card c, int tp, Group mg, Group sg, Group g, Card fc, any sub, any chkf, any fun1, any minc, any maxc, any fun2, ... any)
-TODO document.
+●bool Auxiliary.FCheckSelectMixRepAll(Card c, int tp, Group mg, Group sg, Group g, Card fc, bool sub, int chkf, function fun1, int minc, int maxc, [function|nil fun2], ... function)
+Recursive helper for mixed-repeat Fusion selection when field-space constraints are already satisfied or not required.
 Parameters:
   c: Card
   tp: int
@@ -8710,169 +8730,203 @@ Parameters:
   sg: Group
   g: Group
   fc: Card
-  sub: any
-  chkf: any
-  fun1: any
-  minc: any
-  maxc: any
-  fun2: any
-  ...: any
+  sub: bool
+  chkf: int
+  fun1: function
+  minc: int
+  maxc: int
+  fun2: function|nil optional
+  ...: function
+Returns:
+  bool - true if the selection can be completed through c.
 Source: Utilities/procedure.lua:1166
 
-●void Auxiliary.FCheckSelectMixRepM(Card c, int tp, ... any)
-TODO document.
+●bool Auxiliary.FCheckSelectMixRepM(Card c, int tp, ... any)
+Recursive helper for mixed-repeat Fusion selection that requires the next candidate to be controlled by tp in the Monster Zone.
 Parameters:
   c: Card
   tp: int
   ...: any
+Returns:
+  bool - true if c is a valid Monster Zone candidate and the selection can be completed.
 Source: Utilities/procedure.lua:1184
 
-●void Auxiliary.FConditionFilterMix(Card c, Card fc, any sub, any notfusion, ... any)
-TODO document.
+●bool Auxiliary.FConditionFilterMix(Card c, Card fc, bool sub, bool notfusion, ... function)
+Material filter used by mixed Fusion procedures. It checks whether c can be used as Fusion Material for fc and satisfies at least one required material function.
 Parameters:
   c: Card
   fc: Card
-  sub: any
-  notfusion: any
-  ...: any
+  sub: bool
+  notfusion: bool
+  ...: function
+Returns:
+  bool - true if c is valid material and satisfies any required material function.
 Source: Utilities/procedure.lua:948
 
-●void Auxiliary.FConditionMix(any insf, any sub, ... any)
-TODO document.
+●function Auxiliary.FConditionMix(bool insf, bool sub, ... function)
+Returns the condition function for fixed mixed Fusion Material procedures.
 Parameters:
-  insf: any
-  sub: any
-  ...: any
+  insf: bool
+  sub: bool
+  ...: function
+Returns:
+  function - Condition function for a fixed mixed Fusion Material procedure.
 Source: Utilities/procedure.lua:907
 
-●void Auxiliary.FConditionMixRep(any insf, any sub, any fun1, any minc, any maxc, ... any)
-TODO document.
+●function Auxiliary.FConditionMixRep(bool insf, bool sub, function fun1, int minc, int maxc, ... function)
+Returns the condition function for mixed Fusion Material procedures with a repeated material slot.
 Parameters:
-  insf: any
-  sub: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  insf: bool
+  sub: bool
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  function - Condition function for a mixed-repeat Fusion Material procedure.
 Source: Utilities/procedure.lua:1036
 
-●void Auxiliary.FMaterialFilter(Card c, Effect e, int tp)
-TODO document.
+●bool Auxiliary.FMaterialFilter(Card c, Effect e, int tp)
+Default Fusion Material filter for Fusion effects; returns whether c can be used as Fusion Material.
 Parameters:
   c: Card
   e: Effect
   tp: int
+Returns:
+  bool - true if c can be used as Fusion Material.
 Source: Utilities/procedure.lua:1431
 
-●void Auxiliary.FMaterialRemove(any mat)
-TODO document.
+●void Auxiliary.FMaterialRemove(Group|Card mat)
+Default operation for banishing Fusion Materials with Fusion reason flags.
 Parameters:
-  mat: any
+  mat: Group|Card
 Source: Utilities/procedure.lua:1443
 
-●void Auxiliary.FMaterialRemoveFilter(Card c, Effect e, int tp)
-TODO document.
+●bool Auxiliary.FMaterialRemoveFilter(Card c, Effect e, int tp)
+Default Graveyard-material filter for Fusion effects that banish materials; returns whether c can be banished.
 Parameters:
   c: Card
   e: Effect
   tp: int
+Returns:
+  bool - true if c can be banished.
 Source: Utilities/procedure.lua:1434
 
-●void Auxiliary.FMaterialToDeck(any mat)
-TODO document.
+●void Auxiliary.FMaterialToDeck(Group|Card mat)
+Default operation for returning Fusion Materials to the Deck with Fusion reason flags.
 Parameters:
-  mat: any
+  mat: Group|Card
 Source: Utilities/procedure.lua:1446
 
-●void Auxiliary.FMaterialToGrave(any mat)
-TODO document.
+●void Auxiliary.FMaterialToGrave(Group|Card mat)
+Default operation for sending Fusion Materials to the Graveyard with Fusion reason flags.
 Parameters:
-  mat: any
+  mat: Group|Card
 Source: Utilities/procedure.lua:1440
 
-●void Auxiliary.FMaterialToGraveFilter(Card c, Effect e, int tp)
-TODO document.
+●bool Auxiliary.FMaterialToGraveFilter(Card c, Effect e, int tp)
+Default Fusion Material filter for effects that send materials to the Graveyard; returns whether c can be sent to the Graveyard.
 Parameters:
   c: Card
   e: Effect
   tp: int
+Returns:
+  bool - true if c can be sent to the Graveyard.
 Source: Utilities/procedure.lua:1437
 
-●void Auxiliary.FOperationMix(any insf, any sub, ... any)
-TODO document.
+●function Auxiliary.FOperationMix(bool insf, bool sub, ... function)
+Returns the operation function for fixed mixed Fusion Material procedures; it selects valid materials and stores them with Duel.SetFusionMaterial.
 Parameters:
-  insf: any
-  sub: any
-  ...: any
+  insf: bool
+  sub: bool
+  ...: function
+Returns:
+  function - Operation function for a fixed mixed Fusion Material procedure.
 Source: Utilities/procedure.lua:929
 
-●void Auxiliary.FOperationMixRep(any insf, any sub, any fun1, any minc, any maxc, ... any)
-TODO document.
+●function Auxiliary.FOperationMixRep(bool insf, bool sub, function fun1, int minc, int maxc, ... function)
+Returns the operation function for mixed Fusion Material procedures with a repeated material slot; it lets the player build a valid material group and stores it.
 Parameters:
-  insf: any
-  sub: any
-  fun1: any
-  minc: any
-  maxc: any
-  ...: any
+  insf: bool
+  sub: bool
+  fun1: function
+  minc: int
+  maxc: int
+  ...: function
+Returns:
+  function - Operation function for a mixed-repeat Fusion Material procedure.
 Source: Utilities/procedure.lua:1055
 
-●void Auxiliary.FossilFusionLimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.FossilFusionLimit(Effect e, Effect se, int sp, int st)
+Special Summon restriction value for Fossil Fusion effects; allows Fossil Fusion's summon value, Fossil Fusion itself, or non-Extra Deck handlers.
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool - true if the Summon matches Fossil Fusion conditions.
 Source: Utilities/procedure.lua:2327
 
-●void Auxiliary.FSelectMixRep(Card c, int tp, Group mg, Group sg, Card fc, any sub, any chkfnf, ... any)
-TODO document.
+●bool Auxiliary.FSelectMixRep(Card c, int tp, Group mg, Group sg, Card fc, bool sub, int chkfnf, ... function)
+Candidate test for mixed-repeat Fusion selection. It temporarily adds c to sg and returns whether the selection is already valid or can still be completed.
 Parameters:
   c: Card
   tp: int
   mg: Group
   sg: Group
   fc: Card
-  sub: any
-  chkfnf: any
-  ...: any
+  sub: bool
+  chkfnf: int
+  ...: function
+Returns:
+  bool - true if adding c can complete or continue the selection.
 Source: Utilities/procedure.lua:1188
 
-●void Auxiliary.FShaddollCondition(any attr)
-TODO document.
+●function Auxiliary.FShaddollCondition(int attr)
+Returns the condition function for Shaddoll Fusion procedures. It checks for one Shaddoll material and one material with the required Attribute, with optional field-spell opponent-material support.
 Parameters:
-  attr: any
+  attr: int
+Returns:
+  function - Condition function for a Shaddoll Fusion procedure.
 Source: Utilities/procedure.lua:1377
 
-●void Auxiliary.FShaddollExFilter(Card c, Card fc, any attr, Effect fe)
-TODO document.
+●bool Auxiliary.FShaddollExFilter(Card c, Card fc, int attr, Effect fe)
+Opponent-field Shaddoll Fusion Material filter used with effect code 81788994; c must be face-up, affected by the field effect, and pass the standard Shaddoll material filter.
 Parameters:
   c: Card
   fc: Card
-  attr: any
+  attr: int
   fe: Effect
+Returns:
+  bool - true if c is a valid opponent-field Shaddoll Fusion Material.
 Source: Utilities/procedure.lua:1354
 
-●void Auxiliary.FShaddollFilter(Card c, Card fc, any attr)
-TODO document.
+●bool Auxiliary.FShaddollFilter(Card c, Card fc, int attr)
+Standard Shaddoll Fusion Material filter. The card must be either a Shaddoll monster or match the required Attribute, be usable as Fusion Material, and not be blocked by effect 6205579.
 Parameters:
   c: Card
   fc: Card
-  attr: any
+  attr: int
+Returns:
+  bool - true if c is valid Shaddoll Fusion Material.
 Source: Utilities/procedure.lua:1351
 
-●void Auxiliary.FShaddollFilter1(Card c)
-TODO document.
+●bool Auxiliary.FShaddollFilter1(Card c)
+Returns true if c belongs to the Shaddoll Fusion set 0x9d.
 Parameters:
   c: Card
+Returns:
+  bool - true if c belongs to Shaddoll Fusion set 0x9d.
 Source: Utilities/procedure.lua:1357
 
-●void Auxiliary.FShaddollFilter2(Card c, any attr)
-TODO document.
+●bool Auxiliary.FShaddollFilter2(Card c, int attr)
+Returns true if c has the required Fusion Attribute or effect code 4904633.
 Parameters:
   c: Card
-  attr: any
+  attr: int
+Returns:
+  bool - true if c has attr as Fusion Attribute or effect code 4904633.
 Source: Utilities/procedure.lua:1360
 
 ●void Auxiliary.FShaddollOperation(any attr)
