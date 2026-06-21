@@ -292,6 +292,10 @@ namespace DataEditorX
         {
             tooltipDic = codeconfig.TooltipDic;
             items = codeconfig.Items;
+            if (fctb.SyntaxHighlighter is MySyntaxHighlighter highlighter)
+            {
+                highlighter.SetKnownFunctions(codeconfig.LongTooltipDic.Keys);
+            }
             popupMenu.Items.SetAutocompleteItems(items);
         }
         #endregion
