@@ -40,6 +40,26 @@ namespace DataEditorX.Common
             Timeout = TimeSpan.FromSeconds(15)
         };
 
+        public sealed class DownloadProgress
+        {
+            public long BytesReceived { get; init; }
+            public long? TotalBytes { get; init; }
+
+            public int Percent
+            {
+                get
+                {
+                    if (!TotalBytes.HasValue || TotalBytes.Value <= 0)
+                    {
+                        return 0;
+                    }
+
+                    long percent = BytesReceived * 100 / TotalBytes.Value;
+                    return (int)Math.Clamp(percent, 0, 100);
+                }
+            }
+        }
+
         #region Version check
         /// <summary>
         /// Reads the latest available version from update metadata.
@@ -186,7 +206,7 @@ namespace DataEditorX.Common
             return DownloadAsync(filename).GetAwaiter().GetResult();
         }
 
-        public static async Task<bool> DownloadAsync(string filename, IProgress<long>? progress = null, CancellationToken cancellationToken = default)
+        public static async Task<bool> DownloadAsync(string filename, IProgress<DownloadProgress>? progress = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -219,6 +239,7 @@ namespace DataEditorX.Common
                     return false;
                 }
 
+                long? totalBytes = response.Content.Headers.ContentLength;
                 await using Stream source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
                 await using FileStream destination = new(
                     tempFile,
@@ -235,7 +256,11 @@ namespace DataEditorX.Common
                 {
                     await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
                     totalDownloadedByte += bytesRead;
-                    progress?.Report(totalDownloadedByte);
+                    progress?.Report(new DownloadProgress
+                    {
+                        BytesReceived = totalDownloadedByte,
+                        TotalBytes = totalBytes
+                    });
                 }
 
                 if (File.Exists(filename))

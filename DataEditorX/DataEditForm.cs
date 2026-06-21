@@ -1154,6 +1154,12 @@ namespace DataEditorX
         }
         public void CheckUpdate(bool showNew)
         {
+            if (showNew)
+            {
+                UpdateProgressForm.CheckForUpdates(this, true);
+                return;
+            }
+
             if (!IsRun())
             {
                 tasker.SetTask(MyTask.CheckUpdate, null, showNew.ToString());

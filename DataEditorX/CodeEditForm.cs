@@ -438,7 +438,7 @@ namespace DataEditorX
 
         void AboutToolStripMenuItemClick(object sender, EventArgs e)
         {
-            AboutForm.ShowVersionInfo(this, () => TaskHelper.CheckVersion(true));
+            AboutForm.ShowVersionInfo(this, () => UpdateProgressForm.CheckForUpdates(this, true));
         }
 
         void Menuitem_openClick(object sender, EventArgs e)
