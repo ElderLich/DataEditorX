@@ -6,13 +6,16 @@ namespace DataEditorX
 {
     public sealed class ProjectManagerForm : DockContent
     {
+        private const int MaxRecentDirectories = 5;
+        private const char RecentDirectorySeparator = '|';
+
         private readonly ProjectManagerService service;
         private readonly List<Control> actionControls = new();
 
-        private TextBox tbMdPro3Directory;
-        private TextBox tbMdPro3DataDirectory;
-        private TextBox tbCustomProjectDirectory;
-        private TextBox tbVoicePackDirectory;
+        private ComboBox tbMdPro3Directory;
+        private ComboBox tbMdPro3DataDirectory;
+        private ComboBox tbCustomProjectDirectory;
+        private ComboBox tbVoicePackDirectory;
         private CheckBox chkActiveSync;
         private ListView lvResolvedPaths;
         private RichTextBox logBox;
@@ -277,7 +280,7 @@ namespace DataEditorX
             return layout;
         }
 
-        private void AddDirectoryRow(TableLayoutPanel layout, int row, string labelText, TextBox textBox)
+        private void AddDirectoryRow(TableLayoutPanel layout, int row, string labelText, ComboBox textBox)
         {
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
@@ -302,11 +305,15 @@ namespace DataEditorX
             layout.Controls.Add(browse, 2, row);
         }
 
-        private static TextBox CreateDirectoryTextBox()
+        private static ComboBox CreateDirectoryTextBox()
         {
-            return new TextBox
+            return new ComboBox
             {
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                AutoCompleteMode = AutoCompleteMode.SuggestAppend,
+                AutoCompleteSource = AutoCompleteSource.ListItems,
+                DropDownStyle = ComboBoxStyle.DropDown,
+                IntegralHeight = false,
                 Margin = new Padding(3, 4, 3, 3)
             };
         }
@@ -324,7 +331,7 @@ namespace DataEditorX
             return button;
         }
 
-        private void BrowseDirectory(TextBox target)
+        private void BrowseDirectory(ComboBox target)
         {
             using FolderBrowserDialog dialog = new();
             if (Directory.Exists(target.Text))
@@ -350,14 +357,115 @@ namespace DataEditorX
 
             tbCustomProjectDirectory.Text = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR);
             tbVoicePackDirectory.Text = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_VOICE_PACK_DIR);
+
+            LoadRecentDirectories();
         }
 
         private void SaveSettings()
         {
-            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DIR, tbMdPro3Directory.Text);
-            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR, tbMdPro3DataDirectory.Text);
-            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR, tbCustomProjectDirectory.Text);
-            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_VOICE_PACK_DIR, tbVoicePackDirectory.Text);
+            SaveDirectorySetting(
+                DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DIR,
+                DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DIR_HISTORY,
+                tbMdPro3Directory);
+            SaveDirectorySetting(
+                DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR,
+                DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR_HISTORY,
+                tbMdPro3DataDirectory);
+            SaveDirectorySetting(
+                DEXConfig.TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR,
+                DEXConfig.TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR_HISTORY,
+                tbCustomProjectDirectory);
+            SaveDirectorySetting(
+                DEXConfig.TAG_PROJECT_MANAGER_VOICE_PACK_DIR,
+                DEXConfig.TAG_PROJECT_MANAGER_VOICE_PACK_DIR_HISTORY,
+                tbVoicePackDirectory);
+        }
+
+        private void LoadRecentDirectories()
+        {
+            LoadRecentDirectory(tbMdPro3Directory, DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DIR_HISTORY);
+            LoadRecentDirectory(tbMdPro3DataDirectory, DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR_HISTORY);
+            LoadRecentDirectory(tbCustomProjectDirectory, DEXConfig.TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR_HISTORY);
+            LoadRecentDirectory(tbVoicePackDirectory, DEXConfig.TAG_PROJECT_MANAGER_VOICE_PACK_DIR_HISTORY);
+        }
+
+        private static void LoadRecentDirectory(ComboBox directoryBox, string historyKey)
+        {
+            List<string> directories = ParseRecentDirectories(DEXConfig.ReadString(historyKey));
+            AddRecentDirectory(directories, directoryBox.Text);
+            SetRecentDirectoryItems(directoryBox, directories);
+        }
+
+        private static void SaveDirectorySetting(string settingKey, string historyKey, ComboBox directoryBox)
+        {
+            DEXConfig.Save(settingKey, directoryBox.Text);
+
+            List<string> directories = GetRecentDirectories(directoryBox);
+            AddRecentDirectory(directories, directoryBox.Text);
+            SetRecentDirectoryItems(directoryBox, directories);
+            DEXConfig.Save(historyKey, string.Join(RecentDirectorySeparator, directories));
+        }
+
+        private static List<string> GetRecentDirectories(ComboBox directoryBox)
+        {
+            List<string> directories = new();
+            foreach (object item in directoryBox.Items)
+            {
+                if (item is string path)
+                {
+                    AddRecentDirectory(directories, path);
+                }
+            }
+
+            return directories;
+        }
+
+        private static List<string> ParseRecentDirectories(string value)
+        {
+            List<string> directories = new();
+            value ??= string.Empty;
+            string[] paths = value.Split(new[] { RecentDirectorySeparator }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string path in paths)
+            {
+                AddRecentDirectory(directories, path);
+            }
+
+            return directories;
+        }
+
+        private static void AddRecentDirectory(List<string> directories, string path)
+        {
+            path = path?.Trim();
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            _ = directories.RemoveAll(item => string.Equals(item, path, StringComparison.OrdinalIgnoreCase));
+            directories.Insert(0, path);
+            if (directories.Count > MaxRecentDirectories)
+            {
+                directories.RemoveRange(MaxRecentDirectories, directories.Count - MaxRecentDirectories);
+            }
+        }
+
+        private static void SetRecentDirectoryItems(ComboBox directoryBox, List<string> directories)
+        {
+            string text = directoryBox.Text;
+            directoryBox.BeginUpdate();
+            try
+            {
+                directoryBox.Items.Clear();
+                foreach (string directory in directories)
+                {
+                    _ = directoryBox.Items.Add(directory);
+                }
+            }
+            finally
+            {
+                directoryBox.EndUpdate();
+            }
+            directoryBox.Text = text;
         }
 
         private void MdPro3DirectoryTextChanged(object sender, EventArgs e)

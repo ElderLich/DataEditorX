@@ -98,6 +98,10 @@ namespace DataEditorX.Config
         public const string TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR = "project_manager_mdpro3_data_dir";
         public const string TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR = "project_manager_custom_project_dir";
         public const string TAG_PROJECT_MANAGER_VOICE_PACK_DIR = "project_manager_voice_pack_dir";
+        public const string TAG_PROJECT_MANAGER_MDPRO3_DIR_HISTORY = "project_manager_mdpro3_dir_history";
+        public const string TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR_HISTORY = "project_manager_mdpro3_data_dir_history";
+        public const string TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR_HISTORY = "project_manager_custom_project_dir_history";
+        public const string TAG_PROJECT_MANAGER_VOICE_PACK_DIR_HISTORY = "project_manager_voice_pack_dir_history";
         /// <summary>
         /// Default script name
         /// </summary>
