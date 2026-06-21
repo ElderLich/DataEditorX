@@ -65,7 +65,7 @@ Each line in `language_english.txt` and `cardinfo_english.txt` is separated by a
 * Source Code and external Lua file launches use the Windows shell, avoiding URL/file launch exceptions.
 * SQLitePCLRaw package updates remove the known vulnerable package warning.
 * In-app updater can install downloaded releases and restart DataEditorX.
-* Bundled data files are organized into purpose-specific subfolders while old flat data folders remain compatible.
+* Bundled data files are organized into purpose-specific subfolders.
 
 ## Release Script
 Use `tools/release.py` to prepare release builds and keep version metadata in sync.

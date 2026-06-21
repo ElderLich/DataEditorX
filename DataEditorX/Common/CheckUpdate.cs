@@ -234,34 +234,8 @@ $cleanupFiles = @(
     'WeifenLuo.WinFormsUI.Docking.dll',
     'WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll'
 )
-$cleanupDataFiles = @(
-    '_function_english.txt',
-    '_functions.txt',
-    'avalon.xshd',
-    'cardinfo_chinese.txt',
-    'cardinfo_english.txt',
-    'constant.lua',
-    'cover.jpg',
-    'effect_creator_settings.txt',
-    'language_chinese.txt',
-    'language_english.txt',
-    'mse_Chinese-Simplified.txt',
-    'mse_Chinese-Traditional.txt',
-    'mse_English-Omega.txt',
-    'mse_English.txt',
-    'mse_French.txt',
-    'mse_German.txt',
-    'mse_Italian.txt',
-    'mse_Japanese.txt',
-    'mse_Portuguese.txt',
-    'single.lua',
-    'strings.conf'
-)
 foreach ($file in $cleanupFiles) {
     Remove-Item -LiteralPath (Join-Path '{{EscapePowerShell(appDir)}}' $file) -Force -ErrorAction SilentlyContinue
-}
-foreach ($file in $cleanupDataFiles) {
-    Remove-Item -LiteralPath (Join-Path (Join-Path '{{EscapePowerShell(appDir)}}' 'data') $file) -Force -ErrorAction SilentlyContinue
 }
 Remove-Item -LiteralPath (Join-Path '{{EscapePowerShell(appDir)}}' 'de') -Recurse -Force -ErrorAction SilentlyContinue
 Expand-Archive -LiteralPath '{{EscapePowerShell(zipFile)}}' -DestinationPath '{{EscapePowerShell(appDir)}}' -Force

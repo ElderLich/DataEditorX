@@ -139,12 +139,6 @@ namespace System.IO
                 return fileName;
             }
 
-            string rootFile = Combine(dir, fileName);
-            if (File.Exists(rootFile))
-            {
-                return rootFile;
-            }
-
             foreach (string subdir in preferredSubdirs)
             {
                 if (string.IsNullOrEmpty(subdir))
@@ -159,24 +153,9 @@ namespace System.IO
                 }
             }
 
-            if (Directory.Exists(dir))
-            {
-                try
-                {
-                    string found = Directory.GetFiles(dir, fileName, SearchOption.AllDirectories).FirstOrDefault();
-                    if (!string.IsNullOrEmpty(found))
-                    {
-                        return found;
-                    }
-                }
-                catch
-                {
-                }
-            }
-
             return preferredSubdirs.Length > 0 && !string.IsNullOrEmpty(preferredSubdirs[0])
                 ? Combine(dir, preferredSubdirs[0], fileName)
-                : rootFile;
+                : Combine(dir, fileName);
         }
 
         public static string[] FindFiles(string dir, string searchPattern, params string[] preferredSubdirs)
@@ -205,15 +184,20 @@ namespace System.IO
                 }
             }
 
-            AddFiles(dir, SearchOption.TopDirectoryOnly);
-            foreach (string subdir in preferredSubdirs)
+            if (preferredSubdirs.Length == 0)
             {
-                if (!string.IsNullOrEmpty(subdir))
+                AddFiles(dir, SearchOption.TopDirectoryOnly);
+            }
+            else
+            {
+                foreach (string subdir in preferredSubdirs)
                 {
-                    AddFiles(Combine(dir, subdir), SearchOption.TopDirectoryOnly);
+                    if (!string.IsNullOrEmpty(subdir))
+                    {
+                        AddFiles(Combine(dir, subdir), SearchOption.TopDirectoryOnly);
+                    }
                 }
             }
-            AddFiles(dir, SearchOption.AllDirectories);
 
             return files
                 .OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase)
