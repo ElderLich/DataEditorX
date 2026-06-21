@@ -9491,10 +9491,12 @@ Returns:
   function - Condition function for a basic Synchro Summon procedure.
 Source: Utilities/procedure.lua:75
 
-●void Auxiliary.SynGroupCheckLevelAddition(Card syncard)
-TODO document.
+●function Auxiliary.SynGroupCheckLevelAddition(Card syncard)
+Returns a group check for Synchro material selection that keeps the sum of the selected materials' minimum Synchro Levels at or below syncard's Level.
 Parameters:
   syncard: Card
+Returns:
+  function - Group check for Synchro material Level pruning.
 Source: Utilities/procedure.lua:463
 
 ●void Auxiliary.synlimit(Effect e, Effect se, any sp, any st)
@@ -9510,231 +9512,269 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2297
 
-●void Auxiliary.SynLimitFilter(Card c, function f, Effect e, Card syncard)
-TODO document.
+●bool Auxiliary.SynLimitFilter(Card c, function|nil f, Effect e, Card syncard)
+Returns true when limiter function f exists and rejects c for syncard.
 Parameters:
   c: Card
-  f: function
+  f: function|nil
   e: Effect
   syncard: Card
+Returns:
+  bool - true if f rejects c.
 Source: Utilities/procedure.lua:158
 
-●void Auxiliary.SynMaterialFilter(Card c, Card syncard)
-TODO document.
+●bool Auxiliary.SynMaterialFilter(Card c, Card syncard)
+Synchro Material filter; c must be face-up or public and usable as Synchro Material for syncard.
 Parameters:
   c: Card
   syncard: Card
+Returns:
+  bool - true if c is usable Synchro Material.
 Source: Utilities/procedure.lua:155
 
-●void Auxiliary.SynMixCheck(Group mg, any sg1, any minc, any maxc, Card syncard, any mg1, any smat, any gc, any mgchk, any goalchk)
-TODO document.
+●bool Auxiliary.SynMixCheck(Group mg, Group sg1, int minc, int maxc, Card syncard, Group mg1, Card|nil smat, function|nil gc, bool mgchk, bool goalchk)
+Checks whether the remaining mixed Synchro Material pool can complete the selected fixed-material group within the variable material count range.
 Parameters:
   mg: Group
-  sg1: any
-  minc: any
-  maxc: any
+  sg1: Group
+  minc: int
+  maxc: int
   syncard: Card
-  mg1: any
-  smat: any
-  gc: any
-  mgchk: any
-  goalchk: any
+  mg1: Group
+  smat: Card|nil
+  gc: function|nil
+  mgchk: bool
+  goalchk: bool
+Returns:
+  bool - true if the mixed Synchro Material selection can be completed.
 Source: Utilities/procedure.lua:356
 
-●void Auxiliary.SynMixCheckGoal(int tp, Group sg, any minc, any ct, Card syncard, any sg1, any smat, any gc, any mgchk, any goalchk)
-TODO document.
+●bool Auxiliary.SynMixCheckGoal(int tp, Group sg, int minc, int ct, Card syncard, Group sg1, Card|nil smat, function|nil gc, bool mgchk, bool goalchk)
+Final mixed Synchro Material group check. It validates count, Extra Monster Zone availability, group callback, fixed material, mandatory Synchro Materials, EFFECT_TUNE_MAGICIAN restrictions, Level total, hand-material limits, and tuner limits.
 Parameters:
   tp: int
   sg: Group
-  minc: any
-  ct: any
+  minc: int
+  ct: int
   syncard: Card
-  sg1: any
-  smat: any
-  gc: any
-  mgchk: any
-  goalchk: any
+  sg1: Group
+  smat: Card|nil
+  gc: function|nil
+  mgchk: bool
+  goalchk: bool
+Returns:
+  bool - true if sg plus sg1 is a valid mixed Synchro Material group.
 Source: Utilities/procedure.lua:413
 
-●void Auxiliary.SynMixCheckPrune(Group sg, any sg1, Card syncard)
-TODO document.
+●bool Auxiliary.SynMixCheckPrune(Group sg, Group sg1, Card syncard)
+Pruning check for mixed Synchro searches; returns true once the selected materials' minimum Synchro Level total reaches syncard's Level.
 Parameters:
   sg: Group
-  sg1: any
+  sg1: Group
   syncard: Card
+Returns:
+  bool - true if the branch can be pruned by minimum Synchro Level total.
 Source: Utilities/procedure.lua:376
 
-●void Auxiliary.SynMixCheckRecursive(Card c, int tp, Group sg, Group mg, any ct, any minc, any maxc, Card syncard, any sg1, any smat, any gc, any mgchk, any goalchk, any fulltraversal)
-TODO document.
+●bool Auxiliary.SynMixCheckRecursive(Card c, int tp, Group sg, Group mg, int ct, int minc, int maxc, Card syncard, Group sg1, Card|nil smat, function|nil gc, bool mgchk, bool goalchk, bool fulltraversal)
+Recursive mixed Synchro Material search helper. It temporarily adds c, checks the goal, and continues through mg while the branch remains possible.
 Parameters:
   c: Card
   tp: int
   sg: Group
   mg: Group
-  ct: any
-  minc: any
-  maxc: any
+  ct: int
+  minc: int
+  maxc: int
   syncard: Card
-  sg1: any
-  smat: any
-  gc: any
-  mgchk: any
-  goalchk: any
-  fulltraversal: any
+  sg1: Group
+  smat: Card|nil
+  gc: function|nil
+  mgchk: bool
+  goalchk: bool
+  fulltraversal: bool
+Returns:
+  bool - true if the recursive search can reach a valid group.
 Source: Utilities/procedure.lua:364
 
-●void Auxiliary.SynMixCondition(any f1, any f2, any f3, any f4, any minct, any maxct, any gc)
-TODO document.
+●function Auxiliary.SynMixCondition(function|nil f1, function|nil f2, function|nil f3, function|nil f4, int minct, int maxct, function|nil gc)
+Returns the condition function for mixed Synchro Summon procedures with up to three fixed material filters and a variable material slot.
 Parameters:
-  f1: any
-  f2: any
-  f3: any
-  f4: any
-  minct: any
-  maxct: any
-  gc: any
+  f1: function|nil
+  f2: function|nil
+  f3: function|nil
+  f4: function|nil
+  minct: int
+  maxct: int
+  gc: function|nil
+Returns:
+  function - Condition function for a mixed Synchro Summon procedure.
 Source: Utilities/procedure.lua:181
 
-●void Auxiliary.SynMixFilter1(Card c, any f1, any f2, any f3, any f4, any minc, any maxc, Card syncard, Group mg, any smat, any gc, any mgchk, any goalchk)
-TODO document.
+●bool Auxiliary.SynMixFilter1(Card c, function|nil f1, function|nil f2, function|nil f3, function|nil f4, int minc, int maxc, Card syncard, Group mg, Card|nil smat, function|nil gc, bool mgchk, bool goalchk)
+First fixed-material candidate filter for mixed Synchro procedures.
 Parameters:
   c: Card
-  f1: any
-  f2: any
-  f3: any
-  f4: any
-  minc: any
-  maxc: any
+  f1: function|nil
+  f2: function|nil
+  f3: function|nil
+  f4: function|nil
+  minc: int
+  maxc: int
   syncard: Card
   mg: Group
-  smat: any
-  gc: any
-  mgchk: any
-  goalchk: any
+  smat: Card|nil
+  gc: function|nil
+  mgchk: bool
+  goalchk: bool
+Returns:
+  bool - true if c can fill the first fixed material slot.
 Source: Utilities/procedure.lua:322
 
-●void Auxiliary.SynMixFilter2(Card c, any f2, any f3, any f4, any minc, any maxc, Card syncard, Group mg, any smat, any c1, any gc, any mgchk, any goalchk)
-TODO document.
+●bool Auxiliary.SynMixFilter2(Card c, function|nil f2, function|nil f3, function|nil f4, int minc, int maxc, Card syncard, Group mg, Card|nil smat, Card c1, function|nil gc, bool mgchk, bool goalchk)
+Second fixed-material candidate filter for mixed Synchro procedures, or the transition into the variable material slot when no second filter is required.
 Parameters:
   c: Card
-  f2: any
-  f3: any
-  f4: any
-  minc: any
-  maxc: any
+  f2: function|nil
+  f3: function|nil
+  f4: function|nil
+  minc: int
+  maxc: int
   syncard: Card
   mg: Group
-  smat: any
-  c1: any
-  gc: any
-  mgchk: any
-  goalchk: any
+  smat: Card|nil
+  c1: Card
+  gc: function|nil
+  mgchk: bool
+  goalchk: bool
+Returns:
+  bool - true if c can fill the second fixed material slot or advance selection.
 Source: Utilities/procedure.lua:325
 
-●void Auxiliary.SynMixFilter3(Card c, any f3, any f4, any minc, any maxc, Card syncard, Group mg, any smat, any c1, any c2, any gc, any mgchk, any goalchk)
-TODO document.
+●bool Auxiliary.SynMixFilter3(Card c, function|nil f3, function|nil f4, int minc, int maxc, Card syncard, Group mg, Card|nil smat, Card c1, Card c2, function|nil gc, bool mgchk, bool goalchk)
+Third fixed-material candidate filter for mixed Synchro procedures, or the transition into the variable material slot when no third filter is required.
 Parameters:
   c: Card
-  f3: any
-  f4: any
-  minc: any
-  maxc: any
+  f3: function|nil
+  f4: function|nil
+  minc: int
+  maxc: int
   syncard: Card
   mg: Group
-  smat: any
-  c1: any
-  c2: any
-  gc: any
-  mgchk: any
-  goalchk: any
+  smat: Card|nil
+  c1: Card
+  c2: Card
+  gc: function|nil
+  mgchk: bool
+  goalchk: bool
+Returns:
+  bool - true if c can fill the third fixed material slot or advance selection.
 Source: Utilities/procedure.lua:334
 
-●void Auxiliary.SynMixFilter4(Card c, any f4, any minc, any maxc, Card syncard, any mg1, any smat, any c1, any c2, any c3, any gc, any mgchk, any goalchk)
-TODO document.
+●bool Auxiliary.SynMixFilter4(Card c, function|nil f4, int minc, int maxc, Card syncard, Group mg1, Card|nil smat, Card c1, Card|nil c2, Card|nil c3, function|nil gc, bool mgchk, bool goalchk)
+Variable-slot candidate filter for mixed Synchro procedures; after adding c it checks whether the remaining material pool can complete the summon.
 Parameters:
   c: Card
-  f4: any
-  minc: any
-  maxc: any
+  f4: function|nil
+  minc: int
+  maxc: int
   syncard: Card
-  mg1: any
-  smat: any
-  c1: any
-  c2: any
-  c3: any
-  gc: any
-  mgchk: any
-  goalchk: any
+  mg1: Group
+  smat: Card|nil
+  c1: Card
+  c2: Card|nil
+  c3: Card|nil
+  gc: function|nil
+  mgchk: bool
+  goalchk: bool
+Returns:
+  bool - true if c can fill the variable material slot.
 Source: Utilities/procedure.lua:343
 
-●void Auxiliary.SynMixHandCheck(Group g, int tp, Card syncard)
-TODO document.
+●bool Auxiliary.SynMixHandCheck(Group g, int tp, Card syncard)
+Checks whether selected hand Synchro Materials are allowed by a material that grants hand Synchro use, including filter and count limits.
 Parameters:
   g: Group
   tp: int
   syncard: Card
+Returns:
+  bool - true if hand Synchro Materials in g are legal.
 Source: Utilities/procedure.lua:396
 
-●void Auxiliary.SynMixHandFilter(Card c, int tp, Card syncard)
-TODO document.
+●bool Auxiliary.SynMixHandFilter(Card c, int tp, Card syncard)
+Returns true for a hand material that is being used because another card enables it, rather than by its own extra Synchro Material effect.
 Parameters:
   c: Card
   tp: int
   syncard: Card
+Returns:
+  bool - true if c is a hand material enabled by another card.
 Source: Utilities/procedure.lua:383
 
-●void Auxiliary.SynMixOperation(any f1, any f2, any f3, any f4, any minct, any maxct, any gc)
-TODO document.
+●function Auxiliary.SynMixOperation(function|nil f1, function|nil f2, function|nil f3, function|nil f4, int minct, int maxct, function|nil gc)
+Returns the operation function for mixed Synchro Summon procedures; it sets materials, sends them to the Graveyard, and releases the kept group.
 Parameters:
-  f1: any
-  f2: any
-  f3: any
-  f4: any
-  minct: any
-  maxct: any
-  gc: any
+  f1: function|nil
+  f2: function|nil
+  f3: function|nil
+  f4: function|nil
+  minct: int
+  maxct: int
+  gc: function|nil
+Returns:
+  function - Operation function for a mixed Synchro Summon procedure.
 Source: Utilities/procedure.lua:314
 
-●void Auxiliary.SynMixTarget(any f1, any f2, any f3, any f4, any minct, any maxct, any gc)
-TODO document.
+●function Auxiliary.SynMixTarget(function|nil f1, function|nil f2, function|nil f3, function|nil f4, int minct, int maxct, function|nil gc)
+Returns the target function for mixed Synchro Summon procedures; it guides material selection and stores the selected group on the effect.
 Parameters:
-  f1: any
-  f2: any
-  f3: any
-  f4: any
-  minct: any
-  maxct: any
-  gc: any
+  f1: function|nil
+  f2: function|nil
+  f3: function|nil
+  f4: function|nil
+  minct: int
+  maxct: int
+  gc: function|nil
+Returns:
+  function - Target function for a mixed Synchro Summon procedure.
 Source: Utilities/procedure.lua:225
 
-●void Auxiliary.SynOperation(any f1, any f2, any minct, any maxct)
-TODO document.
+●function Auxiliary.SynOperation(function|nil f1, function|nil f2, int minct, int maxct)
+Returns the operation function for basic Synchro Summon procedures; it sets materials, sends them to the Graveyard, and releases the kept group.
 Parameters:
-  f1: any
-  f2: any
-  minct: any
-  maxct: any
+  f1: function|nil
+  f2: function|nil
+  minct: int
+  maxct: int
+Returns:
+  function - Operation function for a basic Synchro Summon procedure.
 Source: Utilities/procedure.lua:113
 
-●void Auxiliary.SynTarget(any f1, any f2, any minct, any maxct)
-TODO document.
+●function Auxiliary.SynTarget(function|nil f1, function|nil f2, int minct, int maxct)
+Returns the target function for basic Synchro Summon procedures; it selects Synchro Materials and stores the selected group on the effect.
 Parameters:
-  f1: any
-  f2: any
-  minct: any
-  maxct: any
+  f1: function|nil
+  f2: function|nil
+  minct: int
+  maxct: int
+Returns:
+  function - Target function for a basic Synchro Summon procedure.
 Source: Utilities/procedure.lua:91
 
-●void Auxiliary.TuneMagicianCheckAdditionalX(Effect ecode)
-TODO document.
+●function Auxiliary.TuneMagicianCheckAdditionalX(int ecode)
+Deprecated factory that returns a group check rejecting groups with an invalid EFFECT_TUNE_MAGICIAN_* pair for ecode.
 Parameters:
-  ecode: Effect
+  ecode: int
+Returns:
+  function - Group check that rejects invalid EFFECT_TUNE_MAGICIAN_* pairs.
 Source: Utilities/procedure.lua:458
 
-●void Auxiliary.TuneMagicianCheckAdditionalXyz(Group g)
-TODO document.
+●bool Auxiliary.TuneMagicianCheckAdditionalXyz(Group g)
+Additional Xyz material group check that rejects invalid EFFECT_TUNE_MAGICIAN_X pairs.
 Parameters:
   g: Group
+Returns:
+  bool - true if g has no invalid EFFECT_TUNE_MAGICIAN_X pair.
 Source: Utilities/procedure.lua:454
 
 ●void Auxiliary.TuneMagicianCheckX(Card c, Group sg, Effect ecode)
@@ -9760,119 +9800,139 @@ Parameters:
   ...: any
 Source: Utilities/procedure.lua:42
 
-●void Auxiliary.Xyz2XMaterialEffectFilter(Card c, Card xyzc, any lv, function f, int tp, any checked)
-TODO document.
+●bool Auxiliary.Xyz2XMaterialEffectFilter(Card c, Card xyzc, int lv, function|nil f, int tp, bool|nil checked)
+Checks whether c has a valid EFFECT_DOUBLE_XMATERIAL effect for xyzc, optionally skipping the normal Xyz Material filter when checked is true.
 Parameters:
   c: Card
   xyzc: Card
-  lv: any
-  f: function
+  lv: int
+  f: function|nil
   tp: int
-  checked: any
+  checked: bool|nil
+Returns:
+  bool - true if c has a valid EFFECT_DOUBLE_XMATERIAL effect.
 Source: Utilities/procedure.lua:532
 
-●void Auxiliary.Xyz2XMaterialFilter(Card c, Card xyzc, any lv, function f)
-TODO document.
+●bool Auxiliary.Xyz2XMaterialFilter(Card c, Card xyzc, int lv, function|nil f)
+Xyz Material filter for double-material handling; c must be face-up or public, usable as Xyz Material for xyzc, match lv, and satisfy f when provided.
 Parameters:
   c: Card
   xyzc: Card
-  lv: any
-  f: function
+  lv: int
+  f: function|nil
+Returns:
+  bool - true if c is valid Xyz Material for double-material handling.
 Source: Utilities/procedure.lua:529
 
-●void Auxiliary.Xyz2XMaterialGoal(Group g, int tp, Card xyzc, any minc)
-TODO document.
+●bool Auxiliary.Xyz2XMaterialGoal(Group g, int tp, Card xyzc, int minc)
+Final group check for Xyz Summons that may use EFFECT_DOUBLE_XMATERIAL. It validates Extra Monster Zone availability, EFFECT_XYZ_MIN_COUNT, and whether double-material effects cover minc.
 Parameters:
   g: Group
   tp: int
   xyzc: Card
-  minc: any
+  minc: int
+Returns:
+  bool - true if g satisfies the double-material Xyz requirements.
 Source: Utilities/procedure.lua:540
 
-●void Auxiliary.Xyz2XMaterialOperation(int tp, Group mg, Card xyzc, any minct, any maxct)
-TODO document.
+●void Auxiliary.Xyz2XMaterialOperation(int tp, Group mg, Card xyzc, int minct, int maxct)
+Consumes the count limits for selected EFFECT_DOUBLE_XMATERIAL cards needed for the selected group to satisfy the minimum material count.
 Parameters:
   tp: int
   mg: Group
   xyzc: Card
-  minct: any
-  maxct: any
+  minct: int
+  maxct: int
 Source: Utilities/procedure.lua:675
 
-●void Auxiliary.XyzAlterFilter(Card c, any alterf, Card xyzc, Effect e, int tp, any alterop)
-TODO document.
+●bool Auxiliary.XyzAlterFilter(Card c, function alterf, Card xyzc, Effect e, int tp, function|nil alterop)
+Alternate Xyz Summon candidate filter. It checks alterf, Xyz Material legality, Extra Monster Zone availability, mandatory Xyz Materials, EFFECT_XYZ_MIN_COUNT, and optional alterop validation.
 Parameters:
   c: Card
-  alterf: any
+  alterf: function
   xyzc: Card
   e: Effect
   tp: int
-  alterop: any
+  alterop: function|nil
+Returns:
+  bool - true if c is a valid alternate Xyz Material.
 Source: Utilities/procedure.lua:471
 
-●void Auxiliary.XyzCondition(function f, any lv, any minct, any maxct, any alterf, any alterdesc, any alterop)
-TODO document.
+●function Auxiliary.XyzCondition(function|nil f, int lv, int minct, int maxct, function|nil alterf, int|string|nil alterdesc, function|nil alterop)
+Returns the condition function for standard Xyz Summon procedures, including optional alternate one-card Xyz Summon and EFFECT_DOUBLE_XMATERIAL handling.
 Parameters:
-  f: function
-  lv: any
-  minct: any
-  maxct: any
-  alterf: any
-  alterdesc: any
-  alterop: any
+  f: function|nil
+  lv: int
+  minct: int
+  maxct: int
+  alterf: function|nil
+  alterdesc: int|string|nil
+  alterop: function|nil
+Returns:
+  function - Condition function for a standard Xyz Summon procedure.
 Source: Utilities/procedure.lua:499
 
-●void Auxiliary.XyzLevelFreeCondition(function f, any gf, any minct, any maxct, any alterf, any alterdesc, any alterop)
-TODO document.
+●function Auxiliary.XyzLevelFreeCondition(function|nil f, function|nil gf, int minct, int maxct, function|nil alterf, int|string|nil alterdesc, function|nil alterop)
+Returns the condition function for Level-free Xyz Summon procedures with optional group filter and alternate one-card Xyz Summon support.
 Parameters:
-  f: function
-  gf: any
-  minct: any
-  maxct: any
-  alterf: any
-  alterdesc: any
-  alterop: any
+  f: function|nil
+  gf: function|nil
+  minct: int
+  maxct: int
+  alterf: function|nil
+  alterdesc: int|string|nil
+  alterop: function|nil
+Returns:
+  function - Condition function for a Level-free Xyz Summon procedure.
 Source: Utilities/procedure.lua:728
 
-●void Auxiliary.XyzLevelFreeFilter(Card c, Card xyzc, function f)
-TODO document.
+●bool Auxiliary.XyzLevelFreeFilter(Card c, Card xyzc, function|nil f)
+Level-free Xyz Material filter; c must be face-up if on the field, usable as Xyz Material for xyzc, and satisfy f when provided.
 Parameters:
   c: Card
   xyzc: Card
-  f: function
+  f: function|nil
+Returns:
+  bool - true if c is valid Level-free Xyz Material.
 Source: Utilities/procedure.lua:714
 
-●void Auxiliary.XyzLevelFreeGoal(Group g, int tp, Card xyzc, any gf)
-TODO document.
+●bool Auxiliary.XyzLevelFreeGoal(Group g, int tp, Card xyzc, function|nil gf)
+Final group check for Level-free Xyz Summons. It validates Extra Monster Zone availability, optional group filter gf, and EFFECT_XYZ_MIN_COUNT requirements.
 Parameters:
   g: Group
   tp: int
   xyzc: Card
-  gf: any
+  gf: function|nil
+Returns:
+  bool - true if g satisfies the Level-free Xyz requirements.
 Source: Utilities/procedure.lua:717
 
-●void Auxiliary.XyzLevelFreeOperation(function f, any gf, any minct, any maxct, any alterf, any alterdesc, any alterop)
-TODO document.
+●function Auxiliary.XyzLevelFreeOperation(function|nil f, function|nil gf, int minct, int maxct, function|nil alterf, int|string|nil alterdesc, function|nil alterop)
+Returns the operation function for Level-free Xyz Summon procedures; it handles alternate summons, sends old overlay cards to the Graveyard by rule, sets materials, and overlays them.
 Parameters:
-  f: function
-  gf: any
-  minct: any
-  maxct: any
-  alterf: any
-  alterdesc: any
-  alterop: any
+  f: function|nil
+  gf: function|nil
+  minct: int
+  maxct: int
+  alterf: function|nil
+  alterdesc: int|string|nil
+  alterop: function|nil
+Returns:
+  function - Operation function for a Level-free Xyz Summon procedure.
 Source: Utilities/procedure.lua:818
 
-●void Auxiliary.XyzLevelFreeTarget(function f, any gf, any minct, any maxct, any alterf, any alterdesc, any alterop)
-TODO document.
+●function Auxiliary.XyzLevelFreeTarget(function|nil f, function|nil gf, int minct, int maxct, function|nil alterf, int|string|nil alterdesc, function|nil alterop)
+Returns the target function for Level-free Xyz Summon procedures; it chooses between alternate material and regular group selection and stores the selected group.
 Parameters:
-  f: function
-  gf: any
-  minct: any
-  maxct: any
-  alterf: any
-  alterdesc: any
-  alterop: any
+  f: function|nil
+  gf: function|nil
+  minct: int
+  maxct: int
+  alterf: function|nil
+  alterdesc: int|string|nil
+  alterop: function|nil
+Returns:
+  function - Target function for a Level-free Xyz Summon procedure.
 Source: Utilities/procedure.lua:761
 
 ●void Auxiliary.xyzlimit(Effect e, Effect se, any sp, any st)
@@ -9888,26 +9948,30 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2301
 
-●void Auxiliary.XyzOperation(function f, any lv, any minct, any maxct, any alterf, any alterdesc, any alterop)
-TODO document.
+●function Auxiliary.XyzOperation(function|nil f, int lv, int minct, int maxct, function|nil alterf, int|string|nil alterdesc, function|nil alterop)
+Returns the operation function for standard Xyz Summon procedures; it handles alternate summons, double-material count limits, sends old overlay cards to the Graveyard by rule, sets materials, and overlays them.
 Parameters:
-  f: function
-  lv: any
-  minct: any
-  maxct: any
-  alterf: any
-  alterdesc: any
-  alterop: any
+  f: function|nil
+  lv: int
+  minct: int
+  maxct: int
+  alterf: function|nil
+  alterdesc: int|string|nil
+  alterop: function|nil
+Returns:
+  function - Operation function for a standard Xyz Summon procedure.
 Source: Utilities/procedure.lua:637
 
-●void Auxiliary.XyzTarget(function f, any lv, any minct, any maxct, any alterf, any alterdesc, any alterop)
-TODO document.
+●function Auxiliary.XyzTarget(function|nil f, int lv, int minct, int maxct, function|nil alterf, int|string|nil alterdesc, function|nil alterop)
+Returns the target function for standard Xyz Summon procedures; it chooses between alternate material, double-material group selection, and regular Xyz Material selection.
 Parameters:
-  f: function
-  lv: any
-  minct: any
-  maxct: any
-  alterf: any
-  alterdesc: any
-  alterop: any
+  f: function|nil
+  lv: int
+  minct: int
+  maxct: int
+  alterf: function|nil
+  alterdesc: int|string|nil
+  alterop: function|nil
+Returns:
+  function - Target function for a standard Xyz Summon procedure.
 Source: Utilities/procedure.lua:576
