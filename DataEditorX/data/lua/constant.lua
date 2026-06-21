@@ -291,7 +291,7 @@ SUMMON_INFO_DEFENSE	=0x100	--Summon info: DEF
 SUMMON_INFO_REASON_EFFECT	=0x200	--Summon info: reason Effect
 SUMMON_INFO_REASON_PLAYER	=0x400	--Summon info: reason player
 
---========== Reset ==========	--重置条件（注意：重置条件可以多个相加）
+--========== Reset ==========	--Reset conditions. Multiple reset flags can be combined.
 RESET_SELF_TURN	=0x10000000	--Reset at the end of your turn's phase
 RESET_OPPO_TURN	=0x20000000	--Reset at the end of opponent's turn's phase
 RESET_PHASE	=0x40000000	--Reset at phase end (typically used with phases above)
@@ -313,12 +313,12 @@ RESET_CONTROL	=0x02000000	--Reset when controller changes
 RESET_OVERLAY	=0x04000000	--Reset when used as Xyz Material
 RESET_MSCHANGE	=0x08000000	--Reset when moving from Monster Zone to Spell/Trap Zone or vice versa (e.g., move_to_field(), Gem Beasts)
 
-----组合时点
+----Combined reset masks
 RESETS_STANDARD	=0x1fe0000	--RESET_TOFIELD + RESET_LEAVE + RESET_TODECK + RESET_TOHAND + RESET_TEMP_REMOVE + RESET_REMOVE + RESET_TOGRAVE + RESET_TURN_SET
 RESETS_REDIRECT	=0xc7e0000	--RESETS_STANDARD + RESET_OVERLAY + RESET_MSCHANGE - RESET_TOFIELD - RESET_LEAVE (used for EFFECT_LEAVE_FIELD_REDIRECT)
 RESETS_WITHOUT_TEMP_REMOVE	=0x56e0000	--RESETS_STANDARD - RESET_TEMP_REMOVE - RESET_LEAVE + RESET_OVERLAY
 
---========== Types ==========	--效果类型（定义效果触发类型，和codes一起使用）
+--========== Types ==========	--Effect types. Used with effect/event codes to define how an effect is handled.
 EFFECT_TYPE_SINGLE	=0x0001	--Triggered when the card's own status changes
 EFFECT_TYPE_FIELD	=0x0002	--Triggered when any card on the field's status changes
 EFFECT_TYPE_EQUIP	=0x0004	--Equip effect
@@ -335,7 +335,7 @@ EFFECT_TYPE_XMATERIAL	=0x1000	--Effect gained by an Xyz Monster when used as Xyz
 EFFECT_TYPE_GRANT	=0x2000	--Grants effects to other cards (e.g., Weather Pattern)
 EFFECT_TYPE_TARGET	=0x4000	--Continuous effect with sustained targets (mainly for Spells/Traps)
 
---========== Flags ==========	--效果的特殊性质
+--========== Flags ==========	--Special effect properties
 EFFECT_FLAG_INITIAL	=0x0001	--Can be activated
 EFFECT_FLAG_FUNC_VALUE	=0x0002	--The Value property of this effect is a function
 EFFECT_FLAG_COUNT_LIMIT	=0x0004	--Activation count limit
@@ -376,7 +376,7 @@ EFFECT_FLAG2_COF	=0x0002	--Normal Spell can activate outside Main Phase 1 (speci
 EFFECT_FLAG2_WICKED	=0x0004	--Attack change for The Wicked Avatar/Dreadroot calculated last
 EFFECT_FLAG2_OPTION	=0x0008	--Child Machine
 
---========== Codes ==========	--对永续性效果表示效果类型(EFFECT开头)，对诱发型效果表示触发效果的事件/时点(EVENT开头)
+--========== Codes ==========	--For continuous effects, EFFECT_* values describe behavior; for triggered effects, EVENT_* values describe event timing.
 EFFECT_IMMUNE_EFFECT	=1	--Immune to effects
 EFFECT_DISABLE	=2	--Negates effects (e.g., Skill Drain)
 EFFECT_CANNOT_DISABLE	=3	--Effect cannot be negated
@@ -640,7 +640,7 @@ EFFECT_RITUAL_LEVEL_EX	=374	--Allows monsters without Levels to be used as Ritua
 EFFECT_DOUBLE_XMATERIAL	=375	--Counts as 2 materials when Xyz Summoning a monster that requires 3 or more materials
 EFFECT_FLAG_EFFECT	=0x20000000	--Flag effect created by RegisterFlagEffect()
 
---下面是诱发效果的诱发事件、时点 （如果是TYPE_SINGLE则自己发生以下事件后触发，如果TYPE_FIELD则场上任何卡发生以下事件都触发）
+--Trigger events and timings. TYPE_SINGLE reacts to events involving itself; TYPE_FIELD reacts to matching events involving any card on the field.
 EVENT_STARTUP	=1000	--N/A
 EVENT_FLIP	=1001	--When flipped
 EVENT_FREE_CHAIN	=1002	--Free Chain timing (e.g., Torrential Tribute, or Quick Effects like Pleiades)
@@ -718,7 +718,7 @@ EVENT_ADD_COUNTER	=0x10000	--When adding a counter
 EVENT_REMOVE_COUNTER	=0x20000	--When removing a counter (A-Counter, Card.RemoveCounter() must manually trigger this event)
 EVENT_CUSTOM	=0x10000000	--Custom event
 
---Category	效果分类（表示这个效果将要发生什么事，OperationInfo设置了效果分类才能触发针对这一类型发动的卡，如破坏->星尘龙
+--Category	Effect categories. Duel.SetOperationInfo records these so cards can respond to effect types, such as destruction prevention.
 CATEGORY_DESTROY	=0x1	--Destruction effect
 CATEGORY_RELEASE	=0x2	--Tribute effect
 CATEGORY_REMOVE	=0x4	--Banish effect
@@ -794,7 +794,7 @@ OPCODE_ISATTRIBUTE	=0x40000104	--Check attribute
 DOUBLE_DAMAGE	=-2147483648	--Double damage
 HALF_DAMAGE	=-2147483647	--Half damage
 
---Hint Message	--提示消息，显示在窗口的上面
+--Hint Message	--Prompt messages shown at the top of the client window
 HINTMSG_RELEASE	=500	--Select a card to Tribute
 HINTMSG_DISCARD	=501	--Select a card to discard from hand
 HINTMSG_DESTROY	=502	--Select a card to destroy
@@ -853,11 +853,11 @@ HINTMSG_DISABLE	=573	--Select a card to negate
 HINTMSG_OPERATECARD	=574	--Select a card to operate
 HINTMSG_FIELD_FIRST	=575	--Select a card on the field (press Cancel to select a card from another zone)
 
---Select	--请选择
+--Select	--Selection constants
 SELECT_HEADS	=60	--Heads
 SELECT_TAILS	=61	--Tails
 
---Timing	--提示时点，可以给freechain卡片增加自动提示时点
+--Timing	--Prompt timings; free-chain cards can use these for automatic activation prompts
 TIMING_DRAW_PHASE	=0x1	--Draw Phase timing
 TIMING_STANDBY_PHASE	=0x2	--Standby Phase timing
 TIMING_MAIN_END	=0x4	--Main Phase end timing
@@ -887,10 +887,10 @@ TIMING_EQUIP	=0x2000000	--Equip timing
 TIMING_BATTLE_STEP_END	=0x4000000	--Battle Step end timing
 TIMING_BATTLED	=0x8000000	--After damage calculation timing
 
-----组合时点
+----Combined timings
 TIMINGS_CHECK_MONSTER	=0x1c0	--Monster summoned face-up
 
---Global flag	--特殊标记
+--Global flag	--Special global flags
 GLOBALFLAG_DECK_REVERSE_CHECK	=0x1	--Deck reverse check
 GLOBALFLAG_BRAINWASHING_CHECK	=0x2	--Brainwashing release check
 GLOBALFLAG_SCRAP_CHIMERA	=0x4	--Scrap Chimera check
@@ -909,7 +909,7 @@ EFFECT_COUNT_CODE_DUEL	=0x20000000	--Duel usage count
 EFFECT_COUNT_CODE_CHAIN	=0x40000000	--Use count within the same Chain
 EFFECT_COUNT_CODE_SINGLE	=0x1	--Shared count for multiple effects on the same card
 
---特殊选项
+--Special options
 DUEL_TEST_MODE	=0x01	--Test mode (currently none)
 DUEL_ATTACK_FIRST_TURN	=0x02	--First turn can attack (for puzzles)
 DUEL_OLD_REPLAY	=0x04	--Old replay
