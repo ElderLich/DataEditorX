@@ -102,7 +102,7 @@ namespace DataEditorX
             YGOUtil.SetConfig(datacfg);
 
             //代码提示
-            string funtxt = MyPath.FindFile(datapath, DEXConfig.FILE_FUNCTION, "lua");
+            string funtxt = DEXConfig.GetFunctionFile(datapath);
             string conlua = MyPath.FindFile(datapath, DEXConfig.FILE_CONSTANT, "lua");
             codecfg = new CodeConfig();
             //添加函数

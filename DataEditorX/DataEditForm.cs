@@ -1905,7 +1905,7 @@ namespace DataEditorX
         #region 查找lua函数
         private void Menuitem_findluafunc_Click(object sender, EventArgs e)
         {
-            string funtxt = MyPath.FindFile(datapath, DEXConfig.FILE_FUNCTION, "lua");
+            string funtxt = DEXConfig.GetFunctionFile(datapath);
             using FolderBrowserDialog fd = new();
             fd.Description = "Folder Name: ocgcore";
             if (fd.ShowDialog() == DialogResult.OK)

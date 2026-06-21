@@ -55,6 +55,7 @@ namespace DataEditorX.Config
         /// 函数
         /// </summary>
         public const string FILE_FUNCTION = "_functions.txt";
+        public const string FILE_FUNCTION_ENGLISH = "_function_english.txt";
         /// <summary>
         /// 常量
         /// </summary>
@@ -334,6 +335,41 @@ namespace DataEditorX.Config
 
             string englishFile = MyPath.FindFile(path, MyPath.GetFileName(TAG_CARDINFO, "english"), "languages");
             return File.Exists(englishFile) ? englishFile : cardInfoFile;
+        }
+
+        public static string GetFunctionFile(string path)
+        {
+            string fileName = IsChineseLanguage(GetAppConfig(TAG_LANGUAGE))
+                ? FILE_FUNCTION
+                : FILE_FUNCTION_ENGLISH;
+
+            string functionFile = MyPath.FindFile(path, fileName, "lua");
+            if (File.Exists(functionFile))
+            {
+                return functionFile;
+            }
+
+            string fallbackFile = MyPath.FindFile(
+                path,
+                fileName.Equals(FILE_FUNCTION, StringComparison.OrdinalIgnoreCase)
+                    ? FILE_FUNCTION_ENGLISH
+                    : FILE_FUNCTION,
+                "lua");
+            return File.Exists(fallbackFile) ? fallbackFile : functionFile;
+        }
+
+        static bool IsChineseLanguage(string language)
+        {
+            if (string.IsNullOrWhiteSpace(language))
+            {
+                return false;
+            }
+
+            string normalized = language.Replace('_', '-');
+            return normalized.Contains("chinese", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("zh", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("zh-cn", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("zh-tw", StringComparison.OrdinalIgnoreCase);
         }
 
         public static string[] GetAvailableLanguageNames(string path)
