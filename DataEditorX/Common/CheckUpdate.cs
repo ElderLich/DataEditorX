@@ -30,10 +30,15 @@ namespace DataEditorX.Common
         public static string URL = "";
         public static UpdateInfoStatus LastInfoStatus { get; private set; } = UpdateInfoStatus.Ok;
         public static string LastInfoError { get; private set; } = "";
+        public static string LastDownloadError { get; private set; } = "";
         /// <summary>
         /// Default version when metadata cannot be read.
         /// </summary>
         public const string DEFAULT = "0.0.0.0";
+        private static readonly HttpClient Http = new()
+        {
+            Timeout = TimeSpan.FromSeconds(15)
+        };
 
         #region Version check
         /// <summary>
@@ -42,6 +47,11 @@ namespace DataEditorX.Common
         /// <param name="VERURL">Metadata URL.</param>
         /// <returns>Version number.</returns>
         public static string GetNewVersion(string VERURL)
+        {
+            return GetNewVersionAsync(VERURL).GetAwaiter().GetResult();
+        }
+
+        public static async Task<string> GetNewVersionAsync(string VERURL, CancellationToken cancellationToken = default)
         {
             URL = "";
             LastInfoStatus = UpdateInfoStatus.Ok;
@@ -55,7 +65,8 @@ namespace DataEditorX.Common
                 return urlver;
             }
 
-            if (!TryGetHtmlContentByUrl(VERURL, out string html, out string error))
+            (bool success, string html, string error) = await TryGetHtmlContentByUrlAsync(VERURL, cancellationToken).ConfigureAwait(false);
+            if (!success)
             {
                 LastInfoStatus = UpdateInfoStatus.Unavailable;
                 LastInfoError = error;
@@ -131,35 +142,35 @@ namespace DataEditorX.Common
         /// <returns>Response content.</returns>
         public static string GetHtmlContentByUrl(string url)
         {
-            return TryGetHtmlContentByUrl(url, out string htmlContent, out _) ? htmlContent : "";
+            return GetHtmlContentByUrlAsync(url).GetAwaiter().GetResult();
         }
 
-        private static bool TryGetHtmlContentByUrl(string url, out string htmlContent, out string error)
+        public static async Task<string> GetHtmlContentByUrlAsync(string url, CancellationToken cancellationToken = default)
         {
-            htmlContent = "";
-            error = "";
+            (bool success, string content, _) = await TryGetHtmlContentByUrlAsync(url, cancellationToken).ConfigureAwait(false);
+            return success ? content : "";
+        }
+
+        private static async Task<(bool Success, string Content, string Error)> TryGetHtmlContentByUrlAsync(string url, CancellationToken cancellationToken)
+        {
             try
             {
-                using HttpClient httpClient = new()
-                {
-                    Timeout = TimeSpan.FromMilliseconds(15000)
-                };
-                using HttpResponseMessage response = httpClient.GetAsync(url).Result;
+                using HttpResponseMessage response = await Http
+                    .GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                    .ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
-                    error = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}";
-                    return false;
+                    return (false, "", $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}");
                 }
 
-                using Stream stream = response.Content.ReadAsStreamAsync().Result;
+                await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
                 using StreamReader streamReader = new(stream, Encoding.UTF8);
-                htmlContent = streamReader.ReadToEnd();
-                return true;
+                string htmlContent = await streamReader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                return (true, htmlContent, "");
             }
             catch (Exception ex)
             {
-                error = ex.GetBaseException().Message;
-                return false;
+                return (false, "", ex.GetBaseException().Message);
             }
         }
         #endregion
@@ -172,31 +183,72 @@ namespace DataEditorX.Common
         /// <returns>Whether the download succeeded.</returns>
         public static bool DownLoad(string filename)
         {
+            return DownloadAsync(filename).GetAwaiter().GetResult();
+        }
+
+        public static async Task<bool> DownloadAsync(string filename, IProgress<long>? progress = null, CancellationToken cancellationToken = default)
+        {
             try
             {
+                LastDownloadError = "";
+
+                if (string.IsNullOrWhiteSpace(URL))
+                {
+                    LastDownloadError = "The update download URL is empty.";
+                    return false;
+                }
+
+                string? directory = Path.GetDirectoryName(filename);
+                if (!string.IsNullOrWhiteSpace(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                string tempFile = filename + ".tmp";
+                if (File.Exists(tempFile))
+                {
+                    File.Delete(tempFile);
+                }
+
+                using HttpResponseMessage response = await Http
+                    .GetAsync(URL, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                    .ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
+                {
+                    LastDownloadError = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}";
+                    return false;
+                }
+
+                await using Stream source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+                await using FileStream destination = new(
+                    tempFile,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None,
+                    1024 * 128,
+                    useAsync: true);
+
+                long totalDownloadedByte = 0;
+                byte[] buffer = new byte[1024 * 128];
+                int bytesRead;
+                while ((bytesRead = await source.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken).ConfigureAwait(false)) > 0)
+                {
+                    await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
+                    totalDownloadedByte += bytesRead;
+                    progress?.Report(totalDownloadedByte);
+                }
+
                 if (File.Exists(filename))
                 {
                     File.Delete(filename);
                 }
 
-                Stream st = new HttpClient().GetStreamAsync(URL).Result;
-                Stream so = new FileStream(filename + ".tmp", FileMode.Create);
-                long totalDownloadedByte = 0;
-                byte[] by = new byte[1024 * 512];
-                int osize = st.Read(by, 0, by.Length);
-                while (osize > 0)
-                {
-                    totalDownloadedByte = osize + totalDownloadedByte;
-                    Application.DoEvents();
-                    so.Write(by, 0, osize);
-                    osize = st.Read(by, 0, by.Length);
-                }
-                so.Close();
-                st.Close();
-                File.Move(filename + ".tmp", filename);
+                File.Move(tempFile, filename);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LastDownloadError = ex.GetBaseException().Message;
+                TryDelete(filename + ".tmp");
                 return false;
             }
             return true;
@@ -263,6 +315,20 @@ Remove-Item -LiteralPath $PSCommandPath -Force -ErrorAction SilentlyContinue
         private static string EscapePowerShell(string text)
         {
             return (text ?? "").Replace("'", "''");
+        }
+
+        private static void TryDelete(string file)
+        {
+            try
+            {
+                if (File.Exists(file))
+                {
+                    File.Delete(file);
+                }
+            }
+            catch
+            {
+            }
         }
         #endregion
     }

@@ -173,7 +173,7 @@ namespace DataEditorX.Core
                     }
                     else
                     {
-                        MyMsg.Show(LMSG.DownloadFail);
+                        MyMsg.Show(GetInstallFailureMessage());
                     }
                 }
                 else
@@ -183,7 +183,7 @@ namespace DataEditorX.Core
             }
             else
             {
-                MyMsg.Show(LMSG.DownloadFail);
+                MyMsg.Show(GetDownloadFailureMessage());
             }
         }
 
@@ -205,6 +205,20 @@ namespace DataEditorX.Core
                 + "\n" + updateUrl
                 + "\n\nIf you have not pushed the repo/update metadata yet, or the GitHub repo is private, this is expected."
                 + detail;
+        }
+
+        private static string GetDownloadFailureMessage()
+        {
+            string message = LanguageHelper.GetMsg(LMSG.DownloadFail);
+            return string.IsNullOrWhiteSpace(CheckUpdate.LastDownloadError)
+                ? message
+                : message + "\n\nDetails: " + CheckUpdate.LastDownloadError;
+        }
+
+        private static string GetInstallFailureMessage()
+        {
+            return "Update downloaded, but the installer could not start."
+                + "\n\nYou can still install manually from the downloaded archive.";
         }
 
         public static void OnCheckUpdate(bool showNew)
