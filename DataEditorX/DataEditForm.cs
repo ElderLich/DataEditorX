@@ -1146,10 +1146,7 @@ namespace DataEditorX
         #region 帮助菜单
         void Menuitem_aboutClick(object sender, EventArgs e)
         {
-            MyMsg.Show(
-                LanguageHelper.GetMsg(LMSG.About) + "\t" + Application.ProductName + "\n"
-                + LanguageHelper.GetMsg(LMSG.Version) + "\t" + Application.ProductVersion + "\n"
-                + LanguageHelper.GetMsg(LMSG.Author) + "\tLyris");
+            AboutForm.ShowVersionInfo(this, () => CheckUpdate(true));
         }
 
         void Menuitem_checkupdateClick(object sender, EventArgs e)

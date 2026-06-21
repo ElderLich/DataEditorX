@@ -12,7 +12,7 @@ CodeEditForm.mainMenu.menuitem_find	查找
 CodeEditForm.mainMenu.menuitem_replace	替换
 CodeEditForm.mainMenu.menuitem_setcard	设置卡片库
 CodeEditForm.mainMenu.menuitem_help	帮助(&H)
-CodeEditForm.mainMenu.menuitem_about	关于
+CodeEditForm.mainMenu.menuitem_about	版本信息
 CodeEditForm.mainMenu.menuitem_tools	工具(&T)
 CodeEditForm.mainMenu.menuitem_testlua	语法错误检查
 CodeEditForm.mainMenu.menuitem_effectcreator	效果生成器
@@ -38,7 +38,7 @@ CodeEditForm_Avalon.mainMenu.menuitem_find	查找
 CodeEditForm_Avalon.mainMenu.menuitem_replace	替换
 CodeEditForm_Avalon.mainMenu.menuitem_setcard	设置卡片库
 CodeEditForm_Avalon.mainMenu.menuitem_help	帮助(&H)
-CodeEditForm_Avalon.mainMenu.menuitem_about	关于
+CodeEditForm_Avalon.mainMenu.menuitem_about	版本信息
 CodeEditForm_Avalon.mainMenu.menuitem_tools	工具(&T)
 CodeEditForm_Avalon.mainMenu.menuitem_testlua	语法错误检查
 CodeEditForm_Avalon.mainMenu.menuitem_effectcreator	效果生成器
@@ -97,7 +97,7 @@ DataEditForm.mainMenu.menuitem_testpendulumtext	测试灵摆效果文本
 DataEditForm.mainMenu.menuitem_export_all_sql	所有卡片导出为sql
 DataEditForm.mainMenu.menuitem_export_select_sql	选择卡片导出为sql
 DataEditForm.mainMenu.menuitem_help	帮助(&H)
-DataEditForm.mainMenu.menuitem_about	关于
+DataEditForm.mainMenu.menuitem_about	版本信息
 DataEditForm.mainMenu.menuitem_language	语言
 DataEditForm.mainMenu.menuitem_checkupdate	检查更新
 DataEditForm.mainMenu.menuitem_autocheckupdate	自动检查更新

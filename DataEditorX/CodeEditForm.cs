@@ -434,10 +434,7 @@ namespace DataEditorX
 
         void AboutToolStripMenuItemClick(object sender, EventArgs e)
         {
-            MyMsg.Show(
-                LanguageHelper.GetMsg(LMSG.About) + "\t" + Application.ProductName + "\n"
-                + LanguageHelper.GetMsg(LMSG.Version) + "\t" + Application.ProductVersion + "\n"
-                + LanguageHelper.GetMsg(LMSG.Author) + "\tLyris");
+            AboutForm.ShowVersionInfo(this, () => TaskHelper.CheckVersion(true));
         }
 
         void Menuitem_openClick(object sender, EventArgs e)

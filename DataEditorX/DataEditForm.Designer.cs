@@ -378,7 +378,7 @@ namespace DataEditorX
             menuitem_about.Name = "menuitem_about";
             menuitem_about.ShortcutKeys = Keys.F1;
             menuitem_about.Size = new Size(177, 22);
-            menuitem_about.Text = "About";
+            menuitem_about.Text = "Version Info";
             menuitem_about.Click += Menuitem_aboutClick;
             // 
             // menuitem_language
@@ -391,7 +391,7 @@ namespace DataEditorX
             // 
             menuitem_checkupdate.Name = "menuitem_checkupdate";
             menuitem_checkupdate.Size = new Size(177, 22);
-            menuitem_checkupdate.Text = "Check Update";
+            menuitem_checkupdate.Text = "Check for Updates";
             menuitem_checkupdate.Click += Menuitem_checkupdateClick;
             // 
             // menuitem_autocheckupdate

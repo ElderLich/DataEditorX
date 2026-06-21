@@ -7,6 +7,7 @@
  */
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace DataEditorX.Common
 {
@@ -36,7 +37,7 @@ namespace DataEditorX.Common
             string html = GetHtmlContentByUrl(VERURL);
             if (!string.IsNullOrEmpty(html))
             {
-                Regex ver = new(@"\[DataEditorX\]([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\[DataEditorX\]");
+                Regex ver = new(@"\[DataEditorX\]([0-9]+(?:\.[0-9]+){2,3})\[DataEditorX\]");
                 Regex url = new(@"\[URL\]([^\[]+?) ?\[URL\]");
                 if (ver.IsMatch(html) && url.IsMatch(html))
                 {
@@ -65,16 +66,17 @@ namespace DataEditorX.Common
         public static bool CheckVersion(string ver, string oldver)
         {
             bool hasNew = false;
-            string[] vers = ver.Split('.');
+            string[] vers = Regex.Replace(ver, "\\+.*", "").Split('.');
             string[] oldvers = Regex.Replace(oldver, "\\+.*", "").Split('.');
 
-            if (vers.Length == oldvers.Length)
+            int count = Math.Max(vers.Length, oldvers.Length);
+            if (count > 0)
             {
                 //从左到右比较数字
-                for (int i = 0; i < oldvers.Length; i++)
+                for (int i = 0; i < count; i++)
                 {
-                    int.TryParse(vers[i], out int j);
-                    int.TryParse(oldvers[i], out int k);
+                    int.TryParse(i < vers.Length ? vers[i] : "0", out int j);
+                    int.TryParse(i < oldvers.Length ? oldvers[i] : "0", out int k);
                     if (j > k)//新的版本号大于旧的
                     {
                         hasNew = true;
@@ -163,6 +165,49 @@ namespace DataEditorX.Common
                 return false;
             }
             return true;
+        }
+
+        public static bool InstallUpdate(string zipFile)
+        {
+            try
+            {
+                if (!File.Exists(zipFile))
+                {
+                    return false;
+                }
+
+                string appDir = Application.StartupPath;
+                string exe = Application.ExecutablePath;
+                string script = Path.Combine(Path.GetTempPath(), $"DataEditorX_Update_{Guid.NewGuid():N}.ps1");
+                string content = $"""
+$ErrorActionPreference = 'Stop'
+Wait-Process -Id {Environment.ProcessId} -ErrorAction SilentlyContinue
+Start-Sleep -Milliseconds 500
+Expand-Archive -LiteralPath '{EscapePowerShell(zipFile)}' -DestinationPath '{EscapePowerShell(appDir)}' -Force
+Remove-Item -LiteralPath '{EscapePowerShell(zipFile)}' -Force -ErrorAction SilentlyContinue
+Start-Process -FilePath '{EscapePowerShell(exe)}' -WorkingDirectory '{EscapePowerShell(appDir)}'
+Remove-Item -LiteralPath $PSCommandPath -Force -ErrorAction SilentlyContinue
+""";
+                File.WriteAllText(script, content, new UTF8Encoding(false));
+
+                ProcessStartInfo info = new()
+                {
+                    FileName = "powershell.exe",
+                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{script}\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                return Process.Start(info) != null;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static string EscapePowerShell(string text)
+        {
+            return (text ?? "").Replace("'", "''");
         }
         #endregion
     }

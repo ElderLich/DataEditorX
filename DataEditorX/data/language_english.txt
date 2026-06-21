@@ -12,7 +12,7 @@ CodeEditForm.mainMenu.menuitem_find	Find
 CodeEditForm.mainMenu.menuitem_replace	Replace
 CodeEditForm.mainMenu.menuitem_setcard	Set Card Database...
 CodeEditForm.mainMenu.menuitem_help	Help...(&H)
-CodeEditForm.mainMenu.menuitem_about	About...
+CodeEditForm.mainMenu.menuitem_about	Version Info...
 CodeEditForm.mainMenu.menuitem_tools	Tools(&T)
 CodeEditForm.mainMenu.menuitem_testlua	Lua Syntax Check
 CodeEditForm.mainMenu.menuitem_effectcreator	Effect Creator...
@@ -89,9 +89,9 @@ DataEditForm.mainMenu.menuitem_export_select_sql	Export Selected Cards to SQL Fi
 DataEditForm.mainMenu.menuitem_cancelTask	Cancel Task
 DataEditForm.mainMenu.menuitem_exportMSEimage	Export MSE-set to Images(Click stop)
 DataEditForm.mainMenu.menuitem_help	Help(&H)
-DataEditForm.mainMenu.menuitem_about	About
+DataEditForm.mainMenu.menuitem_about	Version Info
 DataEditForm.mainMenu.menuitem_language	Language
-DataEditForm.mainMenu.menuitem_checkupdate	Check Update
+DataEditForm.mainMenu.menuitem_checkupdate	Check for Updates
 DataEditForm.mainMenu.menuitem_autocheckupdate	Auto Check Update
 DataEditForm.mainMenu.menuitem_github	Source Code
 #

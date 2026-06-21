@@ -160,11 +160,27 @@ namespace DataEditorX.Core
                     return;
                 }
             }
+            string downloadDir = MyPath.Combine(Path.GetTempPath(), "DataEditorX");
+            MyPath.CreateDir(downloadDir);
+            string zipFile = MyPath.Combine(downloadDir, "DataEditorX_" + newver + ".zip");
             //下载文件
-            if (CheckUpdate.DownLoad(
-                MyPath.Combine(Application.StartupPath, newver + ".zip")))
+            if (CheckUpdate.DownLoad(zipFile))
             {
-                MyMsg.Show(LMSG.DownloadSucceed);
+                if (MyMsg.Question("Update downloaded.\n\nInstall it now? DataEditorX will close and restart."))
+                {
+                    if (CheckUpdate.InstallUpdate(zipFile))
+                    {
+                        Application.Exit();
+                    }
+                    else
+                    {
+                        MyMsg.Show(LMSG.DownloadFail);
+                    }
+                }
+                else
+                {
+                    MyMsg.Show("Update downloaded to:\n" + zipFile);
+                }
             }
             else
             {
