@@ -8771,77 +8771,91 @@ Returns:
   bool - true if c has attr as Fusion Attribute or effect code 4904633.
 Source: Utilities/procedure.lua:1360
 
-●void Auxiliary.FShaddollOperation(any attr)
-TODO document.
+●function Auxiliary.FShaddollOperation(int attr)
+返回「影依」融合手续的操作函数；选择2张必需融合素材，必要时使用对方场上素材效果，并通过Duel.SetFusionMaterial保存。
 Parameters:
-  attr: any
+  attr: int
+Returns:
+  function - Operation function for a Shaddoll Fusion procedure.
 Source: Utilities/procedure.lua:1396
 
-●void Auxiliary.FShaddollSpFilter1(Card c, Card fc, int tp, Group mg, Group exg, any attr, any chkf)
-TODO document.
+●bool Auxiliary.FShaddollSpFilter1(Card c, Card fc, int tp, Group mg, Group|nil exg, int attr, int chkf)
+检查c是否可以和mg或exg中的另一张有效「影依」融合素材配对。
 Parameters:
   c: Card
   fc: Card
   tp: int
   mg: Group
-  exg: Group
-  attr: any
-  chkf: any
+  exg: Group|nil
+  attr: int
+  chkf: int
+Returns:
+  bool - true if c can be paired with another valid material.
 Source: Utilities/procedure.lua:1363
 
-●void Auxiliary.FShaddollSpFilter2(Card c, Card fc, int tp, any mc, any attr, any chkf)
-TODO document.
+●bool Auxiliary.FShaddollSpFilter2(Card c, Card fc, int tp, Card mc, int attr, int chkf)
+检查c和mc是否组成所需的「影依」融合素材组合，并同时遵守必须融合素材和额外融合检查。
 Parameters:
   c: Card
   fc: Card
   tp: int
-  mc: any
-  attr: any
-  chkf: any
+  mc: Card
+  attr: int
+  chkf: int
+Returns:
+  bool - true if c and mc form a valid Shaddoll Fusion Material pair.
 Source: Utilities/procedure.lua:1367
 
-●void Auxiliary.FusionEffectUltimateFilter(Card c, Effect e, int tp, Group mg, any chkf, any params)
-TODO document.
+●bool Auxiliary.FusionEffectUltimateFilter(Card c, Effect e, int tp, Group mg, int chkf, table params)
+检查c是否为可由e使用mg和params中筛选条件进行融合召唤的融合怪兽。
 Parameters:
   c: Card
   e: Effect
   tp: int
   mg: Group
-  chkf: any
-  params: any
+  chkf: int
+  params: table
+Returns:
+  bool - true if c can be Fusion Summoned with the provided material pool.
 Source: Utilities/procedure.lua:1482
 
-●void Auxiliary.FusionEffectUltimateMatFilter(Card c, Effect e, int tp, function f)
-TODO document.
+●bool Auxiliary.FusionEffectUltimateMatFilter(Card c, Effect e, int tp, function|nil f)
+融合效果素材筛选；排除不受e影响的素材，并在提供f时套用该素材筛选。
 Parameters:
   c: Card
   e: Effect
   tp: int
-  f: function
+  f: function|nil
+Returns:
+  bool - true if c is affected by e and passes f when provided.
 Source: Utilities/procedure.lua:1493
 
-●void Auxiliary.FusionEffectUltimateMatLocFilter(Card c, Effect e, int tp, int loc, function f)
-TODO document.
+●bool Auxiliary.FusionEffectUltimateMatLocFilter(Card c, Effect e, int tp, int loc, function|nil f)
+按位置使用的融合素材筛选；不在loc的卡直接通过，在loc的卡则需要在提供f时满足f。
 Parameters:
   c: Card
   e: Effect
   tp: int
   loc: int
-  f: function
+  f: function|nil
+Returns:
+  bool - true if c is outside loc or passes f.
 Source: Utilities/procedure.lua:1496
 
 ●function Auxiliary.FusionEffectUltimateOperation(table params)
-TODO document.
+返回可配置融合召唤效果的操作函数；构建素材池，处理连锁素材，按位置执行素材操作，特殊召唤选择的融合怪兽，并执行额外回调。
 Parameters:
   params: table
 Returns:
-  function
+  function - Operation function for a configurable Fusion Summon effect.
 Source: Utilities/procedure.lua:1575
 
-●void Auxiliary.FusionEffectUltimateTarget(any params)
-TODO document.
+●function Auxiliary.FusionEffectUltimateTarget(table params)
+返回可配置融合召唤效果的目标函数；检查可召唤融合怪兽和素材池，处理连锁素材的备用检查，并登记操作信息。
 Parameters:
-  params: any
+  params: table
+Returns:
+  function - Target function for a configurable Fusion Summon effect.
 Source: Utilities/procedure.lua:1499
 
 ●void Auxiliary.fuslimit(Effect e, Effect se, any sp, any st)
@@ -8859,33 +8873,41 @@ Parameters:
   c: Card
 Source: Utilities/procedure.lua:2158
 
-●void Auxiliary.GetLinkMaterials(int tp, function f, any lc, Effect e)
-TODO document.
+●Group Auxiliary.GetLinkMaterials(int tp, function|nil f, Card lc, Effect e)
+返回tp可用的连接素材，包括通常怪兽区域素材，以及由额外连接素材效果允许使用的卡。
 Parameters:
   tp: int
-  f: function
-  lc: any
+  f: function|nil
+  lc: Card
   e: Effect
+Returns:
+  Group - Available Link Materials.
 Source: Utilities/procedure.lua:2163
 
-●void Auxiliary.GetMinSynchroLevel(Card c, Card syncard)
-TODO document.
+●int Auxiliary.GetMinSynchroLevel(Card c, Card syncard)
+返回c可为syncard提供的最小同调等级，包括打包保存的可选同调等级。
 Parameters:
   c: Card
   syncard: Card
+Returns:
+  int - Smallest Synchro Level value c can provide.
 Source: Utilities/procedure.lua:164
 
-●void Auxiliary.GetSynchroLevelFlowerCardian(Card c)
-TODO document.
+●int Auxiliary.GetSynchroLevelFlowerCardian(Card c)
+返回「花札卫」辅助函数使用的固定同调等级。
 Parameters:
   c: Card
+Returns:
+  int - Fixed Synchro Level value 2.
 Source: Utilities/procedure.lua:161
 
-●void Auxiliary.GetSynMaterials(int tp, Card syncard)
-TODO document.
+●Group Auxiliary.GetSynMaterials(int tp, Card syncard)
+返回tp对syncard可用的同调素材；若场上素材允许使用手牌同调素材，也会合并有效手牌素材。
 Parameters:
   tp: int
   syncard: Card
+Returns:
+  Group - Available Synchro Materials.
 Source: Utilities/procedure.lua:173
 
 ●void Auxiliary.IsDualState(Effect effect)
@@ -8900,58 +8922,68 @@ Parameters:
   effect: Effect
 Source: Utilities/procedure.lua:14
 
-●void Auxiliary.LCheckGoal(Group sg, int tp, any lc, any gf, any lmat)
-TODO document.
+●bool Auxiliary.LCheckGoal(Group sg, int tp, Card lc, function|nil gf, Card|nil lmat)
+连接素材组的最终检查；验证连接数值合计、额外怪兽区域可用性、可选组筛选、额外素材兼容性，以及是否包含指定lmat。
 Parameters:
   sg: Group
   tp: int
-  lc: any
-  gf: any
-  lmat: any
+  lc: Card
+  gf: function|nil
+  lmat: Card|nil
+Returns:
+  bool - true if sg is a valid Link Material group.
 Source: Utilities/procedure.lua:2185
 
-●void Auxiliary.LCheckOtherMaterial(Card c, Group mg, any lc, int tp)
-TODO document.
+●bool Auxiliary.LCheckOtherMaterial(Card c, Group mg, Card lc, int tp)
+通过EFFECT_EXTRA_LINK_MATERIAL处理函数检查c是否与其他已选连接素材兼容。
 Parameters:
   c: Card
   mg: Group
-  lc: any
+  lc: Card
   tp: int
+Returns:
+  bool - true if c is compatible with mg.
 Source: Utilities/procedure.lua:2169
 
-●void Auxiliary.LConditionFilter(Card c, function f, any lc, Effect e)
-TODO document.
+●bool Auxiliary.LConditionFilter(Card c, function|nil f, Card lc, Effect e)
+通常连接素材筛选；该卡必须可见或可被e选择，可以作为lc的连接素材，并在提供f时满足f。
 Parameters:
   c: Card
-  f: function
-  lc: any
+  f: function|nil
+  lc: Card
   e: Effect
+Returns:
+  bool - true if c is regular Link Material.
 Source: Utilities/procedure.lua:2143
 
-●void Auxiliary.LExtraFilter(Card c, function f, any lc, int tp)
-TODO document.
+●bool Auxiliary.LExtraFilter(Card c, function|nil f, Card lc, int tp)
+由EFFECT_EXTRA_LINK_MATERIAL允许的额外连接素材筛选，用于手牌、魔法/陷阱区域或对方场上的卡。
 Parameters:
   c: Card
-  f: function
-  lc: any
+  f: function|nil
+  lc: Card
   tp: int
+Returns:
+  bool - true if c can be used through an extra Link Material effect.
 Source: Utilities/procedure.lua:2147
 
-●void Auxiliary.LExtraMaterialCount(Group mg, any lc, int tp)
-TODO document.
+●void Auxiliary.LExtraMaterialCount(Group mg, Card lc, int tp)
+对通过有效EFFECT_EXTRA_LINK_MATERIAL效果使用的已选连接素材消耗次数限制。
 Parameters:
   mg: Group
-  lc: any
+  lc: Card
   tp: int
 Source: Utilities/procedure.lua:2191
 
-●void Auxiliary.LinkCondition(function f, any minct, any maxct, any gf)
-TODO document.
+●function Auxiliary.LinkCondition(function|nil f, int minct, int maxct, function|nil gf)
+返回连接召唤手续的条件函数。
 Parameters:
-  f: function
-  minct: any
-  maxct: any
-  gf: any
+  f: function|nil
+  minct: int
+  maxct: int
+  gf: function|nil
+Returns:
+  function - Condition function for a Link Summon procedure.
 Source: Utilities/procedure.lua:2204
 
 ●void Auxiliary.linklimit(Effect e, Effect se, any sp, any st)
@@ -8963,40 +8995,48 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2309
 
-●void Auxiliary.LinkOperation(function f, any minct, any maxct, any gf)
-TODO document.
+●function Auxiliary.LinkOperation(function|nil f, int minct, int maxct, function|nil gf)
+返回连接召唤手续的操作函数；设置素材，消耗额外素材次数限制，并把素材送去墓地。
 Parameters:
-  f: function
-  minct: any
-  maxct: any
-  gf: any
+  f: function|nil
+  minct: int
+  maxct: int
+  gf: function|nil
+Returns:
+  function - Operation function for a Link Summon procedure.
 Source: Utilities/procedure.lua:2263
 
-●void Auxiliary.LinkTarget(function f, any minct, any maxct, any gf)
-TODO document.
+●function Auxiliary.LinkTarget(function|nil f, int minct, int maxct, function|nil gf)
+返回连接召唤手续的目标函数；选择有效连接素材子组并保存在效果上。
 Parameters:
-  f: function
-  minct: any
-  maxct: any
-  gf: any
+  f: function|nil
+  minct: int
+  maxct: int
+  gf: function|nil
+Returns:
+  function - Target function for a Link Summon procedure.
 Source: Utilities/procedure.lua:2232
 
-●void Auxiliary.LUncompatibilityFilter(Card c, Group sg, any lc, int tp)
-TODO document.
+●bool Auxiliary.LUncompatibilityFilter(Card c, Group sg, Card lc, int tp)
+c与其他已选连接素材不兼容时返回true。
 Parameters:
   c: Card
   sg: Group
-  lc: any
+  lc: Card
   tp: int
+Returns:
+  bool - true if c is incompatible with the rest of sg.
 Source: Utilities/procedure.lua:2181
 
-●void Auxiliary.MaskChangeLimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.MaskChangeLimit(Effect e, Effect se, int sp, int st)
+Masked HERO/Mask Change类效果的特殊召唤限制Value函数；允许Mask Change召唤值，或由编号21143940的卡发动的效果。
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool - true if the Summon matches Mask Change conditions.
 Source: Utilities/procedure.lua:2317
 
 ●void Auxiliary.MustMaterialCheck(any v, int tp, int code)
@@ -9021,88 +9061,100 @@ Parameters:
   ...: any
 Source: Utilities/procedure.lua:48
 
-●void Auxiliary.PConditionExtraFilter(Card c, Effect e, int tp, Effect lscale, Effect rscale, any eset)
-TODO document.
+●bool Auxiliary.PConditionExtraFilter(Card c, Effect e, int tp, int lscale, int rscale, table eset)
+检查eset中的任意额外灵摆召唤效果是否允许c在当前刻度下使用。
 Parameters:
   c: Card
   e: Effect
   tp: int
-  lscale: Effect
-  rscale: Effect
-  eset: any
+  lscale: int
+  rscale: int
+  eset: table
+Returns:
+  bool - true if any extra Pendulum Summon effect allows c.
 Source: Utilities/procedure.lua:1985
 
-●void Auxiliary.PConditionExtraFilterSpecific(Card c, Effect e, int tp, Effect lscale, Effect rscale, Effect te)
-TODO document.
+●bool Auxiliary.PConditionExtraFilterSpecific(Card c, Effect e, int tp, int lscale, int rscale, Effect|nil te)
+检查1个额外灵摆召唤效果是否允许c在当前刻度下使用。
 Parameters:
   c: Card
   e: Effect
   tp: int
-  lscale: Effect
-  rscale: Effect
-  te: Effect
+  lscale: int
+  rscale: int
+  te: Effect|nil
+Returns:
+  bool - true if te allows c or te is nil.
 Source: Utilities/procedure.lua:1980
 
-●void Auxiliary.PConditionFilter(Card c, Effect e, int tp, Effect lscale, Effect rscale, any eset)
-TODO document.
+●bool Auxiliary.PConditionFilter(Card c, Effect e, int tp, int lscale, int rscale, table eset)
+灵摆召唤候选筛选；检查位置、等级或pendulum_level、刻度、特殊召唤合法性、禁止状态，以及额外灵摆召唤许可。
 Parameters:
   c: Card
   e: Effect
   tp: int
-  lscale: Effect
-  rscale: Effect
-  eset: any
+  lscale: int
+  rscale: int
+  eset: table
+Returns:
+  bool - true if c can be Pendulum Summoned.
 Source: Utilities/procedure.lua:1991
 
-●void Auxiliary.PendCondition(Effect e, Card c, Group og)
-TODO document.
+●bool Auxiliary.PendCondition(Effect e, Card|nil c, Group|nil og)
+共通灵摆召唤手续的条件函数；检查2个灵摆区域、可用位置和区域、每回合状态，以及可召唤怪兽。
 Parameters:
   e: Effect
-  c: Card
-  og: Group
+  c: Card|nil
+  og: Group|nil
+Returns:
+  bool - true if a Pendulum Summon is available.
 Source: Utilities/procedure.lua:2004
 
-●void Auxiliary.PendOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, Card c, Group sg, Group og)
-TODO document.
+●void Auxiliary.PendOperation(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp, Card c, Group sg, Group|nil og)
+共通灵摆召唤手续的操作函数；选择通常或额外灵摆召唤效果，在手牌/额外卡组区域限制内选择怪兽，更新检查标记，并把选择合并到sg。
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
   c: Card
   sg: Group
-  og: Group
+  og: Group|nil
 Source: Utilities/procedure.lua:2033
 
-●void Auxiliary.PendOperationCheck(any ft1, any ft2, any ft)
-TODO document.
+●function Auxiliary.PendOperationCheck(int ft1, int ft2, int ft)
+返回组检查函数，用于限制一次灵摆召唤选择中的手牌数量、额外卡组数量和总区域数量。
 Parameters:
-  ft1: any
-  ft2: any
-  ft: any
+  ft1: int
+  ft2: int
+  ft: int
+Returns:
+  function - Group check for Pendulum Summon zone limits.
 Source: Utilities/procedure.lua:2026
 
-●void Auxiliary.PendulumReset(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●void Auxiliary.PendulumReset(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+在抽卡阶段开始时重置共通灵摆召唤检查标记。
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
 Source: Utilities/procedure.lua:1977
 
-●void Auxiliary.PendulumSummonableBool(Card c)
-TODO document.
+●bool Auxiliary.PendulumSummonableBool(Card c)
+c具有psummonable_location标记且当前位置包含在其中时返回true。
 Parameters:
   c: Card
+Returns:
+  bool - true if c's current location is Pendulum Summonable by its flag.
 Source: Utilities/procedure.lua:2111
 
 ●void Auxiliary.penlimit(Effect e, Effect se, any sp, any st)
@@ -9114,16 +9166,16 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2305
 
-●void Auxiliary.PSSCompleteProcedure(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●void Auxiliary.PSSCompleteProcedure(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+对通过复活限制辅助函数设置、并以灵摆召唤特殊召唤的怪兽完成正规手续。
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
 Source: Utilities/procedure.lua:2114
 
@@ -9149,93 +9201,107 @@ Returns:
   bool
 Source: Utilities/procedure.lua:1786
 
-●void Auxiliary.RitualCheckAdditional(Card c, any lv, any greater_or_equal)
-TODO document.
+●function Auxiliary.RitualCheckAdditional(Card c, int lv, string greater_or_equal)
+返回仪式素材选择时使用的额外子组检查函数，支持Equal或Greater仪式手续。
 Parameters:
   c: Card
-  lv: any
-  greater_or_equal: any
+  lv: int
+  greater_or_equal: string
+Returns:
+  function - Additional Ritual Material subgroup check.
 Source: Utilities/procedure.lua:1810
 
-●void Auxiliary.RitualCheckAdditionalLevel(Card c, Card rc)
-TODO document.
+●int Auxiliary.RitualCheckAdditionalLevel(Card c, Card rc)
+当c的仪式等级打包了2个可选数值时，返回较小的可用仪式等级。
 Parameters:
   c: Card
   rc: Card
+Returns:
+  int - Smallest usable Ritual Level value.
 Source: Utilities/procedure.lua:1800
 
 ●bool Auxiliary.RitualCheckEqual(Group g, Card c, int lv)
-TODO document.
+检查g中仪式等级合计是否正好等于c所需的lv。
 Parameters:
   g: Group
   c: Card
   lv: int
 Returns:
-  bool
+  bool - true if g exactly matches lv.
 Source: Utilities/procedure.lua:1775
 
 ●bool Auxiliary.RitualCheckGreater(Group g, Card c, int lv)
-TODO document.
+检查g中仪式等级合计是否大于或等于c所需的lv。
 Parameters:
   g: Group
   c: Card
   lv: int
 Returns:
-  bool
+  bool - true if g reaches at least lv.
 Source: Utilities/procedure.lua:1767
 
-●void Auxiliary.RitualExtraFilter(Card c, function f)
-TODO document.
+●bool Auxiliary.RitualExtraFilter(Card c, function f)
+墓地仪式素材筛选；c必须是f接受的有等级怪兽，并且可以被除外。
 Parameters:
   c: Card
   f: function
+Returns:
+  bool - true if c is valid extra Graveyard Ritual Material.
 Source: Utilities/procedure.lua:1842
 
-●void Auxiliary.RitualUltimateFilter(Card c, function filter, Effect e, int tp, any m1, any m2, any level_function, any greater_or_equal, bool chk)
-TODO document.
+●bool Auxiliary.RitualUltimateFilter(Card c, function|nil filter, Effect e, int tp, Group m1, Group|nil m2, function level_function, string greater_or_equal, bool|nil chk)
+检查c是否为可用现有素材组以及所选Equal或Greater等级规则进行仪式召唤的有效仪式怪兽。
 Parameters:
   c: Card
-  filter: function
+  filter: function|nil
   e: Effect
   tp: int
-  m1: any
-  m2: any
-  level_function: any
-  greater_or_equal: any
-  chk: bool
+  m1: Group
+  m2: Group|nil
+  level_function: function
+  greater_or_equal: string
+  chk: bool|nil
+Returns:
+  bool - true if c can be Ritual Summoned.
 Source: Utilities/procedure.lua:1825
 
-●void Auxiliary.RitualUltimateOperation(function filter, any level_function, any greater_or_equal, any summon_location, any grave_filter, any mat_filter, any extra_operation)
-TODO document.
+●function Auxiliary.RitualUltimateOperation(function|nil filter, function level_function, string greater_or_equal, int summon_location, function|nil grave_filter, function|nil mat_filter, function|nil extra_operation)
+返回可配置仪式召唤效果的操作函数；选择仪式怪兽和素材，解放或除外素材，特殊召唤该怪兽，并执行额外回调。
 Parameters:
-  filter: function
-  level_function: any
-  greater_or_equal: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  extra_operation: any
+  filter: function|nil
+  level_function: function
+  greater_or_equal: string
+  summon_location: int
+  grave_filter: function|nil
+  mat_filter: function|nil
+  extra_operation: function|nil
+Returns:
+  function - Operation function for a configurable Ritual Summon effect.
 Source: Utilities/procedure.lua:1865
 
-●void Auxiliary.RitualUltimateTarget(function filter, any level_function, any greater_or_equal, any summon_location, any grave_filter, any mat_filter, any extra_target)
-TODO document.
+●function Auxiliary.RitualUltimateTarget(function|nil filter, function level_function, string greater_or_equal, int summon_location, function|nil grave_filter, function|nil mat_filter, function|nil extra_target)
+返回可配置仪式召唤效果的目标函数；检查仪式怪兽和素材池，并登记特殊召唤、除外及额外目标信息。
 Parameters:
-  filter: function
-  level_function: any
-  greater_or_equal: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  extra_target: any
+  filter: function|nil
+  level_function: function
+  greater_or_equal: string
+  summon_location: int
+  grave_filter: function|nil
+  mat_filter: function|nil
+  extra_target: function|nil
+Returns:
+  function - Target function for a configurable Ritual Summon effect.
 Source: Utilities/procedure.lua:1845
 
-●void Auxiliary.SynCondition(any f1, any f2, any minct, any maxct)
-TODO document.
+●function Auxiliary.SynCondition(function|nil f1, function|nil f2, int minct, int maxct)
+返回基础同调召唤手续的条件函数，并支持可选的固定调整素材处理。
 Parameters:
-  f1: any
-  f2: any
-  minct: any
-  maxct: any
+  f1: function|nil
+  f2: function|nil
+  minct: int
+  maxct: int
+Returns:
+  function - Condition function for a basic Synchro Summon procedure.
 Source: Utilities/procedure.lua:75
 
 ●void Auxiliary.SynGroupCheckLevelAddition(Card syncard)

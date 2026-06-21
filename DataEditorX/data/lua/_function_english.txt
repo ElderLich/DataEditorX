@@ -8929,77 +8929,91 @@ Returns:
   bool - true if c has attr as Fusion Attribute or effect code 4904633.
 Source: Utilities/procedure.lua:1360
 
-●void Auxiliary.FShaddollOperation(any attr)
-TODO document.
+●function Auxiliary.FShaddollOperation(int attr)
+Returns the operation function for Shaddoll Fusion procedures; it selects the two required materials, optionally using the opponent-field material effect, and stores them with Duel.SetFusionMaterial.
 Parameters:
-  attr: any
+  attr: int
+Returns:
+  function - Operation function for a Shaddoll Fusion procedure.
 Source: Utilities/procedure.lua:1396
 
-●void Auxiliary.FShaddollSpFilter1(Card c, Card fc, int tp, Group mg, Group exg, any attr, any chkf)
-TODO document.
+●bool Auxiliary.FShaddollSpFilter1(Card c, Card fc, int tp, Group mg, Group|nil exg, int attr, int chkf)
+Checks whether c can be paired with another valid Shaddoll Fusion Material from mg or exg.
 Parameters:
   c: Card
   fc: Card
   tp: int
   mg: Group
-  exg: Group
-  attr: any
-  chkf: any
+  exg: Group|nil
+  attr: int
+  chkf: int
+Returns:
+  bool - true if c can be paired with another valid material.
 Source: Utilities/procedure.lua:1363
 
-●void Auxiliary.FShaddollSpFilter2(Card c, Card fc, int tp, any mc, any attr, any chkf)
-TODO document.
+●bool Auxiliary.FShaddollSpFilter2(Card c, Card fc, int tp, Card mc, int attr, int chkf)
+Checks whether c and mc form the required Shaddoll Fusion Material pair while respecting mandatory Fusion Material and additional Fusion checks.
 Parameters:
   c: Card
   fc: Card
   tp: int
-  mc: any
-  attr: any
-  chkf: any
+  mc: Card
+  attr: int
+  chkf: int
+Returns:
+  bool - true if c and mc form a valid Shaddoll Fusion Material pair.
 Source: Utilities/procedure.lua:1367
 
-●void Auxiliary.FusionEffectUltimateFilter(Card c, Effect e, int tp, Group mg, any chkf, any params)
-TODO document.
+●bool Auxiliary.FusionEffectUltimateFilter(Card c, Effect e, int tp, Group mg, int chkf, table params)
+Checks whether c is a Fusion Monster that can be Fusion Summoned by e using mg and the filters stored in params.
 Parameters:
   c: Card
   e: Effect
   tp: int
   mg: Group
-  chkf: any
-  params: any
+  chkf: int
+  params: table
+Returns:
+  bool - true if c can be Fusion Summoned with the provided material pool.
 Source: Utilities/procedure.lua:1482
 
-●void Auxiliary.FusionEffectUltimateMatFilter(Card c, Effect e, int tp, function f)
-TODO document.
+●bool Auxiliary.FusionEffectUltimateMatFilter(Card c, Effect e, int tp, function|nil f)
+Fusion effect material filter; rejects materials immune to e and applies the optional material filter f.
 Parameters:
   c: Card
   e: Effect
   tp: int
-  f: function
+  f: function|nil
+Returns:
+  bool - true if c is affected by e and passes f when provided.
 Source: Utilities/procedure.lua:1493
 
-●void Auxiliary.FusionEffectUltimateMatLocFilter(Card c, Effect e, int tp, int loc, function f)
-TODO document.
+●bool Auxiliary.FusionEffectUltimateMatLocFilter(Card c, Effect e, int tp, int loc, function|nil f)
+Location-specific Fusion material filter; cards outside loc pass, and cards in loc must satisfy f when one is provided.
 Parameters:
   c: Card
   e: Effect
   tp: int
   loc: int
-  f: function
+  f: function|nil
+Returns:
+  bool - true if c is outside loc or passes f.
 Source: Utilities/procedure.lua:1496
 
 ●function Auxiliary.FusionEffectUltimateOperation(table params)
-TODO document.
+Returns the operation function for configurable Fusion Summon effects. It builds the material pool, handles Chain Material, applies per-location material operations, Special Summons the chosen Fusion Monster, and runs extra callbacks.
 Parameters:
   params: table
 Returns:
-  function
+  function - Operation function for a configurable Fusion Summon effect.
 Source: Utilities/procedure.lua:1575
 
-●void Auxiliary.FusionEffectUltimateTarget(any params)
-TODO document.
+●function Auxiliary.FusionEffectUltimateTarget(table params)
+Returns the target function for configurable Fusion Summon effects. It checks available Fusion Monsters and material pools, handles Chain Material fallback, and registers operation information.
 Parameters:
-  params: any
+  params: table
+Returns:
+  function - Target function for a configurable Fusion Summon effect.
 Source: Utilities/procedure.lua:1499
 
 ●void Auxiliary.fuslimit(Effect e, Effect se, any sp, any st)
@@ -9026,33 +9040,41 @@ Parameters:
   c: Card
 Source: Utilities/procedure.lua:2158
 
-●void Auxiliary.GetLinkMaterials(int tp, function f, any lc, Effect e)
-TODO document.
+●Group Auxiliary.GetLinkMaterials(int tp, function|nil f, Card lc, Effect e)
+Returns the available Link Materials for tp, including regular Monster Zone materials and cards allowed by extra Link Material effects.
 Parameters:
   tp: int
-  f: function
-  lc: any
+  f: function|nil
+  lc: Card
   e: Effect
+Returns:
+  Group - Available Link Materials.
 Source: Utilities/procedure.lua:2163
 
-●void Auxiliary.GetMinSynchroLevel(Card c, Card syncard)
-TODO document.
+●int Auxiliary.GetMinSynchroLevel(Card c, Card syncard)
+Returns the smallest Synchro Level value c can provide for syncard, including packed alternative Synchro Levels.
 Parameters:
   c: Card
   syncard: Card
+Returns:
+  int - Smallest Synchro Level value c can provide.
 Source: Utilities/procedure.lua:164
 
-●void Auxiliary.GetSynchroLevelFlowerCardian(Card c)
-TODO document.
+●int Auxiliary.GetSynchroLevelFlowerCardian(Card c)
+Returns the fixed Synchro Level value used by Flower Cardian helpers.
 Parameters:
   c: Card
+Returns:
+  int - Fixed Synchro Level value 2.
 Source: Utilities/procedure.lua:161
 
-●void Auxiliary.GetSynMaterials(int tp, Card syncard)
-TODO document.
+●Group Auxiliary.GetSynMaterials(int tp, Card syncard)
+Returns the available Synchro Materials for tp and syncard, including valid hand materials when any field material enables hand Synchro use.
 Parameters:
   tp: int
   syncard: Card
+Returns:
+  Group - Available Synchro Materials.
 Source: Utilities/procedure.lua:173
 
 ●void Auxiliary.IsDualState(Effect effect)
@@ -9068,58 +9090,68 @@ Parameters:
   effect: Effect
 Source: Utilities/procedure.lua:14
 
-●void Auxiliary.LCheckGoal(Group sg, int tp, any lc, any gf, any lmat)
-TODO document.
+●bool Auxiliary.LCheckGoal(Group sg, int tp, Card lc, function|nil gf, Card|nil lmat)
+Final Link Material group check. It verifies Link Rating total, Extra Monster Zone availability, optional group filter, extra-material compatibility, and required lmat inclusion.
 Parameters:
   sg: Group
   tp: int
-  lc: any
-  gf: any
-  lmat: any
+  lc: Card
+  gf: function|nil
+  lmat: Card|nil
+Returns:
+  bool - true if sg is a valid Link Material group.
 Source: Utilities/procedure.lua:2185
 
-●void Auxiliary.LCheckOtherMaterial(Card c, Group mg, any lc, int tp)
-TODO document.
+●bool Auxiliary.LCheckOtherMaterial(Card c, Group mg, Card lc, int tp)
+Checks whether c is compatible with the other selected Link Materials through EFFECT_EXTRA_LINK_MATERIAL handlers.
 Parameters:
   c: Card
   mg: Group
-  lc: any
+  lc: Card
   tp: int
+Returns:
+  bool - true if c is compatible with mg.
 Source: Utilities/procedure.lua:2169
 
-●void Auxiliary.LConditionFilter(Card c, function f, any lc, Effect e)
-TODO document.
+●bool Auxiliary.LConditionFilter(Card c, function|nil f, Card lc, Effect e)
+Regular Link Material filter. The card must be visible or selectable by e, usable as Link Material for lc, and satisfy f when provided.
 Parameters:
   c: Card
-  f: function
-  lc: any
+  f: function|nil
+  lc: Card
   e: Effect
+Returns:
+  bool - true if c is regular Link Material.
 Source: Utilities/procedure.lua:2143
 
-●void Auxiliary.LExtraFilter(Card c, function f, any lc, int tp)
-TODO document.
+●bool Auxiliary.LExtraFilter(Card c, function|nil f, Card lc, int tp)
+Extra Link Material filter for hand, Spell & Trap Zone, or opponent-field cards granted by EFFECT_EXTRA_LINK_MATERIAL.
 Parameters:
   c: Card
-  f: function
-  lc: any
+  f: function|nil
+  lc: Card
   tp: int
+Returns:
+  bool - true if c can be used through an extra Link Material effect.
 Source: Utilities/procedure.lua:2147
 
-●void Auxiliary.LExtraMaterialCount(Group mg, any lc, int tp)
-TODO document.
+●void Auxiliary.LExtraMaterialCount(Group mg, Card lc, int tp)
+Consumes count limits for selected Link Materials that were used through valid EFFECT_EXTRA_LINK_MATERIAL effects.
 Parameters:
   mg: Group
-  lc: any
+  lc: Card
   tp: int
 Source: Utilities/procedure.lua:2191
 
-●void Auxiliary.LinkCondition(function f, any minct, any maxct, any gf)
-TODO document.
+●function Auxiliary.LinkCondition(function|nil f, int minct, int maxct, function|nil gf)
+Returns the condition function for Link Summon procedures.
 Parameters:
-  f: function
-  minct: any
-  maxct: any
-  gf: any
+  f: function|nil
+  minct: int
+  maxct: int
+  gf: function|nil
+Returns:
+  function - Condition function for a Link Summon procedure.
 Source: Utilities/procedure.lua:2204
 
 ●void Auxiliary.linklimit(Effect e, Effect se, any sp, any st)
@@ -9135,40 +9167,48 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2309
 
-●void Auxiliary.LinkOperation(function f, any minct, any maxct, any gf)
-TODO document.
+●function Auxiliary.LinkOperation(function|nil f, int minct, int maxct, function|nil gf)
+Returns the operation function for Link Summon procedures; it sets the materials, consumes extra-material count limits, and sends the materials to the Graveyard.
 Parameters:
-  f: function
-  minct: any
-  maxct: any
-  gf: any
+  f: function|nil
+  minct: int
+  maxct: int
+  gf: function|nil
+Returns:
+  function - Operation function for a Link Summon procedure.
 Source: Utilities/procedure.lua:2263
 
-●void Auxiliary.LinkTarget(function f, any minct, any maxct, any gf)
-TODO document.
+●function Auxiliary.LinkTarget(function|nil f, int minct, int maxct, function|nil gf)
+Returns the target function for Link Summon procedures; it selects a valid Link Material subgroup and stores it on the effect.
 Parameters:
-  f: function
-  minct: any
-  maxct: any
-  gf: any
+  f: function|nil
+  minct: int
+  maxct: int
+  gf: function|nil
+Returns:
+  function - Target function for a Link Summon procedure.
 Source: Utilities/procedure.lua:2232
 
-●void Auxiliary.LUncompatibilityFilter(Card c, Group sg, any lc, int tp)
-TODO document.
+●bool Auxiliary.LUncompatibilityFilter(Card c, Group sg, Card lc, int tp)
+Returns true when c is not compatible with the other selected Link Materials.
 Parameters:
   c: Card
   sg: Group
-  lc: any
+  lc: Card
   tp: int
+Returns:
+  bool - true if c is incompatible with the rest of sg.
 Source: Utilities/procedure.lua:2181
 
-●void Auxiliary.MaskChangeLimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.MaskChangeLimit(Effect e, Effect se, int sp, int st)
+Special Summon restriction value for Masked HERO/Mask Change effects; allows the Mask Change summon value or effects activated by card code 21143940.
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool - true if the Summon matches Mask Change conditions.
 Source: Utilities/procedure.lua:2317
 
 ●void Auxiliary.MustMaterialCheck(any v, int tp, int code)
@@ -9200,88 +9240,100 @@ Parameters:
   ...: any
 Source: Utilities/procedure.lua:48
 
-●void Auxiliary.PConditionExtraFilter(Card c, Effect e, int tp, Effect lscale, Effect rscale, any eset)
-TODO document.
+●bool Auxiliary.PConditionExtraFilter(Card c, Effect e, int tp, int lscale, int rscale, table eset)
+Checks whether any extra Pendulum Summon effect in eset allows c for the current scales.
 Parameters:
   c: Card
   e: Effect
   tp: int
-  lscale: Effect
-  rscale: Effect
-  eset: any
+  lscale: int
+  rscale: int
+  eset: table
+Returns:
+  bool - true if any extra Pendulum Summon effect allows c.
 Source: Utilities/procedure.lua:1985
 
-●void Auxiliary.PConditionExtraFilterSpecific(Card c, Effect e, int tp, Effect lscale, Effect rscale, Effect te)
-TODO document.
+●bool Auxiliary.PConditionExtraFilterSpecific(Card c, Effect e, int tp, int lscale, int rscale, Effect|nil te)
+Checks whether one extra Pendulum Summon effect allows c for the current scales.
 Parameters:
   c: Card
   e: Effect
   tp: int
-  lscale: Effect
-  rscale: Effect
-  te: Effect
+  lscale: int
+  rscale: int
+  te: Effect|nil
+Returns:
+  bool - true if te allows c or te is nil.
 Source: Utilities/procedure.lua:1980
 
-●void Auxiliary.PConditionFilter(Card c, Effect e, int tp, Effect lscale, Effect rscale, any eset)
-TODO document.
+●bool Auxiliary.PConditionFilter(Card c, Effect e, int tp, int lscale, int rscale, table eset)
+Pendulum Summon candidate filter. It checks location, Level or pendulum_level, scales, Special Summon legality, forbidden state, and extra Pendulum Summon permissions.
 Parameters:
   c: Card
   e: Effect
   tp: int
-  lscale: Effect
-  rscale: Effect
-  eset: any
+  lscale: int
+  rscale: int
+  eset: table
+Returns:
+  bool - true if c can be Pendulum Summoned.
 Source: Utilities/procedure.lua:1991
 
-●void Auxiliary.PendCondition(Effect e, Card c, Group og)
-TODO document.
+●bool Auxiliary.PendCondition(Effect e, Card|nil c, Group|nil og)
+Condition function for the shared Pendulum Summon procedure. It checks the two Pendulum Zones, available locations and zones, once-per-turn state, and valid summonable monsters.
 Parameters:
   e: Effect
-  c: Card
-  og: Group
+  c: Card|nil
+  og: Group|nil
+Returns:
+  bool - true if a Pendulum Summon is available.
 Source: Utilities/procedure.lua:2004
 
-●void Auxiliary.PendOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, Card c, Group sg, Group og)
-TODO document.
+●void Auxiliary.PendOperation(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp, Card c, Group sg, Group|nil og)
+Operation function for the shared Pendulum Summon procedure. It chooses the regular or extra Pendulum Summon effect, selects monsters within hand/Extra Deck zone limits, updates the checklist, and merges the selection into sg.
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
   c: Card
   sg: Group
-  og: Group
+  og: Group|nil
 Source: Utilities/procedure.lua:2033
 
-●void Auxiliary.PendOperationCheck(any ft1, any ft2, any ft)
-TODO document.
+●function Auxiliary.PendOperationCheck(int ft1, int ft2, int ft)
+Returns a group check that enforces the hand, Extra Deck, and total zone limits for a Pendulum Summon selection.
 Parameters:
-  ft1: any
-  ft2: any
-  ft: any
+  ft1: int
+  ft2: int
+  ft: int
+Returns:
+  function - Group check for Pendulum Summon zone limits.
 Source: Utilities/procedure.lua:2026
 
-●void Auxiliary.PendulumReset(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●void Auxiliary.PendulumReset(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+Resets the shared Pendulum Summon checklist at the start of the Draw Phase.
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
 Source: Utilities/procedure.lua:1977
 
-●void Auxiliary.PendulumSummonableBool(Card c)
-TODO document.
+●bool Auxiliary.PendulumSummonableBool(Card c)
+Returns true if c has a psummonable_location flag that includes its current location.
 Parameters:
   c: Card
+Returns:
+  bool - true if c's current location is Pendulum Summonable by its flag.
 Source: Utilities/procedure.lua:2111
 
 ●void Auxiliary.penlimit(Effect e, Effect se, any sp, any st)
@@ -9297,16 +9349,16 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2305
 
-●void Auxiliary.PSSCompleteProcedure(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●void Auxiliary.PSSCompleteProcedure(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+Completes the procedure for monsters that were Special Summoned by Pendulum Summon through the revive-limit helper.
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
 Source: Utilities/procedure.lua:2114
 
@@ -9336,93 +9388,107 @@ Returns:
   bool
 Source: Utilities/procedure.lua:1786
 
-●void Auxiliary.RitualCheckAdditional(Card c, any lv, any greater_or_equal)
-TODO document.
+●function Auxiliary.RitualCheckAdditional(Card c, int lv, string greater_or_equal)
+Returns an additional subgroup check used while selecting Ritual Materials for Equal or Greater Ritual procedures.
 Parameters:
   c: Card
-  lv: any
-  greater_or_equal: any
+  lv: int
+  greater_or_equal: string
+Returns:
+  function - Additional Ritual Material subgroup check.
 Source: Utilities/procedure.lua:1810
 
-●void Auxiliary.RitualCheckAdditionalLevel(Card c, Card rc)
-TODO document.
+●int Auxiliary.RitualCheckAdditionalLevel(Card c, Card rc)
+Returns the smaller usable Ritual Level value for c when its Ritual Level packs two alternatives.
 Parameters:
   c: Card
   rc: Card
+Returns:
+  int - Smallest usable Ritual Level value.
 Source: Utilities/procedure.lua:1800
 
 ●bool Auxiliary.RitualCheckEqual(Group g, Card c, int lv)
-TODO document.
+Checks whether g's Ritual Levels exactly equal lv for c.
 Parameters:
   g: Group
   c: Card
   lv: int
 Returns:
-  bool
+  bool - true if g exactly matches lv.
 Source: Utilities/procedure.lua:1775
 
 ●bool Auxiliary.RitualCheckGreater(Group g, Card c, int lv)
-TODO document.
+Checks whether g's Ritual Levels are greater than or equal to lv for c.
 Parameters:
   g: Group
   c: Card
   lv: int
 Returns:
-  bool
+  bool - true if g reaches at least lv.
 Source: Utilities/procedure.lua:1767
 
-●void Auxiliary.RitualExtraFilter(Card c, function f)
-TODO document.
+●bool Auxiliary.RitualExtraFilter(Card c, function f)
+Graveyard Ritual Material filter; c must be a Level monster accepted by f and able to be banished.
 Parameters:
   c: Card
   f: function
+Returns:
+  bool - true if c is valid extra Graveyard Ritual Material.
 Source: Utilities/procedure.lua:1842
 
-●void Auxiliary.RitualUltimateFilter(Card c, function filter, Effect e, int tp, any m1, any m2, any level_function, any greater_or_equal, bool chk)
-TODO document.
+●bool Auxiliary.RitualUltimateFilter(Card c, function|nil filter, Effect e, int tp, Group m1, Group|nil m2, function level_function, string greater_or_equal, bool|nil chk)
+Checks whether c is a valid Ritual Monster that can be Ritual Summoned with the available material groups and the selected Equal or Greater level rule.
 Parameters:
   c: Card
-  filter: function
+  filter: function|nil
   e: Effect
   tp: int
-  m1: any
-  m2: any
-  level_function: any
-  greater_or_equal: any
-  chk: bool
+  m1: Group
+  m2: Group|nil
+  level_function: function
+  greater_or_equal: string
+  chk: bool|nil
+Returns:
+  bool - true if c can be Ritual Summoned.
 Source: Utilities/procedure.lua:1825
 
-●void Auxiliary.RitualUltimateOperation(function filter, any level_function, any greater_or_equal, any summon_location, any grave_filter, any mat_filter, any extra_operation)
-TODO document.
+●function Auxiliary.RitualUltimateOperation(function|nil filter, function level_function, string greater_or_equal, int summon_location, function|nil grave_filter, function|nil mat_filter, function|nil extra_operation)
+Returns the operation function for configurable Ritual Summon effects. It selects the Ritual Monster and materials, releases or banishes the materials, Special Summons the monster, and runs extra callbacks.
 Parameters:
-  filter: function
-  level_function: any
-  greater_or_equal: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  extra_operation: any
+  filter: function|nil
+  level_function: function
+  greater_or_equal: string
+  summon_location: int
+  grave_filter: function|nil
+  mat_filter: function|nil
+  extra_operation: function|nil
+Returns:
+  function - Operation function for a configurable Ritual Summon effect.
 Source: Utilities/procedure.lua:1865
 
-●void Auxiliary.RitualUltimateTarget(function filter, any level_function, any greater_or_equal, any summon_location, any grave_filter, any mat_filter, any extra_target)
-TODO document.
+●function Auxiliary.RitualUltimateTarget(function|nil filter, function level_function, string greater_or_equal, int summon_location, function|nil grave_filter, function|nil mat_filter, function|nil extra_target)
+Returns the target function for configurable Ritual Summon effects. It checks Ritual Monsters and material pools, then registers Special Summon, banish, and extra target information.
 Parameters:
-  filter: function
-  level_function: any
-  greater_or_equal: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  extra_target: any
+  filter: function|nil
+  level_function: function
+  greater_or_equal: string
+  summon_location: int
+  grave_filter: function|nil
+  mat_filter: function|nil
+  extra_target: function|nil
+Returns:
+  function - Target function for a configurable Ritual Summon effect.
 Source: Utilities/procedure.lua:1845
 
-●void Auxiliary.SynCondition(any f1, any f2, any minct, any maxct)
-TODO document.
+●function Auxiliary.SynCondition(function|nil f1, function|nil f2, int minct, int maxct)
+Returns the condition function for basic Synchro Summon procedures, including optional fixed tuner material handling.
 Parameters:
-  f1: any
-  f2: any
-  minct: any
-  maxct: any
+  f1: function|nil
+  f2: function|nil
+  minct: int
+  maxct: int
+Returns:
+  function - Condition function for a basic Synchro Summon procedure.
 Source: Utilities/procedure.lua:75
 
 ●void Auxiliary.SynGroupCheckLevelAddition(Card syncard)
