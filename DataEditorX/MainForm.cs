@@ -82,7 +82,7 @@ namespace DataEditorX
         {
             // File paths.
             conflang = DEXConfig.GetLanguageFile(datapath);
-            // Game and MSE data.
+            // Game data.
             olddatacfg = datacfg = new DataConfig(DEXConfig.GetCardInfoFile(datapath));
             string confstring = MyPath.FindFile(datapath, DEXConfig.FILE_STRINGS, "lua");
             if (File.Exists(confstring))

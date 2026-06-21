@@ -62,9 +62,6 @@ DataEditForm.mainMenu.menuitem_copyselectto	Copy Selected
 DataEditForm.mainMenu.menuitem_copyto	Copy All
 DataEditForm.mainMenu.menuitem_openLastDataBase	Open Last Opened Database
 DataEditForm.mainMenu.menuitem_quit	Exit
-DataEditForm.mainMenu.menu_image	MSE(&M)
-DataEditForm.mainMenu.menuitem_importmseimg	Import MSE Images
-DataEditForm.mainMenu.menuitem_mseconfig	Set MSE Config File
 DataEditForm.mainMenu.menu_data	Data(&D)
 DataEditForm.mainMenu.menuitem_operacardsfile	Rename both Script and Image
 DataEditForm.mainMenu.menuitem_openfileinthis	Open Lua with CodeEditor
@@ -76,18 +73,11 @@ DataEditForm.mainMenu.menuitem_readimages	Read from Images Path(&I)
 DataEditForm.mainMenu.menuitem_readscripts	Read from Scripts Path
 DataEditForm.mainMenu.menuitem_compdb	Compress Database
 DataEditForm.mainMenu.menuitem_exportdata	Export Data as ZIP File
-DataEditForm.mainMenu.menuitem_mseconfig	Set MSE Config
 DataEditForm.mainMenu.menuitem_testpendulumtext	Test Pendulum Texts
-DataEditForm.mainMenu.menuitem_readmse	Read MSE-set
-DataEditForm.mainMenu.menuitem_saveasmse_select	Save Selected as MSE-set
-DataEditForm.mainMenu.menuitem_saveasmse	Save All as MSE-set
-DataEditForm.mainMenu.menuitem_cutimages	Cut Images
 DataEditForm.mainMenu.menuitem_convertimage	Convert Images
-DataEditForm.mainMenu.menuitem_importmseimg	Set MSE's Image
 DataEditForm.mainMenu.menuitem_export_all_sql	Export All Cards to SQL File
 DataEditForm.mainMenu.menuitem_export_select_sql	Export Selected Cards to SQL File
 DataEditForm.mainMenu.menuitem_cancelTask	Cancel Task
-DataEditForm.mainMenu.menuitem_exportMSEimage	Export MSE-set to Images(Click stop)
 DataEditForm.mainMenu.menuitem_help	Help(&H)
 DataEditForm.mainMenu.menuitem_about	Version Info
 DataEditForm.mainMenu.menuitem_language	Language
@@ -158,18 +148,11 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x27	Checking Update...
 0x28	Copying Database...
 0x29	Copied Database successfully.
-0x2a	Save Mse-set file
-0x2b	MSE set(*.mse-set)|*.mse-set|all files(*.*)|*.*
-0x2c	Exporting Mse-set
-0x2d	Export Mse-set OK
-0x2e	Cutting Images...
-0x2f	Cut Images successfully.
 0x30	No card selected
 0x31	Replace Image while it already exists?
 0x32	Converting Images
 0x33	Convert Images OK
 0x34	Compression Database OK
-0x35	Only update the text of the set?
 0x36	Task canceled
 0x37	Task paused
 0x38	Task resumed
@@ -187,11 +170,7 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x44	New File
 0x45	Saved Successfully.
 0x46	Save Script?
-0x47	Read MSE-set
-0x48	Successfully reading MSE-set.
 0x49	Please restart program to apply changes.
-0x4a	Successfully exported MSE-set to images.
-0x4b	Failed to export MSE-set to images fail.
 0x4c	No syntax error found.
 0x4d	It is not recommended to open lots of file at a time. Continue?
 0x4e	Are you sure to undo? All unsaved contents will be lost.

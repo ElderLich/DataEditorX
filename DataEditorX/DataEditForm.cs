@@ -8,7 +8,6 @@
 using DataEditorX.Common;
 using DataEditorX.Config;
 using DataEditorX.Core;
-using DataEditorX.Core.Mse;
 using DataEditorX.Language;
 using System.Globalization;
 using WeifenLuo.WinFormsUI.Docking;
@@ -81,9 +80,15 @@ namespace DataEditorX
         //Setcode input is being edited
         readonly bool[] setcodeIsedit = new bool[5];
         readonly CommandManager cmdManager = new();
+        const string PendulumScalePrefix = "Pendulum Scale = ";
+        const string PendulumEffectHeader = "[ Pendulum Effect ]";
+        const string MonsterEffectHeader = "[ Monster Effect ]";
+        const string PendulumSeparator = "----------------------------------------";
+        static readonly Regex PendulumTextRegex = new(
+            @"\[ Pendulum Effect \]\s*\r?\n([\s\S]*?)\r?\n-+\s*\r?\n\[ (?:Monster Effect|Flavor Text) \]\s*\r?\n([\s\S]*)",
+            RegexOptions.Multiline);
 
         Image cover;
-        MSEConfig msecfg;
 
         string datapath, confcover;
 
@@ -214,9 +219,8 @@ namespace DataEditorX
             //InitListRows();//Recalculate card list rows
             HideMenu();//Hide the embedded menu when needed
             SetTitle();//Update the title
-                            //Load data
-            msecfg = new MSEConfig(datapath);
-            tasker = new TaskHelper(datapath, bgWorker1, msecfg);
+            //Load data
+            tasker = new TaskHelper(datapath, bgWorker1);
             //Reset to an empty card
             oldCard = new Card(0);
             SetCard(oldCard);
@@ -232,9 +236,6 @@ namespace DataEditorX
             {
                 _ = Open(nowCdbFile);
             }
-            //Build the MSE config menu
-            AddMenuItemFormMSE();
-            //
             GetLanguageItem();
             ApplyTheme();
             //   CheckUpdate(false);//Check for updates
@@ -1448,19 +1449,8 @@ namespace DataEditorX
                     case MyTask.ExportData:
                         MyMsg.Show(LMSG.ExportDataOK);
                         break;
-                    case MyTask.CutImages:
-                        MyMsg.Show(LMSG.CutImageOK);
-                        break;
-                    case MyTask.SaveAsMSE:
-                        MyMsg.Show(LMSG.SaveMseOK);
-                        break;
                     case MyTask.ConvertImages:
                         MyMsg.Show(LMSG.ConvertImageOK);
-                        break;
-                    case MyTask.ReadMSE:
-                        //Save imported cards
-                        SaveCards(tasker.CardList);
-                        MyMsg.Show(LMSG.ReadMSEisOK);
                         break;
                 }
             }
@@ -1567,69 +1557,6 @@ namespace DataEditorX
         }
         #endregion
 
-        #region MSE files and image cropping
-        //Crop images
-        void Menuitem_cutimagesClick(object sender, EventArgs e)
-        {
-            if (!CheckOpen())
-            {
-                return;
-            }
-
-            if (IsRun())
-            {
-                return;
-            }
-
-            bool isreplace = MyMsg.Question(LMSG.IfReplaceExistingImage);
-            tasker.SetTask(MyTask.CutImages, cardlist.ToArray(),
-                           ygopath.picpath, isreplace.ToString());
-            Run(LanguageHelper.GetMsg(LMSG.CutImage));
-        }
-        void Menuitem_saveasmse_selectClick(object sender, EventArgs e)
-        {
-            //Selected cards
-            SaveAsMSE(true);
-        }
-
-        void Menuitem_saveasmseClick(object sender, EventArgs e)
-        {
-            //All cards
-            SaveAsMSE(false);
-        }
-        void SaveAsMSE(bool onlyselect)
-        {
-            if (!CheckOpen())
-            {
-                return;
-            }
-
-            if (IsRun())
-            {
-                return;
-            }
-
-            Card[] cards = GetCardList(onlyselect);
-            if (cards == null)
-            {
-                return;
-            }
-            //select save mse-set
-            using SaveFileDialog dlg = new();
-            dlg.Title = LanguageHelper.GetMsg(LMSG.selectMseset);
-            try
-            {
-                dlg.Filter = LanguageHelper.GetMsg(LMSG.MseType);
-            }
-            catch { }
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                tasker.SetTask(MyTask.SaveAsMSE, cards, dlg.FileName, "");
-                Run(LanguageHelper.GetMsg(LMSG.SaveMse));
-            }
-        }
-        #endregion
-
         #region Import card art
         void ImportImageFromSelect()
         {
@@ -1676,37 +1603,15 @@ namespace DataEditorX
                 e.Effect = DragDropEffects.None;
             }
         }
-        private void Menuitem_importmseimg_Click(object sender, EventArgs e)
-        {
-            string tid = tb_cardcode.Text;
-            menuitem_importmseimg.Checked = !menuitem_importmseimg.Checked;
-            SetImage(tid);
-        }
         void ImportImage(string file, string tid)
         {
-            string f;
             if (pl_image.BackgroundImage != null
                 && pl_image.BackgroundImage != cover)
             {//Release image resources
                 pl_image.BackgroundImage.Dispose();
                 pl_image.BackgroundImage = cover;
             }
-            if (menuitem_importmseimg.Checked)
-            {
-                if (!Directory.Exists(tasker.MSEImagePath))
-                {
-                    _ = Directory.CreateDirectory(tasker.MSEImagePath);
-                }
-
-                f = MyPath.Combine(tasker.MSEImagePath, tid + ".jpg");
-                File.Copy(file, f, true);
-            }
-            else
-            {
-                //	tasker.ToImg(file, ygopath.GetImage(tid),
-                //				 ygopath.GetImageThum(tid));
-                tasker.ToImg(file, ygopath.GetImage(tid));
-            }
+            tasker.ToImg(file, ygopath.GetImage(tid));
             SetImage(tid);
         }
         public void SetImage(string id)
@@ -1717,15 +1622,7 @@ namespace DataEditorX
         public void SetImage(long id)
         {
             string pic = ygopath.GetImage(id);
-            if (menuitem_importmseimg.Checked)//Show MSE image
-            {
-                string msepic = MseMaker.GetCardImagePath(tasker.MSEImagePath, oldCard);
-                if (File.Exists(msepic))
-                {
-                    pl_image.BackgroundImage = MyBitmap.ReadImage(msepic);
-                }
-            }
-            else if (File.Exists(pic))
+            if (File.Exists(pic))
             {
                 pl_image.BackgroundImage = MyBitmap.ReadImage(pic);
             }
@@ -1858,58 +1755,6 @@ namespace DataEditorX
         }
         #endregion
 
-        #region MSE config menu
-        //Add config files to the menu
-        void AddMenuItemFormMSE()
-        {
-            if (!Directory.Exists(datapath))
-            {
-                return;
-            }
-
-            menuitem_mseconfig.DropDownItems.Clear();//Clear current state
-            string[] files = MyPath.FindFiles(datapath, MyPath.GetFileName(MSEConfig.TAG, "*"), "mse");
-            foreach (string file in files)
-            {
-                string name = MyPath.GetFullFileName(MSEConfig.TAG, file);
-                //Check for MSE config files
-                if (string.IsNullOrEmpty(name))
-                {
-                    continue;
-                }
-                //Use the language name as menu text
-                ToolStripMenuItem tsmi = new(name)
-                {
-                    ToolTipText = file//Store the real path in the tooltip
-                };
-                tsmi.Click += SetMseConfig_Click;
-                if (msecfg.configName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    tsmi.Checked = true;//Check the current config
-                }
-
-                _ = menuitem_mseconfig.DropDownItems.Add(tsmi);
-            }
-        }
-        void SetMseConfig_Click(object sender, EventArgs e)
-        {
-            if (IsRun())//Task is running
-            {
-                return;
-            }
-
-            if (sender is ToolStripMenuItem tsmi)
-            {
-                //Load selected config
-                msecfg.SetConfig(tsmi.ToolTipText, datapath);
-                //Refresh menu
-                AddMenuItemFormMSE();
-                //Save config
-                XMLReader.Save(DEXConfig.TAG_MSE, tsmi.Text);
-            }
-        }
-        #endregion
-
         #region Find Lua functions
         private void Menuitem_findluafunc_Click(object sender, EventArgs e)
         {
@@ -2008,36 +1853,6 @@ namespace DataEditorX
         }
         #endregion
 
-        #region Read MSE file
-        private void Menuitem_readmse_Click(object sender, EventArgs e)
-        {
-            if (!CheckOpen())
-            {
-                return;
-            }
-
-            if (IsRun())
-            {
-                return;
-            }
-            //select open mse-set
-            using OpenFileDialog dlg = new();
-            dlg.Title = LanguageHelper.GetMsg(LMSG.selectMseset);
-            try
-            {
-                dlg.Filter = LanguageHelper.GetMsg(LMSG.MseType);
-            }
-            catch { }
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                bool isUpdate = MyMsg.Question(LMSG.IfReplaceExistingImage);
-                tasker.SetTask(MyTask.ReadMSE, null,
-                               dlg.FileName, isUpdate.ToString());
-                Run(LanguageHelper.GetMsg(LMSG.ReadMSE));
-            }
-        }
-        #endregion
-
         #region Compact database
         private void Menuitem_compdb_Click(object sender, EventArgs e)
         {
@@ -2123,63 +1938,12 @@ namespace DataEditorX
         }
         #endregion
 
-        //Export MSE set as images
-        void Menuitem_exportMSEimageClick(object sender, EventArgs e)
-        {
-            if (IsRun())
-            {
-                return;
-            }
-
-            string msepath = MyPath.GetRealPath(DEXConfig.ReadString(DEXConfig.TAG_MSE_PATH));
-            if (!File.Exists(msepath))
-            {
-                MyMsg.Error(LMSG.exportMseImagesErr);
-                menuitem_exportMSEimage.Checked = false;
-                return;
-            }
-            else
-            {
-                if (MseMaker.MseIsRunning())
-                {
-                    MseMaker.MseStop();
-                    menuitem_exportMSEimage.Checked = false;
-                    return;
-                }
-                else
-                {
-
-                }
-            }
-            //select open mse-set
-            using OpenFileDialog dlg = new();
-            dlg.Title = LanguageHelper.GetMsg(LMSG.selectMseset);
-            try
-            {
-                dlg.Filter = LanguageHelper.GetMsg(LMSG.MseType);
-            }
-            catch { }
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                string mseset = dlg.FileName;
-                string exportpath = MyPath.GetRealPath(DEXConfig.ReadString(DEXConfig.TAG_MSE_EXPORT));
-                MseMaker.ExportSet(msepath, mseset, exportpath, delegate
-                {
-                    menuitem_exportMSEimage.Checked = false;
-                });
-                menuitem_exportMSEimage.Checked = true;
-            }
-            else
-            {
-                menuitem_exportMSEimage.Checked = false;
-            }
-        }
         void Menuitem_testPendulumTextClick(object sender, EventArgs e)
         {
             Card c = GetCard();
             if (c != null)
             {
-                tasker.TestPendulumText(c.desc);
+                TestPendulumText(c.desc);
             }
         }
         void Menuitem_export_select_sqlClick(object sender, EventArgs e)
@@ -2376,28 +2140,84 @@ namespace DataEditorX
                 }
             }
         }
+        private static string NormalizeCardText(string text)
+        {
+            return Regex.Replace(text ?? "", "\\[/?b\\]", "")
+                .Replace("\r\n", "\n")
+                .Replace("\r", "\n")
+                .Replace("\n", Environment.NewLine)
+                .Trim();
+        }
+        private static bool TrySplitPendulumText(string desc, out string monsterText, out string pendulumText)
+        {
+            monsterText = "";
+            pendulumText = "";
+            string text = NormalizeCardText(desc);
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+
+            Match match = PendulumTextRegex.Match(text.Replace(Environment.NewLine, "\n"));
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            pendulumText = NormalizeCardText(match.Groups[1].Value);
+            monsterText = NormalizeCardText(match.Groups[2].Value);
+            return true;
+        }
+        private static bool IsFormattedPendulumText(string text)
+        {
+            return TrySplitPendulumText(text, out _, out _)
+                || NormalizeCardText(text).StartsWith(PendulumScalePrefix, StringComparison.OrdinalIgnoreCase);
+        }
+        private static void TestPendulumText(string desc)
+        {
+            if (string.IsNullOrWhiteSpace(desc))
+            {
+                _ = MessageBox.Show("desc is null", "Info");
+                return;
+            }
+
+            if (!TrySplitPendulumText(desc, out string monsterText, out string pendulumText))
+            {
+                monsterText = NormalizeCardText(desc);
+                pendulumText = "";
+            }
+
+            _ = MessageBox.Show(monsterText, "Monster Effect");
+            _ = MessageBox.Show(pendulumText, "Pendulum Effect");
+        }
         void TextToPendulum(object sender, EventArgs e)
         {
             string txt = tb_cardtext.Text;
             if ((GetCheck(pl_cardtype) & 0x1000000) > 0)
             {
-                string[] template = msecfg.temp_text.Replace("\n", Environment.NewLine).Split("%");
                 GetTexts(txt, out string[] tmp);
-                if (!txt.StartsWith(template[0]))
-                    tb_cardtext.Text = template.Length > 5 ? template[0] + tb_pleft.Text
-                        + (tb_pleft.Text != tb_pright.Text ? "/" + tb_pright.Text : "") + template[2]
-                        + ((GetCheck(pl_flags) & 0x800000) > 0 ? "" : tmp[0]) + template[4] + tmp[1] + template[6]
-                        : template[0] + ((GetCheck(pl_flags) & 0x800000) > 0 ? "" : tmp[0]) + template[2] + tmp[1]
-                        + template[4];
+                if (!IsFormattedPendulumText(txt))
+                {
+                    string scale = tb_pleft.Text + (tb_pleft.Text != tb_pright.Text ? "/" + tb_pright.Text : "");
+                    string pendulumText = (GetCheck(pl_flags) & 0x800000) > 0 ? "" : tmp[0];
+                    tb_cardtext.Text = PendulumScalePrefix + scale
+                        + Environment.NewLine + PendulumEffectHeader
+                        + Environment.NewLine + pendulumText
+                        + Environment.NewLine + PendulumSeparator
+                        + Environment.NewLine + MonsterEffectHeader
+                        + Environment.NewLine + tmp[1];
+                }
             }
             else
             {
-                txt = Regex.Replace(txt, msecfg.regx_pendulum, "$1");
-                txt = Regex.Replace(txt, "(\\r?\\n)*---*\\r?\\n.*", "");
-                txt = Regex.Replace(txt, msecfg.regx_monster, "$1");
-                txt = Regex.Replace(txt, "^(\\r?\\n)*", "", RegexOptions.Multiline);
-                txt = Regex.Replace(txt, "(?:\\r)?\\n", Environment.NewLine);
-                tb_cardtext.Text = txt;
+                if (TrySplitPendulumText(txt, out string monsterText, out _))
+                {
+                    tb_cardtext.Text = monsterText;
+                }
+                else
+                {
+                    tb_cardtext.Text = NormalizeCardText(txt);
+                }
             }
         }
         private void OnDragEnter(object sender, DragEventArgs e)

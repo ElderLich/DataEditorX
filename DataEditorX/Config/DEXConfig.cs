@@ -12,8 +12,6 @@ namespace DataEditorX.Config
         #region Constants
         public const string TAG_SAVE_LAGN = "-savelanguage";
         public const string TAG_SAVE_LAGN2 = "-sl";
-        public const string TAG_MSE_PATH = "mse_path";
-        public const string TAG_MSE_EXPORT = "mse_exportpath";
         public const string TAG_AUTO_LEN = "autolength";
         /// <summary>
         /// Window message for opening files
@@ -32,9 +30,6 @@ namespace DataEditorX.Config
         /// </summary>
         //public const string TAG_OPEN = "open";
         /// <summary>
-        /// MSE
-        /// </summary>
-        public const string TAG_MSE = "mse";
         /// <summary>
         /// Card info
         /// </summary>
@@ -108,19 +103,6 @@ namespace DataEditorX.Config
         /// Check system language
         /// </summary>
         public const string TAG_CHECK_SYSLANG = "check_system_language";
-        /// <summary>
-        /// Default crop settings
-        /// </summary>
-        public const string TAG_IMAGE_OTHER = "image_other";
-        /// <summary>
-        /// Xyz crop settings
-        /// </summary>
-        public const string TAG_IMAGE_XYZ = "image_xyz";
-        /// <summary>
-        /// Pendulum crop settings
-        /// </summary>
-        public const string TAG_IMAGE_PENDULUM = "image_pendulum";
-        /// <summary>
         /// Image dimensions: thumbnail w/h and full-size W/H
         /// </summary>
         public const string TAG_IMAGE_SIZE = "image";

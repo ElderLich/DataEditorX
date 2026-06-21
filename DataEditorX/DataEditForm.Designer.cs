@@ -36,16 +36,7 @@ namespace DataEditorX
         private void InitializeComponent()
         {
             mainMenu = new MenuStrip();
-            menu_image = new ToolStripMenuItem();
-            menuitem_mseconfig = new ToolStripMenuItem();
-            tsep3 = new ToolStripSeparator();
-            menuitem_readmse = new ToolStripMenuItem();
-            menuitem_saveasmse_select = new ToolStripMenuItem();
-            menuitem_saveasmse = new ToolStripMenuItem();
-            menuitem_exportMSEimage = new ToolStripMenuItem();
             menuitem_testpendulumtext = new ToolStripMenuItem();
-            tsep7 = new ToolStripSeparator();
-            menuitem_importmseimg = new ToolStripMenuItem();
             menu_data = new ToolStripMenuItem();
             menuitem_operacardsfile = new ToolStripMenuItem();
             menuitem_openfileinthis = new ToolStripMenuItem();
@@ -62,7 +53,6 @@ namespace DataEditorX
             menuitem_findluafunc = new ToolStripMenuItem();
             menuitem_exportdata = new ToolStripMenuItem();
             tsep5 = new ToolStripSeparator();
-            menuitem_cutimages = new ToolStripMenuItem();
             menuitem_convertimage = new ToolStripMenuItem();
             tsep1 = new ToolStripSeparator();
             menuitem_cancelTask = new ToolStripMenuItem();
@@ -148,81 +138,16 @@ namespace DataEditorX
             // 
             // mainMenu
             // 
-            mainMenu.Items.AddRange(new ToolStripItem[] { menu_image, menu_data, menuitem_help, menuitem_addarchetype });
+            mainMenu.Items.AddRange(new ToolStripItem[] { menu_data, menuitem_help, menuitem_addarchetype });
             mainMenu.Location = new Point(0, 0);
             mainMenu.Name = "mainMenu";
             mainMenu.Size = new Size(991, 24);
             mainMenu.TabIndex = 0;
             mainMenu.Text = "mainMenu";
             // 
-            // menu_image
-            // 
-            menu_image.DropDownItems.AddRange(new ToolStripItem[] { menuitem_mseconfig, tsep3, menuitem_readmse, menuitem_saveasmse_select, menuitem_saveasmse, menuitem_exportMSEimage, menuitem_testpendulumtext, tsep7, menuitem_importmseimg });
-            menu_image.Name = "menu_image";
-            menu_image.Size = new Size(63, 20);
-            menu_image.Text = "Image(&I)";
-            // 
-            // menuitem_mseconfig
-            // 
-            menuitem_mseconfig.Name = "menuitem_mseconfig";
-            menuitem_mseconfig.Size = new Size(210, 22);
-            menuitem_mseconfig.Text = "MSE config";
-            // 
-            // tsep3
-            // 
-            tsep3.Name = "tsep3";
-            tsep3.Size = new Size(207, 6);
-            // 
-            // menuitem_readmse
-            // 
-            menuitem_readmse.Name = "menuitem_readmse";
-            menuitem_readmse.Size = new Size(210, 22);
-            menuitem_readmse.Text = "Read from MSE";
-            menuitem_readmse.Click += Menuitem_readmse_Click;
-            // 
-            // menuitem_saveasmse_select
-            // 
-            menuitem_saveasmse_select.Name = "menuitem_saveasmse_select";
-            menuitem_saveasmse_select.Size = new Size(210, 22);
-            menuitem_saveasmse_select.Text = "Select Save As MSE";
-            menuitem_saveasmse_select.Click += Menuitem_saveasmse_selectClick;
-            // 
-            // menuitem_saveasmse
-            // 
-            menuitem_saveasmse.Name = "menuitem_saveasmse";
-            menuitem_saveasmse.Size = new Size(210, 22);
-            menuitem_saveasmse.Text = "All Now Save As MSE";
-            menuitem_saveasmse.Click += Menuitem_saveasmseClick;
-            // 
-            // menuitem_exportMSEimage
-            // 
-            menuitem_exportMSEimage.Name = "menuitem_exportMSEimage";
-            menuitem_exportMSEimage.Size = new Size(210, 22);
-            menuitem_exportMSEimage.Text = "Export MSE-Set to Images";
-            menuitem_exportMSEimage.Click += Menuitem_exportMSEimageClick;
-            // 
-            // menuitem_testpendulumtext
-            // 
-            menuitem_testpendulumtext.Name = "menuitem_testpendulumtext";
-            menuitem_testpendulumtext.Size = new Size(210, 22);
-            menuitem_testpendulumtext.Text = "Test Pendulum Text";
-            menuitem_testpendulumtext.Click += Menuitem_testPendulumTextClick;
-            // 
-            // tsep7
-            // 
-            tsep7.Name = "tsep7";
-            tsep7.Size = new Size(207, 6);
-            // 
-            // menuitem_importmseimg
-            // 
-            menuitem_importmseimg.Name = "menuitem_importmseimg";
-            menuitem_importmseimg.Size = new Size(210, 22);
-            menuitem_importmseimg.Text = "Drop Image to MSE";
-            menuitem_importmseimg.Click += Menuitem_importmseimg_Click;
-            // 
             // menu_data
             // 
-            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_default_script, tsep2, menuitem_readydk, menuitem_readlist, menuitem_readimages, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_export_select_sql, menuitem_export_all_sql, menuitem_findluafunc, menuitem_exportdata, tsep5, menuitem_cutimages, menuitem_convertimage, tsep1, menuitem_cancelTask, menuitem_autoreturn, menuitem_replace });
+            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_default_script, tsep2, menuitem_readydk, menuitem_readlist, menuitem_readimages, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_export_select_sql, menuitem_export_all_sql, menuitem_findluafunc, menuitem_exportdata, menuitem_testpendulumtext, tsep5, menuitem_convertimage, tsep1, menuitem_cancelTask, menuitem_autoreturn, menuitem_replace });
             menu_data.Name = "menu_data";
             menu_data.Size = new Size(57, 20);
             menu_data.Text = "Data(&T)";
@@ -321,17 +246,17 @@ namespace DataEditorX
             menuitem_exportdata.Text = "Export Data";
             menuitem_exportdata.Click += Menuitem_exportdataClick;
             // 
+            // menuitem_testpendulumtext
+            // 
+            menuitem_testpendulumtext.Name = "menuitem_testpendulumtext";
+            menuitem_testpendulumtext.Size = new Size(222, 22);
+            menuitem_testpendulumtext.Text = "Test Pendulum Text";
+            menuitem_testpendulumtext.Click += Menuitem_testPendulumTextClick;
+            // 
             // tsep5
             // 
             tsep5.Name = "tsep5";
             tsep5.Size = new Size(219, 6);
-            // 
-            // menuitem_cutimages
-            // 
-            menuitem_cutimages.Name = "menuitem_cutimages";
-            menuitem_cutimages.Size = new Size(222, 22);
-            menuitem_cutimages.Text = "Cut Images";
-            menuitem_cutimages.Click += Menuitem_cutimagesClick;
             // 
             // menuitem_convertimage
             // 
@@ -1234,7 +1159,6 @@ namespace DataEditorX
         }
 
         private System.Windows.Forms.ToolStripMenuItem menuitem_testpendulumtext;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_exportMSEimage;
         private System.Windows.Forms.ToolStripMenuItem menuitem_exportdata;
         private System.Windows.Forms.ToolStripMenuItem menu_data;
         private System.Windows.Forms.ToolStripMenuItem menuitem_cancelTask;
@@ -1302,18 +1226,9 @@ namespace DataEditorX
         private System.Windows.Forms.ToolStripMenuItem menuitem_readydk;
         private System.Windows.Forms.ToolStripMenuItem menuitem_readlist;
         private System.Windows.Forms.MenuStrip mainMenu;
-        private System.Windows.Forms.ToolStripMenuItem menu_image;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_mseconfig;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_importmseimg;
         private System.Windows.Forms.ToolStripMenuItem menuitem_findluafunc;
         private System.Windows.Forms.ToolStripSeparator tsep6;
         private System.Windows.Forms.ToolStripMenuItem menuitem_compdb;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_readmse;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_saveasmse_select;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_saveasmse;
-        private System.Windows.Forms.ToolStripSeparator tsep3;
-        private System.Windows.Forms.ToolStripSeparator tsep7;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_cutimages;
         private System.Windows.Forms.ToolStripMenuItem menuitem_operacardsfile;
         private System.Windows.Forms.ToolStripSeparator tsep2;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_openfileinthis;

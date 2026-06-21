@@ -7,8 +7,6 @@
  */
 using DataEditorX.Common;
 using DataEditorX.Config;
-using DataEditorX.Core.Info;
-using DataEditorX.Core.Mse;
 using DataEditorX.Language;
 using System.ComponentModel;
 using System.IO.Compression;
@@ -49,10 +47,6 @@ namespace DataEditorX.Core
         /// </summary>
         private readonly ImageSet imgSet;
         /// <summary>
-        /// MSE conversion
-        /// </summary>
-        private readonly MseMaker mseHelper;
-        /// <summary>
         /// Whether cancelled
         /// </summary>
         private bool isCancel = false;
@@ -65,16 +59,11 @@ namespace DataEditorX.Core
         /// </summary>
         private readonly BackgroundWorker worker;
 
-        public TaskHelper(string datapath, BackgroundWorker worker, MSEConfig mcfg)
+        public TaskHelper(string datapath, BackgroundWorker worker)
         {
             Datapath = datapath;
             this.worker = worker;
-            mseHelper = new MseMaker(mcfg);
             imgSet = new ImageSet();
-        }
-        public MseMaker MseHelper
-        {
-            get { return mseHelper; }
         }
         public bool IsRuning()
         {
@@ -94,10 +83,6 @@ namespace DataEditorX.Core
             return lastTask;
         }
 
-        public void TestPendulumText(string desc)
-        {
-            mseHelper.TestPendulum(desc);
-        }
         #endregion
 
         #region Other
@@ -227,46 +212,6 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region Crop images
-        public void CutImages(string imgpath, bool isreplace)
-        {
-            int count = cardlist.Length;
-            int i = 0;
-            foreach (Card c in cardlist)
-            {
-                if (isCancel)
-                {
-                    break;
-                }
-
-                i++;
-                worker.ReportProgress(i / count, string.Format("{0}/{1}", i, count));
-                string jpg = MyPath.Combine(imgpath, c.id + ".jpg");
-                string savejpg = MyPath.Combine(mseHelper.ImagePath, c.id + ".jpg");
-                if (File.Exists(jpg) && (isreplace || !File.Exists(savejpg)))
-                {
-                    Bitmap bp = new(jpg);
-                    Bitmap bmp;
-                    if (c.IsType(CardType.TYPE_XYZ))//Xyz
-                    {
-                        bmp = MyBitmap.Cut(bp, imgSet.xyzArea);
-                    }
-                    else if (c.IsType(CardType.TYPE_PENDULUM))//Pendulum monster
-                    {
-                        bmp = MyBitmap.Cut(bp, imgSet.pendulumArea);
-                    }
-                    else//Regular monster
-                    {
-                        bmp = MyBitmap.Cut(bp, imgSet.normalArea);
-                    }
-                    bp.Dispose();
-                    _ = MyBitmap.SaveAsJPEG(bmp, savejpg, imgSet.quality);
-                    //bmp.Save(savejpg, ImageFormat.Png);
-                }
-            }
-        }
-        #endregion
-
         //removed thumbnail
         #region Convert images
         public void ConvertImages(string imgpath, string gamepath, bool isreplace)
@@ -315,105 +260,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region MSE files
-        public string MSEImagePath
-        {
-            get { return mseHelper.ImagePath; }
-        }
-
         public string Datapath { get; }
-
-        public void SaveMSEs(string file, Card[] cards, bool isUpdate)
-        {
-            if (cards == null)
-            {
-                return;
-            }
-            string pack_db = MyPath.GetRealPath(DEXConfig.ReadString("pack_db"));
-            bool rarity = DEXConfig.ReadBoolean("mse_auto_rarity", false);
-            int c = cards.Length;
-            //Do not split when card count fits one save file
-            if (mseHelper.MaxNum == 0 || c < mseHelper.MaxNum)
-            {
-                SaveMSE(1, file, cards, pack_db, rarity, isUpdate);
-            }
-            else
-            {
-                int nums = c / mseHelper.MaxNum;
-                if (nums * mseHelper.MaxNum < c)//Calculate how many save files are needed
-                {
-                    nums++;
-                }
-
-                List<Card> clist = new();
-                for (int i = 0; i < nums; i++)//Generate each save file
-                {
-                    clist.Clear();
-                    for (int j = 0; j < mseHelper.MaxNum; j++)
-                    {
-                        int index = i * mseHelper.MaxNum + j;
-                        if (index < c)
-                        {
-                            clist.Add(cards[index]);
-                        }
-                    }
-                    int t = file.LastIndexOf(".mse-set");
-                    string fname = (t > 0) ? file[..t] : file;
-                    fname += string.Format("_{0}.mse-set", i + 1);
-                    SaveMSE(i + 1, fname, clist.ToArray(), pack_db, rarity, isUpdate);
-                }
-            }
-        }
-        public void SaveMSE(int num, string file, Card[] cards, string pack_db, bool rarity, bool isUpdate)
-        {
-            string setFile = file + ".txt";
-            Dictionary<Card, string> images = mseHelper.WriteSet(setFile, cards, pack_db, rarity);
-            if (isUpdate)//Update text only
-            {
-                return;
-            }
-
-            int i = 0;
-            int count = images.Count;
-            if (File.Exists(file)) File.Delete(file);
-            ZipArchive zips = ZipFile.Open(file, ZipArchiveMode.Create, System.Text.Encoding.UTF8);
-            zips.CreateEntryFromFile(setFile, "set");
-            foreach (Card c in images.Keys)
-            {
-                string img = images[c];
-                if (isCancel)
-                {
-                    break;
-                }
-
-                i++;
-                worker.ReportProgress(i / count, string.Format("{0}/{1}-{2}", i, count, num));
-                //TODO: crop images first
-                zips.CreateEntryFromFile(img, Path.GetFileName(img));
-            }
-            zips.Dispose();
-            File.Delete(setFile);
-        }
-        public Card[] ReadMSE(string mseset, bool repalceOld)
-        {
-            //Extract all files
-            using (ZipStorer zips = ZipStorer.Open(mseset, FileAccess.Read))
-            {
-                zips.EncodeUTF8 = true;
-                List<ZipStorer.ZipFileEntry> files = zips.ReadCentralDir();
-                int count = files.Count;
-                int i = 0;
-                foreach (ZipStorer.ZipFileEntry file in files)
-                {
-                    worker.ReportProgress(i / count, string.Format("{0}/{1}", i, count));
-                    string savefilename = MyPath.Combine(mseHelper.ImagePath, file.FilenameInZip);
-                    _ = zips.ExtractFile(file, savefilename);
-                }
-            }
-            string setfile = MyPath.Combine(mseHelper.ImagePath, "set");
-            return mseHelper.ReadCards(setfile, repalceOld);
-        }
-        #endregion
 
         #region Export data
         public void ExportData(string path, string zipname, string _cdbfile, string modulescript)
@@ -508,48 +355,6 @@ namespace DataEditorX.Core
                     }
                     OnCheckUpdate(showNew);
                     break;
-                case MyTask.CutImages:
-                    if (mArgs != null && mArgs.Length >= 2)
-                    {
-                        replace = true;
-                        if (mArgs.Length >= 2)
-                        {
-                            if (mArgs[1] == bool.FalseString)
-                            {
-                                replace = false;
-                            }
-                        }
-                        CutImages(mArgs[0], replace);
-                    }
-                    break;
-                case MyTask.SaveAsMSE:
-                    if (mArgs != null && mArgs.Length >= 2)
-                    {
-                        replace = false;
-                        if (mArgs.Length >= 2)
-                        {
-                            if (mArgs[1] == bool.TrueString)
-                            {
-                                replace = true;
-                            }
-                        }
-                        SaveMSEs(mArgs[0], cardlist, replace);
-                    }
-                    break;
-                case MyTask.ReadMSE:
-                    if (mArgs != null && mArgs.Length >= 2)
-                    {
-                        replace = false;
-                        if (mArgs.Length >= 2)
-                        {
-                            if (mArgs[1] == bool.TrueString)
-                            {
-                                replace = true;
-                            }
-                        }
-                        cardlist = ReadMSE(mArgs[0], replace);
-                    }
-                    break;
                 case MyTask.ConvertImages:
                     if (mArgs != null && mArgs.Length >= 2)
                     {
@@ -568,10 +373,7 @@ namespace DataEditorX.Core
             isRun = false;
             lastTask = nowTask;
             nowTask = MyTask.NONE;
-            if (lastTask != MyTask.ReadMSE)
-            {
-                cardlist = null;
-            }
+            cardlist = null;
 
             mArgs = null;
         }

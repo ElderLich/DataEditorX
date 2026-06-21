@@ -21,12 +21,6 @@ namespace DataEditorX.Config
         // Initialize defaults.
         void Init()
         {
-            normalArea = DEXConfig.ReadArea(DEXConfig.TAG_IMAGE_OTHER);
-
-            xyzArea = DEXConfig.ReadArea(DEXConfig.TAG_IMAGE_XYZ);
-
-            pendulumArea = DEXConfig.ReadArea(DEXConfig.TAG_IMAGE_PENDULUM);
-
             int[] ints = DEXConfig.ReadIntegers(DEXConfig.TAG_IMAGE_SIZE, 4);
 
             w = ints[0];
@@ -56,17 +50,5 @@ namespace DataEditorX.Config
         /// Full image height
         /// </summary>
         public int H;
-        /// <summary>
-        /// Monster middle image
-        /// </summary>
-        public Area normalArea;
-        /// <summary>
-        /// Xyz monster middle image
-        /// </summary>
-        public Area xyzArea;
-        /// <summary>
-        /// Pendulum monster middle image
-        /// </summary>
-        public Area pendulumArea;
     }
 }
