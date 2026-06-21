@@ -76,6 +76,8 @@ Upload uses the GitHub CLI, so run `gh auth login` first. The script creates or 
 * `DataEditorX_win32.zip`
 * `DataEditorX_win64.zip`
 
+Release zips omit `.pdb` debug symbol files by default. Add `--include-symbols` only when preparing a build for debugging.
+
 ## Special Features of KoishiDEX
 1. The format of scripts will be in Koishi-Style when creating new scripts. Also the module script to be required will be adjustable, and will be packed when exporting zip files.
 2. Scripts of Non-Pendulum Normal monsters will be openable, for creating module scripts.

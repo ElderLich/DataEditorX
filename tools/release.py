@@ -104,7 +104,20 @@ def zip_dir(source: Path, destination: Path) -> None:
                 zf.write(file, file.relative_to(source))
 
 
-def publish(runtime: str, output: Path, version: str, framework: str, self_contained: bool, sources: list[str]) -> None:
+def strip_debug_symbols(output: Path) -> None:
+    for file in output.rglob("*.pdb"):
+        file.unlink()
+
+
+def publish(
+    runtime: str,
+    output: Path,
+    version: str,
+    framework: str,
+    self_contained: bool,
+    include_symbols: bool,
+    sources: list[str],
+) -> None:
     if output.exists():
         shutil.rmtree(output)
     asm = assembly_version(version)
@@ -131,6 +144,8 @@ def publish(runtime: str, output: Path, version: str, framework: str, self_conta
             str(output),
         ]
     )
+    if not include_symbols:
+        strip_debug_symbols(output)
 
 
 def upload(repo: str, tag: str, version: str, assets: list[Path]) -> None:
@@ -148,6 +163,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--upload", action="store_true", help="Upload zips to the GitHub release using the gh CLI.")
     parser.add_argument("--skip-build", action="store_true", help="Only update version metadata and upload existing zips.")
     parser.add_argument("--self-contained", action="store_true", help="Publish self-contained builds instead of framework-dependent builds.")
+    parser.add_argument("--include-symbols", action="store_true", help="Keep .pdb debug symbol files in the release zips.")
     parser.add_argument("--framework", default=DEFAULT_FRAMEWORK, help=f"Target framework to publish. Default: {DEFAULT_FRAMEWORK}.")
     parser.add_argument("--source", action="append", help=f"NuGet source for restore. Can be repeated. Default: {NUGET_ORG}.")
     return parser.parse_args()
@@ -166,8 +182,8 @@ def main() -> int:
 
     ARTIFACTS.mkdir(exist_ok=True)
     if not args.skip_build:
-        publish("win-x86", win32_publish, version, args.framework, args.self_contained, sources)
-        publish("win-x64", win64_publish, version, args.framework, args.self_contained, sources)
+        publish("win-x86", win32_publish, version, args.framework, args.self_contained, args.include_symbols, sources)
+        publish("win-x64", win64_publish, version, args.framework, args.self_contained, args.include_symbols, sources)
         zip_dir(win32_publish, win32_zip)
         zip_dir(win64_publish, win64_zip)
 
