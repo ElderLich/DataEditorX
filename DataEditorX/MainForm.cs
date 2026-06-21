@@ -285,8 +285,7 @@ namespace DataEditorX
             // Scan all tabs.
             foreach (DockContent dc in contents.Cast<DockContent>())
             {
-                IEditForm edform = (IEditForm)dc;
-                if (edform == null)
+                if (dc is not IEditForm edform)
                 {
                     continue;
                 }
@@ -326,6 +325,29 @@ namespace DataEditorX
         void Menuitem_codeeditorClick(object sender, EventArgs e)
         {
             OpenScript(null);
+        }
+
+        // Open project manager.
+        void Menuitem_projectmanagerClick(object sender, EventArgs e)
+        {
+            OpenProjectManager();
+        }
+
+        void OpenProjectManager()
+        {
+            foreach (DockContent dc in dockPanel.Contents.Cast<DockContent>())
+            {
+                if (dc is ProjectManagerForm existing)
+                {
+                    existing.DockHandler.Activate();
+                    return;
+                }
+            }
+
+            ProjectManagerForm manager = new();
+            LanguageHelper.SetFormLabel(manager);
+            manager.ApplyTheme();
+            manager.Show(dockPanel, DockState.Document);
         }
 
         // Create DataEditorX database.
@@ -750,6 +772,9 @@ namespace DataEditorX
                         break;
                     case CodeEditForm codeEditForm:
                         codeEditForm.ApplyTheme();
+                        break;
+                    case ProjectManagerForm projectManagerForm:
+                        projectManagerForm.ApplyTheme();
                         break;
                     default:
                         ThemeManager.ApplyControlTree(dc);

@@ -105,9 +105,10 @@ MainForm.mainMenu.menuitem_shistory	脚本历史
 MainForm.mainMenu.menuitem_quit	退出
 MainForm.mainMenu.menuitem_view	视图(&V)
 MainForm.mainMenu.menuitem_darktheme	主题
-MainForm.mainMenu.menuitem_windows	窗口(&W)
+MainForm.mainMenu.menuitem_windows	工作区(&W)
 MainForm.mainMenu.menuitem_dataeditor	数据编辑
 MainForm.mainMenu.menuitem_codeeditor	脚本编辑
+MainForm.mainMenu.menuitem_projectmanager	项目管理器
 MainForm.mainMenu.menuitem_close	关闭当前
 MainForm.mainMenu.menuitem_closeother	关闭其他
 MainForm.mainMenu.menuitem_closeall	关闭所有

@@ -66,6 +66,7 @@ namespace DataEditorX
             this.menuitem_windows = new System.Windows.Forms.ToolStripMenuItem();
             this.menuitem_dataeditor = new System.Windows.Forms.ToolStripMenuItem();
             this.menuitem_codeeditor = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuitem_projectmanager = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuitem_close = new System.Windows.Forms.ToolStripMenuItem();
             this.menuitem_closeother = new System.Windows.Forms.ToolStripMenuItem();
@@ -260,52 +261,60 @@ namespace DataEditorX
             this.menuitem_windows.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuitem_dataeditor,
             this.menuitem_codeeditor,
+            this.menuitem_projectmanager,
             this.toolStripSeparator2,
             this.menuitem_close,
             this.menuitem_closeother,
             this.menuitem_closeall});
             this.menuitem_windows.Name = "menuitem_windows";
-            this.menuitem_windows.Size = new System.Drawing.Size(87, 20);
-            this.menuitem_windows.Text = "Windows(&W)";
+            this.menuitem_windows.Size = new System.Drawing.Size(94, 20);
+            this.menuitem_windows.Text = "Workspace(&W)";
             // 
             // menuitem_dataeditor
             // 
             this.menuitem_dataeditor.Name = "menuitem_dataeditor";
-            this.menuitem_dataeditor.Size = new System.Drawing.Size(148, 22);
+            this.menuitem_dataeditor.Size = new System.Drawing.Size(158, 22);
             this.menuitem_dataeditor.Text = "DataEditor";
             this.menuitem_dataeditor.Click += new System.EventHandler(this.DataEditorToolStripMenuItemClick);
             // 
             // menuitem_codeeditor
             // 
             this.menuitem_codeeditor.Name = "menuitem_codeeditor";
-            this.menuitem_codeeditor.Size = new System.Drawing.Size(148, 22);
+            this.menuitem_codeeditor.Size = new System.Drawing.Size(158, 22);
             this.menuitem_codeeditor.Text = "CodeEditor";
             this.menuitem_codeeditor.Click += new System.EventHandler(this.Menuitem_codeeditorClick);
+            //
+            // menuitem_projectmanager
+            //
+            this.menuitem_projectmanager.Name = "menuitem_projectmanager";
+            this.menuitem_projectmanager.Size = new System.Drawing.Size(158, 22);
+            this.menuitem_projectmanager.Text = "Project Manager";
+            this.menuitem_projectmanager.Click += new System.EventHandler(this.Menuitem_projectmanagerClick);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(145, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(155, 6);
             // 
             // menuitem_close
             // 
             this.menuitem_close.Name = "menuitem_close";
             this.menuitem_close.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
-            this.menuitem_close.Size = new System.Drawing.Size(148, 22);
+            this.menuitem_close.Size = new System.Drawing.Size(158, 22);
             this.menuitem_close.Text = "Close";
             this.menuitem_close.Click += new System.EventHandler(this.CloseToolStripMenuItemClick);
             // 
             // menuitem_closeother
             // 
             this.menuitem_closeother.Name = "menuitem_closeother";
-            this.menuitem_closeother.Size = new System.Drawing.Size(148, 22);
+            this.menuitem_closeother.Size = new System.Drawing.Size(158, 22);
             this.menuitem_closeother.Text = "Close Other";
             this.menuitem_closeother.Click += new System.EventHandler(this.CloseOtherToolStripMenuItemClick);
             // 
             // menuitem_closeall
             // 
             this.menuitem_closeall.Name = "menuitem_closeall";
-            this.menuitem_closeall.Size = new System.Drawing.Size(148, 22);
+            this.menuitem_closeall.Size = new System.Drawing.Size(158, 22);
             this.menuitem_closeall.Text = "Close All";
             this.menuitem_closeall.Click += new System.EventHandler(this.CloseAllToolStripMenuItemClick);
             // 
@@ -356,6 +365,7 @@ namespace DataEditorX
 		private System.Windows.Forms.ToolStripMenuItem menuitem_closeother;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_close;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_dataeditor;
+        private System.Windows.Forms.ToolStripMenuItem menuitem_projectmanager;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_windows;
         private System.Windows.Forms.ToolStripMenuItem menuitem_darktheme;
         private System.Windows.Forms.ToolStripMenuItem menuitem_view;
