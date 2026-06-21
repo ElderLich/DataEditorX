@@ -29,6 +29,8 @@ Directory fields keep the latest five paths for faster switching between project
 
 The Custom Project tab can install, uninstall, restart MDPro3, open the current custom `.cdb`, and enable active sync. The resolved path list shows where card databases, scripts, pictures, overframe images, and `SpecialCards.json` will be read or written.
 
+The integrated Project Manager was co-created with BullyWiiPlaza, bringing the custom-card manager workflow directly into DataEditorX.
+
 ## Archetypes and Counters
 Use `Add Archetype` or `Add Counter` from the DataEditor menu bar.
 
@@ -73,4 +75,5 @@ Each line in `language_english.txt` and `cardinfo_english.txt` is separated by a
 ## Credits
 * Original author: [purerosefallen/DataEditorX](https://github.com/purerosefallen/DataEditorX)
 * Based on the [Lyris12 fork](https://github.com/Lyris12/DataEditorX).
+* Project Manager co-created with BullyWiiPlaza.
 * Maintained for MDPro3 custom card workflows by [ElderLich](https://github.com/ElderLich/DataEditorX).

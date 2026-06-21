@@ -32,7 +32,7 @@ namespace DataEditorX
             MinimizeBox = false;
             ShowIcon = true;
             Icon = SystemIcons.Information;
-            ClientSize = new Size(580, 350);
+            ClientSize = new Size(580, 370);
 
             TableLayoutPanel root = new()
             {
@@ -102,6 +102,7 @@ namespace DataEditorX
 
             AddDetail(details, "Version", CleanVersion(Application.ProductVersion));
             AddDetail(details, "Maintainer", "ElderLich");
+            AddDetail(details, "Project Manager", "Co-created with BullyWiiPlaza");
             AddDetail(details, "Original Author", "purerosefallen/DataEditorX", "https://github.com/purerosefallen/DataEditorX");
             AddDetail(details, "Based On", "Lyris12 fork", "https://github.com/Lyris12/DataEditorX");
             AddDetail(details, "Repository", DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL), DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL));
