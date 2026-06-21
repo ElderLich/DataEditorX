@@ -1,13 +1,15 @@
 # Generated from MDPro3 locale strings.conf
 ################ 使用 tab 分隔
 ##rule
-0x0	许可 N/A
+0x0	Rule
 0x1	OCG
 0x2	TCG
 0x3	OCG & TCG
-0x4	Custom
-0x9	简体中文
-0xb	简体中文 & TCG
+0x4	Custom & Illegal
+0x8	Pre-Release
+0x9	OCG Pre-Release
+0xa	TCG Pre-Release
+0xb	OCG & TCG Pre-Release
 ##attribute
 0x0	属性
 0x1	地
@@ -141,7 +143,6 @@
 0x2000000	特殊召唤
 0x4000	衍生物
 ##flags (category)
-0x80	Pre-Release
 0x100	Rush Duel
 0x200	Dark Synchro
 0x40000	Obelisk

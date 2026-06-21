@@ -89,16 +89,8 @@ namespace DataEditorX
             {
                 Dictionary<long, string> d = datacfg.dicSetnames;
                 if (!d.ContainsKey(0)) d.Add(0L, "Archetype");
-                foreach (string l in File.ReadAllLines(confstring))
-                {
-                    if (l.StartsWith("!setname"))
-                    {
-                        string[] sn = l.Split([' '], 3);
-                        _ = long.TryParse(sn[1], System.Globalization.NumberStyles.HexNumber, null,
-                            out long sc);
-                        if (!d.ContainsKey(sc)) d.Add(sc, sn[2]);
-                    }
-                }
+                ArchetypeStringsService.MergeSetnames(d, confstring);
+                ArchetypeStringsService.MergeSetnames(d, ArchetypeStringsService.GetCustomStringsFile());
             }
             // Initialize YGOUtil data.
             YGOUtil.SetConfig(datacfg);
@@ -111,6 +103,7 @@ namespace DataEditorX
             codecfg.AddFunction(funtxt);
             // Add counters.
             codecfg.AddStrings(confstring);
+            codecfg.AddStrings(ArchetypeStringsService.GetCustomStringsFile());
             // Add constants.
             codecfg.AddConstant(conlua);
             codecfg.SetNames(datacfg.dicSetnames);

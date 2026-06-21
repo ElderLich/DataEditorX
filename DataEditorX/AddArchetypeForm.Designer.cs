@@ -1,4 +1,4 @@
-﻿namespace DataEditorX
+namespace DataEditorX
 {
     partial class AddArchetypeForm
     {
@@ -28,61 +28,99 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tb_archename = new System.Windows.Forms.TextBox();
-            this.btn_confirm = new System.Windows.Forms.Button();
-            this.btn_cancel = new System.Windows.Forms.Button();
-            this.SuspendLayout();
-            // 
+            label_setcode = new Label();
+            tb_archecode = new TextBox();
+            label_name = new Label();
+            tb_archename = new TextBox();
+            btn_confirm = new Button();
+            btn_cancel = new Button();
+            SuspendLayout();
+            //
+            // label_setcode
+            //
+            label_setcode.AutoSize = true;
+            label_setcode.Location = new Point(12, 15);
+            label_setcode.Name = "label_setcode";
+            label_setcode.Size = new Size(77, 12);
+            label_setcode.TabIndex = 0;
+            label_setcode.Text = "Setcode ID:";
+            //
+            // tb_archecode
+            //
+            tb_archecode.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            tb_archecode.Location = new Point(112, 11);
+            tb_archecode.Name = "tb_archecode";
+            tb_archecode.Size = new Size(260, 21);
+            tb_archecode.TabIndex = 1;
+            //
+            // label_name
+            //
+            label_name.AutoSize = true;
+            label_name.Location = new Point(12, 45);
+            label_name.Name = "label_name";
+            label_name.Size = new Size(95, 12);
+            label_name.TabIndex = 2;
+            label_name.Text = "Archetype Name:";
+            //
             // tb_archename
-            // 
-            this.tb_archename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tb_archename.Location = new System.Drawing.Point(12, 7);
-            this.tb_archename.Name = "tb_archename";
-            this.tb_archename.Size = new System.Drawing.Size(360, 21);
-            this.tb_archename.TabIndex = 0;
-            // 
+            //
+            tb_archename.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            tb_archename.Location = new Point(112, 41);
+            tb_archename.Name = "tb_archename";
+            tb_archename.Size = new Size(260, 21);
+            tb_archename.TabIndex = 3;
+            //
             // btn_confirm
-            // 
-            this.btn_confirm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_confirm.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btn_confirm.Location = new System.Drawing.Point(223, 34);
-            this.btn_confirm.Name = "btn_confirm";
-            this.btn_confirm.Size = new System.Drawing.Size(75, 23);
-            this.btn_confirm.TabIndex = 1;
-            this.btn_confirm.Text = "Confirm";
-            this.btn_confirm.Click += new System.EventHandler(this.Btn_confirm_Click);
-            // 
+            //
+            btn_confirm.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btn_confirm.Location = new Point(216, 74);
+            btn_confirm.Name = "btn_confirm";
+            btn_confirm.Size = new Size(75, 23);
+            btn_confirm.TabIndex = 4;
+            btn_confirm.Text = "Confirm";
+            btn_confirm.Click += Btn_confirm_Click;
+            //
             // btn_cancel
-            // 
-            this.btn_cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btn_cancel.Location = new System.Drawing.Point(304, 34);
-            this.btn_cancel.Name = "btn_cancel";
-            this.btn_cancel.Size = new System.Drawing.Size(75, 23);
-            this.btn_cancel.TabIndex = 1;
-            this.btn_cancel.Text = "Cancel";
-            // 
+            //
+            btn_cancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btn_cancel.DialogResult = DialogResult.Cancel;
+            btn_cancel.Location = new Point(297, 74);
+            btn_cancel.Name = "btn_cancel";
+            btn_cancel.Size = new Size(75, 23);
+            btn_cancel.TabIndex = 5;
+            btn_cancel.Text = "Cancel";
+            //
             // AddArchetypeForm
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 61);
-            this.Controls.Add(this.tb_archename);
-            this.Controls.Add(this.btn_cancel);
-            this.Controls.Add(this.btn_confirm);
-            this.Font = new System.Drawing.Font("SimSun", 9F);
-            this.Name = "AddArchetypeForm";
-            this.Text = "Name this Archetype:";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(AddArchetypeForm_KeyDown);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            //
+            AutoScaleDimensions = new SizeF(6F, 12F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(384, 109);
+            Controls.Add(btn_cancel);
+            Controls.Add(btn_confirm);
+            Controls.Add(tb_archename);
+            Controls.Add(label_name);
+            Controls.Add(tb_archecode);
+            Controls.Add(label_setcode);
+            Font = new Font("SimSun", 9F);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            KeyPreview = true;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "AddArchetypeForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Add Archetype";
+            KeyDown += AddArchetypeForm_KeyDown;
+            ResumeLayout(false);
+            PerformLayout();
         }
-        private System.Windows.Forms.TextBox tb_archename;
-        private System.Windows.Forms.Button btn_confirm;
-        #endregion
 
-        private System.Windows.Forms.Button btn_cancel;
+        private Label label_setcode;
+        private TextBox tb_archecode;
+        private Label label_name;
+        private TextBox tb_archename;
+        private Button btn_confirm;
+        private Button btn_cancel;
+
+        #endregion
     }
 }

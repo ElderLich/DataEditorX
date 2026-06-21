@@ -2087,14 +2087,38 @@ namespace DataEditorX
             }
             DataConfig datacfg = mf.GetDataConfig();
             Dictionary<long, string> d = datacfg.dicSetnames;
-            AddArchetypeForm form = new(d);
+            Dictionary<long, string> knownSetnames = ArchetypeStringsService.BuildKnownSetnames(d, datapath);
+            AddArchetypeForm form = new(knownSetnames);
             if (form.ShowDialog() == DialogResult.OK)
             {
-                int setcode = form.code;
+                long setcode = form.code;
                 string setname = form.name;
+                try
+                {
+                    ArchetypeWriteResult result = ArchetypeStringsService.AddArchetype(setcode, setname, knownSetnames);
+                    string message = $"Saved {ArchetypeStringsService.FormatSetcode(setcode)} {setname} to:\n{result.CustomStringsFile}";
+                    if (result.SyncedToMdPro3)
+                    {
+                        message += $"\n\nSynced to:\n{result.MdPro3StringsFile}";
+                    }
+                    else
+                    {
+                        message += "\n\nMDPro3 Directory is not configured, so the entry was not synced.";
+                    }
+
+                    MyMsg.Show(message);
+                }
+                catch (Exception ex)
+                {
+                    MyMsg.Error(ex.Message);
+                    return;
+                }
+
                 if (!d.ContainsKey(setcode)) d.Add(setcode, setname);
                 mf.GetCodeConfig().SetNames(d);
+                mf.GetCodeConfig().InitAutoMenus();
                 InitControl(datacfg);
+                tb_setcode1.Text = setcode.ToString("x");
             }
         }
         private void Pl_categoryScroll(object sender, MouseEventArgs e)

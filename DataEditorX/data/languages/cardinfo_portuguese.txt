@@ -6,6 +6,10 @@
 0x2	TCG
 0x3	OCG & TCG
 0x4	Custom & Illegal
+0x8	Pre-Release
+0x9	OCG Pre-Release
+0xa	TCG Pre-Release
+0xb	OCG & TCG Pre-Release
 ##attribute
 0x0	Atributo
 0x1	Terra
@@ -140,7 +144,6 @@
 0x2000000	Invocação Especial
 0x4000000	Link
 ##flags (category)
-0x80	Pre-Release
 0x100	Rush Duel
 0x200	Dark Synchro
 0x40000	Obelisk
