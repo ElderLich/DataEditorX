@@ -16,6 +16,12 @@ namespace DataEditorX.Common
             xDoc.Load(XMLConfigFile);
 
             XmlNode xNode = xDoc.SelectSingleNode("//appSettings");
+            if (xNode == null)
+            {
+                XmlElement appSettings = xDoc.CreateElement("appSettings");
+                _ = xDoc.DocumentElement.AppendChild(appSettings);
+                xNode = appSettings;
+            }
 
             XmlElement xElem = (XmlElement)xNode.SelectSingleNode("//add[@key='" + appKey + "']");
             if (xElem != null) //Update when the entry exists
@@ -31,15 +37,59 @@ namespace DataEditorX.Common
             }
             xDoc.Save(XMLConfigFile);
         }
-        static string XMLConfigFile 
-        { 
+        static string XMLConfigFile
+        {
+            get
+            {
+                return EnsureUserConfigFile();
+            }
+        }
+
+        static string BundledConfigFile
+        {
             get
             {
                 string path = Application.ExecutablePath + ".config";
                 if (!File.Exists(path))
+                {
                     path = path.Replace(".exe", ".dll");
+                }
                 return path;
-            } 
+            }
+        }
+
+        static string UserConfigFile
+        {
+            get
+            {
+                string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                return Path.Combine(appData, "DataEditorX", "DataEditorX.config");
+            }
+        }
+
+        static string EnsureUserConfigFile()
+        {
+            string userConfig = UserConfigFile;
+            if (File.Exists(userConfig))
+            {
+                return userConfig;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(userConfig));
+            string bundledConfig = BundledConfigFile;
+            if (File.Exists(bundledConfig))
+            {
+                File.Copy(bundledConfig, userConfig);
+            }
+            else
+            {
+                XmlDocument xDoc = new();
+                XmlElement root = xDoc.CreateElement("configuration");
+                _ = xDoc.AppendChild(root);
+                _ = root.AppendChild(xDoc.CreateElement("appSettings"));
+                xDoc.Save(userConfig);
+            }
+            return userConfig;
         }
         /// <summary>
         /// Get value
@@ -52,13 +102,25 @@ namespace DataEditorX.Common
             xDoc.Load(XMLConfigFile);
 
             XmlNode xNode = xDoc.SelectSingleNode("//appSettings");
-
-            XmlElement xElem = (XmlElement)xNode.SelectSingleNode("//add[@key='" + appKey + "']");
+            XmlElement xElem = (XmlElement)xNode?.SelectSingleNode("//add[@key='" + appKey + "']");
 
             if (xElem != null)
             {
                 return xElem.Attributes["value"].Value;
             }
+
+            string bundledConfig = BundledConfigFile;
+            if (File.Exists(bundledConfig))
+            {
+                XmlDocument bundledDoc = new();
+                bundledDoc.Load(bundledConfig);
+                XmlElement bundledElem = (XmlElement)bundledDoc.SelectSingleNode("//appSettings/add[@key='" + appKey + "']");
+                if (bundledElem != null)
+                {
+                    return bundledElem.Attributes["value"].Value;
+                }
+            }
+
             return string.Empty;
         }
         #endregion

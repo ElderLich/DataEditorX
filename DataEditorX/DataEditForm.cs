@@ -1005,7 +1005,11 @@ namespace DataEditorX
         {
             if (cardedit != null)
             {
-                cmdManager.ExcuteCommand(cardedit.addCard);
+                Card card = GetCard();
+                if (cmdManager.ExcuteCommand(cardedit.addCard))
+                {
+                    SyncSpecialCardFrameFlags(card, 0);
+                }
             }
         }
         //Modify
@@ -1013,7 +1017,12 @@ namespace DataEditorX
         {
             if (cardedit != null)
             {
-                cmdManager.ExcuteCommand(cardedit.modCard, menuitem_operacardsfile.Checked);
+                Card card = GetCard();
+                uint previousId = GetOldCard().id;
+                if (cmdManager.ExcuteCommand(cardedit.modCard, menuitem_operacardsfile.Checked))
+                {
+                    SyncSpecialCardFrameFlags(card, previousId);
+                }
             }
         }
         //Open script
@@ -1045,6 +1054,15 @@ namespace DataEditorX
                 Search(true);
             }
         }
+
+        private void SyncSpecialCardFrameFlags(Card card, uint previousId)
+        {
+            if (!SpecialCardsJsonService.Sync(card, previousId, out string message))
+            {
+                MyMsg.Warning(message);
+            }
+        }
+
         //Import card art
         void Btn_imgClick(object sender, EventArgs e)
         {

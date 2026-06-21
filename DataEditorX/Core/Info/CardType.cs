@@ -19,6 +19,8 @@ namespace DataEditorX.Core.Info
         TYPE_SPELL = 0x2,
         ///<summary>Trap Card</summary>
         TYPE_TRAP = 0x4,
+        ///<summary>Legend</summary>
+        TYPE_LEGEND = 0x8,
 
         ///<summary>Normal</summary>
         TYPE_NORMAL = 0x10,
@@ -42,6 +44,8 @@ namespace DataEditorX.Core.Info
         TYPE_SYNCHRO = 0x2000,
         ///<summary>Token</summary>
         TYPE_TOKEN = 0x4000,
+        ///<summary>Maximum</summary>
+        TYPE_MAXIMUM = 0x8000,
 
         ///<summary>Quick-Play</summary>
         TYPE_QUICKPLAY = 0x10000,

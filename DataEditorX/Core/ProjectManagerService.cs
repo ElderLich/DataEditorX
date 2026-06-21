@@ -17,6 +17,7 @@ namespace DataEditorX.Core
         string Scripts,
         string Closeups,
         string Art2,
+        string OverFrame,
         string MonsterCutin2);
 
     internal sealed class ProjectManagerService
@@ -40,6 +41,7 @@ namespace DataEditorX.Core
                 Path.Combine(expansions, "script"),
                 Path.Combine(picture, "Closeup"),
                 Path.Combine(picture, "Art2"),
+                Path.Combine(picture, "OverFrame"),
                 Path.Combine(mdpro3Data, "StandaloneWindows64", "MonsterCutin2"));
         }
 
@@ -56,6 +58,7 @@ namespace DataEditorX.Core
             copied += CopyMatching(source.Scripts, destination.Scripts, file => HasExtension(file, ".lua"));
             copied += CopyMatching(source.Art2, destination.Art2, IsImage);
             copied += CopyMatching(source.Closeups, destination.Closeups, IsImage, allowMissingSource: true);
+            copied += CopyMatching(source.OverFrame, destination.OverFrame, IsImage, allowMissingSource: true);
             copied += CopyMatching(source.Expansions, destination.Expansions, file => HasExtension(file, ".conf"));
             copied += CopyMatching(source.MonsterCutin2, destination.MonsterCutin2, _ => true, allowMissingSource: true);
             log($"Project install finished. {copied} file(s) copied.", ProjectManagerLogLevel.Success);
@@ -74,6 +77,7 @@ namespace DataEditorX.Core
             deleted += DeleteMatching(source.Scripts, destination.Scripts, file => HasExtension(file, ".lua"));
             deleted += DeleteMatching(source.Art2, destination.Art2, IsImage);
             deleted += DeleteMatching(source.Closeups, destination.Closeups, IsImage, allowMissingSource: true);
+            deleted += DeleteMatching(source.OverFrame, destination.OverFrame, IsImage, allowMissingSource: true);
             deleted += DeleteMatching(source.Expansions, destination.Expansions, file => HasExtension(file, ".conf"));
             deleted += DeleteMatching(source.MonsterCutin2, destination.MonsterCutin2, _ => true, allowMissingSource: true);
             log($"Project uninstall finished. {deleted} file(s) deleted.", ProjectManagerLogLevel.Success);

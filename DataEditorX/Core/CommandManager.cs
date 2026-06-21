@@ -11,7 +11,7 @@ namespace DataEditorX.Core
     }
     public interface ICommandManager
     {
-        void ExcuteCommand(ICommand command, params object[] args);
+        bool ExcuteCommand(ICommand command, params object[] args);
         void Undo();
         void ReverseUndo();//Redo the last undo
 
@@ -41,11 +41,11 @@ namespace DataEditorX.Core
         }
 
         #region ICommandManager members
-        public void ExcuteCommand(ICommand command, params object[] args)
+        public bool ExcuteCommand(ICommand command, params object[] args)
         {
             if (!command.Execute(args))
             {
-                return;
+                return false;
             }
 
             reverseStack.Clear();
@@ -60,6 +60,7 @@ namespace DataEditorX.Core
             }
 
             UndoStateChanged(undoStack.Count > 0);
+            return true;
         }
 
         public void Undo()

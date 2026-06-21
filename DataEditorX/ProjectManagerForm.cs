@@ -6,14 +6,11 @@ namespace DataEditorX
 {
     public sealed class ProjectManagerForm : DockContent
     {
-        private const string ConfigMdPro3Directory = "project_manager_mdpro3_dir";
-        private const string ConfigCustomProjectDirectory = "project_manager_custom_project_dir";
-        private const string ConfigVoicePackDirectory = "project_manager_voice_pack_dir";
-
         private readonly ProjectManagerService service;
         private readonly List<Control> actionControls = new();
 
         private TextBox tbMdPro3Directory;
+        private TextBox tbMdPro3DataDirectory;
         private TextBox tbCustomProjectDirectory;
         private TextBox tbVoicePackDirectory;
         private CheckBox chkActiveSync;
@@ -73,8 +70,11 @@ namespace DataEditorX
 
             TableLayoutPanel layout = CreateDirectoryLayout();
             tbMdPro3Directory = CreateDirectoryTextBox();
-            tbMdPro3Directory.TextChanged += SharedDirectoryTextChanged;
+            tbMdPro3Directory.TextChanged += MdPro3DirectoryTextChanged;
             AddDirectoryRow(layout, 0, "MDPro3 Directory:", tbMdPro3Directory);
+            tbMdPro3DataDirectory = CreateDirectoryTextBox();
+            tbMdPro3DataDirectory.TextChanged += SharedDirectoryTextChanged;
+            AddDirectoryRow(layout, 1, "MDPro3 Data Directory:", tbMdPro3DataDirectory);
 
             group.Controls.Add(layout);
             return group;
@@ -130,6 +130,7 @@ namespace DataEditorX
             Button installProject = CreateActionButton("Install", InstallProjectClick);
             Button uninstallProject = CreateActionButton("Uninstall", UninstallProjectClick);
             Button restartMdPro3 = CreateActionButton("(Re-)start MDPro3", RestartMdPro3Click);
+            Button openCustomCdb = CreateActionButton("Open .cdb", OpenCustomCdbClick);
             chkActiveSync = new CheckBox
             {
                 Name = "chk_activeSync",
@@ -142,6 +143,7 @@ namespace DataEditorX
             actions.Controls.Add(installProject);
             actions.Controls.Add(uninstallProject);
             actions.Controls.Add(restartMdPro3);
+            actions.Controls.Add(openCustomCdb);
             actions.Controls.Add(chkActiveSync);
             layout.Controls.Add(actions, 0, 1);
 
@@ -339,16 +341,37 @@ namespace DataEditorX
 
         private void LoadSettings()
         {
-            tbMdPro3Directory.Text = DEXConfig.ReadString(ConfigMdPro3Directory);
-            tbCustomProjectDirectory.Text = DEXConfig.ReadString(ConfigCustomProjectDirectory);
-            tbVoicePackDirectory.Text = DEXConfig.ReadString(ConfigVoicePackDirectory);
+            tbMdPro3Directory.Text = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DIR);
+            tbMdPro3DataDirectory.Text = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR);
+            if (string.IsNullOrWhiteSpace(tbMdPro3DataDirectory.Text) && !string.IsNullOrWhiteSpace(tbMdPro3Directory.Text))
+            {
+                tbMdPro3DataDirectory.Text = Path.Combine(tbMdPro3Directory.Text, "Data");
+            }
+
+            tbCustomProjectDirectory.Text = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR);
+            tbVoicePackDirectory.Text = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_VOICE_PACK_DIR);
         }
 
         private void SaveSettings()
         {
-            DEXConfig.Save(ConfigMdPro3Directory, tbMdPro3Directory.Text);
-            DEXConfig.Save(ConfigCustomProjectDirectory, tbCustomProjectDirectory.Text);
-            DEXConfig.Save(ConfigVoicePackDirectory, tbVoicePackDirectory.Text);
+            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DIR, tbMdPro3Directory.Text);
+            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR, tbMdPro3DataDirectory.Text);
+            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_CUSTOM_PROJECT_DIR, tbCustomProjectDirectory.Text);
+            DEXConfig.Save(DEXConfig.TAG_PROJECT_MANAGER_VOICE_PACK_DIR, tbVoicePackDirectory.Text);
+        }
+
+        private void MdPro3DirectoryTextChanged(object sender, EventArgs e)
+        {
+            string dataDirectory = string.IsNullOrWhiteSpace(tbMdPro3Directory.Text)
+                ? string.Empty
+                : Path.Combine(tbMdPro3Directory.Text, "Data");
+            if (string.IsNullOrWhiteSpace(tbMdPro3DataDirectory.Text)
+                || !Directory.Exists(tbMdPro3DataDirectory.Text))
+            {
+                tbMdPro3DataDirectory.Text = dataDirectory;
+            }
+
+            SharedDirectoryTextChanged(sender, e);
         }
 
         private void SharedDirectoryTextChanged(object sender, EventArgs e)
@@ -375,6 +398,52 @@ namespace DataEditorX
         private async void RestartMdPro3Click(object sender, EventArgs e)
         {
             await RunOperationAsync(() => service.RestartMdPro3(tbMdPro3Directory.Text));
+        }
+
+        private void OpenCustomCdbClick(object sender, EventArgs e)
+        {
+            SaveSettings();
+
+            string expansionsDirectory = ProjectManagerService.BuildPaths(tbCustomProjectDirectory.Text).Expansions;
+            if (!Directory.Exists(expansionsDirectory))
+            {
+                _ = MessageBox.Show(this, $"Custom project Expansions folder was not found:\n{expansionsDirectory}",
+                    "Project Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string[] cdbFiles = Directory.GetFiles(expansionsDirectory, "*.cdb", SearchOption.TopDirectoryOnly);
+            string fileToOpen = null;
+            if (cdbFiles.Length == 1)
+            {
+                fileToOpen = cdbFiles[0];
+            }
+            else
+            {
+                using OpenFileDialog dialog = new()
+                {
+                    InitialDirectory = expansionsDirectory,
+                    Filter = "Card databases (*.cdb)|*.cdb|All files (*.*)|*.*",
+                    Title = "Open custom project database"
+                };
+
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
+                fileToOpen = dialog.FileName;
+            }
+
+            if (DockPanel?.FindForm() is MainForm mainForm)
+            {
+                mainForm.Open(fileToOpen);
+                Log($"Opened custom database: {fileToOpen}", ProjectManagerLogLevel.Success);
+            }
+            else
+            {
+                Log("Could not find the main workspace window.", ProjectManagerLogLevel.Error);
+            }
         }
 
         private async void InstallVoicePackClick(object sender, EventArgs e)
@@ -459,7 +528,9 @@ namespace DataEditorX
                 ("Scripts", source.Scripts, destination.Scripts),
                 ("Closeups", source.Closeups, destination.Closeups),
                 ("Art2", source.Art2, destination.Art2),
-                ("MonsterCutin2", source.MonsterCutin2, destination.MonsterCutin2)
+                ("OverFrame", source.OverFrame, destination.OverFrame),
+                ("MonsterCutin2", source.MonsterCutin2, destination.MonsterCutin2),
+                ("SpecialCards.json", "", Path.Combine(tbMdPro3DataDirectory.Text, "SpecialCards.json"))
             };
 
             lvResolvedPaths.BeginUpdate();
