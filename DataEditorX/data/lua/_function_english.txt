@@ -7775,21 +7775,25 @@ Returns:
   bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:421
 
-●void Auxiliary.UrsarcticExCostFilter(Card c, int tp)
-TODO document.
+●bool Auxiliary.UrsarcticExCostFilter(Card c, int tp)
+Replacement-cost filter for the shared Ursarctic Special Summon effect. It accepts cards in the Graveyard that can be banished as cost through effect code 16471775 or 89264428.
 Parameters:
   c: Card
   tp: int
+Returns:
+  bool - true if c can be banished as an Ursarctic replacement cost.
 Source: Utilities/utility.lua:958
 
-●void Auxiliary.UrsarcticReleaseFilter(Card c)
-TODO document.
+●bool Auxiliary.UrsarcticReleaseFilter(Card c)
+Cost filter for the shared Ursarctic Special Summon effect. It accepts Level 7 or higher monsters in the hand.
 Parameters:
   c: Card
+Returns:
+  bool - true if c is a Level 7 or higher monster in the hand.
 Source: Utilities/utility.lua:955
 
-●void Auxiliary.UrsarcticSpSummonCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.UrsarcticSpSummonCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Condition for the shared Ursarctic hand Quick Effect; returns true during either Main Phase.
 Parameters:
   e: Effect
   tp: int
@@ -7799,10 +7803,12 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true during Main Phase 1 or Main Phase 2.
 Source: Utilities/utility.lua:952
 
-●void Auxiliary.UrsarcticSpSummonCost(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.UrsarcticSpSummonCost(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+Checks and pays the shared Ursarctic Special Summon cost. The player releases a Level 7 or higher monster from the hand, or banishes a valid Graveyard replacement-cost card and consumes that effect's count limit.
 Parameters:
   e: Effect
   tp: int
@@ -7813,17 +7819,21 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during cost checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:961
 
-●void Auxiliary.UrsarcticSpSummonLimit(Effect e, Card c)
-TODO document.
+●bool Auxiliary.UrsarcticSpSummonLimit(Effect e, Card c)
+Special Summon restriction target applied after the shared Ursarctic effect resolves; returns true for monsters with Level 0.
 Parameters:
   e: Effect
   c: Card
+Returns:
+  bool - true for Level 0 monsters.
 Source: Utilities/utility.lua:995
 
 ●void Auxiliary.UrsarcticSpSummonOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Operation for the shared Ursarctic Special Summon effect. It Special Summons the handler, then applies the End Phase Special Summon restriction that blocks Level 0 monsters.
 Parameters:
   e: Effect
   tp: int
@@ -7835,8 +7845,8 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:981
 
-●void Auxiliary.UrsarcticSpSummonTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+●bool|nil Auxiliary.UrsarcticSpSummonTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
+Target function for the shared Ursarctic Special Summon effect. It requires an open Monster Zone and that the handler can be Special Summoned, then sets Special Summon operation info.
 Parameters:
   e: Effect
   tp: int
@@ -7847,23 +7857,29 @@ Parameters:
   r: any
   rp: int
   chk: bool
+Returns:
+  bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:976
 
 ●void Auxiliary.UseExtraReleaseCount(Group g, int tp)
-TODO document.
+Consumes count limits for opponent's cards in g that were released through EFFECT_EXTRA_RELEASE_NONSUM, such as Lair of Darkness-style release effects not selected by Duel.SelectReleaseGroup.
 Parameters:
   g: Group
   tp: int
 Source: Utilities/utility.lua:1508
 
 ========== Global ==========
-●void GetID()
-TODO document.
+●table,int,int GetID()
+Returns the current script's table, card code, and string offset. The offset is 1 for regular card IDs and 100 for large custom IDs.
+Returns:
+  table - The current script table.
+  int - The current card code.
+  int - String ID offset, 1 or 100.
 Source: Utilities/utility.lua:8
 
 ========== Group ==========
 ●bool Group.CheckSubGroup(Group g, function f, [int min], [int max], ... any)
-TODO document.
+Checks whether g has a subgroup with size between min and max that satisfies f, while respecting already selected cards from Duel.GrabSelectedCard and Auxiliary.GCheckAdditional.
 Parameters:
   g: Group
   f: function
@@ -7871,22 +7887,22 @@ Parameters:
   max: int optional
   ...: any
 Returns:
-  bool
+  bool - true if a valid subgroup exists.
 Source: Utilities/utility.lua:1230
 
 ●bool Group.CheckSubGroupEach(Group g, table checks, [function f], ... any)
-TODO document.
+Checks whether g can supply one card for each filter in checks. If f is omitted, only the per-position checks are required.
 Parameters:
   g: Group
   checks: table
   f: function optional
   ...: any
 Returns:
-  bool
+  bool - true if one card can satisfy each check.
 Source: Utilities/utility.lua:1338
 
-●Group Group.SelectSubGroup(Group g, int tp, function f, bool cancelable, [int min], [int max], ... any)
-TODO document.
+●Group|nil Group.SelectSubGroup(Group g, int tp, function f, bool cancelable, [int min], [int max], ... any)
+Lets tp select a subgroup from g with size between min and max that satisfies f. It respects already selected cards and returns nil if no valid selection is completed.
 Parameters:
   g: Group
   tp: int
@@ -7896,11 +7912,11 @@ Parameters:
   max: int optional
   ...: any
 Returns:
-  Group
+  Group|nil - The selected subgroup, or nil if no valid selection is completed.
 Source: Utilities/utility.lua:1255
 
-●Group Group.SelectSubGroupEach(Group g, int tp, table checks, [bool cancelable], [function f], ... any)
-TODO document.
+●Group|nil Group.SelectSubGroupEach(Group g, int tp, table checks, [bool cancelable], [function f], ... any)
+Lets tp select one card for each filter in checks, optionally cancelable. If f is omitted, Auxiliary.TRUE is used for the final group check.
 Parameters:
   g: Group
   tp: int
@@ -7909,7 +7925,7 @@ Parameters:
   f: function optional
   ...: any
 Returns:
-  Group
+  Group|nil - The selected subgroup, or nil if no valid selection is completed.
 Source: Utilities/utility.lua:1353
 
 ========== bit ==========
@@ -7920,10 +7936,12 @@ Parameters:
   b: any
 Source: Utilities/utility.lua:15
 
-●void bit.bnot(any a)
-TODO document.
+●int bit.bnot(int a)
+Returns the bitwise NOT of a.
 Parameters:
-  a: any
+  a: int
+Returns:
+  int - Bitwise NOT of a.
 Source: Utilities/utility.lua:30
 
 ●void bit.bor(any a, any b)
@@ -7940,12 +7958,14 @@ Parameters:
   b: any
 Source: Utilities/utility.lua:21
 
-●void bit.extract(any r, any field, any width)
-TODO document.
+●int bit.extract(int r, int field, [int width])
+Extracts width bits from r starting at bit field. width defaults to 1.
 Parameters:
-  r: any
-  field: any
-  width: any
+  r: int
+  field: int
+  width: int optional
+Returns:
+  int - The extracted bit field.
 Source: Utilities/utility.lua:40
 
 ●void bit.lshift(any a, any b)
@@ -7955,13 +7975,15 @@ Parameters:
   b: any
 Source: Utilities/utility.lua:24
 
-●void bit.replace(any r, any v, any field, any width)
-TODO document.
+●int bit.replace(int r, int v, int field, [int width])
+Returns r with width bits starting at field replaced by the low width bits of v. width defaults to 1.
 Parameters:
-  r: any
-  v: any
-  field: any
-  width: any
+  r: int
+  v: int
+  field: int
+  width: int optional
+Returns:
+  int - r with the selected bit field replaced.
 Source: Utilities/utility.lua:45
 
 ●void bit.rshift(any a, any b)
@@ -7972,26 +7994,30 @@ Parameters:
 Source: Utilities/utility.lua:27
 
 ========== Auxiliary ==========
-●void Auxiliary.AddContactFusionProcedure(Card c, function filter, any self_location, any opponent_location, any mat_operation, ... any)
-TODO document.
+●Effect Auxiliary.AddContactFusionProcedure(Card c, function filter, [int self_location], [int opponent_location], function mat_operation, ... any)
+Registers a Contact Fusion Special Summon procedure on c, using material filter locations and the provided material operation, and returns the created procedure effect.
 Parameters:
   c: Card
   filter: function
-  self_location: any
-  opponent_location: any
-  mat_operation: any
+  self_location: int optional
+  opponent_location: int optional
+  mat_operation: function
   ...: any
+Returns:
+  Effect - The created Contact Fusion procedure effect.
 Source: Utilities/procedure.lua:1687
 
-●void Auxiliary.AddFusionEffectProc(Card c, function filter, any mat_location, any mat_filter, any mat_operation, any params)
-TODO document.
+●Effect Auxiliary.AddFusionEffectProc(Card c, function filter, int mat_location, [function|nil mat_filter], [function|nil mat_operation], [table|nil params])
+Convenience wrapper for Auxiliary.AddFusionEffectProcUltimate. It builds a params table from the common arguments and returns the created Fusion effect.
 Parameters:
   c: Card
   filter: function
-  mat_location: any
-  mat_filter: any
-  mat_operation: any
-  params: any
+  mat_location: int
+  mat_filter: function|nil optional
+  mat_operation: function|nil optional
+  params: table|nil optional
+Returns:
+  Effect - The created Fusion effect.
 Source: Utilities/procedure.lua:1677
 
 ●Effect Auxiliary.AddFusionEffectProcUltimate(Card c, table params)
@@ -8288,44 +8314,50 @@ Parameters:
   extra_target: any
 Source: Utilities/procedure.lua:1906
 
-●void Auxiliary.AddRitualProcGreater2(Card c, function filter, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+●Effect Auxiliary.AddRitualProcGreater2(Card c, function filter, [int summon_location], [function|nil grave_filter], [function|nil mat_filter], [bool pause], [function|nil extra_operation], [function|nil extra_target])
+Adds a Ritual Summon effect for c that uses the Ritual Monster's current Level and requires materials whose total Level is greater than or equal to it.
 Parameters:
   c: Card
   filter: function
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  pause: Effect
-  extra_operation: any
-  extra_target: any
+  summon_location: int optional
+  grave_filter: function|nil optional
+  mat_filter: function|nil optional
+  pause: bool optional
+  extra_operation: function|nil optional
+  extra_target: function|nil optional
+Returns:
+  Effect - The created Ritual Summon effect.
 Source: Utilities/procedure.lua:1934
 
-●void Auxiliary.AddRitualProcGreater2Code(Card c, any code1, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+●Effect Auxiliary.AddRitualProcGreater2Code(Card c, int code1, [int summon_location], [function|nil grave_filter], [function|nil mat_filter], [bool pause], [function|nil extra_operation], [function|nil extra_target])
+Registers code1 as listed by c, then adds the Greater2 Ritual procedure restricted to Ritual Monsters with that code.
 Parameters:
   c: Card
-  code1: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  pause: Effect
-  extra_operation: any
-  extra_target: any
+  code1: int
+  summon_location: int optional
+  grave_filter: function|nil optional
+  mat_filter: function|nil optional
+  pause: bool optional
+  extra_operation: function|nil optional
+  extra_target: function|nil optional
+Returns:
+  Effect - The created Ritual Summon effect.
 Source: Utilities/procedure.lua:1937
 
-●void Auxiliary.AddRitualProcGreater2Code2(Card c, any code1, any code2, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+●Effect Auxiliary.AddRitualProcGreater2Code2(Card c, int code1, int code2, [int summon_location], [function|nil grave_filter], [function|nil mat_filter], [bool pause], [function|nil extra_operation], [function|nil extra_target])
+Registers code1 and code2 as listed by c, then adds the Greater2 Ritual procedure restricted to Ritual Monsters with either code.
 Parameters:
   c: Card
-  code1: any
-  code2: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  pause: Effect
-  extra_operation: any
-  extra_target: any
+  code1: int
+  code2: int
+  summon_location: int optional
+  grave_filter: function|nil optional
+  mat_filter: function|nil optional
+  pause: bool optional
+  extra_operation: function|nil optional
+  extra_target: function|nil optional
+Returns:
+  Effect - The created Ritual Summon effect.
 Source: Utilities/procedure.lua:1941
 
 ●void Auxiliary.AddRitualProcGreaterCode(Card c, any code1, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
@@ -8343,19 +8375,21 @@ Parameters:
   extra_target: any
 Source: Utilities/procedure.lua:1909
 
-●void Auxiliary.AddRitualProcUltimate(Card c, function filter, any level_function, any greater_or_equal, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+●Effect Auxiliary.AddRitualProcUltimate(Card c, function filter, function level_function, string greater_or_equal, [int summon_location], [function|nil grave_filter], [function|nil mat_filter], [bool pause], [function|nil extra_operation], [function|nil extra_target])
+Creates the configurable Ritual Summon activation effect for c and returns it. The effect can be paused from registration, can use Graveyard materials, and can run extra target/operation callbacks.
 Parameters:
   c: Card
   filter: function
-  level_function: any
-  greater_or_equal: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  pause: Effect
-  extra_operation: any
-  extra_target: any
+  level_function: function
+  greater_or_equal: string
+  summon_location: int optional
+  grave_filter: function|nil optional
+  mat_filter: function|nil optional
+  pause: bool optional
+  extra_operation: function|nil optional
+  extra_target: function|nil optional
+Returns:
+  Effect - The created Ritual Summon activation effect.
 Source: Utilities/procedure.lua:1750
 
 ●void Auxiliary.AddSynchroMixProcedure(Card c, [function|nil f1], [function|nil f2], [function|nil f3], [function|nil f4], int minc, int maxc, [function gc])
@@ -8428,70 +8462,86 @@ Parameters:
   alterop: function optional
 Source: Utilities/procedure.lua:700
 
-●void Auxiliary.AssaultModeLimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.AssaultModeLimit(Effect e, Effect se, int sp, int st)
+Special Summon restriction value for /Assault Mode monsters; allows the Assault Mode summon value or effects activated by Assault Mode Activate.
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool - true if the Summon matches /Assault Mode conditions.
 Source: Utilities/procedure.lua:2313
 
-●void Auxiliary.CheckXyz2XMaterial(Card c, function f, any lv, any minc, any maxc, Group mg)
-TODO document.
+●bool Auxiliary.CheckXyz2XMaterial(Card c, function f, int lv, int minc, int maxc, Group mg)
+Checks whether c can be Xyz Summoned using materials from mg while allowing valid EFFECT_DOUBLE_XMATERIAL cards to count as two materials.
 Parameters:
   c: Card
   f: function
-  lv: any
-  minc: any
-  maxc: any
+  lv: int
+  minc: int
+  maxc: int
   mg: Group
+Returns:
+  bool - true if c can be Xyz Summoned with double-material support.
 Source: Utilities/procedure.lua:565
 
-●void Auxiliary.ContactFusionCondition(function filter, any self_location, any opponent_location)
-TODO document.
+●function Auxiliary.ContactFusionCondition([function|nil filter], int self_location, int opponent_location)
+Returns the condition function for Contact Fusion procedures. It collects valid materials from the configured locations and checks c's Fusion Material requirement.
 Parameters:
-  filter: function
-  self_location: any
-  opponent_location: any
+  filter: function|nil optional
+  self_location: int
+  opponent_location: int
+Returns:
+  function - Condition function for a Contact Fusion procedure.
 Source: Utilities/procedure.lua:1705
 
-●void Auxiliary.ContactFusionMaterialFilter(Card c, Card fc, function filter)
-TODO document.
+●bool Auxiliary.ContactFusionMaterialFilter(Card c, Card fc, [function|nil filter])
+Material filter for Contact Fusion procedures. The card must be usable as Fusion Material for fc and must satisfy filter when one is provided.
 Parameters:
   c: Card
   fc: Card
-  filter: function
+  filter: function|nil optional
+Returns:
+  bool - true if c is valid Contact Fusion material for fc.
 Source: Utilities/procedure.lua:1702
 
-●void Auxiliary.ContactFusionOperation(any mat_operation, any operation_params)
-TODO document.
+●function Auxiliary.ContactFusionOperation(function mat_operation, table operation_params)
+Returns the operation function for Contact Fusion procedures. It sets the selected materials on the Fusion Monster, runs mat_operation, and deletes the kept-alive group.
 Parameters:
-  mat_operation: any
-  operation_params: any
+  mat_operation: function
+  operation_params: table
+Returns:
+  function - Operation function for a Contact Fusion procedure.
 Source: Utilities/procedure.lua:1725
 
-●void Auxiliary.ContactFusionSendToDeck(Card c)
-TODO document.
+●function Auxiliary.ContactFusionSendToDeck(Card c)
+Returns a Contact Fusion material operation that reveals face-down materials when needed, hints Graveyard/banished materials, and shuffles all materials into the Deck as cost.
 Parameters:
   c: Card
+Returns:
+  function - Material operation that shuffles materials into the Deck.
 Source: Utilities/procedure.lua:1734
 
-●void Auxiliary.ContactFusionTarget(function filter, any self_location, any opponent_location)
-TODO document.
+●function Auxiliary.ContactFusionTarget([function|nil filter], int self_location, int opponent_location)
+Returns the target function for Contact Fusion procedures. It selects Fusion Materials, keeps the selected group alive, stores it on the effect, and returns whether selection succeeded.
 Parameters:
-  filter: function
-  self_location: any
-  opponent_location: any
+  filter: function|nil optional
+  self_location: int
+  opponent_location: int
+Returns:
+  function - Target function for a Contact Fusion procedure.
 Source: Utilities/procedure.lua:1714
 
-●void Auxiliary.DarkFusionLimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.DarkFusionLimit(Effect e, Effect se, int sp, int st)
+Special Summon restriction value for Evil HERO/Dark Fusion effects; allows Dark Fusion itself, the Dark Fusion summon value, or Fusion Summons while the player is affected by effect code 72043279.
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool - true if the Summon matches Dark Fusion conditions.
 Source: Utilities/procedure.lua:2321
 
 ●void Auxiliary.DualNormalCondition(Effect effect)
