@@ -6188,11 +6188,11 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:814
 
-●void Auxiliary.ChangeBattleDamage(int player, Effect value)
+●void Auxiliary.ChangeBattleDamage(int player, any value)
 返回用于EFFECT_CHANGE_BATTLE_DAMAGE的Value函数。player=0时改写效果持有者受到的战斗伤害，player=1时改写对方受到的战斗伤害；其他情况返回-1表示不改写。
 Parameters:
   player: int
-  value: Effect
+  value: any
 Source: Utilities/utility.lua:726
 
 ●void Auxiliary.CheckGroupRecursive(Card c, Group sg, Group g, function f, any min, any max, any ext_params)
@@ -6346,27 +6346,28 @@ Parameters:
 Source: Utilities/utility.lua:1134
 
 ●void Auxiliary.DrytronCostFilter(Card c, int tp)
-TODO document.
+「龙辉巧」共通特殊召唤效果的费用筛选；匹配可以从手牌或场上解放、且解放后会给tp留下可用怪兽区域的「龙辉巧」怪兽或仪式怪兽。
 Parameters:
   c: Card
   tp: int
 Source: Utilities/utility.lua:1013
 
 ●void Auxiliary.DrytronCounterFilter(Card c)
-TODO document.
+「龙辉巧」共通特殊召唤效果的活动计数筛选；对不能通常召唤/盖放的卡返回true，从而让计数器判断tp本回合是否特殊召唤过可以通常召唤/盖放的怪兽。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1010
 
 ●void Auxiliary.DrytronExtraCostFilter(Card c, int tp)
-TODO document.
+判断c是否可以由tp通过编号89771220的效果作为代替费用从墓地除外。
 Parameters:
   c: Card
   tp: int
 Source: Utilities/utility.lua:1017
 
 ●void Auxiliary.DrytronSpSummonCost(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+检查并支付「龙辉巧」共通的自身特殊召唤费用。
+玩家本回合不能已经特殊召唤过可以通常召唤/盖放的怪兽。支付时登记对应的特殊召唤誓约，然后解放1张可用费用卡，或除外1张可用的代替费用卡。
 Parameters:
   e: Effect
   tp: int
@@ -6379,26 +6380,26 @@ Parameters:
   chk: bool
 Source: Utilities/utility.lua:1020
 
-●void Auxiliary.DrytronSpSummonLimit(Effect e, Card c, any sump, Effect sumtype, any sumpos, any targetp, Effect se)
-TODO document.
+●void Auxiliary.DrytronSpSummonLimit(Effect e, Card c, int sump, int sumtype, int sumpos, int targetp, Effect se)
+「龙辉巧」共通费用登记的誓约目标；阻止特殊召唤可以通常召唤/盖放的怪兽，但排除原本种类为魔法/陷阱或陷阱怪兽的卡。
 Parameters:
   e: Effect
   c: Card
-  sump: any
-  sumtype: Effect
-  sumpos: any
-  targetp: any
+  sump: int
+  sumtype: int
+  sumpos: int
+  targetp: int
   se: Effect
 Source: Utilities/utility.lua:1054
 
 ●void Auxiliary.DrytronSpSummonOperation(function func)
-TODO document.
+返回「龙辉巧」共通的操作包装函数；将处理对象守备表示特殊召唤，完成正规手续，然后调用func(e,tp)。
 Parameters:
   func: function
 Source: Utilities/utility.lua:1066
 
 ●void Auxiliary.DrytronSpSummonTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+「龙辉巧」共通自身特殊召唤效果的目标处理；检查怪兽区域需求，确认处理对象能以表侧守备表示特殊召唤，并登记特殊召唤信息。
 Parameters:
   e: Effect
   tp: int
@@ -6420,7 +6421,7 @@ Returns:
 Source: Utilities/utility.lua:1079
 
 ●void Auxiliary.dscon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+改变攻击力/守备力的快速效果条件；不在伤害阶段时为true，或在伤害阶段且尚未进行伤害计算时为true。
 Parameters:
   e: Effect
   tp: int
@@ -6433,7 +6434,7 @@ Parameters:
 Source: Utilities/utility.lua:810
 
 ●void Auxiliary.dsercon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+EVENT_DAMAGE_STEP_END效果的条件；处理对象仍与战斗关联，或已被战斗破坏时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -6446,7 +6447,7 @@ Parameters:
 Source: Utilities/utility.lua:786
 
 ●function Auxiliary.EffectCategoryFilter(int category)
-TODO document.
+返回谓词函数，用于判断Effect是否包含category类别。
 Parameters:
   category: int
 Returns:
@@ -6454,7 +6455,7 @@ Returns:
 Source: Utilities/utility.lua:2012
 
 ●function Auxiliary.EffectPropertyFilter(int flag)
-TODO document.
+返回谓词函数，用于判断Effect是否包含flag属性。
 Parameters:
   flag: int
 Returns:
@@ -6470,26 +6471,27 @@ Parameters:
 Source: Utilities/utility.lua:266
 
 ●void Auxiliary.EnableBESRemove(Card c)
-TODO document.
+为c登记B.E.S.共通维持触发效果；战斗后能取除1个0x1f指示物则取除，否则破坏c。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1791
 
-●void Auxiliary.EnableChangeCode(Card c, Effect code, any location, function condition)
-TODO document.
+●void Auxiliary.EnableChangeCode(Card c, int code, int location, function condition)
+把code登记为c的列名编号，并给c登记取该值的EFFECT_CHANGE_CODE效果。
+省略location时，怪兽默认在怪兽区域适用，非怪兽默认在魔法与陷阱区域适用。省略condition时，该卡名变更始终适用。
 Parameters:
   c: Card
-  code: Effect
-  location: any
+  code: int
+  location: int
   condition: function
 Source: Utilities/utility.lua:433
 
 ●void Auxiliary.EnableExtraDeckSummonCountLimit()
-TODO document.
+初始化共通的额外卡组召唤次数表，双方各为1次，并登记每个抽卡阶段开始时重置的全局效果。此辅助函数只管理计数，具体卡片脚本仍需自行检查并扣除次数。
 Source: Utilities/utility.lua:482
 
 ●void Auxiliary.EnableNeosReturn(Card c, function operation, any set_category)
-TODO document.
+为c登记「元素英雄 新宇侠」融合怪兽共通的结束阶段返回效果；会创建强制返回效果，以及受编号42015635效果影响时使用的可选版本，并返回这两个效果。
 Parameters:
   c: Card
   operation: function
@@ -6512,7 +6514,7 @@ Parameters:
 Source: Utilities/utility.lua:348
 
 ●void Auxiliary.EPDestroyOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+延迟到结束阶段破坏的操作函数；破坏保存在e的label object中的Card或Group。
 Parameters:
   e: Effect
   tp: int
@@ -6525,13 +6527,13 @@ Parameters:
 Source: Utilities/utility.lua:1824
 
 ●void Auxiliary.EquipSpellOperation(any eqlimit)
-TODO document.
+返回共通装备魔法操作函数；若处理对象与第一个目标仍与效果关联、目标表侧表示且eqlimit允许，则把处理对象装备给该目标。
 Parameters:
   eqlimit: any
 Source: Utilities/utility.lua:1920
 
 ●void Auxiliary.EquipSpellTarget(bool is_self, bool is_opponent, function filter, any eqlimit)
-TODO document.
+返回共通装备魔法目标函数；is_self和is_opponent决定可选择哪一方怪兽区域，filter选择有效目标，eqlimit会在连锁中改选目标和处理时再次检查。
 Parameters:
   is_self: bool
   is_opponent: bool
@@ -6565,18 +6567,18 @@ Parameters:
 Source: Utilities/utility.lua:1176
 
 ●void Auxiliary.ExtraDeckSummonCountLimitReset()
-TODO document.
+把共通额外卡组召唤次数表重置为双方各1次。
 Source: Utilities/utility.lua:493
 
 ●void Auxiliary.ExtraReleaseFilter(Card c, int tp)
-TODO document.
+判断c是否为对方控制、且对tp具有EFFECT_EXTRA_RELEASE_NONSUM效果的卡。
 Parameters:
   c: Card
   tp: int
 Source: Utilities/utility.lua:1515
 
 ●void Auxiliary.FALSE()
-TODO document.
+返回false。
 Source: Utilities/utility.lua:94
 
 ●void Auxiliary.FilterBoolFunction(function f, ... any)
@@ -6586,11 +6588,11 @@ Parameters:
   ...: any
 Source: Utilities/utility.lua:466
 
-●void Auxiliary.FilterEqualFunction(function f, Effect value, ... any)
+●void Auxiliary.FilterEqualFunction(function f, any value, ... any)
 TODO document.
 Parameters:
   f: function
-  value: Effect
+  value: any
   ...: any
 Source: Utilities/utility.lua:460
 
@@ -6630,25 +6632,25 @@ Returns:
 Source: Utilities/utility.lua:695
 
 ●void Auxiliary.GetAttributeCount(Group g)
-TODO document.
+返回g中包含的不同属性数量；空Group返回0。
 Parameters:
   g: Group
 Source: Utilities/utility.lua:584
 
 ●void Auxiliary.GetCappedAttack(Card c)
-TODO document.
+返回c的当前攻击力，但最高限制为MAX_PARAMETER。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1537
 
 ●void Auxiliary.GetCappedLevel(Card c)
-TODO document.
+返回c的当前等级，但最高限制为MAX_PARAMETER。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1519
 
 ●void Auxiliary.GetCappedXyzLevel(Card c)
-TODO document.
+返回c的当前等级，但最高限制为MAX_XYZ_LEVEL。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1528
@@ -6671,34 +6673,34 @@ Returns:
   int
 Source: Utilities/utility.lua:670
 
-●void Auxiliary.GetGlobalColumn(any p, any location, Effect sequence)
+●void Auxiliary.GetGlobalColumn(any p, int location, int sequence)
 TODO document.
 Parameters:
   p: any
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:655
 
-●void Auxiliary.GetGlobalRow(any p, any location, Effect sequence)
+●void Auxiliary.GetGlobalRow(any p, int location, int sequence)
 TODO document.
 Parameters:
   p: any
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:621
 
-●void Auxiliary.GetLocalColumn(any location, Effect sequence)
+●void Auxiliary.GetLocalColumn(int location, int sequence)
 TODO document.
 Parameters:
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:633
 
-●void Auxiliary.GetLocalRow(any location, Effect sequence)
+●void Auxiliary.GetLocalRow(int location, int sequence)
 TODO document.
 Parameters:
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:601
 
 ●void Auxiliary.GetMaterialListCount(Card c)
@@ -6793,18 +6795,18 @@ Returns:
   bool
 Source: Utilities/utility.lua:1981
 
-●void Auxiliary.IsCodeListed(Card c, Effect code)
+●void Auxiliary.IsCodeListed(Card c, int code)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
+  code: int
 Source: Utilities/utility.lua:547
 
-●void Auxiliary.IsCodeOrListed(Card c, Effect code)
+●void Auxiliary.IsCodeOrListed(Card c, int code)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
+  code: int
 Source: Utilities/utility.lua:550
 
 ●void Auxiliary.IsCounterAdded(Card c, any counter)
@@ -6821,25 +6823,25 @@ Parameters:
   g: Group
 Source: Utilities/utility.lua:597
 
-●void Auxiliary.IsMaterialListCode(Card c, Effect code)
+●void Auxiliary.IsMaterialListCode(Card c, int code)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
+  code: int
 Source: Utilities/utility.lua:512
 
-●void Auxiliary.IsMaterialListSetCard(Card c, Effect setcode)
+●void Auxiliary.IsMaterialListSetCard(Card c, int setcode)
 TODO document.
 Parameters:
   c: Card
-  setcode: Effect
+  setcode: int
 Source: Utilities/utility.lua:515
 
-●void Auxiliary.IsMaterialListType(Card c, Effect type)
+●void Auxiliary.IsMaterialListType(Card c, int type)
 TODO document.
 Parameters:
   c: Card
-  type: Effect
+  type: int
 Source: Utilities/utility.lua:526
 
 ●bool Auxiliary.IsPlayerCanNormalDraw(int tp)
@@ -6859,18 +6861,18 @@ Returns:
   bool
 Source: Utilities/utility.lua:1953
 
-●void Auxiliary.IsSetNameMonsterListed(Card c, Effect setcode)
+●void Auxiliary.IsSetNameMonsterListed(Card c, int setcode)
 TODO document.
 Parameters:
   c: Card
-  setcode: Effect
+  setcode: int
 Source: Utilities/utility.lua:567
 
-●void Auxiliary.IsTypeInText(Card c, Effect type)
+●void Auxiliary.IsTypeInText(Card c, int type)
 TODO document.
 Parameters:
   c: Card
-  type: Effect
+  type: int
 Source: Utilities/utility.lua:581
 
 ●void Auxiliary.IsUnionState(Effect effect)
@@ -7176,29 +7178,29 @@ Parameters:
   te: Effect
 Source: Utilities/utility.lua:892
 
-●void Auxiliary.RegisterMergedDelayedEvent(Card c, Effect code, any event, Group g)
+●void Auxiliary.RegisterMergedDelayedEvent(Card c, int code, int event, Group g)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
-  event: any
+  code: int
+  event: int
   g: Group
 Source: Utilities/utility.lua:1647
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, Effect code, any events)
+●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, int code, any events)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
+  code: int
   events: any
 Source: Utilities/utility.lua:1684
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, any event, Effect event_code_single)
+●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, int event, Effect event_code_single)
 TODO document.
 Parameters:
   c: Card
   g: Group
-  event: any
+  event: int
   event_code_single: Effect
 Source: Utilities/utility.lua:1729
 
@@ -7275,11 +7277,11 @@ Parameters:
   ...: any
 Source: Utilities/utility.lua:1395
 
-●void Auxiliary.SelfEquipFilter(Card c, any id)
+●void Auxiliary.SelfEquipFilter(Card c, int id)
 TODO document.
 Parameters:
   c: Card
-  id: any
+  id: int
 Source: Utilities/utility.lua:1956
 
 ●void Auxiliary.SequenceToGlobal(any p, int loc, int seq)
@@ -7376,11 +7378,11 @@ Parameters:
   chk: bool
 Source: Utilities/utility.lua:212
 
-●void Auxiliary.Stringid(Effect code, any id)
+●void Auxiliary.Stringid(int code, int id)
 TODO document.
 Parameters:
-  code: Effect
-  id: any
+  code: int
+  id: int
 Source: Utilities/utility.lua:79
 
 ●void Auxiliary.sumreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
@@ -7409,11 +7411,11 @@ Parameters:
   ...: any
 Source: Utilities/utility.lua:454
 
-●void Auxiliary.TargetEqualFunction(function f, Effect value, ... any)
+●void Auxiliary.TargetEqualFunction(function f, any value, ... any)
 TODO document.
 Parameters:
   f: function
-  value: Effect
+  value: any
   ...: any
 Source: Utilities/utility.lua:448
 
@@ -8788,12 +8790,12 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2317
 
-●void Auxiliary.MustMaterialCheck(any v, int tp, Effect code)
+●void Auxiliary.MustMaterialCheck(any v, int tp, int code)
 TODO document.
 Parameters:
   v: any
   tp: int
-  code: Effect
+  code: int
 Source: Utilities/procedure.lua:2274
 
 ●void Auxiliary.MustMaterialCounterFilter(Card c, Group g)

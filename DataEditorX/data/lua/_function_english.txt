@@ -6183,11 +6183,11 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:814
 
-●void Auxiliary.ChangeBattleDamage(int player, Effect value)
+●void Auxiliary.ChangeBattleDamage(int player, any value)
 Returns a value function for EFFECT_CHANGE_BATTLE_DAMAGE. player=0 changes damage taken by the effect owner, player=1 changes damage taken by the opponent; otherwise it returns -1 to keep the damage unchanged.
 Parameters:
   player: int
-  value: Effect
+  value: any
 Source: Utilities/utility.lua:726
 
 ●void Auxiliary.CheckGroupRecursive(Card c, Group sg, Group g, function f, any min, any max, any ext_params)
@@ -6357,27 +6357,28 @@ Parameters:
 Source: Utilities/utility.lua:1134
 
 ●void Auxiliary.DrytronCostFilter(Card c, int tp)
-TODO document.
+Cost filter for the shared Drytron Special Summon effect. It accepts Drytron monsters and Ritual Monsters that can be Tributed from the hand or field while leaving tp an open Monster Zone.
 Parameters:
   c: Card
   tp: int
 Source: Utilities/utility.lua:1013
 
 ●void Auxiliary.DrytronCounterFilter(Card c)
-TODO document.
+Activity-counter filter for the shared Drytron Special Summon effect. It returns true for cards that cannot be Normal Summoned/Set, so the counter can detect whether tp Special Summoned a monster that can be Normal Summoned/Set this turn.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1010
 
 ●void Auxiliary.DrytronExtraCostFilter(Card c, int tp)
-TODO document.
+Checks whether c can be banished by tp as a replacement cost through effect code 89771220.
 Parameters:
   c: Card
   tp: int
 Source: Utilities/utility.lua:1017
 
 ●void Auxiliary.DrytronSpSummonCost(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+Checks and pays the shared Drytron self-Summon cost.
+The player must not have Special Summoned a monster that can be Normal Summoned/Set this turn. On payment, it applies the matching Special Summon oath, then either Tributes one valid cost card or banishes one valid replacement-cost card.
 Parameters:
   e: Effect
   tp: int
@@ -6390,26 +6391,26 @@ Parameters:
   chk: bool
 Source: Utilities/utility.lua:1020
 
-●void Auxiliary.DrytronSpSummonLimit(Effect e, Card c, any sump, Effect sumtype, any sumpos, any targetp, Effect se)
-TODO document.
+●void Auxiliary.DrytronSpSummonLimit(Effect e, Card c, int sump, int sumtype, int sumpos, int targetp, Effect se)
+Oath target for the shared Drytron cost; it prevents Special Summoning monsters that can be Normal Summoned/Set, excluding cards whose original type is Spell/Trap or Trap Monster.
 Parameters:
   e: Effect
   c: Card
-  sump: any
-  sumtype: Effect
-  sumpos: any
-  targetp: any
+  sump: int
+  sumtype: int
+  sumpos: int
+  targetp: int
   se: Effect
 Source: Utilities/utility.lua:1054
 
 ●void Auxiliary.DrytronSpSummonOperation(function func)
-TODO document.
+Returns the shared Drytron operation wrapper. It Special Summons the handler in face-up Defense Position, completes its procedure, then calls func(e,tp).
 Parameters:
   func: function
 Source: Utilities/utility.lua:1066
 
 ●void Auxiliary.DrytronSpSummonTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+Target function for the shared Drytron self-Summon effect. It checks the Monster Zone requirement, confirms the handler can be Special Summoned in face-up Defense Position, and sets Special Summon operation info.
 Parameters:
   e: Effect
   tp: int
@@ -6431,7 +6432,7 @@ Returns:
 Source: Utilities/utility.lua:1079
 
 ●void Auxiliary.dscon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Condition for Quick Effects that change ATK/DEF; true outside the Damage Phase, or during the Damage Phase before damage calculation has been performed.
 Parameters:
   e: Effect
   tp: int
@@ -6444,7 +6445,7 @@ Parameters:
 Source: Utilities/utility.lua:810
 
 ●void Auxiliary.dsercon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Condition for EVENT_DAMAGE_STEP_END effects; true if the handler is still related to battle or was battle destroyed.
 Parameters:
   e: Effect
   tp: int
@@ -6457,7 +6458,7 @@ Parameters:
 Source: Utilities/utility.lua:786
 
 ●function Auxiliary.EffectCategoryFilter(int category)
-TODO document.
+Returns a predicate that checks whether an Effect has category.
 Parameters:
   category: int
 Returns:
@@ -6465,7 +6466,7 @@ Returns:
 Source: Utilities/utility.lua:2012
 
 ●function Auxiliary.EffectPropertyFilter(int flag)
-TODO document.
+Returns a predicate that checks whether an Effect has property flag.
 Parameters:
   flag: int
 Returns:
@@ -6481,26 +6482,27 @@ Parameters:
 Source: Utilities/utility.lua:266
 
 ●void Auxiliary.EnableBESRemove(Card c)
-TODO document.
+Registers the shared B.E.S. maintenance trigger on c. After c battles, it removes one 0x1f counter if possible; otherwise it destroys c.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1791
 
-●void Auxiliary.EnableChangeCode(Card c, Effect code, any location, function condition)
-TODO document.
+●void Auxiliary.EnableChangeCode(Card c, int code, int location, function condition)
+Registers code as a listed code for c and gives c an EFFECT_CHANGE_CODE effect with that value.
+If location is omitted, monsters use the Monster Zone and non-monsters use the Spell & Trap Zone. If condition is omitted, the code change is always active.
 Parameters:
   c: Card
-  code: Effect
-  location: any
+  code: int
+  location: int
   condition: function
 Source: Utilities/utility.lua:433
 
 ●void Auxiliary.EnableExtraDeckSummonCountLimit()
-TODO document.
+Initializes the shared Extra Deck Summon count table with one count for each player and registers a global Draw Phase Start reset. The helper only manages the counter; individual card scripts still check and decrement it.
 Source: Utilities/utility.lua:482
 
 ●void Auxiliary.EnableNeosReturn(Card c, function operation, any set_category)
-TODO document.
+Registers the shared Elemental HERO Neos Fusion End Phase return effects on c. It creates a mandatory return effect and an optional version used while c is affected by effect code 42015635, then returns both effects.
 Parameters:
   c: Card
   operation: function
@@ -6523,7 +6525,7 @@ Parameters:
 Source: Utilities/utility.lua:348
 
 ●void Auxiliary.EPDestroyOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Operation for delayed End Phase destruction effects. It destroys the Card or Group stored as e's label object.
 Parameters:
   e: Effect
   tp: int
@@ -6536,13 +6538,13 @@ Parameters:
 Source: Utilities/utility.lua:1824
 
 ●void Auxiliary.EquipSpellOperation(any eqlimit)
-TODO document.
+Returns the shared Equip Spell operation. It equips the handler to the first target if both cards are still related to the effect, the target is face-up, and eqlimit allows it.
 Parameters:
   eqlimit: any
 Source: Utilities/utility.lua:1920
 
 ●void Auxiliary.EquipSpellTarget(bool is_self, bool is_opponent, function filter, any eqlimit)
-TODO document.
+Returns the shared Equip Spell target function. is_self and is_opponent choose which Monster Zones can be targeted, filter selects a valid target, and eqlimit is rechecked for chained target changes and resolution.
 Parameters:
   is_self: bool
   is_opponent: bool
@@ -6587,18 +6589,18 @@ Parameters:
 Source: Utilities/utility.lua:1176
 
 ●void Auxiliary.ExtraDeckSummonCountLimitReset()
-TODO document.
+Resets the shared Extra Deck Summon count table to one count for each player.
 Source: Utilities/utility.lua:493
 
 ●void Auxiliary.ExtraReleaseFilter(Card c, int tp)
-TODO document.
+Returns true for an opponent's card that has EFFECT_EXTRA_RELEASE_NONSUM available to tp.
 Parameters:
   c: Card
   tp: int
 Source: Utilities/utility.lua:1515
 
 ●void Auxiliary.FALSE()
-TODO document.
+Returns false.
 Source: Utilities/utility.lua:94
 
 ●void Auxiliary.FilterBoolFunction(function f, ... any)
@@ -6614,7 +6616,7 @@ Parameters:
   ...: any
 Source: Utilities/utility.lua:466
 
-●void Auxiliary.FilterEqualFunction(function f, Effect value, ... any)
+●void Auxiliary.FilterEqualFunction(function f, any value, ... any)
 Filter cards satisfying a single filter condition f with value value, returning a function with a bool return type; additional parameters start from the third parameter
 function Auxiliary.FilterEqualFunction(f, value, ...)
   local ext_params={...}
@@ -6624,7 +6626,7 @@ function Auxiliary.FilterEqualFunction(f, value, ...)
 end
 Parameters:
   f: function
-  value: Effect
+  value: any
   ...: any
 Source: Utilities/utility.lua:460
 
@@ -6669,25 +6671,25 @@ Returns:
 Source: Utilities/utility.lua:695
 
 ●void Auxiliary.GetAttributeCount(Group g)
-TODO document.
+Returns how many different Attributes are represented among the cards in g; an empty group returns 0.
 Parameters:
   g: Group
 Source: Utilities/utility.lua:584
 
 ●void Auxiliary.GetCappedAttack(Card c)
-TODO document.
+Returns c's current ATK, capped at MAX_PARAMETER.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1537
 
 ●void Auxiliary.GetCappedLevel(Card c)
-TODO document.
+Returns c's current Level, capped at MAX_PARAMETER.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1519
 
 ●void Auxiliary.GetCappedXyzLevel(Card c)
-TODO document.
+Returns c's current Level, capped at MAX_XYZ_LEVEL.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1528
@@ -6710,34 +6712,34 @@ Returns:
   int
 Source: Utilities/utility.lua:670
 
-●void Auxiliary.GetGlobalColumn(any p, any location, Effect sequence)
+●void Auxiliary.GetGlobalColumn(any p, int location, int sequence)
 TODO document.
 Parameters:
   p: any
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:655
 
-●void Auxiliary.GetGlobalRow(any p, any location, Effect sequence)
+●void Auxiliary.GetGlobalRow(any p, int location, int sequence)
 TODO document.
 Parameters:
   p: any
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:621
 
-●void Auxiliary.GetLocalColumn(any location, Effect sequence)
+●void Auxiliary.GetLocalColumn(int location, int sequence)
 TODO document.
 Parameters:
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:633
 
-●void Auxiliary.GetLocalRow(any location, Effect sequence)
+●void Auxiliary.GetLocalRow(int location, int sequence)
 TODO document.
 Parameters:
-  location: any
-  sequence: Effect
+  location: int
+  sequence: int
 Source: Utilities/utility.lua:601
 
 ●void Auxiliary.GetMaterialListCount(Card c)
@@ -6841,18 +6843,18 @@ Returns:
   bool
 Source: Utilities/utility.lua:1981
 
-●void Auxiliary.IsCodeListed(Card c, Effect code)
+●void Auxiliary.IsCodeListed(Card c, int code)
 Check if card c lists card code in its card_code_list
 Parameters:
   c: Card
-  code: Effect
+  code: int
 Source: Utilities/utility.lua:547
 
-●void Auxiliary.IsCodeOrListed(Card c, Effect code)
+●void Auxiliary.IsCodeOrListed(Card c, int code)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
+  code: int
 Source: Utilities/utility.lua:550
 
 ●void Auxiliary.IsCounterAdded(Card c, any counter)
@@ -6869,25 +6871,25 @@ Parameters:
   g: Group
 Source: Utilities/utility.lua:597
 
-●void Auxiliary.IsMaterialListCode(Card c, Effect code)
+●void Auxiliary.IsMaterialListCode(Card c, int code)
 Check if card c lists card code as a material in its material list
 Parameters:
   c: Card
-  code: Effect
+  code: int
 Source: Utilities/utility.lua:512
 
-●void Auxiliary.IsMaterialListSetCard(Card c, Effect setcode)
+●void Auxiliary.IsMaterialListSetCard(Card c, int setcode)
 Check if card c lists setcode as a material in its material_setcode
 Parameters:
   c: Card
-  setcode: Effect
+  setcode: int
 Source: Utilities/utility.lua:515
 
-●void Auxiliary.IsMaterialListType(Card c, Effect type)
+●void Auxiliary.IsMaterialListType(Card c, int type)
 TODO document.
 Parameters:
   c: Card
-  type: Effect
+  type: int
 Source: Utilities/utility.lua:526
 
 ●bool Auxiliary.IsPlayerCanNormalDraw(int tp)
@@ -6907,18 +6909,18 @@ Returns:
   bool
 Source: Utilities/utility.lua:1953
 
-●void Auxiliary.IsSetNameMonsterListed(Card c, Effect setcode)
+●void Auxiliary.IsSetNameMonsterListed(Card c, int setcode)
 TODO document.
 Parameters:
   c: Card
-  setcode: Effect
+  setcode: int
 Source: Utilities/utility.lua:567
 
-●void Auxiliary.IsTypeInText(Card c, Effect type)
+●void Auxiliary.IsTypeInText(Card c, int type)
 TODO document.
 Parameters:
   c: Card
-  type: Effect
+  type: int
 Source: Utilities/utility.lua:581
 
 ●void Auxiliary.IsUnionState(Effect effect)
@@ -7261,29 +7263,29 @@ Parameters:
   te: Effect
 Source: Utilities/utility.lua:892
 
-●void Auxiliary.RegisterMergedDelayedEvent(Card c, Effect code, any event, Group g)
+●void Auxiliary.RegisterMergedDelayedEvent(Card c, int code, int event, Group g)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
-  event: any
+  code: int
+  event: int
   g: Group
 Source: Utilities/utility.lua:1647
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, Effect code, any events)
+●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, int code, any events)
 TODO document.
 Parameters:
   c: Card
-  code: Effect
+  code: int
   events: any
 Source: Utilities/utility.lua:1684
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, any event, Effect event_code_single)
+●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, int event, Effect event_code_single)
 TODO document.
 Parameters:
   c: Card
   g: Group
-  event: any
+  event: int
   event_code_single: Effect
 Source: Utilities/utility.lua:1729
 
@@ -7360,11 +7362,11 @@ Parameters:
   ...: any
 Source: Utilities/utility.lua:1395
 
-●void Auxiliary.SelfEquipFilter(Card c, any id)
+●void Auxiliary.SelfEquipFilter(Card c, int id)
 TODO document.
 Parameters:
   c: Card
-  id: any
+  id: int
 Source: Utilities/utility.lua:1956
 
 ●void Auxiliary.SequenceToGlobal(any p, int loc, int seq)
@@ -7461,11 +7463,11 @@ Parameters:
   chk: bool
 Source: Utilities/utility.lua:212
 
-●void Auxiliary.Stringid(Effect code, any id)
+●void Auxiliary.Stringid(int code, int id)
 Used to index the card number code for the card the first id (from 0) effect prompts
 Parameters:
-  code: Effect
-  id: any
+  code: int
+  id: int
 Source: Utilities/utility.lua:79
 
 ●void Auxiliary.sumreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
@@ -7511,7 +7513,7 @@ Parameters:
   ...: any
 Source: Utilities/utility.lua:454
 
-●void Auxiliary.TargetEqualFunction(function f, Effect value, ... any)
+●void Auxiliary.TargetEqualFunction(function f, any value, ... any)
 Used in effect registration, returns a function with a bool return type; additional parameters start from the third parameter
 function Auxiliary.TargetEqualFunction(f, value, ...)
   local ext_params={...}
@@ -7521,7 +7523,7 @@ function Auxiliary.TargetEqualFunction(f, value, ...)
 end
 Parameters:
   f: function
-  value: Effect
+  value: any
   ...: any
 Source: Utilities/utility.lua:448
 
@@ -8960,7 +8962,7 @@ Parameters:
   st: any
 Source: Utilities/procedure.lua:2317
 
-●void Auxiliary.MustMaterialCheck(any v, int tp, Effect code)
+●void Auxiliary.MustMaterialCheck(any v, int tp, int code)
 Check if value contains cards or a group affected by player's effect type code
 Currently involved codes are:
 EFFECT_MUST_BE_SMATERIAL
@@ -8971,7 +8973,7 @@ All are checks for required materials
 Parameters:
   v: any
   tp: int
-  code: Effect
+  code: int
 Source: Utilities/procedure.lua:2274
 
 ●void Auxiliary.MustMaterialCounterFilter(Card c, Group g)
