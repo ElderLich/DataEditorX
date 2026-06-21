@@ -64,7 +64,7 @@ namespace DataEditorX
                                 cStream.Close();
                             }
                         }
-                    string file = MyPath.Combine(Application.StartupPath, DEXConfig.TAG_DATA, DEXConfig.FILE_STRINGS);
+                    string file = MyPath.FindFile(MyPath.Combine(Application.StartupPath, DEXConfig.TAG_DATA), DEXConfig.FILE_STRINGS, "lua");
                     if (!string.IsNullOrEmpty(file) && File.Exists(file))
                     {
                         using FileStream sStream = new(file, FileMode.Open, FileAccess.Write);

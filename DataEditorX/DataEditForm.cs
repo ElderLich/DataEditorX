@@ -342,7 +342,7 @@ namespace DataEditorX
         void InitPath(string datapath)
         {
             this.datapath = datapath;
-            confcover = MyPath.Combine(datapath, "cover.jpg");
+            confcover = MyPath.FindFile(datapath, "cover.jpg", "assets");
             if (File.Exists(confcover))
             {
                 cover = MyBitmap.ReadImage(confcover);
@@ -1860,7 +1860,7 @@ namespace DataEditorX
             }
 
             menuitem_mseconfig.DropDownItems.Clear();//清空
-            string[] files = Directory.GetFiles(datapath);
+            string[] files = MyPath.FindFiles(datapath, MyPath.GetFileName(MSEConfig.TAG, "*"), "mse");
             foreach (string file in files)
             {
                 string name = MyPath.GetFullFileName(MSEConfig.TAG, file);
@@ -1905,7 +1905,7 @@ namespace DataEditorX
         #region 查找lua函数
         private void Menuitem_findluafunc_Click(object sender, EventArgs e)
         {
-            string funtxt = MyPath.Combine(datapath, DEXConfig.FILE_FUNCTION);
+            string funtxt = MyPath.FindFile(datapath, DEXConfig.FILE_FUNCTION, "lua");
             using FolderBrowserDialog fd = new();
             fd.Description = "Folder Name: ocgcore";
             if (fd.ShowDialog() == DialogResult.OK)
@@ -2080,7 +2080,7 @@ namespace DataEditorX
             }
 
             menuitem_language.DropDownItems.Clear();
-            string[] files = Directory.GetFiles(datapath);
+            string[] files = MyPath.FindFiles(datapath, MyPath.GetFileName(DEXConfig.TAG_LANGUAGE, "*"), "languages");
             foreach (string file in files)
             {
                 string name = MyPath.GetFullFileName(DEXConfig.TAG_LANGUAGE, file);

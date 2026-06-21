@@ -194,11 +194,11 @@ namespace DataEditorX.Core.Mse
             Iscn2tw = false;
 
             //读取配置
-            string tmp = MyPath.Combine(path, MyPath.GetFileName(TAG, DEXConfig.ReadString(DEXConfig.TAG_MSE)));
+            string tmp = MyPath.FindFile(path, MyPath.GetFileName(TAG, DEXConfig.ReadString(DEXConfig.TAG_MSE)), "mse");
 
             if (!File.Exists(tmp))
             {
-                tmp = MyPath.Combine(path, MyPath.GetFileName(TAG, FILE_CONFIG_NAME));
+                tmp = MyPath.FindFile(path, MyPath.GetFileName(TAG, FILE_CONFIG_NAME), "mse");
                 if (!File.Exists(tmp))
                 {
                     return;//如果默认的也不存在

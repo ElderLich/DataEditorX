@@ -37,19 +37,27 @@ The update metadata file must be pushed to GitHub and readable from the configur
 * Use the CodeEditor tab to edit scripts, check syntax, find/replace text, and connect card names from a selected database.
 * Use Help-->Language to choose a UI language, then restart the application.
 
+## Data Folder Layout
+Bundled data files are grouped by purpose:
+* `data/languages`: UI language files and card info definitions.
+* `data/lua`: Lua constants, strings, script templates, and function autocomplete data.
+* `data/mse`: Magic Set Editor export templates, including English, Chinese, French, German, Italian, Japanese, and Portuguese.
+* `data/editor`: editor syntax/highlighting resources.
+* `data/assets`: shared bundled images.
+
 ## Add a New Archetype
 First decide the setcode, as a hex number, for the new archetype. Avoid conflicts with existing setcodes.
 
-Type the setcode in the text box to the right of the archetype combo box and click Modify. To show the archetype name in the combo box, open `data/cardinfo_xxx.txt`, where `xxx` is the language, then add a new line between `##setname` and `#end`. Write the setcode starting with `0x`, then a tab, then the archetype name.
+Type the setcode in the text box to the right of the archetype combo box and click Modify. To show the archetype name in the combo box, open `data/languages/cardinfo_xxx.txt`, where `xxx` is the language, then add a new line between `##setname` and `#end`. Write the setcode starting with `0x`, then a tab, then the archetype name.
 
 ## Language
 Open Help-->Language to choose a language, then restart the application.
 
 To add a language named `xxx`, add both files:
-* `data/language_xxx.txt` for the graphic interface.
-* `data/cardinfo_xxx.txt` for card information.
+* `data/languages/language_xxx.txt` for the graphic interface.
+* `data/languages/cardinfo_xxx.txt` for card information.
 
-Each line in `language_english.txt` and `cardinfo_english.txt` is separated by a tab. Translate the content on the right side of the tab, then put the translated files in `language_xxx.txt` and `cardinfo_xxx.txt`.
+Each line in `language_english.txt` and `cardinfo_english.txt` is separated by a tab. Translate the content on the right side of the tab, then put the translated files in `data/languages`.
 
 ## Fork Additions
 * Persistent dark theme toggle.
@@ -57,6 +65,7 @@ Each line in `language_english.txt` and `cardinfo_english.txt` is separated by a
 * Source Code and external Lua file launches use the Windows shell, avoiding URL/file launch exceptions.
 * SQLitePCLRaw package updates remove the known vulnerable package warning.
 * In-app updater can install downloaded releases and restart DataEditorX.
+* Bundled data files are organized into purpose-specific subfolders while old flat data folders remain compatible.
 
 ## Release Script
 Use `tools/release.py` to prepare release builds and keep version metadata in sync.

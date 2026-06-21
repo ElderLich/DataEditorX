@@ -132,6 +132,95 @@ namespace System.IO
             }
         }
 
+        public static string FindFile(string dir, string fileName, params string[] preferredSubdirs)
+        {
+            if (string.IsNullOrEmpty(dir) || string.IsNullOrEmpty(fileName))
+            {
+                return fileName;
+            }
+
+            string rootFile = Combine(dir, fileName);
+            if (File.Exists(rootFile))
+            {
+                return rootFile;
+            }
+
+            foreach (string subdir in preferredSubdirs)
+            {
+                if (string.IsNullOrEmpty(subdir))
+                {
+                    continue;
+                }
+
+                string file = Combine(dir, subdir, fileName);
+                if (File.Exists(file))
+                {
+                    return file;
+                }
+            }
+
+            if (Directory.Exists(dir))
+            {
+                try
+                {
+                    string found = Directory.GetFiles(dir, fileName, SearchOption.AllDirectories).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(found))
+                    {
+                        return found;
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return preferredSubdirs.Length > 0 && !string.IsNullOrEmpty(preferredSubdirs[0])
+                ? Combine(dir, preferredSubdirs[0], fileName)
+                : rootFile;
+        }
+
+        public static string[] FindFiles(string dir, string searchPattern, params string[] preferredSubdirs)
+        {
+            if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir))
+            {
+                return [];
+            }
+
+            List<string> files = new();
+            HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
+
+            void AddFiles(string path, SearchOption option)
+            {
+                if (!Directory.Exists(path))
+                {
+                    return;
+                }
+
+                foreach (string file in Directory.GetFiles(path, searchPattern, option))
+                {
+                    if (seen.Add(Path.GetFileName(file)))
+                    {
+                        files.Add(file);
+                    }
+                }
+            }
+
+            AddFiles(dir, SearchOption.TopDirectoryOnly);
+            foreach (string subdir in preferredSubdirs)
+            {
+                if (!string.IsNullOrEmpty(subdir))
+                {
+                    AddFiles(Combine(dir, subdir), SearchOption.TopDirectoryOnly);
+                }
+            }
+            AddFiles(dir, SearchOption.AllDirectories);
+
+            return files
+                .OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(file => file, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
         public static void CreateDir(string dir)
         {
             if (!Directory.Exists(dir))

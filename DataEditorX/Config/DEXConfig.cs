@@ -301,7 +301,7 @@ namespace DataEditorX.Config
                 Save(TAG_CHECK_SYSLANG, "false");
                 string[] words = CultureInfo.InstalledUICulture.EnglishName.Split(' ');
                 string syslang = words[0];
-                string[] files = Directory.GetFiles(path);
+                string[] files = MyPath.FindFiles(path, MyPath.GetFileName(TAG_LANGUAGE, "*"), "languages");
                 foreach (string file in files)
                 {
                     string name = MyPath.GetFullFileName(TAG_LANGUAGE, file);
@@ -317,7 +317,7 @@ namespace DataEditorX.Config
                     }
                 }
             }
-            return MyPath.Combine(path, MyPath.GetFileName(TAG_LANGUAGE, GetAppConfig(TAG_LANGUAGE)));
+            return MyPath.FindFile(path, MyPath.GetFileName(TAG_LANGUAGE, GetAppConfig(TAG_LANGUAGE)), "languages");
         }
         /// <summary>
         /// 卡片信息配置文件名
@@ -326,7 +326,7 @@ namespace DataEditorX.Config
         /// <returns></returns>
         public static string GetCardInfoFile(string path)
         {
-            return MyPath.Combine(path, MyPath.GetFileName(TAG_CARDINFO, GetAppConfig(TAG_LANGUAGE)));
+            return MyPath.FindFile(path, MyPath.GetFileName(TAG_CARDINFO, GetAppConfig(TAG_LANGUAGE)), "languages");
         }
         /// <summary>
         /// 发送消息打开文件

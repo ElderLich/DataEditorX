@@ -82,7 +82,7 @@ namespace DataEditorX
             conflang = DEXConfig.GetLanguageFile(datapath);
             //游戏数据,MSE数据
             olddatacfg = datacfg = new DataConfig(DEXConfig.GetCardInfoFile(datapath));
-            string confstring = MyPath.Combine(datapath, DEXConfig.FILE_STRINGS);
+            string confstring = MyPath.FindFile(datapath, DEXConfig.FILE_STRINGS, "lua");
             if (File.Exists(confstring))
             {
                 Dictionary<long, string> d = datacfg.dicSetnames;
@@ -102,8 +102,8 @@ namespace DataEditorX
             YGOUtil.SetConfig(datacfg);
 
             //代码提示
-            string funtxt = MyPath.Combine(datapath, DEXConfig.FILE_FUNCTION);
-            string conlua = MyPath.Combine(datapath, DEXConfig.FILE_CONSTANT);
+            string funtxt = MyPath.FindFile(datapath, DEXConfig.FILE_FUNCTION, "lua");
+            string conlua = MyPath.FindFile(datapath, DEXConfig.FILE_CONSTANT, "lua");
             codecfg = new CodeConfig();
             //添加函数
             codecfg.AddFunction(funtxt);
