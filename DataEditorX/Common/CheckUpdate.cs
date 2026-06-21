@@ -239,28 +239,30 @@ namespace DataEditorX.Common
                     return false;
                 }
 
-                long? totalBytes = response.Content.Headers.ContentLength;
-                await using Stream source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-                await using FileStream destination = new(
-                    tempFile,
-                    FileMode.Create,
-                    FileAccess.Write,
-                    FileShare.None,
-                    1024 * 128,
-                    useAsync: true);
-
-                long totalDownloadedByte = 0;
-                byte[] buffer = new byte[1024 * 128];
-                int bytesRead;
-                while ((bytesRead = await source.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken).ConfigureAwait(false)) > 0)
                 {
-                    await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
-                    totalDownloadedByte += bytesRead;
-                    progress?.Report(new DownloadProgress
+                    long? totalBytes = response.Content.Headers.ContentLength;
+                    await using Stream source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+                    await using FileStream destination = new(
+                        tempFile,
+                        FileMode.Create,
+                        FileAccess.Write,
+                        FileShare.None,
+                        1024 * 128,
+                        useAsync: true);
+
+                    long totalDownloadedByte = 0;
+                    byte[] buffer = new byte[1024 * 128];
+                    int bytesRead;
+                    while ((bytesRead = await source.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken).ConfigureAwait(false)) > 0)
                     {
-                        BytesReceived = totalDownloadedByte,
-                        TotalBytes = totalBytes
-                    });
+                        await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
+                        totalDownloadedByte += bytesRead;
+                        progress?.Report(new DownloadProgress
+                        {
+                            BytesReceived = totalDownloadedByte,
+                            TotalBytes = totalBytes
+                        });
+                    }
                 }
 
                 if (File.Exists(filename))
