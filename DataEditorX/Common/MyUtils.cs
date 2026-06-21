@@ -6,6 +6,7 @@
  * 
  * 要改变这种模板请点击 工具|选项|代码编写|编辑标准头文件
  */
+using System.Diagnostics;
 using System.Text;
 
 namespace DataEditorX.Common
@@ -46,6 +47,33 @@ namespace DataEditorX.Common
         public static bool Md5isEmpty(string md5)
         {
             return md5 == null || md5.Length < 16;
+        }
+
+        public static bool OpenShellTarget(string target)
+        {
+            if (string.IsNullOrWhiteSpace(target))
+            {
+                return false;
+            }
+
+            try
+            {
+                ProcessStartInfo info = new()
+                {
+                    FileName = target,
+                    UseShellExecute = true
+                };
+                if (File.Exists(target))
+                {
+                    info.WorkingDirectory = Path.GetDirectoryName(target);
+                }
+
+                return Process.Start(info) != null;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

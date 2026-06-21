@@ -354,7 +354,7 @@ namespace DataEditorX.Core
                 }
                 else
                 {
-                    _ = System.Diagnostics.Process.Start(lua);
+                    return DataEditorX.Common.MyUtils.OpenShellTarget(lua);
                 }
 
                 return true;

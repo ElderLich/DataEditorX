@@ -1191,7 +1191,11 @@ namespace DataEditorX
         }
         void Menuitem_githubClick(object sender, EventArgs e)
         {
-            _ = System.Diagnostics.Process.Start(DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL));
+            string url = DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL);
+            if (!MyUtils.OpenShellTarget(url))
+            {
+                MyMsg.Error($"Unable to open source URL:\n{url}");
+            }
         }
         #endregion
 
