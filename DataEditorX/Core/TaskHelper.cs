@@ -129,7 +129,8 @@ namespace DataEditorX.Core
         #region 检查更新
         public static void CheckVersion(bool showNew)
         {
-            string newver = CheckUpdate.GetNewVersion(DEXConfig.ReadString(DEXConfig.TAG_UPDATE_URL));
+            string updateUrl = DEXConfig.ReadString(DEXConfig.TAG_UPDATE_URL);
+            string newver = CheckUpdate.GetNewVersion(updateUrl);
             if (newver == CheckUpdate.DEFAULT)
             {   //检查失败
                 if (!showNew)
@@ -137,7 +138,7 @@ namespace DataEditorX.Core
                     return;
                 }
 
-                MyMsg.Error(LMSG.CheckUpdateFail);
+                MyMsg.Error(GetUpdateInfoFailureMessage(updateUrl));
                 return;
             }
 
@@ -155,10 +156,8 @@ namespace DataEditorX.Core
                     return;
                 }
 
-                if (!MyMsg.Question(LMSG.NowIsNewVersion))
-                {
-                    return;
-                }
+                MyMsg.Show(LMSG.NowIsNewVersion);
+                return;
             }
             string downloadDir = MyPath.Combine(Path.GetTempPath(), "DataEditorX");
             MyPath.CreateDir(downloadDir);
@@ -187,6 +186,27 @@ namespace DataEditorX.Core
                 MyMsg.Show(LMSG.DownloadFail);
             }
         }
+
+        private static string GetUpdateInfoFailureMessage(string updateUrl)
+        {
+            string reason = CheckUpdate.LastInfoStatus switch
+            {
+                CheckUpdate.UpdateInfoStatus.EmptyUrl => "The update metadata URL is empty.",
+                CheckUpdate.UpdateInfoStatus.InvalidFormat => "The update metadata file exists, but it does not contain a valid DataEditorX version and release URL.",
+                CheckUpdate.UpdateInfoStatus.Unavailable => "The update metadata file could not be reached.",
+                _ => "The update metadata could not be checked."
+            };
+            string detail = string.IsNullOrWhiteSpace(CheckUpdate.LastInfoError)
+                ? ""
+                : "\n\nDetails: " + CheckUpdate.LastInfoError;
+
+            return reason
+                + "\n\nDataEditorX checks this file before looking for release zips:"
+                + "\n" + updateUrl
+                + "\n\nIf you have not pushed the repo/update metadata yet, or the GitHub repo is private, this is expected."
+                + detail;
+        }
+
         public static void OnCheckUpdate(bool showNew)
         {
             CheckVersion(showNew);

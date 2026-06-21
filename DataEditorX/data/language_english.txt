@@ -129,8 +129,8 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0xc	Create a script file?
 0xd	Open the created database?
 0xe	Replace cards if exists?
-0xf	You're using the newest version.\nDo you want to download the software again anyway?
-0x10	Failed to check the update. Check your network.
+0xf	You're using the newest version.
+0x10	Failed to check update information.
 0x11	New version found.\nDo you want to proceed an update?
 0x12	File not found!
 0x13	No database selected!

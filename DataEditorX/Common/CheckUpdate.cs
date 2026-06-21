@@ -16,10 +16,20 @@ namespace DataEditorX.Common
     /// </summary>
     public static class CheckUpdate
     {
+        public enum UpdateInfoStatus
+        {
+            Ok,
+            EmptyUrl,
+            Unavailable,
+            InvalidFormat,
+        }
+
         /// <summary>
         /// 下载URL
         /// </summary>
         public static string URL = "";
+        public static UpdateInfoStatus LastInfoStatus { get; private set; } = UpdateInfoStatus.Ok;
+        public static string LastInfoError { get; private set; } = "";
         /// <summary>
         /// 从HEAD获取版本号
         /// </summary>
@@ -33,8 +43,25 @@ namespace DataEditorX.Common
         /// <returns>版本号</returns>
         public static string GetNewVersion(string VERURL)
         {
+            URL = "";
+            LastInfoStatus = UpdateInfoStatus.Ok;
+            LastInfoError = "";
+
             string urlver = DEFAULT;
-            string html = GetHtmlContentByUrl(VERURL);
+            if (string.IsNullOrWhiteSpace(VERURL))
+            {
+                LastInfoStatus = UpdateInfoStatus.EmptyUrl;
+                LastInfoError = "Update URL is empty.";
+                return urlver;
+            }
+
+            if (!TryGetHtmlContentByUrl(VERURL, out string html, out string error))
+            {
+                LastInfoStatus = UpdateInfoStatus.Unavailable;
+                LastInfoError = error;
+                return urlver;
+            }
+
             if (!string.IsNullOrEmpty(html))
             {
                 Regex ver = new(@"\[DataEditorX\]([0-9]+(?:\.[0-9]+){2,3})\[DataEditorX\]");
@@ -55,6 +82,9 @@ namespace DataEditorX.Common
                     return $"{mVer.Groups[1].Value}";
                 }
             }
+
+            LastInfoStatus = UpdateInfoStatus.InvalidFormat;
+            LastInfoError = "Update metadata was found, but it did not contain a DataEditorX version and release URL.";
             return urlver;
         }
         /// <summary>
@@ -101,31 +131,36 @@ namespace DataEditorX.Common
         /// <returns>内容</returns>
         public static string GetHtmlContentByUrl(string url)
         {
-            string htmlContent = string.Empty;
+            return TryGetHtmlContentByUrl(url, out string htmlContent, out _) ? htmlContent : "";
+        }
+
+        private static bool TryGetHtmlContentByUrl(string url, out string htmlContent, out string error)
+        {
+            htmlContent = "";
+            error = "";
             try
             {
-                HttpClient httpClient = new()
+                using HttpClient httpClient = new()
                 {
-                    //(HttpWebRequest)WebRequest.Create(url);
                     Timeout = TimeSpan.FromMilliseconds(15000)
                 };
-                using (Stream stream = httpClient.GetStreamAsync(url).Result)
+                using HttpResponseMessage response = httpClient.GetAsync(url).Result;
+                if (!response.IsSuccessStatusCode)
                 {
-                    using (StreamReader streamReader =
-                            new(stream, Encoding.UTF8))
-                    {
-                        htmlContent = streamReader.ReadToEnd();
-                        streamReader.Close();
-                    }
-                    stream.Close();
+                    error = $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}";
+                    return false;
                 }
-                return htmlContent;
-            }
-            catch
-            {
 
+                using Stream stream = response.Content.ReadAsStreamAsync().Result;
+                using StreamReader streamReader = new(stream, Encoding.UTF8);
+                htmlContent = streamReader.ReadToEnd();
+                return true;
             }
-            return "";
+            catch (Exception ex)
+            {
+                error = ex.GetBaseException().Message;
+                return false;
+            }
         }
         #endregion
 

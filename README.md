@@ -28,6 +28,7 @@ The dark theme updates the main window, dock area, database editor, script edito
 Open Help-->Version Info to see the current DataEditorX version, maintainer, original author, repository, runtime, and process architecture.
 
 Use Help-->Check for Updates to check the update metadata in `DataEditorX/readme.txt` on GitHub. If a newer version is available, DataEditorX downloads the matching win32 or win64 zip, offers to install it, closes the app, extracts the update, and restarts.
+The update metadata file must be pushed to GitHub and readable from the configured `updateURL`; release zip assets are only checked after that metadata is available.
 
 ## Common Workflows
 * Open `.cdb`, `.db`, or `.lua` files with File-->Open, or drag files/folders into the app.
