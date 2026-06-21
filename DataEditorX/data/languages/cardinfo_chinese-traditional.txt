@@ -140,19 +140,13 @@
 0x2000000	特殊召喚
 0x4000000	連結
 ##flags (category)
-0x1	Skill Card
-0x2	Speed Spell
-0x4	Boss Card
 0x80	Pre-Release
+0x100	Rush Duel
 0x200	Dark Synchro
-0x800	Rush Duel
-0x10000	Level 0
 0x40000	Obelisk
 0x80000	Ra
 0x100000	Slifer
-0x200000	Maximum
 0x400000	Raviel
-0x800000	Blank Pendulum Effect
 0x1000000	Uria
 0x2000000	Hamon
 ##setname

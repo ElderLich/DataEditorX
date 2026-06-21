@@ -25,17 +25,71 @@ namespace DataEditorX.Core
             (FlagDarkSynchro, "FrameDarkSynchro")
         };
 
-        private static long AllFrameFlags => FrameFlags.Aggregate(0L, (value, item) => value | item.Flag);
+        public static long AllFrameFlags => FrameFlags.Aggregate(0L, (value, item) => value | item.Flag);
 
-        public static bool Sync(Card card, uint previousId, out string message)
+        public static bool TryGetFrameFlags(uint cardId, out long flags, out string message)
         {
+            flags = 0;
             message = string.Empty;
-            if (card.id == 0 || card.omega == null || card.omega.Length < 2 || card.omega[0] <= 0)
+            if (cardId == 0)
             {
                 return true;
             }
 
-            long flags = card.omega[1];
+            string dataDirectory = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR);
+            if (string.IsNullOrWhiteSpace(dataDirectory))
+            {
+                return true;
+            }
+
+            string jsonFile = Path.Combine(dataDirectory, "SpecialCards.json");
+            if (!File.Exists(jsonFile))
+            {
+                return true;
+            }
+
+            JObject root;
+            try
+            {
+                root = JObject.Parse(File.ReadAllText(jsonFile));
+            }
+            catch (Exception ex)
+            {
+                message = $"SpecialCards.json could not be read: {ex.Message}";
+                return false;
+            }
+
+            foreach ((long flag, string property) in FrameFlags)
+            {
+                if (root[property] is JArray array && ContainsCode(array, cardId))
+                {
+                    flags |= flag;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool Sync(Card card, uint previousId, out string message)
+        {
+            long flags = 0;
+            if (card.omega != null && card.omega.Length > 1)
+            {
+                flags = card.omega[1];
+            }
+
+            return Sync(card.id, previousId, flags, out message);
+        }
+
+        public static bool Sync(uint cardId, uint previousId, long flags, out string message)
+        {
+            message = string.Empty;
+            if (cardId == 0)
+            {
+                return true;
+            }
+
+            flags &= AllFrameFlags;
             bool hasFrameFlag = (flags & AllFrameFlags) != 0;
             string dataDirectory = DEXConfig.ReadString(DEXConfig.TAG_PROJECT_MANAGER_MDPRO3_DATA_DIR);
             if (string.IsNullOrWhiteSpace(dataDirectory))
@@ -72,8 +126,8 @@ namespace DataEditorX.Core
             foreach ((_, string property) in FrameFlags)
             {
                 JArray array = EnsureArray(root, property);
-                changed |= RemoveCode(array, card.id);
-                if (previousId != 0 && previousId != card.id)
+                changed |= RemoveCode(array, cardId);
+                if (previousId != 0 && previousId != cardId)
                 {
                     changed |= RemoveCode(array, previousId);
                 }
@@ -87,9 +141,9 @@ namespace DataEditorX.Core
                 }
 
                 JArray array = EnsureArray(root, property);
-                if (!ContainsCode(array, card.id))
+                if (!ContainsCode(array, cardId))
                 {
-                    array.Add((long)card.id);
+                    array.Add((long)cardId);
                     changed = true;
                 }
             }
