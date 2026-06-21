@@ -722,12 +722,13 @@ namespace DataEditorX
 
         public void ApplyTheme()
         {
+            ThemeManager.ThemePalette palette = ThemeManager.CurrentPalette;
             ThemeManager.ApplyControlTree(this);
-            popupMenu.BackColor = ThemeManager.IsDarkTheme ? ThemeManager.CurrentInputBackColor : fctb.BackColor;
-            popupMenu.ForeColor = ThemeManager.IsDarkTheme ? ThemeManager.CurrentTextColor : fctb.ForeColor;
-            popupMenu.SelectedColor = ThemeManager.IsDarkTheme ? Color.FromArgb(63, 63, 70) : Color.LightGray;
-            documentMap1.BackColor = ThemeManager.IsDarkTheme ? Color.FromArgb(37, 37, 38) : Color.DimGray;
-            documentMap1.ForeColor = ThemeManager.IsDarkTheme ? ThemeManager.CurrentTextColor : Color.Maroon;
+            popupMenu.BackColor = palette.UsesOriginalColors ? fctb.BackColor : palette.InputBackColor;
+            popupMenu.ForeColor = palette.UsesOriginalColors ? fctb.ForeColor : palette.TextColor;
+            popupMenu.SelectedColor = palette.UsesOriginalColors ? Color.LightGray : palette.HeaderBackColor;
+            documentMap1.BackColor = palette.UsesOriginalColors ? Color.DimGray : palette.SurfaceBackColor;
+            documentMap1.ForeColor = palette.UsesOriginalColors ? Color.Maroon : palette.TextColor;
             fctb.Invalidate();
         }
     }

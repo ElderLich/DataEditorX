@@ -107,6 +107,8 @@ MainForm.mainMenu.menuitem_comp2Set Compare Database 2
 MainForm.mainMenu.menuitem_history	DataBase History
 MainForm.mainMenu.menuitem_shistory	Script History
 MainForm.mainMenu.menuitem_quit	Quit
+MainForm.mainMenu.menuitem_view	View(&V)
+MainForm.mainMenu.menuitem_darktheme	Theme
 MainForm.mainMenu.menuitem_windows	Windows(&W)
 MainForm.mainMenu.menuitem_dataeditor	DataEditor
 MainForm.mainMenu.menuitem_codeeditor	CodeEditor

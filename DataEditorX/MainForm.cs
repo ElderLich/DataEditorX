@@ -32,6 +32,7 @@ namespace DataEditorX
         CodeConfig codecfg = null;
         // Pending file to open.
         string openfile;
+        readonly List<ToolStripMenuItem> themeProfileMenuItems = new();
         #endregion
         public DataConfig GetDataConfig(bool old = false) {
             return old ? olddatacfg : datacfg;
@@ -44,6 +45,7 @@ namespace DataEditorX
         {
             // Initialize controls.
             InitializeComponent();
+            InitializeThemeMenu();
             ApplyTheme();
         }
         public void SetDataPath(string datapath)
@@ -123,6 +125,7 @@ namespace DataEditorX
         void InitForm()
         {
             LanguageHelper.SetFormLabel(this);
+            InitializeThemeMenu();
 
             // Apply language to all open windows.
             DockContentCollection contents = dockPanel.Contents;
@@ -671,13 +674,70 @@ namespace DataEditorX
         }
         private void Menuitem_darkthemeClick(object sender, EventArgs e)
         {
-            DEXConfig.Save(DEXConfig.TAG_DARK_THEME, menuitem_darktheme.Checked.ToString().ToLowerInvariant());
+            ThemeManager.SaveThemeProfile(menuitem_darktheme.Checked ? ThemeManager.ProfileDark : ThemeManager.ProfileLight);
+            ApplyTheme();
+        }
+
+        private void InitializeThemeMenu()
+        {
+            menuitem_darktheme.Click -= Menuitem_darkthemeClick;
+            menuitem_darktheme.CheckOnClick = false;
+            menuitem_darktheme.Text = "Theme";
+            menuitem_darktheme.DropDownItems.Clear();
+            themeProfileMenuItems.Clear();
+
+            foreach (string profile in ThemeManager.ProfileNames)
+            {
+                ToolStripMenuItem item = new(profile)
+                {
+                    CheckOnClick = false,
+                    Tag = profile
+                };
+                item.Click += Menuitem_themeProfileClick;
+                themeProfileMenuItems.Add(item);
+                _ = menuitem_darktheme.DropDownItems.Add(item);
+            }
+
+            _ = menuitem_darktheme.DropDownItems.Add(new ToolStripSeparator());
+            ToolStripMenuItem customize = new("Customize...")
+            {
+                Name = "menuitem_theme_customize"
+            };
+            customize.Click += Menuitem_themeCustomizeClick;
+            _ = menuitem_darktheme.DropDownItems.Add(customize);
+        }
+
+        private void Menuitem_themeProfileClick(object sender, EventArgs e)
+        {
+            if (sender is not ToolStripMenuItem item || item.Tag is not string profile)
+            {
+                return;
+            }
+
+            ThemeManager.SaveThemeProfile(profile);
+            ApplyTheme();
+        }
+
+        private void Menuitem_themeCustomizeClick(object sender, EventArgs e)
+        {
+            using ThemeSettingsForm dialog = new();
+            if (dialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
             ApplyTheme();
         }
 
         private void ApplyTheme()
         {
-            menuitem_darktheme.Checked = ThemeManager.IsDarkTheme;
+            menuitem_darktheme.Text = "Theme";
+            foreach (ToolStripMenuItem item in themeProfileMenuItems)
+            {
+                item.Checked = item.Tag is string profile
+                    && profile.Equals(ThemeManager.CurrentProfileName, StringComparison.OrdinalIgnoreCase);
+            }
+
             ThemeManager.ApplyControlTree(this);
             ThemeManager.ApplyDockPanel(dockPanel);
 

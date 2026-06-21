@@ -117,6 +117,8 @@ MainForm.mainMenu.menuitem_comp2	作为对比的数据库2
 MainForm.mainMenu.menuitem_history	数据库历史
 MainForm.mainMenu.menuitem_shistory	脚本历史
 MainForm.mainMenu.menuitem_quit	退出
+MainForm.mainMenu.menuitem_view	视图(&V)
+MainForm.mainMenu.menuitem_darktheme	主题
 MainForm.mainMenu.menuitem_windows	窗口(&W)
 MainForm.mainMenu.menuitem_dataeditor	数据编辑
 MainForm.mainMenu.menuitem_codeeditor	脚本编辑

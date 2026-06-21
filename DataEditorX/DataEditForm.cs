@@ -2456,10 +2456,9 @@ namespace DataEditorX
 
         public void ApplyTheme()
         {
+            ThemeManager.ThemePalette palette = ThemeManager.CurrentPalette;
             ThemeManager.ApplyControlTree(this);
-            pl_image.BackColor = ThemeManager.IsDarkTheme
-                ? ThemeManager.CurrentInputBackColor
-                : SystemColors.ButtonHighlight;
+            pl_image.BackColor = palette.UsesOriginalColors ? SystemColors.ButtonHighlight : palette.InputBackColor;
             ThemeManager.ApplyListViewItems(lv_cardlist);
         }
     }

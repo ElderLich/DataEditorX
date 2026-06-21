@@ -93,6 +93,14 @@ namespace DataEditorX.Config
         /// </summary>
         public const string TAG_DARK_THEME = "dark_theme";
         /// <summary>
+        /// Selected theme profile
+        /// </summary>
+        public const string TAG_THEME_PROFILE = "theme_profile";
+        /// <summary>
+        /// Custom theme palette
+        /// </summary>
+        public const string TAG_THEME_CUSTOM_PALETTE = "theme_custom_palette";
+        /// <summary>
         /// add require automatically
         /// </summary>
         public const string TAG_ADD_REQUIRE = "add_require";
