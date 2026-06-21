@@ -23,6 +23,7 @@ DEFAULT_TAG = "MDPro3"
 DEFAULT_FRAMEWORK = "net9.0-windows7.0"
 NUGET_ORG = "https://api.nuget.org/v3/index.json"
 VS_OFFLINE_PACKAGES = Path(r"C:\Program Files (x86)\Microsoft SDKs\NuGetPackages")
+RELEASE_ASSETS = ("DataEditorX_win32.zip", "DataEditorX_win64.zip")
 
 
 def run(args: list[str], *, cwd: Path = ROOT, check: bool = True) -> subprocess.CompletedProcess:
@@ -37,6 +38,13 @@ def assembly_version(version: str) -> str:
     if len(parts) == 4:
         return version
     raise ValueError("Version must look like 1.0.0 or 1.0.0.0")
+
+
+def normalize_version(version: str) -> str:
+    normalized = version.strip().lstrip("v")
+    if not re.fullmatch(r"\d+\.\d+\.\d+(?:\.\d+)?", normalized):
+        raise ValueError("Version must look like 1.0.0 or 1.0.0.0")
+    return normalized
 
 
 def update_text_file(path: Path, replacements: list[tuple[str, str]]) -> None:
@@ -109,12 +117,53 @@ def zip_dir(source: Path, destination: Path) -> None:
     with zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED) as zf:
         for file in sorted(source.rglob("*")):
             if file.is_file():
-                zf.write(file, file.relative_to(source))
+                zf.write(file, file.relative_to(source).as_posix())
 
 
 def strip_debug_symbols(output: Path) -> None:
     for file in output.rglob("*.pdb"):
         file.unlink()
+
+
+def validate_publish_output(output: Path, include_symbols: bool) -> None:
+    required = [output / "DataEditorX.exe", output / "pack.db", output / "data"]
+    missing = [str(path) for path in required if not path.exists()]
+    if missing:
+        raise RuntimeError("Publish output is missing required files: " + ", ".join(missing))
+
+    if not include_symbols:
+        pdbs = list(output.rglob("*.pdb"))
+        if pdbs:
+            raise RuntimeError("Publish output still contains debug symbols: " + ", ".join(str(path) for path in pdbs))
+
+
+def validate_release_zip(path: Path, include_symbols: bool) -> None:
+    if not path.exists():
+        raise RuntimeError(f"Release asset was not created: {path}")
+    if path.stat().st_size == 0:
+        raise RuntimeError(f"Release asset is empty: {path}")
+
+    with zipfile.ZipFile(path, "r") as zf:
+        bad_file = zf.testzip()
+        if bad_file:
+            raise RuntimeError(f"{path} has a corrupt zip entry: {bad_file}")
+
+        names = {name.replace("\\", "/") for name in zf.namelist() if not name.endswith("/")}
+        required = {"DataEditorX.exe", "pack.db"}
+        missing = sorted(required - names)
+        if missing:
+            raise RuntimeError(f"{path} is missing required files: {', '.join(missing)}")
+        if not any(name.startswith("data/") for name in names):
+            raise RuntimeError(f"{path} is missing bundled data files.")
+        if not include_symbols:
+            pdbs = sorted(name for name in names if name.lower().endswith(".pdb"))
+            if pdbs:
+                raise RuntimeError(f"{path} contains debug symbols: {', '.join(pdbs)}")
+
+
+def validate_release_assets(assets: list[Path], include_symbols: bool) -> None:
+    for asset in assets:
+        validate_release_zip(asset, include_symbols)
 
 
 def publish(
@@ -161,6 +210,7 @@ def publish(
     run(publish_args)
     if not include_symbols:
         strip_debug_symbols(output)
+    validate_publish_output(output, include_symbols)
 
 
 def upload(repo: str, tag: str, version: str, assets: list[Path]) -> None:
@@ -202,15 +252,26 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    try:
+        return run_main()
+    except (ValueError, RuntimeError, zipfile.BadZipFile) as ex:
+        print(f"error: {ex}", file=sys.stderr)
+        return 1
+    except subprocess.CalledProcessError as ex:
+        print(f"error: command failed with exit code {ex.returncode}: {' '.join(ex.cmd)}", file=sys.stderr)
+        return ex.returncode or 1
+
+
+def run_main() -> int:
     args = parse_args()
-    version = args.version.lstrip("v")
+    version = normalize_version(args.version)
     sources = args.source or default_sources()
     update_version_files(version, args.repo, args.tag)
 
     win32_publish = PUBLISH / "win32"
     win64_publish = PUBLISH / "win64"
-    win32_zip = ARTIFACTS / "DataEditorX_win32.zip"
-    win64_zip = ARTIFACTS / "DataEditorX_win64.zip"
+    win32_zip = ARTIFACTS / RELEASE_ASSETS[0]
+    win64_zip = ARTIFACTS / RELEASE_ASSETS[1]
 
     ARTIFACTS.mkdir(exist_ok=True)
     if not args.skip_build:
@@ -220,11 +281,14 @@ def main() -> int:
         zip_dir(win32_publish, win32_zip)
         zip_dir(win64_publish, win64_zip)
 
+    assets = [win32_zip, win64_zip]
+    validate_release_assets(assets, args.include_symbols)
+
     print(f"Created: {win32_zip}")
     print(f"Created: {win64_zip}")
 
     if args.upload:
-        upload(args.repo, args.tag, version, [win32_zip, win64_zip])
+        upload(args.repo, args.tag, version, assets)
         if not args.no_push_version:
             push_version_metadata(version)
 

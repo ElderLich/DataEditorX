@@ -18,6 +18,7 @@ A: Please install the [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/en-u
 * Export and import [MSE](https://github.com/247321453/MagicSetEditor2) sets.
 * Open the project source from Help-->Source Code.
 * Switch between light and dark theme from View-->Dark Theme.
+* Check for updates with download progress, cancellation, and in-app install handoff.
 
 ## Dark Theme
 Open View-->Dark Theme to toggle the app theme. The setting is saved in the app config, so the next launch keeps your preference.
@@ -27,7 +28,9 @@ The dark theme updates the main window, dock area, database editor, script edito
 ## Version Info and Updates
 Open Help-->Version Info to see the current DataEditorX version, maintainer, original author, repository, runtime, and process architecture.
 
-Use Help-->Check for Updates to check the update metadata in `DataEditorX/version` on GitHub. If a newer version is available, DataEditorX downloads the matching win32 or win64 zip, offers to install it, closes the app, extracts the update, and restarts.
+Use Help-->Check for Updates to check the update metadata in `DataEditorX/version` on GitHub. Manual update checks open a progress dialog, can be cancelled while checking/downloading, and show detailed failure information when GitHub metadata or release assets cannot be reached.
+
+If a newer version is available, DataEditorX downloads the matching win32 or win64 zip, offers to install it, closes the app, extracts the update, and restarts.
 The update metadata file must be pushed to GitHub and readable from the configured `updateURL`; release zip assets are only checked after that metadata is available.
 
 ## Common Workflows
@@ -90,6 +93,7 @@ After a successful `--upload`, the script commits and pushes the updated `DataEd
 
 Release zips omit `.pdb` debug symbol files by default. Add `--include-symbols` only when preparing a build for debugging.
 Release builds also bundle managed dependencies into `DataEditorX.exe` by default, keeping the extracted folder close to the original layout. Add `--multi-file` only when you need separate dependency DLLs for troubleshooting.
+Before upload, the script validates both zip files, checks that they contain `DataEditorX.exe`, `pack.db`, and bundled `data` files, and fails if debug symbols slipped into a normal release.
 
 ## Special Features of KoishiDEX
 1. The format of scripts will be in Koishi-Style when creating new scripts. Also the module script to be required will be adjustable, and will be packed when exporting zip files.
