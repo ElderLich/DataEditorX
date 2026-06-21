@@ -5970,7 +5970,7 @@ Parameters:
 Source: Utilities/utility.lua:1548
 
 ●void Auxiliary.AddUrsarcticSpSummonEffect(Card c)
-为c添加「北斗天熊」共通的手牌快速效果，在主要阶段特殊召唤自身。
+为c添加「北极天熊」共通的手牌快速效果，在主要阶段特殊召唤自身。
 费用为解放手牌中1只7星以上怪兽，或从墓地除外可代替费用的对应卡。
 Parameters:
   c: Card
@@ -6189,14 +6189,14 @@ Parameters:
 Source: Utilities/utility.lua:814
 
 ●void Auxiliary.ChangeBattleDamage(int player, Effect value)
-TODO document.
+返回用于EFFECT_CHANGE_BATTLE_DAMAGE的Value函数。player=0时改写效果持有者受到的战斗伤害，player=1时改写对方受到的战斗伤害；其他情况返回-1表示不改写。
 Parameters:
   player: int
   value: Effect
 Source: Utilities/utility.lua:726
 
 ●void Auxiliary.CheckGroupRecursive(Card c, Group sg, Group g, function f, any min, any max, any ext_params)
-TODO document.
+Group.CheckSubGroup使用的内部递归辅助函数；尝试把c加入sg，遵守Auxiliary.GCheckAdditional，并寻找数量在min到max之间且满足f的子组。
 Parameters:
   c: Card
   sg: Group
@@ -6208,7 +6208,7 @@ Parameters:
 Source: Utilities/utility.lua:1196
 
 ●void Auxiliary.CheckGroupRecursiveCapture(Card c, Group sg, Group g, function f, any min, any max, any ext_params)
-TODO document.
+Group.SelectSubGroup使用的内部递归辅助函数；按Auxiliary.CheckGroupRecursive的方式搜索，并把找到的一个有效子组保存到Auxiliary.SubGroupCaptured。
 Parameters:
   c: Card
   sg: Group
@@ -6220,7 +6220,7 @@ Parameters:
 Source: Utilities/utility.lua:1207
 
 ●void Auxiliary.CheckGroupRecursiveEach(Card c, Group sg, Group g, function f, any checks, any ext_params)
-TODO document.
+Group.CheckSubGroupEach和Group.SelectSubGroupEach使用的内部递归辅助函数；每张被选卡必须满足checks中对应位置的筛选函数，最终组再交给f检查。
 Parameters:
   c: Card
   sg: Group
@@ -6248,14 +6248,14 @@ Returns:
 Source: Utilities/utility.lua:1307
 
 ●void Auxiliary.CreateMaterialReasonCardRelation(Card c, Effect te)
-TODO document.
+为c登记EVENT_BE_MATERIAL持续效果；当c作为素材使用时，让召唤出的怪兽与te建立效果关联。
 Parameters:
   c: Card
   te: Effect
 Source: Utilities/utility.lua:859
 
 ●void Auxiliary.dabcheck(Group g)
-TODO document.
+判断g中的每张卡是否具有不同属性。
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1142
@@ -6274,26 +6274,26 @@ Parameters:
 Source: Utilities/utility.lua:879
 
 ●void Auxiliary.DimensionalFissureTarget(Effect e, Card c)
-TODO document.
+「次元裂缝」类替代效果使用的目标筛选；匹配原本种类包含怪兽的卡，但排除超量素材以及当前作为魔法/陷阱处理的卡。
 Parameters:
   e: Effect
   c: Card
 Source: Utilities/utility.lua:1986
 
 ●void Auxiliary.dlkcheck(Group g)
-TODO document.
+判断g中的每张卡是否具有不同连接数值。
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1138
 
 ●void Auxiliary.dlvcheck(Group g)
-TODO document.
+判断g中的每张卡是否具有不同等级。
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1130
 
 ●void Auxiliary.dncheck(Group g)
-TODO document.
+判断g中的每张卡是否具有不同卡名编号。
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1126
@@ -6312,7 +6312,7 @@ Parameters:
 Source: Utilities/utility.lua:791
 
 ●void Auxiliary.dogfcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+EVENT_TO_GRAVE触发条件：处理对象之前在tp场上，被破坏，且原因玩家是对方时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -6334,13 +6334,13 @@ Returns:
 Source: Utilities/utility.lua:1086
 
 ●void Auxiliary.drccheck(Group g)
-TODO document.
+判断g中的每张卡是否具有不同种族。
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1146
 
 ●void Auxiliary.drkcheck(Group g)
-TODO document.
+判断g中的每张卡是否具有不同阶级。
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1134

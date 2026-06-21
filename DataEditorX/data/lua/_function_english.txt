@@ -116,10 +116,9 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3541
 
 ●void Card.CancelToGrave(Card c, [bool cancel])
-Cancel to send to determine the state tomb, cancel = false to reset the tomb to determine the state
-Note: to send the tomb to determine the state refers to the field to start without leaving field magic and traps, the state of these cards
-Cards sent to the tomb determine the state can not return cards and cards, and sent to the cemetery at the end of the chain
-The purpose of this function is to cancel this state to stay in the field, for the light of the sword and seal the Scarlet Scarlet card
+Cancels the confirmed-to-Graveyard state for c. If cancel is false, sets that state again.
+This state is used for non-continuous Spell/Trap Cards activated on the field before they leave the field; while set, they cannot return to the hand or Deck and are sent to the Graveyard when the Chain ends.
+Use this helper to keep such cards on the field, as with Swords of Revealing Light or Scrap-Iron Scarecrow.
 Parameters:
   c: Card
   cancel: bool optional - default: true
@@ -1263,7 +1262,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3591
 
 ●bool Card.IsAbleToGrave(Card c)
-Check whether c can be sent to the cemetery
+Checks whether c can be sent to the Graveyard.
 Parameters:
   c: Card
 Returns:
@@ -1271,7 +1270,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3587
 
 ●bool Card.IsAbleToGraveAsCost(Card c)
-Check whether c can be sent to the cemetery as a cost
+Checks whether c can be sent to the Graveyard as a cost.
 Parameters:
   c: Card
 Returns:
@@ -1468,7 +1467,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3583
 
 ●bool Card.IsCanBeRitualMaterial(Card c, [Card|nil sc])
-Check whether c can serve as ritual monsters sc sacrifice
+Checks whether c can be used as Ritual Material for sc; pass nil when no Ritual Monster is being checked.
 Parameters:
   c: Card
   sc: Card|nil optional
@@ -1663,9 +1662,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3570
 
 ●bool Card.IsDiscardable(Card c, [int reason])
-Check whether c can be discarded
-Note: This function is only used to detect,
-REASON_DISCARD as a reason to hand a card to the tomb and will not lead to that card can not be discarded
+Checks whether c can be discarded for reason.
+This is only a check: sending a card from the hand to the Graveyard with REASON_DISCARD does not by itself make that card unable to be discarded.
 Parameters:
   c: Card
   reason: int optional - default: REASON_COST
@@ -2266,8 +2264,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3504
 
 ●bool Card.IsSummonable(Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
-Check whether c is usually called (not including the normally called set), ignore_count = true does not check the number of calls limit
-E ~ = nil check whether c can be the effect of e is usually called, min said at least the number of sacrifice (used to distinguish between compromise summons and superior call)
+Checks whether c can be Normal Summoned, excluding Normal Summon/Set.
+If e is not nil, checks whether c can be Normal Summoned by that effect. min is the minimum number of Tributes, and zone restricts the zone it must be Summoned to.
 Parameters:
   c: Card
   ignore_count: bool
@@ -3131,7 +3129,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4912
 
 ●int Duel.DiscardDeck(int player, int count, int reason)
-To reason player player card group top count cards sent to the cemetery, the actual transfer of the number
+Sends count cards from the top of player's Deck to the Graveyard for reason, and returns the number actually moved.
 Parameters:
   player: int
   count: int
@@ -3673,8 +3671,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4975
 
 ●Group Duel.GetRitualMaterial(int player)
-Returns the player's deck of cards available for ritual summoning material
-Including hands, the field can be the liberation of the ceremony and the cemetery and other magic people card
+Returns the cards player can use as Ritual Material, including cards in the hand/field that can be Tributed and cards such as Ritual Djinn monsters in the Graveyard.
 Parameters:
   player: int
 Returns:
@@ -3950,7 +3947,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5059
 
 ●bool Duel.IsPlayerCanDiscardDeck(int player, int count)
-Check player player can put the card group top count cards sent to the cemetery
+Checks whether player can send count cards from the top of the Deck to the Graveyard.
 Parameters:
   player: int
   count: int
@@ -3959,7 +3956,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5045
 
 ●bool Duel.IsPlayerCanDiscardDeckAsCost(int player, int count)
-Check the player player can put the card group top count cards sent to the cemetery as cost
+Checks whether player can send count cards from the top of the Deck to the Graveyard as a cost.
 Parameters:
   player: int
   count: int
@@ -4025,7 +4022,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5058
 
 ●bool Duel.IsPlayerCanSendtoGrave(int player, [Card c])
-Check whether the player can send c to the cemetery
+Checks whether player can send c to the Graveyard.
 Parameters:
   player: int
   c: Card optional
@@ -4162,9 +4159,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4882
 
 ●void Duel.MSet(int player, Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
-Let the player to the effect of c is usually called Set, at least use min sacrifice
-If e = nil, then in accordance with the general rules of the general call usually call
-If ignore_count = true, the usual number of calls per turn limit is ignored
+Makes player Set c by a Normal Summon procedure, optionally using effect e and requiring at least min Tributes.
+If e is nil, regular Normal Summon/Set rules are used. If ignore_count is true, the once-per-turn Normal Summon limit is ignored.
 Parameters:
   player: int
   c: Card
@@ -4307,7 +4303,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4881
 
 ●void Duel.ReleaseRitualMaterial(Group g)
-Liberation ceremony with the material g, if the ceremony is the cemetery and other magic cards are excluded
+Tributes the Ritual Materials in g; materials such as Ritual Djinn monsters in the Graveyard are banished instead.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4999
@@ -4619,7 +4615,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4863
 
 ●int Duel.SendtoGrave(Card|Group targets, int reason, [int reason_player])
-The reason for the targets to the cemetery, the return value is the actual number of operations
+Sends targets to the Graveyard for reason, optionally treating reason_player as the player that moved them, and returns the number actually moved.
 Parameters:
   targets: Card|Group
   reason: int
@@ -4854,9 +4850,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4871
 
 ●void Duel.Summon(int player, Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
-Let the player to the effect of e to c is usually called (not set), at least use min sacrifice
-If e = nil, then in accordance with the general rules of the general call usually call
-If ignore_count = true, the usual number of calls per turn limit is ignored
+Makes player Normal Summon c, not Set it, optionally by effect e and requiring at least min Tributes.
+If e is nil, regular Normal Summon rules are used. If ignore_count is true, the once-per-turn Normal Summon limit is ignored.
 Parameters:
   player: int
   c: Card
@@ -4878,7 +4873,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4907
 
 ●void Duel.SwapDeckAndGrave(int player)
-This world and the underworld reversal dedicated. The players player card group and the cemetery exchange
+For Exchange of the Spirit-style effects, swaps player's Deck and Graveyard.
 Parameters:
   player: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5072
@@ -4983,8 +4978,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:659
 
 ●int Effect.GetActiveType(Effect e)
-Returns the effect type of e (monster, magic, trap)
-And launch the effect of the type of card is not necessarily the same, such as the spirit of pendulum effect as a magic card effect
+Returns the active effect type, such as monster, Spell, or Trap. This can differ from the type of the card that activated the effect, such as Pendulum effects being treated as Spell effects.
 Parameters:
   e: Effect
 Returns:
@@ -6190,14 +6184,14 @@ Parameters:
 Source: Utilities/utility.lua:814
 
 ●void Auxiliary.ChangeBattleDamage(int player, Effect value)
-TODO document.
+Returns a value function for EFFECT_CHANGE_BATTLE_DAMAGE. player=0 changes damage taken by the effect owner, player=1 changes damage taken by the opponent; otherwise it returns -1 to keep the damage unchanged.
 Parameters:
   player: int
   value: Effect
 Source: Utilities/utility.lua:726
 
 ●void Auxiliary.CheckGroupRecursive(Card c, Group sg, Group g, function f, any min, any max, any ext_params)
-TODO document.
+Internal recursive helper for Group.CheckSubGroup. It tries adding c to sg, respects Auxiliary.GCheckAdditional, and searches for a subgroup between min and max that satisfies f.
 Parameters:
   c: Card
   sg: Group
@@ -6209,7 +6203,7 @@ Parameters:
 Source: Utilities/utility.lua:1196
 
 ●void Auxiliary.CheckGroupRecursiveCapture(Card c, Group sg, Group g, function f, any min, any max, any ext_params)
-TODO document.
+Internal recursive helper for Group.SelectSubGroup. It searches like Auxiliary.CheckGroupRecursive and stores one valid subgroup in Auxiliary.SubGroupCaptured.
 Parameters:
   c: Card
   sg: Group
@@ -6221,7 +6215,7 @@ Parameters:
 Source: Utilities/utility.lua:1207
 
 ●void Auxiliary.CheckGroupRecursiveEach(Card c, Group sg, Group g, function f, any checks, any ext_params)
-TODO document.
+Internal recursive helper for Group.CheckSubGroupEach and Group.SelectSubGroupEach. Each selected card must satisfy the filter at the matching position in checks before the final group is tested by f.
 Parameters:
   c: Card
   sg: Group
@@ -6249,14 +6243,14 @@ Returns:
 Source: Utilities/utility.lua:1307
 
 ●void Auxiliary.CreateMaterialReasonCardRelation(Card c, Effect te)
-TODO document.
+Registers an EVENT_BE_MATERIAL continuous effect on c so that, when c is used as material, the Summoned monster creates an effect relation with te.
 Parameters:
   c: Card
   te: Effect
 Source: Utilities/utility.lua:859
 
 ●void Auxiliary.dabcheck(Group g)
-TODO document.
+Returns true if every card in g has a different Attribute.
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1142
@@ -6287,26 +6281,26 @@ Parameters:
 Source: Utilities/utility.lua:879
 
 ●void Auxiliary.DimensionalFissureTarget(Effect e, Card c)
-TODO document.
+Target filter for Dimensional Fissure-style replacement effects. It matches cards whose original type includes Monster, excluding Xyz Materials and cards currently treated as Spell/Trap Cards.
 Parameters:
   e: Effect
   c: Card
 Source: Utilities/utility.lua:1986
 
 ●void Auxiliary.dlkcheck(Group g)
-TODO document.
+Returns true if every card in g has a different Link Rating.
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1138
 
 ●void Auxiliary.dlvcheck(Group g)
-TODO document.
+Returns true if every card in g has a different Level.
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1130
 
 ●void Auxiliary.dncheck(Group g)
-TODO document.
+Returns true if every card in g has a different card code.
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1126
@@ -6329,7 +6323,7 @@ Parameters:
 Source: Utilities/utility.lua:791
 
 ●void Auxiliary.dogfcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Condition for EVENT_TO_GRAVE triggers: true when the handler was previously on the field under tp's control, was destroyed, and the opponent was the reason player.
 Parameters:
   e: Effect
   tp: int
@@ -6351,13 +6345,13 @@ Returns:
 Source: Utilities/utility.lua:1086
 
 ●void Auxiliary.drccheck(Group g)
-TODO document.
+Returns true if every card in g has a different Race.
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1146
 
 ●void Auxiliary.drkcheck(Group g)
-TODO document.
+Returns true if every card in g has a different Rank.
 Parameters:
   g: Group
 Source: Utilities/utility.lua:1134
