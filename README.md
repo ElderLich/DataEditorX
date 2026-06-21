@@ -27,7 +27,7 @@ The dark theme updates the main window, dock area, database editor, script edito
 ## Version Info and Updates
 Open Help-->Version Info to see the current DataEditorX version, maintainer, original author, repository, runtime, and process architecture.
 
-Use Help-->Check for Updates to check the update metadata in `DataEditorX/readme.txt` on GitHub. If a newer version is available, DataEditorX downloads the matching win32 or win64 zip, offers to install it, closes the app, extracts the update, and restarts.
+Use Help-->Check for Updates to check the update metadata in `DataEditorX/version` on GitHub. If a newer version is available, DataEditorX downloads the matching win32 or win64 zip, offers to install it, closes the app, extracts the update, and restarts.
 The update metadata file must be pushed to GitHub and readable from the configured `updateURL`; release zip assets are only checked after that metadata is available.
 
 ## Common Workflows
@@ -76,6 +76,8 @@ python tools/release.py --version 1.0.0 --upload
 Upload uses the GitHub CLI, so run `gh auth login` first. The script creates or updates these assets:
 * `DataEditorX_win32.zip`
 * `DataEditorX_win64.zip`
+
+After a successful `--upload`, the script commits and pushes the updated `DataEditorX/version`, `DataEditorX.csproj`, and `app.config` metadata so the app can fetch the new version info from GitHub. Add `--no-push-version` if you only want to upload assets.
 
 Release zips omit `.pdb` debug symbol files by default. Add `--include-symbols` only when preparing a build for debugging.
 Release builds also bundle managed dependencies into `DataEditorX.exe` by default, keeping the extracted folder close to the original layout. Add `--multi-file` only when you need separate dependency DLLs for troubleshooting.

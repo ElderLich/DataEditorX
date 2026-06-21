@@ -14,7 +14,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT / "DataEditorX" / "DataEditorX.csproj"
-UPDATE_INFO = ROOT / "DataEditorX" / "readme.txt"
+APP_CONFIG = ROOT / "DataEditorX" / "app.config"
+UPDATE_INFO = ROOT / "DataEditorX" / "version"
 ARTIFACTS = ROOT / "artifacts"
 PUBLISH = ARTIFACTS / "publish"
 DEFAULT_REPO = "ElderLich/DataEditorX"
@@ -70,6 +71,7 @@ def normalize_newlines(text: str) -> str:
 
 def update_version_files(version: str, repo: str, tag: str) -> None:
     asm = assembly_version(version)
+    update_url = f"https://raw.githubusercontent.com/{repo}/main/DataEditorX/version"
     update_text_file(
         PROJECT,
         [
@@ -77,6 +79,12 @@ def update_version_files(version: str, repo: str, tag: str) -> None:
             (r"<AssemblyVersion>.*?</AssemblyVersion>", f"<AssemblyVersion>{asm}</AssemblyVersion>"),
             (r"<FileVersion>.*?</FileVersion>", f"<FileVersion>{asm}</FileVersion>"),
             (r"<InformationalVersion>.*?</InformationalVersion>", f"<InformationalVersion>{version}</InformationalVersion>"),
+        ],
+    )
+    update_text_file(
+        APP_CONFIG,
+        [
+            (r'(<add key="updateURL" value=").*?(" />)', f"\\g<1>{update_url}\\g<2>"),
         ],
     )
 
@@ -162,12 +170,28 @@ def upload(repo: str, tag: str, version: str, assets: list[Path]) -> None:
     run(["gh", "release", "upload", tag, "--repo", repo, "--clobber", *[str(asset) for asset in assets]])
 
 
+def git_path(path: Path) -> str:
+    return path.relative_to(ROOT).as_posix()
+
+
+def push_version_metadata(version: str) -> None:
+    paths = [git_path(PROJECT), git_path(APP_CONFIG), git_path(UPDATE_INFO)]
+    run(["git", "add", *paths])
+    diff = run(["git", "diff", "--cached", "--quiet", "--", *paths], check=False)
+    if diff.returncode == 0:
+        print("No version metadata changes to commit.")
+        return
+    run(["git", "commit", "-m", f"Release: update version metadata to {version}", "--", *paths])
+    run(["git", "push"])
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build DataEditorX release zips and optionally upload them to GitHub.")
     parser.add_argument("--version", required=True, help="Release version, for example 1.0.0.")
     parser.add_argument("--repo", default=DEFAULT_REPO, help=f"GitHub owner/repo. Default: {DEFAULT_REPO}.")
     parser.add_argument("--tag", default=DEFAULT_TAG, help=f"GitHub release tag. Default: {DEFAULT_TAG}.")
     parser.add_argument("--upload", action="store_true", help="Upload zips to the GitHub release using the gh CLI.")
+    parser.add_argument("--no-push-version", action="store_true", help="With --upload, do not commit and push DataEditorX/version metadata after assets upload.")
     parser.add_argument("--skip-build", action="store_true", help="Only update version metadata and upload existing zips.")
     parser.add_argument("--self-contained", action="store_true", help="Publish self-contained builds instead of framework-dependent builds.")
     parser.add_argument("--multi-file", action="store_true", help="Keep framework and NuGet assemblies as separate files instead of bundling them into DataEditorX.exe.")
@@ -201,6 +225,8 @@ def main() -> int:
 
     if args.upload:
         upload(args.repo, args.tag, version, [win32_zip, win64_zip])
+        if not args.no_push_version:
+            push_version_metadata(version)
 
     return 0
 

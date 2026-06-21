@@ -110,7 +110,7 @@
     <None Update="pack.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="readme.txt">
+    <None Update="version">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
