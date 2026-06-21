@@ -2898,12 +2898,12 @@ Parameters:
   get_info: bool optional
 Returns:
   bool
-  Group - 可能为空
-  int - 可能为空
-  int - 可能为空
-  Effect - 可能为空
-  int - 可能为空
-  int - 可能为空
+  Group - may be nil
+  int - may be nil
+  int - may be nil
+  Effect - may be nil
+  int - may be nil
+  int - may be nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4894
 
 ●bool Duel.CheckLocation(int player, int location, int seq)
@@ -2931,7 +2931,7 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4908
 Parameters:
   player: int
   cards: Group|Card
-  ecode: int - EFFECT_MUST_BE_FMATERIAL等
+  ecode: int - for example, EFFECT_MUST_BE_FMATERIAL
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4988
@@ -3470,8 +3470,8 @@ Parameters:
   player: int
   location: int optional - default: LOCATION_HAND + LOCATION_MZONE
 Returns:
-  Group - material_all 包含受EFFECT_EXTRA_FUSION_MATERIAL影响的卡
-  Group - material_base 只取那些区域的卡
+  Group - material_all includes cards affected by EFFECT_EXTRA_FUSION_MATERIAL
+  Group - material_base contains only cards from the requested locations
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5000
 
 ●int Duel.GetLastSelectHint(int player)
@@ -3579,7 +3579,7 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4970
 返回必须作为素材的卡片组
 Parameters:
   player: int
-  ecode: int - EFFECT_MUST_BE_FMATERIAL等
+  ecode: int - for example, EFFECT_MUST_BE_FMATERIAL
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4987
@@ -3624,10 +3624,10 @@ Parameters:
   category: int
 Returns:
   bool
-  Group - 可能为空
-  int - 可能为空
-  int - 可能为空
-  int - 可能为空
+  Group - may be nil
+  int - may be nil
+  int - may be nil
+  int - may be nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5009
 
 ●int Duel.GetOverlayCount(int player, int s, int o)
@@ -4437,7 +4437,7 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5027
 Parameters:
   player: int
   c: Card
-  g: Group|nil optional - 不能为空
+  g: Group|nil optional - cannot be nil when selecting materials
   gc: Card|nil optional
   chkf: int optional - default: PLAYER_NONE
   not_material: bool optional - default: false
@@ -5775,7 +5775,7 @@ btok 表示是否可以点击完成选择的按钮， cancelable 表示是否可
 minc 和 maxc 是客户端的文字缓冲提示，表示需要选择 minc-maxc 张卡，但是这个只是影响视觉效果，并不代表必须要选择那个数量
 Parameters:
   cg: Group
-  sg: Group|nil optional - 已选的卡，可以从中取消选择
+  sg: Group|nil optional - already selected cards that can be unselected
   player: int
   btok: bool - default: false
   cancelable: bool - default: false
