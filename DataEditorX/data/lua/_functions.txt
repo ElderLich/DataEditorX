@@ -1725,7 +1725,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3603
 
 ●bool Card.IsFaceup(Card c)
-检查c是否是表侧表示
+检查c是否为表侧表示。
 Parameters:
   c: Card
 Returns:
@@ -1978,9 +1978,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3486
 
 ●bool Card.IsLocation(Card c, int location)
-检查c当前位置是否是location
-注：当怪兽召唤，反转召唤，特殊召唤时召唤成功之前，
-并且location=LOCATION_MZONE时，此函数返回false
+检查c当前是否在location位置。
 Parameters:
   c: Card
   location: int
@@ -2187,10 +2185,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3563
 
 ●bool Card.IsRelateToEffect(Card c, Effect e)
-检查c是否和效果e有联系
-注：每次发动进入连锁的效果时，发动效果的卡，以及发动效果时指定的对象
-（用Duel.SetTargetCard或者Duel.SelectTarget指定的，包括取对象和不取对象）
-会自动与那个效果建立联系，一旦离场，联系会重置
+检查c是否仍与效果e保持联系。
 Parameters:
   c: Card
   e: Effect
@@ -2216,7 +2211,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3596
 
 ●bool Card.IsSetCard(Card c, ... int)
-检查c是否是卡名含有setname的卡
+检查c是否属于任意给定的系列代码。
 Parameters:
   c: Card
   ...: int
@@ -2348,7 +2343,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3506
 
 ●bool Card.IsType(Card c, int type)
-检查c是否包含type之中任何类型
+检查c是否包含type中的任意类型。
 Parameters:
   c: Card
   type: int
@@ -2387,16 +2382,14 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3485
 
-●int Card.RegisterEffect(Card c, Effect e, [bool forced])
-把效果e注册给c，返回效果的全局id，并设置e的Handler为c
-默认情况下注册时如果c带有免疫e的效果那么注册会失败
-如果forced为true则不会检查c对e的免疫效果
+●int|nil Card.RegisterEffect(Card c, Effect e, [bool forced])
+把效果e注册给c，成功时返回效果的场上编号，并设置e的Handler为c。
 Parameters:
   c: Card
   e: Effect
-  forced: bool optional - default: false
+  forced: bool optional
 Returns:
-  int
+  int|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3548
 
 ●Effect Card.RegisterFlagEffect(Card c, int code, int reset_flag, int property, int reset_count, [int label], [int desc])
@@ -3510,18 +3503,16 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4942
 
-●int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
-返回玩家player的场上location可用的[区域 zone 里的]空格数
-location只能是LOCATION_MZONE或者LOCATION_SZONE
-reason为LOCATION_REASON_TOFIELD或LOCATION_REASON_CONTROL
-##第三个第四个额外参数与凯撒斗技场等限制格子的效果有关
+●int,int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
+返回玩家player场上location可用区域数量以及对应的可用区域mask。
 Parameters:
   player: int
   location: int
   use_player: int optional
   reason: int optional
-  zone: int optional - default: 0xff
+  zone: int optional
 Returns:
+  int
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4935
 
@@ -3786,7 +3777,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5003
 
 ●void Duel.Hint(int hint_type, int player, int desc)
-给玩家player发送hint_type类型的消息提示，提示内容为desc
+给玩家player发送hint_type类型的提示消息，提示内容为desc。
 Parameters:
   hint_type: int
   player: int
@@ -3891,9 +3882,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4898
 
 ●bool Duel.IsExistingMatchingCard([function|nil f], int player, int s, int o, int count, [Card|Group|nil ex], ... any)
-过滤函数，检查以player来看的指定位置是否存在至少count张满足过滤条件f并且不等于ex的卡
-s代表以player来看的自己的位置，o代表以player来看的对方的位置
-第7个参数开始为额外参数
+过滤函数；检查以player来看指定位置是否存在至少count张满足f且不等于ex的卡。
 Parameters:
   f: function|nil optional
   player: int
@@ -4446,9 +4435,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4989
 
 ●Group Duel.SelectMatchingCard(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
-过滤函数，让玩家sel_player选择以player来看的指定位置满足过滤条件f并且不等于ex的min-max张卡
-s代表以player来看的自己的位置，o代表以player来看的对方的位置
-第9个参数开始为额外参数
+过滤函数；让玩家sel_player从指定位置选择min到max张满足f且不等于ex的卡。
 Parameters:
   sel_player: int
   f: function|nil optional
@@ -4980,8 +4967,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:609
 
 ●Effect Effect.CreateEffect(Card c)
-新建一个空效果
-并且效果的Owner为c
+新建一个空效果，并把效果的Owner设为c。
 Parameters:
   c: Card
 Returns:
@@ -5062,7 +5048,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:611
 
 ●Card Effect.GetHandler(Effect e)
-返回效果在哪一张卡上生效(通常是用Card.RegisterEffect注册该效果的卡)
+返回效果e当前在哪张卡上生效。
 Parameters:
   e: Effect
 Returns:
@@ -5256,21 +5242,21 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:616
 
 ●void Effect.SetCategory(Effect e, int cate)
-设置Category属性
+设置效果e的Category属性。
 Parameters:
   e: Effect
   cate: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:623
 
 ●void Effect.SetCode(Effect e, int code)
-为效果e设置Code属性
+设置效果e的Code属性。
 Parameters:
   e: Effect
   code: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:613
 
 ●void Effect.SetCondition(Effect e, function con_func)
-设置Condition属性
+设置效果e的Condition函数。
 Parameters:
   e: Effect
   con_func: function
@@ -5291,19 +5277,15 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:657
 
 ●void Effect.SetCountLimit(Effect e, int count, [int code])
-设置一回合可以发动的次数count（仅触发型效果有效），相同的code(不等于0或1时)共用1个次数
-code包含以下数值具有特殊的性质
-EFFECT_COUNT_CODE_OATH          誓约使用次数
-EFFECT_COUNT_CODE_DUEL          决斗中使用次数
-EFFECT_COUNT_CODE_SINGLE        同一张卡多个效果公共使用次数（不限制同名卡）
+设置效果e的使用次数限制count，以及可选的共享次数代码code。
 Parameters:
   e: Effect
-  count: int - default: 1
-  code: int optional - default: 0
+  count: int
+  code: int optional
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:617
 
 ●void Effect.SetDescription(Effect e, int desc)
-为效果e设置效果描述
+设置效果e的描述编号。
 Parameters:
   e: Effect
   desc: int
@@ -5332,7 +5314,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:622
 
 ●void Effect.SetOperation(Effect e, nil|function op_func)
-设置Operation属性
+设置或清除效果e的Operation函数。
 Parameters:
   e: Effect
   op_func: nil|function
@@ -5346,7 +5328,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:630
 
 ●void Effect.SetProperty(Effect e, int prop1, [int prop2])
-设置Property属性
+设置效果e的Property属性。
 Parameters:
   e: Effect
   prop1: int
@@ -5354,22 +5336,22 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:620
 
 ●void Effect.SetRange(Effect e, int range)
-为效果e设置Range属性，即e的生效位置
+设置效果e的生效或可发动位置。
 Parameters:
   e: Effect
   range: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:614
 
 ●void Effect.SetReset(Effect e, int reset_flag, [int reset_count])
-设置reset参数
+设置效果e的reset参数和可选的reset次数。
 Parameters:
   e: Effect
   reset_flag: int
-  reset_count: int optional - default: 1
+  reset_count: int optional
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:618
 
 ●void Effect.SetTarget(Effect e, function targ_func)
-设置Target属性
+设置效果e的Target函数。
 Parameters:
   e: Effect
   targ_func: function
@@ -5393,14 +5375,14 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:615
 
 ●void Effect.SetType(Effect e, int type)
-为效果e设置Type属性
+设置效果e的Type属性。
 Parameters:
   e: Effect
   type: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:619
 
 ●void Effect.SetValue(Effect e, function|int|bool val)
-设置Value属性
+设置效果e的Value属性。
 Parameters:
   e: Effect
   val: function|int|bool
@@ -5624,7 +5606,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:927
 
 ●int Group.GetCount(Group g)
-返回g中卡的数量
+返回g中的卡片数量。
 Parameters:
   g: Group
 Returns:
@@ -7461,11 +7443,13 @@ Returns:
   bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:212
 
-●void Auxiliary.Stringid(int code, int id)
-TODO document.
+●int Auxiliary.Stringid(int code, int id)
+返回卡片code的第id个卡片字符串编号；id从0开始。
 Parameters:
   code: int
   id: int
+Returns:
+  int
 Source: Utilities/utility.lua:79
 
 ●void Auxiliary.sumreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)

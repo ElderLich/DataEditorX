@@ -1710,7 +1710,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3603
 
 ●bool Card.IsFaceup(Card c)
-Check whether c is a surface-side representation
+Checks whether c is in face-up position.
 Parameters:
   c: Card
 Returns:
@@ -1970,9 +1970,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3486
 
 ●bool Card.IsLocation(Card c, int location)
-Check if c is the current location
-Note: When the monster summon, reverse call, call special summon before the success,
-And location = LOCATION_MZONE, this function returns false
+Checks whether c is currently in location.
+Cards treated as not being on the field return false for field locations, including during a Summon before it successfully reaches the Monster Zone.
 Parameters:
   c: Card
   location: int
@@ -2177,9 +2176,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3563
 
 ●bool Card.IsRelateToEffect(Card c, Effect e)
-Check whether c is associated with effect e
-Note: Each launch into the effect of chain, the effect of launching the card, and the effect of the specified object
-(With Duel.SetTargetCard or Duel.SelectTarget specified, including the take and not take objects)
+Checks whether c is still related to effect e.
+When an effect enters the Chain, its handler and cards selected with Duel.SetTargetCard or Duel.SelectTarget are related to that effect. That relation is normally lost once the card leaves its expected place.
 Parameters:
   c: Card
   e: Effect
@@ -2205,7 +2203,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3596
 
 ●bool Card.IsSetCard(Card c, ... int)
-Check whether c is a card with the name setname
+Checks whether c belongs to any of the supplied set codes.
 Parameters:
   c: Card
   ...: int
@@ -2337,7 +2335,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3506
 
 ●bool Card.IsType(Card c, int type)
-Check if c is of type type
+Checks whether c has at least one of the type flags in type.
 Parameters:
   c: Card
   type: int
@@ -2376,16 +2374,15 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3485
 
-●int Card.RegisterEffect(Card c, Effect e, [bool forced])
-Register the effect e to c, return the global id of the effect, and set the Handler of e to c
-By default, if c is registered with the effect of immune e then the registration will fail
-If forced is true, the immune effect of c against e will not be checked
+●int|nil Card.RegisterEffect(Card c, Effect e, [bool forced])
+Registers effect e to card c and returns the generated effect field ID.
+Registration also makes c the effect handler. If the card is unaffected by the current reason effect, registration can fail unless forced is true.
 Parameters:
   c: Card
   e: Effect
-  forced: bool optional - default: false
+  forced: bool optional
 Returns:
-  int
+  int|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3548
 
 ●Effect Card.RegisterFlagEffect(Card c, int code, int reset_flag, int property, int reset_count, [int label], [int desc])
@@ -3498,17 +3495,17 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4942
 
-●int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
-Returns the number of spaces available in the player's field
-Location can only be LOCATION_MZONE or LOCATION_SZONE
-Reason is LOCATION_REASON_TOFIELD or LOCATION_REASON_CONTROL
+●int,int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
+Returns how many zones of location are available on player's field and the corresponding usable zone mask.
+location is normally LOCATION_MZONE or LOCATION_SZONE. use_player, reason, and zone are used by effects that restrict where cards can be placed, such as Kaiser Colosseum-style restrictions.
 Parameters:
   player: int
   location: int
   use_player: int optional
   reason: int optional
-  zone: int optional - default: 0xff
+  zone: int optional
 Returns:
+  int
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4935
 
@@ -3767,7 +3764,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5003
 
 ●void Duel.Hint(int hint_type, int player, int desc)
-Send hint_type to the player player type of message prompts, the contents of the prompt desc
+Sends a hint message of hint_type to player using desc as the message id.
+For HINT_SELECTMSG, desc is also stored as that player's last selection hint. HINT_OPSELECTED is displayed to the other player.
 Parameters:
   hint_type: int
   player: int
@@ -3872,8 +3870,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4898
 
 ●bool Duel.IsExistingMatchingCard([function|nil f], int player, int s, int o, int count, [Card|Group|nil ex], ... any)
-Filter the function to check if there are at least count cards that satisfy the filter condition f and not equal to ex
-The seventh argument starts as an extra parameter
+Checks whether the specified locations contain at least count cards that satisfy filter f and are not excluded by ex.
+s is player's own location mask and o is the opponent's location mask from that player's viewpoint. Extra arguments after ex are passed to f.
 Parameters:
   f: function|nil optional
   player: int
@@ -4419,8 +4417,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4989
 
 ●Group Duel.SelectMatchingCard(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
-Filter function, the player sel_player select the specified location to meet the filter condition f and not equal to the ex min-max card
-The ninth parameter starts as an extra parameter
+Lets sel_player choose min to max cards from the specified locations that satisfy filter f and are not excluded by ex.
+s is player's own location mask and o is the opponent's location mask from that player's viewpoint. Extra arguments after ex are passed to f.
 Parameters:
   sel_player: int
   f: function|nil optional
@@ -4926,8 +4924,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:609
 
 ●Effect Effect.CreateEffect(Card c)
-Create a new empty effect
-And the owner of the effect is c
+Creates a new empty Effect object owned by card c.
 Parameters:
   c: Card
 Returns:
@@ -5007,7 +5004,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:611
 
 ●Card Effect.GetHandler(Effect e)
-Returns the card on which the effect takes effect (usually a card that registers the effect with Card.RegisterEffect)
+Returns the card currently handling e, usually the card that registered it with Card.RegisterEffect.
 Parameters:
   e: Effect
 Returns:
@@ -5199,21 +5196,21 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:616
 
 ●void Effect.SetCategory(Effect e, int cate)
-Set the Category property
+Sets e's operation category flags, such as CATEGORY_DESTROY, CATEGORY_TOHAND, or CATEGORY_SPECIAL_SUMMON.
 Parameters:
   e: Effect
   cate: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:623
 
 ●void Effect.SetCode(Effect e, int code)
-Set the Code property for effect e
+Sets e's code. For triggered effects this is usually an event code; for continuous effects it is the effect code being applied.
 Parameters:
   e: Effect
   code: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:613
 
 ●void Effect.SetCondition(Effect e, function con_func)
-Set the Condition property
+Sets e's condition callback. The callback decides whether the effect can apply or be activated in the current context.
 Parameters:
   e: Effect
   con_func: function
@@ -5234,19 +5231,16 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:657
 
 ●void Effect.SetCountLimit(Effect e, int count, [int code])
-Set the number of times a round can be launched count (only trigger type effect is valid), the same code (not equal to 0 or 1) share a number of times
-The code contains the following values ​​that have special properties
-EFFECT_COUNT_CODE_OATH The number of vows
-EFFECT_COUNT_CODE_DUEL The number of times in the duel
-EFFECT_COUNT_CODE_SINGLE the same card more than the number of public use of the effect (not the same name card)
+Sets how many times e can be used before its count limit is spent.
+Effects that share a nonzero code share the same usage count. Special code flags such as EFFECT_COUNT_CODE_OATH, EFFECT_COUNT_CODE_DUEL, EFFECT_COUNT_CODE_SINGLE, and EFFECT_COUNT_CODE_CHAIN change how that count is scoped.
 Parameters:
   e: Effect
-  count: int - default: 1
-  code: int optional - default: 0
+  count: int
+  code: int optional
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:617
 
 ●void Effect.SetDescription(Effect e, int desc)
-Sets the effect description for effect e
+Sets e's description id, usually produced with Auxiliary.Stringid for card text choices.
 Parameters:
   e: Effect
   desc: int
@@ -5275,7 +5269,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:622
 
 ●void Effect.SetOperation(Effect e, nil|function op_func)
-Set the Operation property
+Sets e's operation callback. Passing nil clears the operation.
 Parameters:
   e: Effect
   op_func: nil|function
@@ -5289,7 +5283,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:630
 
 ●void Effect.SetProperty(Effect e, int prop1, [int prop2])
-Set the Property property
+Sets e's property flags. prop1 holds the normal effect property flags; prop2 is used for the second property word when needed.
 Parameters:
   e: Effect
   prop1: int
@@ -5297,22 +5291,23 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:620
 
 ●void Effect.SetRange(Effect e, int range)
-Set the Range property for effect e
+Sets the location range where e applies or can be activated.
 Parameters:
   e: Effect
   range: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:614
 
 ●void Effect.SetReset(Effect e, int reset_flag, [int reset_count])
-Set the reset parameter
+Sets when e resets and how many reset checks it can survive.
+When a phase reset is used without an explicit turn side, the core applies both RESET_SELF_TURN and RESET_OPPO_TURN.
 Parameters:
   e: Effect
   reset_flag: int
-  reset_count: int optional - default: 1
+  reset_count: int optional
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:618
 
 ●void Effect.SetTarget(Effect e, function targ_func)
-Set the Target property
+Sets e's target callback. For activated effects, this callback performs activation legality checks and records target or operation information.
 Parameters:
   e: Effect
   targ_func: function
@@ -5336,14 +5331,15 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:615
 
 ●void Effect.SetType(Effect e, int type)
-Set the Type property for effect e
+Sets e's effect type flags.
+The core normalizes some type combinations: Spell/Trap activation effects become field activation effects, Flip Effects receive EVENT_FLIP handling, and ignition/Quick Effects gain field behavior.
 Parameters:
   e: Effect
   type: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:619
 
 ●void Effect.SetValue(Effect e, function|int|bool val)
-Set the Value property
+Sets e's value field. The value can be a number, boolean, or callback function depending on the effect code.
 Parameters:
   e: Effect
   val: function|int|bool
@@ -5565,7 +5561,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:927
 
 ●int Group.GetCount(Group g)
-Returns the number of cards in g
+Returns the number of cards in g.
 Parameters:
   g: Group
 Returns:
@@ -7519,11 +7515,13 @@ Returns:
   bool|nil - true during valid target checks; otherwise no meaningful return value.
 Source: Utilities/utility.lua:212
 
-●void Auxiliary.Stringid(int code, int id)
-Used to index the card number code for the card the first id (from 0) effect prompts
+●int Auxiliary.Stringid(int code, int id)
+Returns the card-string id for card code and string index id. The index starts at 0 and is commonly passed to Effect.SetDescription, Duel.Hint, or selection prompts.
 Parameters:
   code: int
   id: int
+Returns:
+  int
 Source: Utilities/utility.lua:79
 
 ●void Auxiliary.sumreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
