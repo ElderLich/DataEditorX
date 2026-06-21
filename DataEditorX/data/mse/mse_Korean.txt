@@ -1,0 +1,90 @@
+###########################
+# Magic Set Editor 2
+# Korean
+# \t = Tab \n = Enter [:space:] = Space
+########################### Chs 2 Cht 
+cn2tw = false
+########################### Setting
+maxcount = 3000
+imagepath = ./Images
+########################### Artwork
+reimage = false
+width = 618
+height = 618
+pwidth = 710
+pheight= 530
+########################### Spell/Trap
+spell = %%
+trap = %%
+############################ language,style,other setting
+head = mse version: 2.0.0\r\ngame: yugioh\r\nstylesheet: series10\r\nset info:\r\n\tlanguage: KR\r\n\tedition: \r\n\tcopyright: ©2020 Studio Dice/SHUEISHA, TV TOKYO, KONAMI\r\n\twatermark: \r\n\twatermark2: \r\n\tST mark is text: yes\r\n\tedition images: no\r\n\tpendulum image is small: yes
+end = version control:\n\ttype: none\napprentice code: 
+############################ Text
+text = Pendulum Scale = %scale%\n[ Pendulum Effect ]\n%ptext%\n----------------------------------------\n[ Monster Effect ]\n%text%
+############################
+pendulum-text = [\S\s]+? Effect \]\s*\r?\n(?:-n/a-)*([\S\s]*?)\r?\n---+
+monster-text = \[ (?:Monster Effect|Flavor Text) \]\s*\r?\n([\S\s]*)
+rush-text = ([\S\s]*?)\r\n\[Requirement\] ([\S\s]*?)\r?\n\[Effect\]([\S\s]*)
+########################### Replace
+#replace = \s <sym-auto>^</sym-auto>
+#replace = ([A-Z]) <i>$1</i>
+########################### no.10's card
+no10 = false
+no_star_cards = 1686814,52653092,65305468,26973555,43490025,90884403
+##race
+race 0x1 전사족
+race 0x2 마법사족
+race 0x4 천사족
+race 0x8 악마족
+race 0x10 언데드족
+race 0x20 기계족
+race 0x40 물족
+race 0x80 화염족
+race 0x100 암석족
+race 0x200 비행야수족
+race 0x400 식물족
+race 0x800 곤충족
+race 0x1000 번개족
+race 0x2000 드래곤족
+race 0x4000 야수족
+race 0x8000 야수전사족
+race 0x10000 공룡족
+race 0x20000 어류족
+race 0x40000 해룡족
+race 0x80000 파충류족
+race 0x100000 사이킥족
+race 0x200000 환신야수족
+race 0x400000 창조신족
+race 0x800000 환룡족
+race 0x1000000 사이버스족
+race 0x2000000 환상마족
+###########################
+##type
+type 0x1 몬스터
+type 0x2 마법
+type 0x4 함정
+type 0x8 N/A
+type 0x10 일반
+type 0x20 효과
+type 0x40 융합
+type 0x80 의식
+type 0x100 함정 몬스터
+type 0x200 스피릿
+type 0x400 유니온
+type 0x800 듀얼
+type 0x1000 튜너
+type 0x2000 싱크로
+type 0x4000 토큰
+type 0x8000 N/A
+type 0x10000 속공
+type 0x20000 지속
+type 0x40000 장착
+type 0x80000 필드
+type 0x100000 카운터
+type 0x200000 리버스
+type 0x400000 툰
+type 0x800000 엑시즈
+type 0x1000000 펜듈럼
+type 0x2000000 특수 소환
+type 0x4000000 링크
+##########################

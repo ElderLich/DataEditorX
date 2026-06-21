@@ -1,0 +1,90 @@
+###########################
+# Magic Set Editor 2
+# Thai
+# \t = Tab \n = Enter [:space:] = Space
+########################### Chs 2 Cht 
+cn2tw = false
+########################### Setting
+maxcount = 3000
+imagepath = ./Images
+########################### Artwork
+reimage = false
+width = 618
+height = 618
+pwidth = 710
+pheight= 530
+########################### Spell/Trap
+spell = %%
+trap = %%
+############################ language,style,other setting
+head = mse version: 2.0.0\r\ngame: yugioh\r\nstylesheet: series10\r\nset info:\r\n\tlanguage: TH\r\n\tedition: \r\n\tcopyright: ©2020 Studio Dice/SHUEISHA, TV TOKYO, KONAMI\r\n\twatermark: \r\n\twatermark2: \r\n\tST mark is text: yes\r\n\tedition images: no\r\n\tpendulum image is small: yes
+end = version control:\n\ttype: none\napprentice code: 
+############################ Text
+text = Pendulum Scale = %scale%\n[ Pendulum Effect ]\n%ptext%\n----------------------------------------\n[ Monster Effect ]\n%text%
+############################
+pendulum-text = [\S\s]+? Effect \]\s*\r?\n(?:-n/a-)*([\S\s]*?)\r?\n---+
+monster-text = \[ (?:Monster Effect|Flavor Text) \]\s*\r?\n([\S\s]*)
+rush-text = ([\S\s]*?)\r\n\[Requirement\] ([\S\s]*?)\r?\n\[Effect\]([\S\s]*)
+########################### Replace
+#replace = \s <sym-auto>^</sym-auto>
+#replace = ([A-Z]) <i>$1</i>
+########################### no.10's card
+no10 = false
+no_star_cards = 1686814,52653092,65305468,26973555,43490025,90884403
+##race
+race 0x1 นักรบ
+race 0x2 จอมเวท
+race 0x4 เทพบริสุทธิ์
+race 0x8 ปีศาจ
+race 0x10 อันเดด
+race 0x20 เครื่องจักร
+race 0x40 วารี
+race 0x80 อัคคี
+race 0x100 ศิลา
+race 0x200 สัตว์ปีก
+race 0x400 พืช
+race 0x800 แมลง
+race 0x1000 สายฟ้า
+race 0x2000 มังกร
+race 0x4000 สัตว์ป่า
+race 0x8000 นักรบอสูร
+race 0x10000 ไดโนเสาร
+race 0x20000 ปลา
+race 0x40000 มังกรทะเล
+race 0x80000 สัตว์เลื้อยคลาน
+race 0x100000 ไซคิก
+race 0x200000 สัตว์เทพ
+race 0x400000 ผู้สร้าง
+race 0x800000 มายามังกร
+race 0x1000000 ไซเบอร์ส
+race 0x2000000 มายา
+###########################
+##type
+type 0x1 มอนสเตอร์
+type 0x2 เวทมนตร์
+type 0x4 กับดัก
+type 0x8 N/A
+type 0x10 ปกติ
+type 0x20 เอฟเฟกต์
+type 0x40 ฟิวชัน
+type 0x80 พิธีกรรม
+type 0x100 กับดักมอนสเตอร์
+type 0x200 สปิริต
+type 0x400 ยูเนียน
+type 0x800 เจมินิ
+type 0x1000 จูนเนอร์
+type 0x2000 ซิงโคร
+type 0x4000 โทเคน
+type 0x8000 N/A
+type 0x10000 ความเร็วสูง
+type 0x20000 ต่อเนื่อง
+type 0x40000 สวมใส่
+type 0x80000 ฟิลด์
+type 0x100000 เคาน์เตอร์
+type 0x200000 พลิกหงาย
+type 0x400000 การ์ตูน
+type 0x800000 เอ็กซีส
+type 0x1000000 เพนดูลัม
+type 0x2000000 อัญเชิญพิเศษ
+type 0x4000000 ลิงก์
+##########################

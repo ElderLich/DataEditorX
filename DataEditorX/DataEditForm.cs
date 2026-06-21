@@ -2080,19 +2080,12 @@ namespace DataEditorX
             }
 
             menuitem_language.DropDownItems.Clear();
-            string[] files = MyPath.FindFiles(datapath, MyPath.GetFileName(DEXConfig.TAG_LANGUAGE, "*"), "languages");
-            foreach (string file in files)
+            TextInfo txinfo = new CultureInfo(CultureInfo.InstalledUICulture.Name).TextInfo;
+            foreach (string name in DEXConfig.GetAvailableLanguageNames(datapath))
             {
-                string name = MyPath.GetFullFileName(DEXConfig.TAG_LANGUAGE, file);
-                if (string.IsNullOrEmpty(name))
-                {
-                    continue;
-                }
-
-                TextInfo txinfo = new CultureInfo(CultureInfo.InstalledUICulture.Name).TextInfo;
                 ToolStripMenuItem tsmi = new(txinfo.ToTitleCase(name))
                 {
-                    ToolTipText = file
+                    Tag = name
                 };
                 tsmi.Click += SetLanguage_Click;
                 if (DEXConfig.ReadString(DEXConfig.TAG_LANGUAGE).Equals(name, StringComparison.OrdinalIgnoreCase))
@@ -2112,7 +2105,8 @@ namespace DataEditorX
 
             if (sender is ToolStripMenuItem tsmi)
             {
-                XMLReader.Save(DEXConfig.TAG_LANGUAGE, tsmi.Text);
+                string language = tsmi.Tag?.ToString() ?? tsmi.Text;
+                XMLReader.Save(DEXConfig.TAG_LANGUAGE, language);
                 GetLanguageItem();
                 MyMsg.Show(LMSG.PlzRestart);
             }

@@ -1,6 +1,6 @@
-﻿###########################
+###########################
 # Magic Set Editor 2
-# English
+# English-Omega
 # \t = Tab \n = Enter [:space:] = Space
 ########################### Chs 2 Cht 
 cn2tw = false
@@ -41,7 +41,7 @@ race 0x20 Machine
 race 0x40 Aqua
 race 0x80 Pyro
 race 0x100 Rock
-race 0x200 Winged Beast
+race 0x200 Winged Beast
 race 0x400 Plant
 race 0x800 Insect
 race 0x1000 Thunder
@@ -50,11 +50,11 @@ race 0x4000 Beast
 race 0x8000 Beast-Warrior
 race 0x10000 Dinosaur
 race 0x20000 Fish
-race 0x40000 Sea Serpent
+race 0x40000 Sea Serpent
 race 0x80000 Reptile
 race 0x100000 Psychic
 race 0x200000 Divine-Beast
-race 0x400000 Creator God
+race 0x400000 Creator God
 race 0x800000 Wyrm
 race 0x1000000 Cyberse
 race 0x2000000 Illusion
@@ -67,14 +67,14 @@ race 0x80000000 Galaxy
 ###########################
 ##type
 type 0x1 Monster
-type 0x2 Spell   
-type 0x4 Trap     
+type 0x2 Spell
+type 0x4 Trap
 type 0x8 N/A
 type 0x10 Normal
 type 0x20 Effect
 type 0x40 Fusion
 type 0x80 Ritual
-type 0x100 T-Monster
+type 0x100 Trap Monsters
 type 0x200 Spirit
 type 0x400 Union
 type 0x800 Gemini
@@ -91,5 +91,6 @@ type 0x200000 Flip
 type 0x400000 Toon
 type 0x800000 Xyz
 type 0x1000000 Pendulum
+type 0x2000000 Special Summon
 type 0x4000000 Link
 ##########################

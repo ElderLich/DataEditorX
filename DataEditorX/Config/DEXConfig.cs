@@ -301,15 +301,8 @@ namespace DataEditorX.Config
                 Save(TAG_CHECK_SYSLANG, "false");
                 string[] words = CultureInfo.InstalledUICulture.EnglishName.Split(' ');
                 string syslang = words[0];
-                string[] files = MyPath.FindFiles(path, MyPath.GetFileName(TAG_LANGUAGE, "*"), "languages");
-                foreach (string file in files)
+                foreach (string name in GetAvailableLanguageNames(path))
                 {
-                    string name = MyPath.GetFullFileName(TAG_LANGUAGE, file);
-                    if (string.IsNullOrEmpty(name))
-                    {
-                        continue;
-                    }
-
                     if (syslang.Equals(name, StringComparison.OrdinalIgnoreCase))
                     {
                         Save(TAG_LANGUAGE, syslang);
@@ -317,7 +310,14 @@ namespace DataEditorX.Config
                     }
                 }
             }
-            return MyPath.FindFile(path, MyPath.GetFileName(TAG_LANGUAGE, GetAppConfig(TAG_LANGUAGE)), "languages");
+            string languageFile = MyPath.FindFile(path, MyPath.GetFileName(TAG_LANGUAGE, GetAppConfig(TAG_LANGUAGE)), "languages");
+            if (File.Exists(languageFile))
+            {
+                return languageFile;
+            }
+
+            string englishFile = MyPath.FindFile(path, MyPath.GetFileName(TAG_LANGUAGE, "english"), "languages");
+            return File.Exists(englishFile) ? englishFile : languageFile;
         }
         /// <summary>
         /// 卡片信息配置文件名
@@ -326,7 +326,43 @@ namespace DataEditorX.Config
         /// <returns></returns>
         public static string GetCardInfoFile(string path)
         {
-            return MyPath.FindFile(path, MyPath.GetFileName(TAG_CARDINFO, GetAppConfig(TAG_LANGUAGE)), "languages");
+            string cardInfoFile = MyPath.FindFile(path, MyPath.GetFileName(TAG_CARDINFO, GetAppConfig(TAG_LANGUAGE)), "languages");
+            if (File.Exists(cardInfoFile))
+            {
+                return cardInfoFile;
+            }
+
+            string englishFile = MyPath.FindFile(path, MyPath.GetFileName(TAG_CARDINFO, "english"), "languages");
+            return File.Exists(englishFile) ? englishFile : cardInfoFile;
+        }
+
+        public static string[] GetAvailableLanguageNames(string path)
+        {
+            if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
+            {
+                return [];
+            }
+
+            SortedSet<string> names = new(StringComparer.OrdinalIgnoreCase);
+            foreach (string file in MyPath.FindFiles(path, MyPath.GetFileName(TAG_LANGUAGE, "*"), "languages"))
+            {
+                string name = MyPath.GetFullFileName(TAG_LANGUAGE, file);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    _ = names.Add(name);
+                }
+            }
+
+            foreach (string file in MyPath.FindFiles(path, MyPath.GetFileName(TAG_CARDINFO, "*"), "languages"))
+            {
+                string name = MyPath.GetFullFileName(TAG_CARDINFO, file);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    _ = names.Add(name);
+                }
+            }
+
+            return names.ToArray();
         }
         /// <summary>
         /// 发送消息打开文件
