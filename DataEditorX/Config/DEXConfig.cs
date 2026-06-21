@@ -88,6 +88,10 @@ namespace DataEditorX.Config
         /// </summary>
         public const string TAG_AUTO_CHECK_UPDATE = "auto_check_update";
         /// <summary>
+        /// 深色主题
+        /// </summary>
+        public const string TAG_DARK_THEME = "dark_theme";
+        /// <summary>
         /// add require automatically
         /// </summary>
         public const string TAG_ADD_REQUIRE = "add_require";

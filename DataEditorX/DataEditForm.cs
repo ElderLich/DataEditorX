@@ -237,6 +237,7 @@ namespace DataEditorX
             AddMenuItemFormMSE();
             //
             GetLanguageItem();
+            ApplyTheme();
             //   CheckUpdate(false);//检查更新
         }
         //窗体关闭
@@ -620,16 +621,8 @@ namespace DataEditorX
                         items[j].Checked = true;
                     }
 
-                    if (i % 2 == 0)
-                    {
-                        items[j].BackColor = Color.GhostWhite;
-                    }
-                    else
-                    {
-                        items[j].BackColor = Color.White;
-                    }
-
                     _ = items[j].SubItems.Add(mcard.name);
+                    ThemeManager.ApplyListViewItem(items[j]);
                 }
                 lv_cardlist.Items.AddRange(items);
             }
@@ -2460,6 +2453,15 @@ namespace DataEditorX
             int d = e.Delta / 6;
             int c = pl_flags.VerticalScroll.Value;
             pl_flags.VerticalScroll.Value = Math.Max(0, c + d);
+        }
+
+        public void ApplyTheme()
+        {
+            ThemeManager.ApplyControlTree(this);
+            pl_image.BackColor = ThemeManager.IsDarkTheme
+                ? ThemeManager.CurrentInputBackColor
+                : SystemColors.ButtonHighlight;
+            ThemeManager.ApplyListViewItems(lv_cardlist);
         }
     }
 }

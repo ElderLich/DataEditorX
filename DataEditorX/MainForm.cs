@@ -44,6 +44,7 @@ namespace DataEditorX
         {
             //初始化控件
             InitializeComponent();
+            ApplyTheme();
         }
         public void SetDataPath(string datapath)
         {
@@ -134,6 +135,7 @@ namespace DataEditorX
             }
             //添加历史菜单
             history.MenuHistory();
+            ApplyTheme();
 
             //如果没有将要打开的文件，则打开一个空数据库标签
             if (string.IsNullOrEmpty(openfile))
@@ -162,11 +164,13 @@ namespace DataEditorX
         public void AddCdbMenu(ToolStripItem item)
         {
             _ = menuitem_history.DropDownItems.Add(item);
+            ThemeManager.ApplyToolStripItem(item);
         }
         //添加lua历史
         public void AddLuaMenu(ToolStripItem item)
         {
             _ = menuitem_shistory.DropDownItems.Add(item);
+            ThemeManager.ApplyToolStripItem(item);
         }
         #endregion
 
@@ -215,6 +219,7 @@ namespace DataEditorX
                 cf.Controls["fctb"].Text = file.IndexOf("```") > -1 ? file.Split("```")[1] : file;
             }
             else _ = cf.Open(file, df == null ? "cards" : Path.GetFileNameWithoutExtension(df.GetOpenFile()));
+            cf.ApplyTheme();
             cf.Show(dockPanel, DockState.Document);
         }
         //打开数据库
@@ -233,6 +238,7 @@ namespace DataEditorX
             LanguageHelper.SetFormLabel(def);
             //初始化界面数据
             def.InitControl(datacfg);
+            def.ApplyTheme();
             def.Show(dockPanel, DockState.Document);
         }
         //打开文件
@@ -663,6 +669,35 @@ namespace DataEditorX
         {
             e.Effect = DragDropEffects.All;
         }
+        private void Menuitem_darkthemeClick(object sender, EventArgs e)
+        {
+            DEXConfig.Save(DEXConfig.TAG_DARK_THEME, menuitem_darktheme.Checked.ToString().ToLowerInvariant());
+            ApplyTheme();
+        }
+
+        private void ApplyTheme()
+        {
+            menuitem_darktheme.Checked = ThemeManager.IsDarkTheme;
+            ThemeManager.ApplyControlTree(this);
+            ThemeManager.ApplyDockPanel(dockPanel);
+
+            foreach (DockContent dc in dockPanel.Contents.Cast<DockContent>())
+            {
+                switch (dc)
+                {
+                    case DataEditForm dataEditForm:
+                        dataEditForm.ApplyTheme();
+                        break;
+                    case CodeEditForm codeEditForm:
+                        codeEditForm.ApplyTheme();
+                        break;
+                    default:
+                        ThemeManager.ApplyControlTree(dc);
+                        break;
+                }
+            }
+        }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             //检查更新

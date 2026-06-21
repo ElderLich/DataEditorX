@@ -61,6 +61,8 @@ namespace DataEditorX
             this.menuitem_shistory = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuitem_quit = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuitem_view = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuitem_darktheme = new System.Windows.Forms.ToolStripMenuItem();
             this.menuitem_windows = new System.Windows.Forms.ToolStripMenuItem();
             this.menuitem_dataeditor = new System.Windows.Forms.ToolStripMenuItem();
             this.menuitem_codeeditor = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,6 +95,7 @@ namespace DataEditorX
             // 
             this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuitem_file,
+            this.menuitem_view,
             this.menuitem_windows});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.MdiWindowListItem = this.menuitem_windows;
@@ -236,6 +239,22 @@ namespace DataEditorX
             this.menuitem_quit.Text = "Quit";
             this.menuitem_quit.Click += new System.EventHandler(this.QuitToolStripMenuItemClick);
             // 
+            // menuitem_view
+            // 
+            this.menuitem_view.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuitem_darktheme});
+            this.menuitem_view.Name = "menuitem_view";
+            this.menuitem_view.Size = new System.Drawing.Size(62, 20);
+            this.menuitem_view.Text = "View(&V)";
+            // 
+            // menuitem_darktheme
+            // 
+            this.menuitem_darktheme.CheckOnClick = true;
+            this.menuitem_darktheme.Name = "menuitem_darktheme";
+            this.menuitem_darktheme.Size = new System.Drawing.Size(138, 22);
+            this.menuitem_darktheme.Text = "Dark Theme";
+            this.menuitem_darktheme.Click += new System.EventHandler(this.Menuitem_darkthemeClick);
+            // 
             // menuitem_windows
             // 
             this.menuitem_windows.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -338,6 +357,8 @@ namespace DataEditorX
 		private System.Windows.Forms.ToolStripMenuItem menuitem_close;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_dataeditor;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_windows;
+        private System.Windows.Forms.ToolStripMenuItem menuitem_darktheme;
+        private System.Windows.Forms.ToolStripMenuItem menuitem_view;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_file;
 		private System.Windows.Forms.MenuStrip mainMenu;
 		private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel { get; set; }

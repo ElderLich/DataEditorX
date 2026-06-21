@@ -95,6 +95,7 @@ namespace DataEditorX
             popupMenu.Opened += PopupMenu_VisibleChanged;
             popupMenu.Items.FocussedItemIndexChanged += Items_FocussedItemIndexChanged;
             title = Text;
+            ApplyTheme();
         }
 
         private void Fctb_TextChanged(object sender, TextChangedEventArgs e)
@@ -716,6 +717,17 @@ namespace DataEditorX
             menuitem_save2database.Checked = !menuitem_save2database.Checked;
             XMLReader.Save(DEXConfig.TAG_SAVE2DB, menuitem_save2database.Checked.ToString().ToLower());
 
+        }
+
+        public void ApplyTheme()
+        {
+            ThemeManager.ApplyControlTree(this);
+            popupMenu.BackColor = ThemeManager.IsDarkTheme ? ThemeManager.CurrentInputBackColor : fctb.BackColor;
+            popupMenu.ForeColor = ThemeManager.IsDarkTheme ? ThemeManager.CurrentTextColor : fctb.ForeColor;
+            popupMenu.SelectedColor = ThemeManager.IsDarkTheme ? Color.FromArgb(63, 63, 70) : Color.LightGray;
+            documentMap1.BackColor = ThemeManager.IsDarkTheme ? Color.FromArgb(37, 37, 38) : Color.DimGray;
+            documentMap1.ForeColor = ThemeManager.IsDarkTheme ? ThemeManager.CurrentTextColor : Color.Maroon;
+            fctb.Invalidate();
         }
     }
 }
