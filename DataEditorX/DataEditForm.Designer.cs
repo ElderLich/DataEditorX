@@ -79,6 +79,7 @@ namespace DataEditorX
             btn_PageDown = new Button();
             btn_add = new Button();
             lb5 = new Label();
+            lb_edittext_hint = new Label();
             tb_atk = new TextBox();
             tb_def = new TextBox();
             tb_cardcode = new TextBox();
@@ -417,13 +418,12 @@ namespace DataEditorX
             tb_edittext.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             tb_edittext.BorderStyle = BorderStyle.FixedSingle;
             tb_edittext.HideSelection = false;
-            tb_edittext.Location = new Point(348, 494);
+            tb_edittext.Location = new Point(348, 507);
             tb_edittext.MaxLength = 2000;
             tb_edittext.Multiline = true;
             tb_edittext.Name = "tb_edittext";
-            tb_edittext.PlaceholderText = "Select a string above, then edit it here";
             tb_edittext.ScrollBars = ScrollBars.Vertical;
-            tb_edittext.Size = new Size(301, 59);
+            tb_edittext.Size = new Size(301, 46);
             tb_edittext.TabIndex = 4;
             tb_edittext.WordWrap = false;
             tb_edittext.TextChanged += Tb_edittextTextChanged;
@@ -542,7 +542,20 @@ namespace DataEditorX
             lb5.Size = new Size(11, 12);
             lb5.TabIndex = 7;
             lb5.Text = "/";
-            // 
+            //
+            // lb_edittext_hint
+            //
+            lb_edittext_hint.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            lb_edittext_hint.BackColor = Color.FromArgb(192, 192, 255);
+            lb_edittext_hint.Location = new Point(348, 487);
+            lb_edittext_hint.Margin = new Padding(3, 3, 3, 0);
+            lb_edittext_hint.Name = "lb_edittext_hint";
+            lb_edittext_hint.Padding = new Padding(4, 0, 0, 0);
+            lb_edittext_hint.Size = new Size(301, 17);
+            lb_edittext_hint.TabIndex = 122;
+            lb_edittext_hint.Text = "Selected String Text";
+            lb_edittext_hint.TextAlign = ContentAlignment.MiddleLeft;
+            //
             // tb_atk
             // 
             tb_atk.Location = new Point(63, 330);
@@ -883,6 +896,7 @@ namespace DataEditorX
             splitContainer.Panel2.Controls.Add(pl_flags);
             splitContainer.Panel2.Controls.Add(pl_category);
             splitContainer.Panel2.Controls.Add(cb_setname4);
+            splitContainer.Panel2.Controls.Add(lb_edittext_hint);
             splitContainer.Panel2.Controls.Add(tb_edittext);
             splitContainer.Panel2.Controls.Add(cb_cardrace);
             splitContainer.Panel2.Controls.Add(tb_setcode4);
@@ -1025,7 +1039,7 @@ namespace DataEditorX
             lb_scripttext.Location = new Point(348, 432);
             lb_scripttext.Name = "lb_scripttext";
             lb_scripttext.ScrollAlwaysVisible = true;
-            lb_scripttext.Size = new Size(301, 58);
+            lb_scripttext.Size = new Size(301, 52);
             lb_scripttext.TabIndex = 6;
             lb_scripttext.SelectedIndexChanged += Lb_scripttextSelectedIndexChanged;
             // 
@@ -1129,6 +1143,7 @@ namespace DataEditorX
         private System.Windows.Forms.TextBox tb_def;
         private System.Windows.Forms.TextBox tb_atk;
         private System.Windows.Forms.Label lb5;
+        private System.Windows.Forms.Label lb_edittext_hint;
         private System.Windows.Forms.Button btn_add;
         private System.Windows.Forms.Button btn_PageDown;
         private System.Windows.Forms.Button btn_PageUp;

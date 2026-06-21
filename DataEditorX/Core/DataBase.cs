@@ -58,6 +58,11 @@ namespace DataEditorX.Core
         #endregion
 
         #region Database creation
+        public static bool IsOmegaDatabase(string db)
+        {
+            return db != null && db.EndsWith(".bytes", StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Creates a new card database.
         /// </summary>
@@ -74,7 +79,7 @@ namespace DataEditorX.Core
             SqliteConnection.ClearAllPools();
             try
             {
-                _ = Db.EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? Command(Db, _defaultTableSQL) : Command(Db, _defaultOTableSQL);
+                _ = IsOmegaDatabase(Db) ? Command(Db, _defaultOTableSQL) : Command(Db, _defaultTableSQL);
             }
             catch
             {
@@ -290,7 +295,7 @@ namespace DataEditorX.Core
                 foreach (Card c in cards)
                 {
                     using SqliteCommand cmd = con.CreateCommand();
-                    cmd.CommandText = DB.EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? GetInsertSQL(c, ignore) : OmegaGetInsertSQL(c, ignore);
+                    cmd.CommandText = IsOmegaDatabase(DB) ? OmegaGetInsertSQL(c, ignore) : GetInsertSQL(c, ignore);
                     result += cmd.ExecuteNonQuery();
                 }
                 trans.Commit();

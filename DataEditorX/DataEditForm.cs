@@ -95,7 +95,7 @@ namespace DataEditorX
         public DataEditForm(string datapath, string cdbfile, DataConfig datacfg = null)
         {
             Initialize(datapath);
-            if (datacfg != null && File.Exists(cdbfile) && !cdbfile.EndsWith(".cdb", StringComparison.OrdinalIgnoreCase))
+            if (datacfg != null && File.Exists(cdbfile) && DataBase.IsOmegaDatabase(cdbfile))
             {
                 Dictionary<long, string> d = datacfg.dicSetnames;
                 if (!d.ContainsKey(0)) d.Add(0L, "Archetype");
@@ -185,6 +185,9 @@ namespace DataEditorX
                 using (SaveFileDialog dlg = new())
                 {
                     dlg.Title = LanguageHelper.GetMsg(LMSG.NewFile);
+                    dlg.AddExtension = true;
+                    dlg.DefaultExt = "cdb";
+                    dlg.FilterIndex = 1;
                     try
                     {
                         dlg.Filter = LanguageHelper.GetMsg(LMSG.CdbType);
@@ -726,7 +729,7 @@ namespace DataEditorX
             SetCheck(pl_category, c.category);
             long savedFrameFlags = GetSavedFrameFlags(c.id, false);
             //MDPro3-exclusive
-            if (!GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase))
+            if (DataBase.IsOmegaDatabase(GetOpenFile()))
             {
                 SetCheck(pl_flags, GetDatabaseFlags(c.omega[1]) | savedFrameFlags);
                 tb_support.Text = c.omega[2].ToString("x");
@@ -782,7 +785,7 @@ namespace DataEditorX
             c.category = GetCheck(pl_category);
 
             c.omega = new long[5];
-            if (!GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase)) {
+            if (DataBase.IsOmegaDatabase(GetOpenFile())) {
                 c.script = oldCard.script;
                 c.omega[0] = 1L;
                 c.omega[1] = GetDatabaseFlags(GetCheck(pl_flags));
@@ -997,7 +1000,7 @@ namespace DataEditorX
             else
             {
                 srcCard = c;
-                string sql = c.omega != null && c.omega[0] > 0 || !nowCdbFile.EndsWith(".cdb")
+                string sql = c.omega != null && c.omega[0] > 0 || DataBase.IsOmegaDatabase(nowCdbFile)
                     ? DataBase.OmegaGetSelectSQL(c) : DataBase.GetSelectSQL(c);
                 SetCards(DataBase.Read(nowCdbFile, true, sql), isfresh);
             }
@@ -1302,6 +1305,9 @@ namespace DataEditorX
         {
             using SaveFileDialog dlg = new();
             dlg.Title = LanguageHelper.GetMsg(LMSG.SelectDataBasePath);
+            dlg.AddExtension = true;
+            dlg.DefaultExt = "cdb";
+            dlg.FilterIndex = 1;
             try
             {
                 dlg.Filter = LanguageHelper.GetMsg(LMSG.CdbType);

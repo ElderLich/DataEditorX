@@ -49,6 +49,7 @@ DataEditForm.pl_bottom.btn_img	导入图片
 DataEditForm.pl_main.splitContainer..lb_types	卡片类型
 DataEditForm.pl_main.splitContainer..lb_markers	连接标记
 DataEditForm.pl_main.splitContainer..lb_tiptexts	脚本提示文字
+DataEditForm.pl_main.splitContainer..lb_edittext_hint	选中的文本
 DataEditForm.pl_main.splitContainer..lb_categorys	效果分类
 DataEditForm.pl_main.splitContainer..lb_cardcode	卡片密码
 DataEditForm.pl_main.splitContainer..lb_cardalias	同名卡
@@ -144,7 +145,7 @@ MainForm.mainMenu.menuitem_closeall	关闭所有
 0x1e	关于：
 0x1f	版本：
 0x20	作者：
-0x21	数据库文件(*.cdb)|*.cdb|脚本文件(*.lua)|*.lua|所有文件(*.*)|*.*
+0x21	数据库文件(*.cdb)|*.cdb|所有文件(*.*)|*.*
 0x23	系列号输入出错！
 0x24	选择卡片图像
 0x25	jpg图像(*.jpg)|*.jpg|bmp图像(*.bmp)|*.bmp|png图像(*.png)|*.png|所有文件(*.*)|*.*

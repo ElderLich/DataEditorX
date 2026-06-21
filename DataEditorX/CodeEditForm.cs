@@ -371,6 +371,9 @@ namespace DataEditorX
             {
                 using SaveFileDialog sfdlg = new();
                 sfdlg.FileName = string.IsNullOrEmpty(nowFile) ? "c" + nowCode.ToString() + ".lua" : nowFile;
+                sfdlg.AddExtension = true;
+                sfdlg.DefaultExt = "lua";
+                sfdlg.FilterIndex = 1;
                 try
                 {
                     sfdlg.Filter = LanguageHelper.GetMsg(LMSG.ScriptFilter);

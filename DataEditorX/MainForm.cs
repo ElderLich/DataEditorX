@@ -431,8 +431,11 @@ namespace DataEditorX
         {
             using SaveFileDialog dlg = new();
             dlg.Title = LanguageHelper.GetMsg(LMSG.NewFile);
-            if (GetActive() != null)// Check whether the active tab is a data editor.
+            dlg.AddExtension = true;
+            if (GetActive() != null || dockPanel.Contents.Count == 0)// Check whether the active tab is a data editor.
             {
+                dlg.DefaultExt = "cdb";
+                dlg.FilterIndex = 1;
                 try
                 {
                     dlg.Filter = LanguageHelper.GetMsg(LMSG.CdbType);
@@ -441,6 +444,8 @@ namespace DataEditorX
             }
             else
             {
+                dlg.DefaultExt = "lua";
+                dlg.FilterIndex = 1;
                 try
                 {
                     dlg.Filter = LanguageHelper.GetMsg(LMSG.ScriptFilter);

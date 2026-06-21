@@ -70,7 +70,7 @@ namespace DataEditorX.Core
                     }
                 }
                 if (DataBase.Command(dataform.GetOpenFile(),
-                    dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(c, true) : DataBase.OmegaGetInsertSQL(c, true)) >= 2)
+                    DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetInsertSQL(c, true) : DataBase.GetInsertSQL(c, true)) >= 2)
                 {
                     MyMsg.Show(LMSG.AddSucceed);
                     undoSQL = DataBase.GetDeleteSQL(c);
@@ -132,7 +132,7 @@ namespace DataEditorX.Core
                 string sql;
                 if (c.id != oldCard.id)//ID was changed
                 {
-                    sql = dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(c, false) : DataBase.OmegaGetInsertSQL(c, false);// Restore by inserting the card.
+                    sql = DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetInsertSQL(c, false) : DataBase.GetInsertSQL(c, false);// Restore by inserting the card.
                     bool delold = MyMsg.Question(LMSG.IfDeleteCard);
                     if (delold)//Whether to delete the old card
                     {
@@ -145,7 +145,7 @@ namespace DataEditorX.Core
                         }
                         else
                         {//Delete succeeded; add restore SQL
-                            undoSQL = DataBase.GetDeleteSQL(c) + (dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(oldCard, false) : DataBase.OmegaGetInsertSQL(oldCard, false));
+                            undoSQL = DataBase.GetDeleteSQL(c) + (DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetInsertSQL(oldCard, false) : DataBase.GetInsertSQL(oldCard, false));
                         }
                     }
                     else
@@ -172,8 +172,8 @@ namespace DataEditorX.Core
                 }
                 else
                 {//Update data
-                    sql = dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetUpdateSQL(c) : DataBase.OmegaGetUpdateSQL(c);
-                    undoSQL = dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetUpdateSQL(oldCard) : DataBase.OmegaGetUpdateSQL(oldCard);
+                    sql = DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetUpdateSQL(c) : DataBase.GetUpdateSQL(c);
+                    undoSQL = DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetUpdateSQL(oldCard) : DataBase.GetUpdateSQL(oldCard);
                 }
                 if (DataBase.Command(dataform.GetOpenFile(), sql) > 0)
                 {
@@ -249,7 +249,7 @@ namespace DataEditorX.Core
                 foreach (Card c in cards)
                 {
                     sql.Add(DataBase.GetDeleteSQL(c));//Delete
-                    undo += dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(c, true) : DataBase.OmegaGetInsertSQL(c, true);
+                    undo += DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetInsertSQL(c, true) : DataBase.GetInsertSQL(c, true);
                     //Load related-file deletion setting
                     if (deletefiles)
                     {
@@ -297,7 +297,7 @@ namespace DataEditorX.Core
             if (c.id > 0)
             {
                 lua = dataform.GetPath().GetScript(id);
-                if (c.omega[0] > 0 && !(dataform.GetOpenFile().EndsWith(".cdb") && File.Exists(lua)))
+                if (c.omega[0] > 0 && (DataBase.IsOmegaDatabase(dataform.GetOpenFile()) || !File.Exists(lua)))
                 {
                     lua = MyPath.Combine(dataform.GetPath().gamepath, "../Scripts", "c" + id + ".lua");
                     if (c.omega[0] > 0 && !string.IsNullOrEmpty(c.script)
@@ -392,7 +392,7 @@ namespace DataEditorX.Core
 
                 if (cards == null || cards.Length == 0)
                     return false;
-                foreach (Card c in cards) c.omega[0] = dataform.GetOpenFile().EndsWith(".db") ? 1 : 0;
+                foreach (Card c in cards) c.omega[0] = DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? 1 : 0;
 
                 bool replace = false;
                 Card[] oldcards = DataBase.Read(dataform.GetOpenFile(), true, "");

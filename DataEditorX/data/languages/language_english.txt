@@ -31,6 +31,7 @@ DataEditForm.pl_main.splitContainer..lb_name	Name
 DataEditForm.pl_main.splitContainer..lb_types	Card Type
 DataEditForm.pl_main.splitContainer..lb_markers	Link Markers
 DataEditForm.pl_main.splitContainer..lb_tiptexts	Strings
+DataEditForm.pl_main.splitContainer..lb_edittext_hint	Selected String Text
 DataEditForm.pl_main.splitContainer..lb_support	Support
 DataEditForm.pl_main.splitContainer..lb_categorys	Genre
 DataEditForm.pl_main.splitContainer..lb_flags	Flags
@@ -132,7 +133,7 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x1e	About  :
 0x1f	Version:
 0x20	Author :
-0x21	Databases(*.db)|*.db|Databases(*.cdb)|*.cdb|Databases(*.bytes)|*.bytes|Scripts(*.lua)|*.lua|all files(*.*)|*.*
+0x21	Databases(*.cdb)|*.cdb|all files(*.*)|*.*
 0x23	Invalid SetCode!
 0x24	Select Image File
 0x25	jpg(*.jpg)|*.jpg|bmp(*.bmp)|*.bmp|png(*.png)|*.png|all files(*.*)|*.*
@@ -155,7 +156,7 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x40	Compare cards with text?
 0x41	Cards compared.
 0x42	Open File
-0x43	Scripts(*.lua)|*.lua|Databases(*.db)|*.db|Databases(*.cdb)|*.cdb|Databases(*.bytes)|*.bytes|all files(*.*)|*.*
+0x43	Scripts(*.lua)|*.lua|Databases(*.cdb)|*.cdb|all files(*.*)|*.*
 0x44	New File
 0x45	Saved Successfully.
 0x46	Save Script?
