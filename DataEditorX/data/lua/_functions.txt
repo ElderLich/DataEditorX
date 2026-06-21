@@ -5970,7 +5970,8 @@ Parameters:
 Source: Utilities/utility.lua:1548
 
 ●void Auxiliary.AddUrsarcticSpSummonEffect(Card c)
-TODO document.
+为c添加「北斗天熊」共通的手牌快速效果，在主要阶段特殊召唤自身。
+费用为解放手牌中1只7星以上怪兽，或从墓地除外可代替费用的对应卡。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:938
@@ -5986,13 +5987,14 @@ Returns:
 Source: Utilities/utility.lua:681
 
 ●void Auxiliary.AND(... any)
-TODO document.
+返回组合条件函数；调用时会用相同参数依次执行传入的函数，并在第一个假值处停止。
 Parameters:
   ...: any
 Source: Utilities/utility.lua:97
 
 ●void Auxiliary.ArcanaCoinOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+处理「秘仪之力」共通的投掷硬币操作。
+通常投掷1次硬币；若受对应替代效果影响，则让玩家选择结果，然后把结果以标记和客户端提示记录在c上。
 Parameters:
   e: Effect
   tp: int
@@ -6005,7 +6007,7 @@ Parameters:
 Source: Utilities/utility.lua:285
 
 ●void Auxiliary.ArcanaCoinTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+声明「秘仪之力」共通效果会为tp进行1次投掷硬币。
 Parameters:
   e: Effect
   tp: int
@@ -6027,13 +6029,13 @@ Returns:
 Source: Utilities/utility.lua:304
 
 ●void Auxiliary.AtkEqualsDef(Card c)
-TODO document.
+判断c是否为攻击力和守备力相同的非连接怪兽；在场上使用当前数值，其他位置要求原本数值可确认。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1115
 
 ●void Auxiliary.BanishRedirectCondition(Effect e)
-TODO document.
+除外重定向效果的默认条件；处理对象表侧表示时返回true。
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:1946
@@ -6107,7 +6109,7 @@ Parameters:
 Source: Utilities/utility.lua:124
 
 ●void Auxiliary.BESRemoveCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+B.E.S.共通战斗后维持效果的条件；处理对象仍与该次战斗关联时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -6120,7 +6122,7 @@ Parameters:
 Source: Utilities/utility.lua:1803
 
 ●void Auxiliary.BESRemoveOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+处理B.E.S.共通战斗后维持效果：能取除1个0x1f指示物则取除，否则破坏自身。
 Parameters:
   e: Effect
   tp: int
@@ -6133,7 +6135,7 @@ Parameters:
 Source: Utilities/utility.lua:1813
 
 ●void Auxiliary.BESRemoveTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+B.E.S.共通战斗后维持效果的目标处理；若不能取除1个0x1f指示物，则登记破坏自身的信息。
 Parameters:
   e: Effect
   tp: int
@@ -6161,7 +6163,7 @@ Parameters:
 Source: Utilities/utility.lua:1121
 
 ●void Auxiliary.bpcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+判断玩家是否可以进入战斗阶段，或当前阶段是否已经处于战斗阶段范围内。
 Parameters:
   e: Effect
   tp: int

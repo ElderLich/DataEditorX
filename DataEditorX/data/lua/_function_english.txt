@@ -5943,7 +5943,8 @@ Parameters:
 Source: Utilities/utility.lua:1548
 
 ●void Auxiliary.AddUrsarcticSpSummonEffect(Card c)
-TODO document.
+Adds the shared Ursarctic hand Quick Effect that Special Summons c during the Main Phase.
+The cost releases a Level 7 or higher monster from the hand, or banishes a valid replacement card from the Graveyard.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:938
@@ -5959,13 +5960,14 @@ Returns:
 Source: Utilities/utility.lua:681
 
 ●void Auxiliary.AND(... any)
-TODO document.
+Returns a composed predicate that calls each function with the same arguments and stops at the first falsy result.
 Parameters:
   ...: any
 Source: Utilities/utility.lua:97
 
 ●void Auxiliary.ArcanaCoinOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Performs the shared Arcana Force coin-toss operation.
+It tosses a coin, or lets the player choose the result while affected by the relevant replacement effect, then stores the result on c with client hints.
 Parameters:
   e: Effect
   tp: int
@@ -5978,7 +5980,7 @@ Parameters:
 Source: Utilities/utility.lua:285
 
 ●void Auxiliary.ArcanaCoinTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+Declares that the shared Arcana Force effect will perform one coin toss for tp.
 Parameters:
   e: Effect
   tp: int
@@ -6000,13 +6002,13 @@ Returns:
 Source: Utilities/utility.lua:304
 
 ●void Auxiliary.AtkEqualsDef(Card c)
-TODO document.
+Returns true for a non-Link Monster whose ATK equals DEF, using current values on the field or known printed values elsewhere.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1115
 
 ●void Auxiliary.BanishRedirectCondition(Effect e)
-TODO document.
+Default condition for banish-redirect effects; returns true while the handler is face-up.
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:1946
@@ -6099,7 +6101,7 @@ Parameters:
 Source: Utilities/utility.lua:124
 
 ●void Auxiliary.BESRemoveCondition(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Condition for the shared B.E.S. maintenance effect after battle; returns true if the handler is still related to that battle.
 Parameters:
   e: Effect
   tp: int
@@ -6112,7 +6114,7 @@ Parameters:
 Source: Utilities/utility.lua:1803
 
 ●void Auxiliary.BESRemoveOperation(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Resolves the shared B.E.S. maintenance effect by removing one 0x1f counter from the handler, or destroying it if no counter can be removed.
 Parameters:
   e: Effect
   tp: int
@@ -6125,7 +6127,7 @@ Parameters:
 Source: Utilities/utility.lua:1813
 
 ●void Auxiliary.BESRemoveTarget(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+Sets destruction operation info for the shared B.E.S. maintenance effect when the handler cannot remove one 0x1f counter.
 Parameters:
   e: Effect
   tp: int
@@ -6157,7 +6159,7 @@ Parameters:
 Source: Utilities/utility.lua:1121
 
 ●void Auxiliary.bpcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Returns true if the player can enter the Battle Phase, or if the current phase is already within the Battle Phase window.
 Parameters:
   e: Effect
   tp: int
