@@ -5894,14 +5894,15 @@ Parameters:
 Source: Utilities/utility.lua:1932
 
 ●void Auxiliary.AddCodeList(Card c, ... any)
-TODO document.
+Registers one or more card codes as codes listed by c, so later checks such as Auxiliary.IsCodeListed can find them. Skipped while c is copying an effect.
 Parameters:
   c: Card
   ...: any
 Source: Utilities/utility.lua:533
 
 ●void Auxiliary.AddDrytronSpSummonEffect(Card c, function func)
-TODO document.
+Adds the shared Drytron ignition effect that Special Summons c from the hand or Graveyard.
+The effect uses the common Drytron release cost, target, operation wrapper, and custom activity counter.
 Parameters:
   c: Card
   func: function
@@ -5920,21 +5921,23 @@ Parameters:
 Source: Utilities/utility.lua:1883
 
 ●void Auxiliary.AddMaterialCodeList(Card c, ... any)
-TODO document.
+Registers one or more material card codes for c and also adds each code to c's listed-code table.
+Fusion Monsters normally do not need this helper.
 Parameters:
   c: Card
   ...: any
 Source: Utilities/utility.lua:498
 
 ●void Auxiliary.AddSetNameMonsterList(Card c, ... any)
-TODO document.
+Registers set codes of monsters listed by c, so Auxiliary.IsSetNameMonsterListed can check them later. Skipped while c is copying an effect.
 Parameters:
   c: Card
   ...: any
 Source: Utilities/utility.lua:553
 
 ●void Auxiliary.AddThisCardInGraveAlreadyCheck(Card c)
-TODO document.
+Registers a continuous effect on c that records the effect that sent c to the Graveyard.
+This lets later Graveyard-condition checks distinguish a card that was already in the Graveyard from one sent there by the currently resolving effect.
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1548

@@ -5921,14 +5921,15 @@ Parameters:
 Source: Utilities/utility.lua:1932
 
 ●void Auxiliary.AddCodeList(Card c, ... any)
-TODO document.
+为c登记1个或多个卡名编号，供Auxiliary.IsCodeListed等函数判断这些编号是否被c列名。复制效果时不处理。
 Parameters:
   c: Card
   ...: any
 Source: Utilities/utility.lua:533
 
 ●void Auxiliary.AddDrytronSpSummonEffect(Card c, function func)
-TODO document.
+为c添加「龙辉巧」共通的从手牌或墓地特殊召唤自身的起动效果。
+该效果使用共通的解放费用、目标、操作包装函数以及特殊召唤限制计数器。
 Parameters:
   c: Card
   func: function
@@ -5947,21 +5948,23 @@ Parameters:
 Source: Utilities/utility.lua:1883
 
 ●void Auxiliary.AddMaterialCodeList(Card c, ... any)
-TODO document.
+为c登记1个或多个素材卡名编号，并同时把这些编号加入c的列名编号表。
+融合怪兽通常不需要使用此辅助函数。
 Parameters:
   c: Card
   ...: any
 Source: Utilities/utility.lua:498
 
 ●void Auxiliary.AddSetNameMonsterList(Card c, ... any)
-TODO document.
+为c登记其文本中列名的怪兽系列编号，供Auxiliary.IsSetNameMonsterListed等函数之后判断。复制效果时不处理。
 Parameters:
   c: Card
   ...: any
 Source: Utilities/utility.lua:553
 
 ●void Auxiliary.AddThisCardInGraveAlreadyCheck(Card c)
-TODO document.
+为c登记一个持续效果，用于记录把c送去墓地的效果。
+这样后续的墓地条件可以区分此卡原本就在墓地，还是被当前正在处理的效果送去墓地。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:1548
