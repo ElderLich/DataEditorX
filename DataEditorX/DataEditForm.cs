@@ -1261,7 +1261,7 @@ namespace DataEditorX
             {
                 tmpCodes.Clear();
                 string[] ids = YGOUtil.ReadYDK(dlg.FileName);
-                if (MessageBox.Show("Show cards outside of this YDK?", null, MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2) == DialogResult.Yes) {
+                if (MessageBox.Show("Show cards NOT in this YDK instead?", "YDK Filter", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes) {
                     SetCards(DataBase.Read(nowCdbFile, true, "SELECT datas.*,texts.* FROM datas,texts WHERE datas.id=texts.id and datas.id not in ("
                         + string.Join(",", ids) + ");"), false);
                     foreach (Card c in cardlist)
@@ -1307,38 +1307,13 @@ namespace DataEditorX
                 if (IDs.Count == 0)
                     return;
                 string[] names = IDs.ToArray();
-                if (MessageBox.Show("Show cards outside of this YDK?", null, MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2) == DialogResult.Yes) {
+                if (MessageBox.Show("Show cards NOT in this deck list instead?", "Deck List Filter", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes) {
                     SetCards(DataBase.Read(nowCdbFile, true, "SELECT datas.*,texts.* FROM datas,texts WHERE datas.id=texts.id and lower(name) not in (\"" + string.Join("\",\"", names) + "\");"), false);
                 } else {
                     SetCards(DataBase.Read(nowCdbFile, true, "SELECT datas.*,texts.* FROM datas,texts WHERE datas.id=texts.id and lower(name) in (\"" + string.Join("\",\"", names) + "\");"), false);
                 }
                 foreach (Card c in cardlist)
                     tmpCodes.Add(c.id.ToString());
-            }
-        }
-        //Read from image folder
-        void Menuitem_readimagesClick(object sender, EventArgs e)
-        {
-            if (!CheckOpen())
-            {
-                return;
-            }
-
-            using FolderBrowserDialog fdlg = new();
-            fdlg.Description = LanguageHelper.GetMsg(LMSG.SelectImagePath);
-            if (fdlg.ShowDialog() == DialogResult.OK)
-            {
-                tmpCodes.Clear();
-                string[] ids = YGOUtil.ReadImage(fdlg.SelectedPath);
-                if (MessageBox.Show("Show cards without an image?", null, MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button2) == DialogResult.Yes) {
-                    SetCards(DataBase.Read(nowCdbFile, true, "SELECT datas.*,texts.* FROM datas,texts WHERE datas.id=texts.id and alias=0 and datas.id not in (" + string.Join(",", ids) + ");"), false);
-                    foreach(Card c in cardlist)
-                        tmpCodes.Add(c.id.ToString());
-                } else {
-                    tmpCodes.AddRange(ids);
-                    SetCards(DataBase.Read(nowCdbFile, true,
-                                           ids.OrderBy(int.Parse).ToArray()), false);
-                }
             }
         }
         void Menuitem_readscriptsClick(object sender, EventArgs e)
@@ -1448,9 +1423,6 @@ namespace DataEditorX
                         break;
                     case MyTask.ExportData:
                         MyMsg.Show(LMSG.ExportDataOK);
-                        break;
-                    case MyTask.ConvertImages:
-                        MyMsg.Show(LMSG.ConvertImageOK);
                         break;
                 }
             }
@@ -1629,28 +1601,6 @@ namespace DataEditorX
             else
             {
                 pl_image.BackgroundImage = cover;
-            }
-        }
-        void Menuitem_convertimageClick(object sender, EventArgs e)
-        {
-            if (!CheckOpen())
-            {
-                return;
-            }
-
-            if (IsRun())
-            {
-                return;
-            }
-
-            using FolderBrowserDialog fdlg = new();
-            fdlg.Description = LanguageHelper.GetMsg(LMSG.SelectImagePath);
-            if (fdlg.ShowDialog() == DialogResult.OK)
-            {
-                bool isreplace = MyMsg.Question(LMSG.IfReplaceExistingImage);
-                tasker.SetTask(MyTask.ConvertImages, null,
-                               fdlg.SelectedPath, ygopath.gamepath, isreplace.ToString());
-                Run(LanguageHelper.GetMsg(LMSG.ConvertImage));
             }
         }
         #endregion
@@ -1938,32 +1888,6 @@ namespace DataEditorX
         }
         #endregion
 
-        void Menuitem_testPendulumTextClick(object sender, EventArgs e)
-        {
-            Card c = GetCard();
-            if (c != null)
-            {
-                TestPendulumText(c.desc);
-            }
-        }
-        void Menuitem_export_select_sqlClick(object sender, EventArgs e)
-        {
-            using SaveFileDialog dlg = new();
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                DataBase.ExportSql(dlg.FileName, GetCardList(true));
-                MyMsg.Show("OK");
-            }
-        }
-        void Menuitem_export_all_sqlClick(object sender, EventArgs e)
-        {
-            using SaveFileDialog dlg = new();
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                DataBase.ExportSql(dlg.FileName, GetCardList(false));
-                MyMsg.Show("OK");
-            }
-        }
         void Menuitem_autoreturnClick(object sender, EventArgs e)
         {
             if (!CheckOpen())
@@ -2172,23 +2096,6 @@ namespace DataEditorX
         {
             return TrySplitPendulumText(text, out _, out _)
                 || NormalizeCardText(text).StartsWith(PendulumScalePrefix, StringComparison.OrdinalIgnoreCase);
-        }
-        private static void TestPendulumText(string desc)
-        {
-            if (string.IsNullOrWhiteSpace(desc))
-            {
-                _ = MessageBox.Show("desc is null", "Info");
-                return;
-            }
-
-            if (!TrySplitPendulumText(desc, out string monsterText, out string pendulumText))
-            {
-                monsterText = NormalizeCardText(desc);
-                pendulumText = "";
-            }
-
-            _ = MessageBox.Show(monsterText, "Monster Effect");
-            _ = MessageBox.Show(pendulumText, "Pendulum Effect");
         }
         void TextToPendulum(object sender, EventArgs e)
         {

@@ -886,15 +886,5 @@ namespace DataEditorX.Core
         #endregion
         #endregion
 
-        public static void ExportSql(string file, params Card[] cards)
-        {
-            using FileStream fs = new(file, FileMode.Create, FileAccess.Write);
-            StreamWriter sw = new(fs, Encoding.UTF8);
-            foreach (Card c in cards)
-            {
-                sw.WriteLine(c.omega[0] > 0 ? OmegaGetInsertSQL(c, false, true) : GetInsertSQL(c, false, true));
-            }
-            sw.Close();
-        }
     }
 }

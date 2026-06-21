@@ -212,54 +212,6 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        //removed thumbnail
-        #region Convert images
-        public void ConvertImages(string imgpath, string gamepath, bool isreplace)
-        {
-            string picspath = MyPath.Combine(gamepath, "pics");
-            //string thubpath = MyPath.Combine(picspath, "thumbnail");
-            string[] files = Directory.GetFiles(imgpath);
-            int i = 0;
-            int count = files.Length;
-
-            foreach (string f in files)
-            {
-                if (isCancel)
-                {
-                    break;
-                }
-
-                i++;
-                worker.ReportProgress(i / count, string.Format("{0}/{1}", i, count));
-                string ex = Path.GetExtension(f).ToLower();
-                string name = Path.GetFileNameWithoutExtension(f);
-                string jpg_b = MyPath.Combine(picspath, name + ".jpg");
-                //string jpg_s = MyPath.Combine(thubpath, name + ".jpg");
-                if (ex == ".jpg" || ex == ".png" || ex == ".bmp")
-                {
-                    if (File.Exists(f))
-                    {
-                        Bitmap bmp = new(f);
-                        //Full image when replacing or missing
-                        if (isreplace || !File.Exists(jpg_b))
-                        {
-
-                            _ = MyBitmap.SaveAsJPEG(MyBitmap.Zoom(bmp, imgSet.W, imgSet.H),
-                                                jpg_b, imgSet.quality);
-                        }
-                        //Thumbnail when replacing or missing
-                        //if (isreplace || !File.Exists(jpg_s))
-                        //{
-                        //	MyBitmap.SaveAsJPEG(MyBitmap.Zoom(bmp, imgSet.w, imgSet.h),
-                        //						jpg_s, imgSet.quilty);
-
-                        //}
-                    }
-                }
-            }
-        }
-        #endregion
-
         public string Datapath { get; }
 
         #region Export data
@@ -337,7 +289,6 @@ namespace DataEditorX.Core
         {
             isCancel = false;
             isRun = true;
-            bool replace;
             bool showNew;
             switch (nowTask)
             {
@@ -354,20 +305,6 @@ namespace DataEditorX.Core
                         showNew = mArgs[0] == bool.TrueString;
                     }
                     OnCheckUpdate(showNew);
-                    break;
-                case MyTask.ConvertImages:
-                    if (mArgs != null && mArgs.Length >= 2)
-                    {
-                        replace = true;
-                        if (mArgs.Length >= 3)
-                        {
-                            if (mArgs[2] == bool.FalseString)
-                            {
-                                replace = false;
-                            }
-                        }
-                        ConvertImages(mArgs[0], mArgs[1], replace);
-                    }
                     break;
             }
             isRun = false;

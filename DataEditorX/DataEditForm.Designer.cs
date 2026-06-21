@@ -36,7 +36,6 @@ namespace DataEditorX
         private void InitializeComponent()
         {
             mainMenu = new MenuStrip();
-            menuitem_testpendulumtext = new ToolStripMenuItem();
             menu_data = new ToolStripMenuItem();
             menuitem_operacardsfile = new ToolStripMenuItem();
             menuitem_openfileinthis = new ToolStripMenuItem();
@@ -44,16 +43,11 @@ namespace DataEditorX
             tsep2 = new ToolStripSeparator();
             menuitem_readydk = new ToolStripMenuItem();
             menuitem_readlist = new ToolStripMenuItem();
-            menuitem_readimages = new ToolStripMenuItem();
             menuitem_readscripts = new ToolStripMenuItem();
             tsep6 = new ToolStripSeparator();
             menuitem_compdb = new ToolStripMenuItem();
-            menuitem_export_select_sql = new ToolStripMenuItem();
-            menuitem_export_all_sql = new ToolStripMenuItem();
             menuitem_findluafunc = new ToolStripMenuItem();
             menuitem_exportdata = new ToolStripMenuItem();
-            tsep5 = new ToolStripSeparator();
-            menuitem_convertimage = new ToolStripMenuItem();
             tsep1 = new ToolStripSeparator();
             menuitem_cancelTask = new ToolStripMenuItem();
             menuitem_autoreturn = new ToolStripMenuItem();
@@ -61,6 +55,7 @@ namespace DataEditorX
             menuitem_help = new ToolStripMenuItem();
             menuitem_about = new ToolStripMenuItem();
             menuitem_language = new ToolStripMenuItem();
+            menuitem_tools = new ToolStripMenuItem();
             menuitem_checkupdate = new ToolStripMenuItem();
             menuitem_autocheckupdate = new ToolStripMenuItem();
             menuitem_github = new ToolStripMenuItem();
@@ -147,7 +142,7 @@ namespace DataEditorX
             // 
             // menu_data
             // 
-            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_default_script, tsep2, menuitem_readydk, menuitem_readlist, menuitem_readimages, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_export_select_sql, menuitem_export_all_sql, menuitem_findluafunc, menuitem_exportdata, menuitem_testpendulumtext, tsep5, menuitem_convertimage, tsep1, menuitem_cancelTask, menuitem_autoreturn, menuitem_replace });
+            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_default_script, tsep2, menuitem_readydk, menuitem_readlist, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_exportdata, tsep1, menuitem_cancelTask, menuitem_autoreturn, menuitem_replace });
             menu_data.Name = "menu_data";
             menu_data.Size = new Size(57, 20);
             menu_data.Text = "Data(&T)";
@@ -182,22 +177,15 @@ namespace DataEditorX
             // 
             menuitem_readydk.Name = "menuitem_readydk";
             menuitem_readydk.Size = new Size(222, 22);
-            menuitem_readydk.Text = "Cards Form ydk file(&Y)";
+            menuitem_readydk.Text = "Read Cards from YDK File(&Y)";
             menuitem_readydk.Click += Menuitem_readydkClick;
             // 
             // menuitem_readlist
             // 
             menuitem_readlist.Name = "menuitem_readlist";
             menuitem_readlist.Size = new Size(222, 22);
-            menuitem_readlist.Text = "Cards Form deck list";
+            menuitem_readlist.Text = "Read from Deck List";
             menuitem_readlist.Click += Menuitem_readlistClick;
-            // 
-            // menuitem_readimages
-            // 
-            menuitem_readimages.Name = "menuitem_readimages";
-            menuitem_readimages.Size = new Size(222, 22);
-            menuitem_readimages.Text = "Cards From Images(&I)";
-            menuitem_readimages.Click += Menuitem_readimagesClick;
             // 
             // menuitem_readscripts
             // 
@@ -218,25 +206,11 @@ namespace DataEditorX
             menuitem_compdb.Text = "Compression DataBase";
             menuitem_compdb.Click += Menuitem_compdb_Click;
             // 
-            // menuitem_export_select_sql
-            // 
-            menuitem_export_select_sql.Name = "menuitem_export_select_sql";
-            menuitem_export_select_sql.Size = new Size(222, 22);
-            menuitem_export_select_sql.Text = "Export select to Sql";
-            menuitem_export_select_sql.Click += Menuitem_export_select_sqlClick;
-            // 
-            // menuitem_export_all_sql
-            // 
-            menuitem_export_all_sql.Name = "menuitem_export_all_sql";
-            menuitem_export_all_sql.Size = new Size(222, 22);
-            menuitem_export_all_sql.Text = "Export all to Sql";
-            menuitem_export_all_sql.Click += Menuitem_export_all_sqlClick;
-            // 
             // menuitem_findluafunc
             // 
             menuitem_findluafunc.Name = "menuitem_findluafunc";
-            menuitem_findluafunc.Size = new Size(222, 22);
-            menuitem_findluafunc.Text = "Find Lua Function";
+            menuitem_findluafunc.Size = new Size(236, 22);
+            menuitem_findluafunc.Text = "Find Lua Functions from C++";
             menuitem_findluafunc.Click += Menuitem_findluafunc_Click;
             // 
             // menuitem_exportdata
@@ -245,25 +219,6 @@ namespace DataEditorX
             menuitem_exportdata.Size = new Size(222, 22);
             menuitem_exportdata.Text = "Export Data";
             menuitem_exportdata.Click += Menuitem_exportdataClick;
-            // 
-            // menuitem_testpendulumtext
-            // 
-            menuitem_testpendulumtext.Name = "menuitem_testpendulumtext";
-            menuitem_testpendulumtext.Size = new Size(222, 22);
-            menuitem_testpendulumtext.Text = "Test Pendulum Text";
-            menuitem_testpendulumtext.Click += Menuitem_testPendulumTextClick;
-            // 
-            // tsep5
-            // 
-            tsep5.Name = "tsep5";
-            tsep5.Size = new Size(219, 6);
-            // 
-            // menuitem_convertimage
-            // 
-            menuitem_convertimage.Name = "menuitem_convertimage";
-            menuitem_convertimage.Size = new Size(222, 22);
-            menuitem_convertimage.Text = "Import Images";
-            menuitem_convertimage.Click += Menuitem_convertimageClick;
             // 
             // tsep1
             // 
@@ -293,7 +248,7 @@ namespace DataEditorX
             // 
             // menuitem_help
             // 
-            menuitem_help.DropDownItems.AddRange(new ToolStripItem[] { menuitem_about, menuitem_language, menuitem_checkupdate, menuitem_autocheckupdate, menuitem_github });
+            menuitem_help.DropDownItems.AddRange(new ToolStripItem[] { menuitem_about, menuitem_language, menuitem_tools, menuitem_checkupdate, menuitem_autocheckupdate, menuitem_github });
             menuitem_help.Name = "menuitem_help";
             menuitem_help.Size = new Size(61, 20);
             menuitem_help.Text = "Help(&H)";
@@ -311,6 +266,13 @@ namespace DataEditorX
             menuitem_language.Name = "menuitem_language";
             menuitem_language.Size = new Size(177, 22);
             menuitem_language.Text = "Language";
+            // 
+            // menuitem_tools
+            // 
+            menuitem_tools.DropDownItems.AddRange(new ToolStripItem[] { menuitem_findluafunc });
+            menuitem_tools.Name = "menuitem_tools";
+            menuitem_tools.Size = new Size(177, 22);
+            menuitem_tools.Text = "Tools";
             // 
             // menuitem_checkupdate
             // 
@@ -1158,7 +1120,6 @@ namespace DataEditorX
             PerformLayout();
         }
 
-        private System.Windows.Forms.ToolStripMenuItem menuitem_testpendulumtext;
         private System.Windows.Forms.ToolStripMenuItem menuitem_exportdata;
         private System.Windows.Forms.ToolStripMenuItem menu_data;
         private System.Windows.Forms.ToolStripMenuItem menuitem_cancelTask;
@@ -1167,8 +1128,6 @@ namespace DataEditorX
         private System.Windows.Forms.TextBox tb_setcode2;
         private System.Windows.Forms.TextBox tb_setcode3;
         private System.Windows.Forms.TextBox tb_setcode4;
-        private System.Windows.Forms.ToolStripSeparator tsep5;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_convertimage;
         private System.Windows.Forms.Button btn_img;
         private System.Windows.Forms.Button btn_undo;
         private System.ComponentModel.BackgroundWorker bgWorker1;
@@ -1221,7 +1180,6 @@ namespace DataEditorX
         private System.Windows.Forms.ToolStripMenuItem menuitem_checkupdate;
         private System.Windows.Forms.ToolStripMenuItem menuitem_about;
         private System.Windows.Forms.ToolStripMenuItem menuitem_help;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_readimages;
         private System.Windows.Forms.ToolStripMenuItem menuitem_readscripts;
         private System.Windows.Forms.ToolStripMenuItem menuitem_readydk;
         private System.Windows.Forms.ToolStripMenuItem menuitem_readlist;
@@ -1234,8 +1192,7 @@ namespace DataEditorX
 		private System.Windows.Forms.ToolStripMenuItem menuitem_openfileinthis;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_autocheckupdate;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_language;
-		private System.Windows.Forms.ToolStripMenuItem menuitem_export_select_sql;
-		private System.Windows.Forms.ToolStripMenuItem menuitem_export_all_sql;
+		private System.Windows.Forms.ToolStripMenuItem menuitem_tools;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_autoreturn;
         private System.Windows.Forms.ToolStripMenuItem menuitem_replace;
         private System.Windows.Forms.Label lb_markers;

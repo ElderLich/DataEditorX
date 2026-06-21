@@ -69,18 +69,14 @@ DataEditForm.mainMenu.menuitem_default_script	Default Script Name
 DataEditForm.mainMenu.menuitem_findluafunc	Find Lua Functions from C++ Code
 DataEditForm.mainMenu.menuitem_readydk	Read Cards from YDK File(&Y)
 DataEditForm.mainMenu.menuitem_readlist	Read from Deck List
-DataEditForm.mainMenu.menuitem_readimages	Read from Images Path(&I)
 DataEditForm.mainMenu.menuitem_readscripts	Read from Scripts Path
 DataEditForm.mainMenu.menuitem_compdb	Compress Database
 DataEditForm.mainMenu.menuitem_exportdata	Export Data as ZIP File
-DataEditForm.mainMenu.menuitem_testpendulumtext	Test Pendulum Texts
-DataEditForm.mainMenu.menuitem_convertimage	Convert Images
-DataEditForm.mainMenu.menuitem_export_all_sql	Export All Cards to SQL File
-DataEditForm.mainMenu.menuitem_export_select_sql	Export Selected Cards to SQL File
 DataEditForm.mainMenu.menuitem_cancelTask	Cancel Task
 DataEditForm.mainMenu.menuitem_help	Help(&H)
 DataEditForm.mainMenu.menuitem_about	Version Info
 DataEditForm.mainMenu.menuitem_language	Language
+DataEditForm.mainMenu.menuitem_tools	Tools
 DataEditForm.mainMenu.menuitem_checkupdate	Check for Updates
 DataEditForm.mainMenu.menuitem_autocheckupdate	Auto Check Update
 DataEditForm.mainMenu.menuitem_github	Source Code
@@ -128,7 +124,6 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x13	No database selected!
 0x14	Select database file
 0x15	Select ydk file
-0x16	Selcet image folder
 0x17	Download successfully!
 0x18	Downloading failed!
 0x19	No selected script text!
@@ -149,9 +144,6 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x28	Copying Database...
 0x29	Copied Database successfully.
 0x30	No card selected
-0x31	Replace Image while it already exists?
-0x32	Converting Images
-0x33	Convert Images OK
 0x34	Compression Database OK
 0x36	Task canceled
 0x37	Task paused

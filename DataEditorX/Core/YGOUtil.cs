@@ -220,19 +220,6 @@ namespace DataEditorX.Core
         #endregion
 
         #region Images
-        public static string[] ReadImage(string path)
-        {
-            List<string> list = new();
-            string[] files = Directory.GetFiles(path, "*.*");
-            int n = files.Length;
-            for (int i = 0; i < n; i++)
-            {
-                string ex = Path.GetExtension(files[i]).ToLower();
-                if ((ex == ".jpg" || ex == ".png" || ex == ".bmp") && int.TryParse(Path.GetFileNameWithoutExtension(files[i]), out int s))
-                        list.Add(s.ToString());
-            }
-            return list.ToArray();
-        }
         public static string[] ReadScript(string path)
         {
             List<string> list = new();

@@ -12,7 +12,5 @@ namespace DataEditorX.Core
         CheckUpdate,
         ///<summary>Export data</summary>
         ExportData,
-        ///<summary>Convert images</summary>
-        ConvertImages,
     }
 }
