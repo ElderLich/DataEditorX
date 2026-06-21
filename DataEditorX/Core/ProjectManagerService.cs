@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Text.RegularExpressions;
 
 namespace DataEditorX.Core
@@ -19,6 +20,8 @@ namespace DataEditorX.Core
         string Art2,
         string OverFrame,
         string MonsterCutin2);
+
+    internal sealed record ProjectPackageResult(string PackageFile, int FileCount);
 
     internal sealed class ProjectManagerService
     {
@@ -43,6 +46,20 @@ namespace DataEditorX.Core
                 Path.Combine(picture, "Art2"),
                 Path.Combine(picture, "OverFrame"),
                 Path.Combine(mdpro3Data, "StandaloneWindows64", "MonsterCutin2"));
+        }
+
+        public static string GetDefaultPackageName(string customProjectDirectory)
+        {
+            string name = string.IsNullOrWhiteSpace(customProjectDirectory)
+                ? "CustomProject"
+                : new DirectoryInfo(customProjectDirectory).Name;
+
+            foreach (char invalid in Path.GetInvalidFileNameChars())
+            {
+                name = name.Replace(invalid, '_');
+            }
+
+            return string.IsNullOrWhiteSpace(name) ? "CustomProject.ypk" : name + ".ypk";
         }
 
         public void InstallProject(string mdpro3Directory, string customProjectDirectory)
@@ -81,6 +98,61 @@ namespace DataEditorX.Core
             deleted += DeleteMatching(source.Expansions, destination.Expansions, file => HasExtension(file, ".conf"));
             deleted += DeleteMatching(source.MonsterCutin2, destination.MonsterCutin2, _ => true, allowMissingSource: true);
             log($"Project uninstall finished. {deleted} file(s) deleted.", ProjectManagerLogLevel.Success);
+        }
+
+        public ProjectPackageResult PackageProject(string customProjectDirectory, string packageFile)
+        {
+            ValidateDirectory(customProjectDirectory, "custom project directory");
+            if (string.IsNullOrWhiteSpace(packageFile))
+            {
+                throw new InvalidOperationException("Package file path is empty.");
+            }
+
+            string packageDirectory = Path.GetDirectoryName(packageFile);
+            if (!string.IsNullOrWhiteSpace(packageDirectory))
+            {
+                Directory.CreateDirectory(packageDirectory);
+            }
+
+            string tempPackageFile = packageFile + ".tmp";
+            if (File.Exists(tempPackageFile))
+            {
+                File.Delete(tempPackageFile);
+            }
+
+            log("Packaging custom card project...", ProjectManagerLogLevel.Info);
+            ProjectInstallPaths paths = BuildPaths(customProjectDirectory);
+            HashSet<string> entryNames = new(StringComparer.OrdinalIgnoreCase);
+            int count = 0;
+
+            using (ZipArchive archive = ZipFile.Open(tempPackageFile, ZipArchiveMode.Create))
+            {
+                count += AddFiles(archive, entryNames, paths.Expansions, "*.cdb", "", SearchOption.TopDirectoryOnly);
+                count += AddFiles(archive, entryNames, paths.Expansions, "*.conf", "", SearchOption.TopDirectoryOnly, ExcludePackageConfig);
+                count += AddFiles(archive, entryNames, paths.Scripts, "*", "script", SearchOption.AllDirectories, file => HasExtension(file, ".lua"));
+                count += AddFiles(archive, entryNames, paths.Closeups, "*", "pics", SearchOption.AllDirectories, IsImage, allowMissingSource: true);
+                count += AddFiles(archive, entryNames, paths.Art2, "*", "art", SearchOption.AllDirectories, IsImage, allowMissingSource: true);
+                count += AddFiles(archive, entryNames, paths.OverFrame, "*", "Picture/OverFrame", SearchOption.AllDirectories, IsImage, allowMissingSource: true);
+                count += AddFiles(archive, entryNames, paths.OverFrame, "*", "pics/overframe", SearchOption.AllDirectories, IsImage, allowMissingSource: true);
+                count += AddFiles(archive, entryNames, Path.Combine(paths.Root, "Deck"), "*.ydk", "pack", SearchOption.TopDirectoryOnly, allowMissingSource: true);
+                count += AddFiles(archive, entryNames, paths.MonsterCutin2, "*", "MDPro3_Data/StandaloneWindows64/MonsterCutin2", SearchOption.AllDirectories, _ => true, allowMissingSource: true);
+            }
+
+            if (count == 0)
+            {
+                File.Delete(tempPackageFile);
+                throw new InvalidOperationException("No packageable project files were found.");
+            }
+
+            if (File.Exists(packageFile))
+            {
+                File.Delete(packageFile);
+            }
+
+            File.Move(tempPackageFile, packageFile);
+            log($"Package created: {packageFile}", ProjectManagerLogLevel.Success);
+            log($"Packed {count} file(s).", ProjectManagerLogLevel.Success);
+            return new ProjectPackageResult(packageFile, count);
         }
 
         public void InstallVoicePack(string voicePackDirectory, string mdpro3Directory)
@@ -261,6 +333,54 @@ namespace DataEditorX.Core
             return count;
         }
 
+        private int AddFiles(
+            ZipArchive archive,
+            HashSet<string> entryNames,
+            string sourceDirectory,
+            string searchPattern,
+            string packageDirectory,
+            SearchOption searchOption,
+            Func<string, bool> predicate = null,
+            bool allowMissingSource = false)
+        {
+            if (!Directory.Exists(sourceDirectory))
+            {
+                if (!allowMissingSource)
+                {
+                    log($"Package source folder not found: {sourceDirectory}", ProjectManagerLogLevel.Warning);
+                }
+
+                return 0;
+            }
+
+            int count = 0;
+            foreach (string sourceFile in Directory.EnumerateFiles(sourceDirectory, searchPattern, searchOption))
+            {
+                if (predicate != null && !predicate(sourceFile))
+                {
+                    continue;
+                }
+
+                string relativeFile = Path.GetRelativePath(sourceDirectory, sourceFile);
+                string entryName = CombineEntryName(packageDirectory, relativeFile);
+                if (!entryNames.Add(entryName))
+                {
+                    log($"Skipping duplicate package entry: {entryName}", ProjectManagerLogLevel.Warning);
+                    continue;
+                }
+
+                archive.CreateEntryFromFile(sourceFile, entryName, CompressionLevel.Optimal);
+                count++;
+            }
+
+            if (count > 0)
+            {
+                log($"Packed {count} file(s) from {sourceDirectory}", ProjectManagerLogLevel.Success);
+            }
+
+            return count;
+        }
+
         private int DeleteMatching(string sourceDirectory, string destinationDirectory, Func<string, bool> predicate, bool allowMissingSource = false)
         {
             if (!Directory.Exists(sourceDirectory))
@@ -311,6 +431,21 @@ namespace DataEditorX.Core
             string extension = Path.GetExtension(file);
             return extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase)
                 || extension.Equals(".png", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool ExcludePackageConfig(string file)
+        {
+            return !Path.GetFileName(file).Equals("corres_srv.ini", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string CombineEntryName(string packageDirectory, string relativeFile)
+        {
+            string entryName = string.IsNullOrWhiteSpace(packageDirectory)
+                ? relativeFile
+                : Path.Combine(packageDirectory, relativeFile);
+
+            return entryName.Replace(Path.DirectorySeparatorChar, '/')
+                .Replace(Path.AltDirectorySeparatorChar, '/');
         }
 
         internal static bool SamePath(string left, string right)

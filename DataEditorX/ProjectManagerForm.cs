@@ -1,4 +1,5 @@
 using DataEditorX.Config;
+using DataEditorX.Common;
 using DataEditorX.Core;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -134,6 +135,8 @@ namespace DataEditorX
             Button uninstallProject = CreateActionButton("Uninstall", UninstallProjectClick);
             Button restartMdPro3 = CreateActionButton("(Re-)start MDPro3", RestartMdPro3Click);
             Button openCustomCdb = CreateActionButton("Open .cdb", OpenCustomCdbClick);
+            Button openProjectFolder = CreateActionButton("Open Project Folder", OpenProjectFolderClick);
+            Button packageProject = CreateActionButton("Package as .ypk", PackageProjectClick);
             chkActiveSync = new CheckBox
             {
                 Name = "chk_activeSync",
@@ -147,6 +150,8 @@ namespace DataEditorX
             actions.Controls.Add(uninstallProject);
             actions.Controls.Add(restartMdPro3);
             actions.Controls.Add(openCustomCdb);
+            actions.Controls.Add(openProjectFolder);
+            actions.Controls.Add(packageProject);
             actions.Controls.Add(chkActiveSync);
             layout.Controls.Add(actions, 0, 1);
 
@@ -551,6 +556,66 @@ namespace DataEditorX
             else
             {
                 Log("Could not find the main workspace window.", ProjectManagerLogLevel.Error);
+            }
+        }
+
+        private void OpenProjectFolderClick(object sender, EventArgs e)
+        {
+            SaveSettings();
+
+            string customProjectDirectory = tbCustomProjectDirectory.Text;
+            if (string.IsNullOrWhiteSpace(customProjectDirectory) || !Directory.Exists(customProjectDirectory))
+            {
+                _ = MessageBox.Show(this, $"Custom project folder was not found:\n{customProjectDirectory}",
+                    "Project Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (MyUtils.OpenShellTarget(customProjectDirectory))
+            {
+                Log($"Opened project folder: {customProjectDirectory}", ProjectManagerLogLevel.Success);
+            }
+            else
+            {
+                Log($"Could not open project folder: {customProjectDirectory}", ProjectManagerLogLevel.Error);
+            }
+        }
+
+        private async void PackageProjectClick(object sender, EventArgs e)
+        {
+            SaveSettings();
+
+            string customProjectDirectory = tbCustomProjectDirectory.Text;
+            if (string.IsNullOrWhiteSpace(customProjectDirectory) || !Directory.Exists(customProjectDirectory))
+            {
+                _ = MessageBox.Show(this, $"Custom project folder was not found:\n{customProjectDirectory}",
+                    "Project Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            using SaveFileDialog dialog = new()
+            {
+                AddExtension = true,
+                DefaultExt = "ypk",
+                FileName = ProjectManagerService.GetDefaultPackageName(customProjectDirectory),
+                Filter = "MDPro3 packages (*.ypk)|*.ypk|All files (*.*)|*.*",
+                FilterIndex = 1,
+                InitialDirectory = customProjectDirectory,
+                OverwritePrompt = true,
+                Title = "Package custom project"
+            };
+
+            if (dialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            ProjectPackageResult result = null;
+            await RunOperationAsync(() => result = service.PackageProject(customProjectDirectory, dialog.FileName));
+            if (result != null)
+            {
+                _ = MessageBox.Show(this, $"Package created:\n{result.PackageFile}\n\n{result.FileCount} file(s) packed.",
+                    "Project Manager", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
