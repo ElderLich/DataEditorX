@@ -124,7 +124,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3527
 
 ●Card Card.CheckUnionTarget(Card c, Card ec)
-TODO document.
+Check if ec is a valid Union Equip target for c. Checks for EFFECT_UNION_LIMIT and new/old Union effects.
 Parameters:
   c: Card
   ec: Card
@@ -275,7 +275,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3431
 
 ●int Card.GetAttributeInGrave(Card c, [int reasonPlayer])
-TODO document.
+Return the Attribute card c is treated as having in the Graveyard
 Parameters:
   c: Card
   reasonPlayer: int optional
@@ -358,7 +358,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3386
 
 ●Group Card.GetColumnGroup(Card c, [int left], [int right])
-TODO document.
+Return the group of cards in the same column as card c, excluding c, the last two parameters include all cards in the left columns and right columns from c
+For example, if c is in the middle zone, c:GetColumnGroup(2,2) is equivalent to retrieving all cards on the field except the Field Spell
 Parameters:
   c: Card
   left: int optional - default: 0
@@ -368,7 +369,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3427
 
 ●int Card.GetColumnGroupCount(Card c, [int left], [int right])
-TODO document.
+Usage is the same as above, but returns the number of cards
 Parameters:
   c: Card
   left: int optional - default: 0
@@ -378,7 +379,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3428
 
 ●int Card.GetColumnZone(Card c, int location, [int left], [int right], [int player])
-TODO document.
+Return the zones [from player's perspective] within the location range that are in the same column as card c [including left columns and right columns], location values are LOCATION_MZONE, LOCATION_SZONE, LOCATION_ONFIELD
 Parameters:
   c: Card
   location: int
@@ -407,7 +408,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3630
 
 ●int Card.GetCurrentScale(Card c)
-TODO document.
+Return the current Pendulum Scale of card c. If in the Left Pendulum Zone, return the left scale; if in the Right Pendulum Zone or not in a Pendulum Zone, return the right scale
 Parameters:
   c: Card
 Returns:
@@ -502,7 +503,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3556
 
 ●int Card.GetFusionAttribute(Card c, [int player])
-TODO document.
+Return the Attribute of card c when used as Fusion Material [for a Fusion Summon by player]
 Parameters:
   c: Card
   player: int optional
@@ -521,7 +522,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3389
 
 ●int Card.GetFusionType(Card c)
-TODO document.
+Return the type of card c when used as Fusion Material (unlike GetType, for monster cards in the Spell/Trap Zone, it returns their original type)
 Parameters:
   c: Card
 Returns:
@@ -529,7 +530,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3401
 
 ●nil|Effect,function|nil,int|nil,int|nil Card.GetHandSynchro(Card c)
-TODO document.
+If card c is affected by the hand Synchro effect EFFECT_HAND_SYNCHRO, return Effect e, function target, int min, int max; otherwise return nil
 Parameters:
   c: Card
 Returns:
@@ -564,7 +565,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3405
 
 ●int Card.GetLink(Card c)
-TODO document.
+Return the Link Marker count of card c
 Parameters:
   c: Card
 Returns:
@@ -572,7 +573,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3407
 
 ●int Card.GetLinkAttribute(Card c, [int player])
-TODO document.
+Return the Attribute of card c when used as Link Material [for a Link Summon by player]
 Parameters:
   c: Card
   player: int optional
@@ -581,7 +582,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3434
 
 ●int,int|nil,...|nil Card.GetLinkCode(Card c)
-TODO document.
+Return the card code(s) of card c when used as Link Material (including c's original card code)
 Parameters:
   c: Card
 Returns:
@@ -591,7 +592,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3390
 
 ●Group Card.GetLinkedGroup(Card c)
-TODO document.
+Return the group of cards in the zones linked to card c
 Parameters:
   c: Card
 Returns:
@@ -599,7 +600,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3419
 
 ●int Card.GetLinkedGroupCount(Card c)
-TODO document.
+Return the number of monster cards in the zones linked to card c
 Parameters:
   c: Card
 Returns:
@@ -607,7 +608,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3420
 
 ●int Card.GetLinkedZone(Card c, [int player])
-TODO document.
+Return the [from player's perspective on the field] Link Zones of card c
 Parameters:
   c: Card
   player: int optional - default: c:GetControler()
@@ -616,7 +617,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3421
 
 ●int Card.GetLinkRace(Card c, [int player])
-TODO document.
+Return the Race of card c when used as Link Material [for a Link Summon by player]
 Parameters:
   c: Card
   player: int optional
@@ -625,7 +626,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3438
 
 ●int Card.GetLinkType(Card c)
-TODO document.
+Return the type of card c when used as Link Material (unlike GetType, for monster cards in the Spell/Trap Zone, it returns their original type)
 Parameters:
   c: Card
 Returns:
@@ -657,7 +658,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3516
 
 ●Group Card.GetMutualLinkedGroup(Card c)
-TODO document.
+Return the group of cards mutually linked with card c
 Parameters:
   c: Card
 Returns:
@@ -665,7 +666,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3422
 
 ●int Card.GetMutualLinkedGroupCount(Card c)
-TODO document.
+Return the number of cards in the group mutually linked with card c
 Parameters:
   c: Card
 Returns:
@@ -673,7 +674,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3423
 
 ●int Card.GetMutualLinkedZone(Card c, [int player])
-TODO document.
+Return the [from player's perspective] zones where cards mutually linked with card c are located
 Parameters:
   c: Card
   player: int optional - default: c:GetControler()
@@ -933,7 +934,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3436
 
 ●int Card.GetRaceInGrave(Card c, [int reasonPlayer])
-TODO document.
+Return the Race card c is treated as having in the Graveyard
 Parameters:
   c: Card
   reasonPlayer: int optional
@@ -1064,7 +1065,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3408
 
 ●int Card.GetSynchroType(Card c)
-TODO document.
+Return the type of card c when used as Synchro Material (unlike GetType, for monster cards in the Spell/Trap Zone, it returns their original type)
 Parameters:
   c: Card
 Returns:
@@ -1097,7 +1098,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3652
 
 ●nil|Effect,function|nil,int|nil,int|nil,int|nil Card.GetTunerLimit(Card c)
-TODO document.
+If card c is affected by the Tuner Material restriction effect EFFECT_TUNER_MATERIAL_LIMIT, return Effect e, function target, int value, int min, int max; otherwise return nil
 Parameters:
   c: Card
 Returns:
@@ -1142,7 +1143,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3523
 
 ●int Card.GetXyzType(Card c)
-TODO document.
+Return the type of card c when used as Xyz Material (unlike GetType, for monster cards in the Spell/Trap Zone, it returns their original type)
 Parameters:
   c: Card
 Returns:
@@ -1254,7 +1255,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3594
 
 ●bool Card.IsAllColumn(Card c)
-TODO document.
+Check if all zones in the same column as card c have cards
 Parameters:
   c: Card
 Returns:
@@ -1280,7 +1281,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3482
 
 ●bool Card.IsAttack(Card c, int atk1, [int atk2], [... int])
-TODO document.
+Check if card c's ATK is atk1 [, or atk2...], returns false if c is not a monster card or not in LOCATION_MZONE
 Parameters:
   c: Card
   atk1: int
@@ -1385,7 +1386,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3639
 
 ●bool Card.IsCanBeLinkMaterial(Card c, [Card|nil sc])
-TODO document.
+Check if c can be used as Link Material [for Link Monster sc]; if sc is not specified, must pass nil
 Parameters:
   c: Card
   sc: Card|nil optional
@@ -1394,7 +1395,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3643
 
 ●bool Card.IsCanBePlacedOnField(Card c, [int toplayer], [int tolocation])
-Checks whether c can be placed onto the field.
+Checks whether c can be placed onto the target player's field.
+Returns false if the target player is invalid, c is forbidden, or placing c there would violate uniqueness checks.
 Parameters:
   c: Card
   toplayer: int optional - Target player. Defaults to the current reason player.
@@ -1449,7 +1451,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3642
 
 ●bool Card.IsCanChangePosition(Card c)
-TODO document.
+Check if c can have its battle position changed by an effect
 Parameters:
   c: Card
 Returns:
@@ -1457,7 +1459,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3633
 
 ●bool Card.IsCanHaveCounter(Card c, int countertype)
-TODO document.
+Check if countertype counters can be placed on c
 Parameters:
   c: Card
   countertype: int
@@ -1466,7 +1468,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3637
 
 ●bool Card.IsCanOverlay(Card c, [int player])
-TODO document.
+Check if c can be used as Xyz Material
 Parameters:
   c: Card
   player: int optional
@@ -1537,7 +1539,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3627
 
 ●bool Card.IsDefense(Card c, int def, [int atk2], [... int])
-TODO document.
+Check if c's DEF is def1 [, or def2...]; returns false if c is not a monster card or not in LOCATION_MZONE
 Parameters:
   c: Card
   def: int
@@ -1627,7 +1629,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3508
 
 ●bool Card.IsExtraDeckMonster(Card c)
-TODO document.
+Check if c is originally a Fusion, Synchro, Xyz, or Link Monster. This function only checks the type, regardless of the monster's current state
 Parameters:
   c: Card
 Returns:
@@ -1635,7 +1637,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3498
 
 ●bool Card.IsExtraLinkState(Card c)
-TODO document.
+Check if card c is in an Extra Link state
 Parameters:
   c: Card
 Returns:
@@ -1675,7 +1677,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3625
 
 ●bool Card.IsFusionAttribute(Card c, int attribute, [int player])
-TODO document.
+Check if card c, when used as Fusion Material [for a Fusion Summon by player], has Attribute attribute
 Parameters:
   c: Card
   attribute: int
@@ -1704,7 +1706,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3396
 
 ●bool Card.IsFusionSummonableCard(Card c, [int sum_type])
-TODO document.
+Check if card c can be Fusion Summoned [using sum_type method]
 Parameters:
   c: Card
   sum_type: int optional
@@ -1713,7 +1715,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3574
 
 ●bool Card.IsFusionType(Card c, int type)
-TODO document.
+Check if card c, when used as Fusion Material, has type type (unlike IsType, for monster cards in the Spell/Trap Zone, it uses their original type for judgment)
 Parameters:
   c: Card
   type: int
@@ -1767,7 +1769,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3646
 
 ●bool Card.IsLevel(Card c, int level1, [int level2], [... int])
-TODO document.
+Check if card c is Level level1 [, or level2...]
 Parameters:
   c: Card
   level1: int
@@ -1796,7 +1798,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3612
 
 ●bool Card.IsLink(Card c, int link1, [int link2], [... int])
-TODO document.
+Check if card c's Link Marker count is link1 [, or link2...]
 Parameters:
   c: Card
   link1: int
@@ -1807,7 +1809,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3489
 
 ●bool Card.IsLinkAbove(Card c, int link)
-TODO document.
+Check if card c's Link Marker count is link or higher
 Parameters:
   c: Card
   link: int
@@ -1816,7 +1818,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3617
 
 ●bool Card.IsLinkAttribute(Card c, int attribute, [int player])
-TODO document.
+Check if card c, when used as Link Material [for a Link Summon by player], has Attribute attribute
 Parameters:
   c: Card
   attribute: int
@@ -1826,7 +1828,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3496
 
 ●bool Card.IsLinkBelow(Card c, int link)
-TODO document.
+Check if card c's Link Marker count is link or lower (at least 1)
 Parameters:
   c: Card
   link: int
@@ -1835,7 +1837,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3616
 
 ●bool Card.IsLinkCode(Card c, int code, [... int])
-TODO document.
+Check if card c, when used as Link Material, can be treated as a card with code, additional parameters are other codes
 Parameters:
   c: Card
   code: int
@@ -1845,7 +1847,16 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3392
 
 ●bool Card.IsLinkMarker(Card c, int dir)
-TODO document.
+Check if card c has a Link Marker in direction dir
+dir values are:
+LINK_MARKER_BOTTOM_LEFT =0x001 -- ↙
+LINK_MARKER_BOTTOM      =0x002 -- ↓
+LINK_MARKER_BOTTOM_RIGHT=0x004 -- ↘
+LINK_MARKER_LEFT        =0x008 -- ←
+LINK_MARKER_RIGHT       =0x020 -- →
+LINK_MARKER_TOP_LEFT    =0x040 -- ↖
+LINK_MARKER_TOP         =0x080 -- ↑
+LINK_MARKER_TOP_RIGHT   =0x100 -- ↗
 Parameters:
   c: Card
   dir: int
@@ -1854,7 +1865,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3418
 
 ●bool Card.IsLinkRace(Card c, int race, [int player])
-TODO document.
+Check if card c, when used as Link Material [for a Link Summon by player], has Race race
 Parameters:
   c: Card
   race: int
@@ -1864,7 +1875,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3493
 
 ●bool Card.IsLinkSetCard(Card c, ... int)
-TODO document.
+Check if card c, when used as Link Material, can be treated as a card with setname in its name
 Parameters:
   c: Card
   ...: int
@@ -1873,7 +1884,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3397
 
 ●bool Card.IsLinkState(Card c)
-TODO document.
+Check if card c is in a linked state
 Parameters:
   c: Card
 Returns:
@@ -1881,7 +1892,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3425
 
 ●bool Card.IsLinkSummonable(Card c, [Group|nil mg], [int min], [int max])
-TODO document.
+Check if card c can be Link Summoned using [min-max Link Materials] from cards on the field [or mg]
+If mg is nil, this function is equivalent to c:IsSpecialSummonable(SUMMON_TYPE_LINK)
 Parameters:
   c: Card
   mg: Group|nil optional
@@ -1892,7 +1904,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3578
 
 ●bool Card.IsLinkType(Card c, int type)
-TODO document.
+Check if card c, when used as Link Material, has type type (unlike IsType, for monster cards in the Spell/Trap Zone, it uses their original type for judgment)
 Parameters:
   c: Card
   type: int
@@ -1953,7 +1965,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3609
 
 ●bool Card.IsOriginalCodeRule(Card c, int code)
-TODO document.
+Check if card c is treated as code under the rules
 Parameters:
   c: Card
   code: int
@@ -1971,7 +1983,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3507
 
 ●bool Card.IsOriginalSetCard(Card c, ... int)
-TODO document.
+Check if card c is originally a card with setname in its name
 Parameters:
   c: Card
   ...: int
@@ -1989,7 +2001,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3605
 
 ●bool Card.IsPreviousControler(Card c, int player)
-TODO document.
+Check if card c's previous controller was player
 Parameters:
   c: Card
   player: int
@@ -2042,7 +2054,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3492
 
 ●bool Card.IsRank(Card c, int rank1, [int rank2], [... int])
-TODO document.
+Check if card c is Rank rank1 [, or rank2...]
 Parameters:
   c: Card
   rank1: int
@@ -2213,7 +2225,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3572
 
 ●bool Card.IsSummonLocation(Card c, int loc)
-TODO document.
+Check if card c's Normal Summon or Special Summon location is loc
 Parameters:
   c: Card
   loc: int
@@ -2222,7 +2234,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3502
 
 ●bool Card.IsSummonPlayer(Card c, int player)
-TODO document.
+Check if the player who Normal Summoned or Special Summoned card c is player
 Parameters:
   c: Card
   player: int
@@ -2231,7 +2243,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3503
 
 ●bool Card.IsSummonType(Card c, int sumtype)
-TODO document.
+Check if card c's summon type is sumtype
 Parameters:
   c: Card
   sumtype: int
@@ -2251,7 +2263,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3576
 
 ●bool Card.IsSynchroType(Card c, int type)
-TODO document.
+Check if card c, when used as Synchro Material, has type type (unlike IsType, for monster cards in the Spell/Trap Zone, it uses their original type for judgment)
 Parameters:
   c: Card
   type: int
@@ -2301,7 +2313,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3577
 
 ●bool Card.IsXyzType(Card c, int type)
-TODO document.
+Check if card c, when used as Xyz Material, has type type (unlike IsType, for monster cards in the Spell/Trap Zone, it uses their original type for judgment)
 Parameters:
   c: Card
   type: int
@@ -2471,7 +2483,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3514
 
 ●bool Card.SetReason(Card c, int reason)
-TODO document.
+Set the reason for card c arriving at its current position to reason
 Parameters:
   c: Card
   reason: int
@@ -2604,7 +2616,8 @@ Source: D:\Programs\GitHub\ygopro-core\libdebug.cpp:212
 
 ========== Duel ==========
 ●void Duel.Activate(Effect e)
-TODO document.
+Activate effect e
+NOTE: The original description includes a question mark (?), indicating potential uncertainty or incomplete information;
 Parameters:
   e: Effect
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4886
@@ -2931,7 +2944,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4897
 
 ●Group Duel.CheckTribute(Card c, int min, [int|nil max], [Group|nil mg], [int|nil toplayer], [int|nil zone])
-TODO document.
+Check if there are min [to max] Tributes on the field [or in mg] for Normal Summoning c [to toplayer's field in zone]
 Parameters:
   c: Card
   min: int
@@ -2972,7 +2985,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5012
 
 ●void Duel.ClearOperationInfo(int chainc)
-TODO document.
+Clear the OperationInfo of chain chainc; used for cases like Fallen Angel copying and using Graveyard effects, where card effects should not be responded to
 Parameters:
   chainc: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5011
@@ -2997,7 +3010,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4890
 
 ●void Duel.ConfirmExtratop(int player, int count)
-TODO document.
+Confirm the top count face-down cards in player's Extra Deck
 Parameters:
   player: int
   count: int
@@ -3039,7 +3052,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4858
 
 ●void Duel.DisableSelfDestroyCheck([bool enabled])
-TODO document.
+Disable card self-destruction checks; no parameter or enabled=true disables the check, enabled=false enables the check
 Parameters:
   enabled: bool optional - default: true
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4913
@@ -3162,7 +3175,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5070
 
 ●Card,Card Duel.GetBattleMonster(int player)
-TODO document.
+Return the monster controlled by player currently in battle; returns nil if there is no battle or no target
 Parameters:
   player: int
 Returns:
@@ -3171,7 +3184,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4959
 
 ●Group,int,int,Effect,int,int Duel.GetChainEvent(int chainc)
-TODO document.
+Return the parameters related to chain chainc; if chainc=0, return parameters for the currently processed chain
+Returns six parameters: eg, ep, ev, re, r, rp
 Parameters:
   chainc: int
 Returns:
@@ -3308,7 +3322,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4851
 
 ●Group Duel.GetExtraTopGroup(int player, int count)
-TODO document.
+Return the top count face-up cards in player's Extra Deck
 Parameters:
   player: int
   count: int
@@ -3377,7 +3391,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4854
 
 ●int,...? Duel.GetFlagEffectLabel(int player, int code)
-TODO document.
+Return the Label of the flag effect of type code for player; return nil if no such effect exists
 Parameters:
   player: int
   code: int
@@ -3387,7 +3401,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4857
 
 ●Group,Group Duel.GetFusionMaterial(int player, [int location])
-TODO document.
+Return the group of cards available to player for Fusion Summon materials
+Includes monsters in hand, on the field, and cards affected by EFFECT_EXTRA_FUSION_MATERIAL
 Parameters:
   player: int
   location: int optional - default: LOCATION_HAND + LOCATION_MZONE
@@ -3405,7 +3420,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5020
 
 ●Group Duel.GetLinkedGroup(int player, int s_range, int o_range)
-TODO document.
+Return the group of linked cards in s_range and o_range zones from player's perspective [as long as the last two parameters are not 0, they become LOCATION_MZONE]
+NOTE: The original description includes a question mark (?), indicating potential uncertainty or incomplete information; translated as written
 Parameters:
   player: int
   s_range: int
@@ -3415,7 +3431,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4940
 
 ●int Duel.GetLinkedGroupCount(int player, int s_range, int o_range)
-TODO document.
+Return the number of linked cards in s_range and o_range zones from player's perspective
+NOTE: The original description includes a question mark (?), indicating potential uncertainty or incomplete information; translated as written
 Parameters:
   player: int
   s_range: int
@@ -3425,7 +3442,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4941
 
 ●int Duel.GetLinkedZone(int player)
-TODO document.
+Return all Link Zones from player's perspective
 Parameters:
   player: int
 Returns:
@@ -3447,7 +3464,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4935
 
 ●int Duel.GetLocationCountFromEx(int player, [int reason_player], [Group|Card|nil targets], [Card|int sc], [int zone])
-TODO document.
+Return the number of available slots on player's field [after targets leave due to reason_player] for Special Summoning card sc from the Extra Deck in zone
 Parameters:
   player: int
   reason_player: int optional - default: player
@@ -3503,7 +3520,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4987
 
 ●int,int Duel.GetMZoneCount(int player, [Group|Card targets], [int use_player], [int reason], [int zone])
-TODO document.
+Return the number of available [zone slots] in the Monster Zone on player's field [after targets leave]
 Parameters:
   player: int
   targets: Group|Card optional
@@ -3603,7 +3620,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4997
 
 ●Group Duel.GetRitualMaterialEx(int player)
-TODO document.
+Returns the group of cards player can use as Ritual Material, including monsters without a Level.
 Parameters:
   player: int
 Returns:
@@ -3686,7 +3703,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4849
 
 ●int Duel.GetUsableMZoneCount(int player, [int use_player])
-TODO document.
+Return the number of available Monster Zones on player's field [for use_player]
+NOTE: The original description includes a question mark (?), indicating potential uncertainty or incomplete information; translated as written
 Parameters:
   player: int
   use_player: int optional
@@ -3695,7 +3713,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4939
 
 ●Group Duel.GrabSelectedCard()
-TODO document.
+Return the card or group of cards set by Duel.SetSelectedCard
+Has no effect when used alone; must be used with Duel.SetSelectedCard first
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5003
@@ -3861,7 +3880,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5043
 
 ●bool Duel.IsPlayerCanAdditionalSummon(int player)
-TODO document.
+Check if player has additional summon counts beyond Normal Summon
 Parameters:
   player: int
 Returns:
@@ -3905,7 +3924,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5051
 
 ●bool Duel.IsPlayerCanMSet(int player, [int sumtype], [Card scard])
-TODO document.
+Check if player can Set [scard using sumtype summon method]
+If optional parameters are included, both must be provided
 Parameters:
   player: int
   sumtype: int optional
@@ -4004,7 +4024,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5052
 
 ●bool Duel.IsPlayerCanSSet(int player, [Card scard])
-TODO document.
+Check if player can Set [scard]
 Parameters:
   player: int
   scard: Card optional
@@ -4025,7 +4045,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5047
 
 ●bool Duel.IsSummonCancelable()
-TODO document.
+Return whether the current Special Summon action can be rolled back and canceled
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5001
@@ -4039,7 +4059,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4848
 
 ●void Duel.LinkSummon(int player, Card pcard, [Group|nil mg], [Card lcard], [int minc], [int maxc])
-TODO document.
+Have player Link Summon pcard using [minc to maxc cards from mg, excluding lcard] as materials
 Parameters:
   player: int
   pcard: Card
@@ -4294,7 +4314,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4914
 
 ●int Duel.RockPaperScissors([bool repeated])
-TODO document.
+Perform Rock-Paper-Scissors; if repeat=false, perform once; otherwise, continue until a winner is determined. Return the winning player's number
 Parameters:
   repeated: bool optional - default: true
 Returns:
@@ -4326,7 +4346,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5022
 
 ●int Duel.SelectField(int player, int count, int loc1, int loc2, int zone, [int code])
-TODO document.
+Have player select zones; flag1 is the low bit, flag2 is the high bit, together forming the selectable zones; count is the number of zones to choose
+Return the selected zones
 Parameters:
   player: int
   count: int
@@ -4418,7 +4439,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4979
 
 ●void Duel.SelectSequence()
-TODO document.
+This function only has a check_action_permission operation, purpose unknown
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5025
 
 ●Group Duel.SelectSynchroMaterial(int player, Card c, [function|nil f1], [function|nil f2], int min, int max, [Card|nil smat], [Group|nil mg])
@@ -4567,7 +4588,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4887
 
 ●void Duel.SetChainLimitTillChainEnd(function f)
-TODO document.
+Same as Duel.SetChainLimit, but the chain limit set by this function persists until the chain ends
 Parameters:
   f: function
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4888
@@ -4589,7 +4610,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5042
 
 ●bool Duel.SetFlagEffectLabel(int player, int code, int label)
-TODO document.
+Return whether player has a flag effect of type code and set its Label property to label
 Parameters:
   player: int
   code: int
@@ -4673,7 +4694,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4915
 
 ●void Duel.ShuffleExtra(int player)
-TODO document.
+Manually shuffle player's Extra Deck
 Parameters:
   player: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4916
@@ -4801,7 +4822,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5072
 
 ●void Duel.SwapSequence(Card c1, Card c2)
-TODO document.
+Swap the positions of c1 and c2
 Parameters:
   c1: Card
   c2: Card
@@ -4858,7 +4879,7 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4868
 
 ========== Effect ==========
 ●bool Effect.CheckCountLimit(Effect e, int p)
-TODO document.
+Check if player p has remaining activation counts for effect e
 Parameters:
   e: Effect
   p: int
@@ -4892,7 +4913,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:658
 
 ●int Effect.GetActivateSequence(Effect e)
-TODO document.
+Return the sequence number of the activation location of effect e
 Parameters:
   e: Effect
 Returns:
@@ -5022,7 +5043,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:634
 
 ●int Effect.GetRange(Effect e)
-TODO document.
+Return the Range property of effect e
 Parameters:
   e: Effect
 Returns:
@@ -5300,7 +5321,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:628
 
 ●void Effect.UseCountLimit(Effect e, int p, [int count], [bool oath_only])
-TODO document.
+Manually reduce player p's available activation count for effect e by count [oath_only indicates whether the effect is EFFECT_FLAG_OATH]
 Parameters:
   e: Effect
   p: int
@@ -5310,7 +5331,7 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:661
 
 ========== Group ==========
 ●Group Group.__add(Group|Card left, Group|Card right)
-TODO document.
+Create a new card group, add all cards from target1 and target2 to this group, and return it; if there are duplicate cards, they are added only once; target1 and target2 remain unchanged
 Parameters:
   left: Group|Card
   right: Group|Card
@@ -5319,7 +5340,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:935
 
 ●Group Group.__band(Group|Card left, Group|Card right)
-TODO document.
+Create a new card group, add all cards that are identical in target1 and target2 (i.e., cards present in both) to this group, and return it; target1 and target2 remain unchanged
 Parameters:
   left: Group|Card
   right: Group|Card
@@ -5328,7 +5349,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:938
 
 ●Group Group.__bor(Group|Card left, Group|Card right)
-TODO document.
+Code is identical to Group.__add
 Parameters:
   left: Group|Card
   right: Group|Card
@@ -5337,7 +5358,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:936
 
 ●Group Group.__bxor(Group|Card left, Group|Card right)
-TODO document.
+Create a new card group, add all cards that are different between target1 and target2 (i.e., cards present in only target1 or target2) to this group, and return it; target1 and target2 remain unchanged
 Parameters:
   left: Group|Card
   right: Group|Card
@@ -5346,7 +5367,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:939
 
 ●int Group.__len(Group g)
-TODO document.
+Same as Group.GetCount
 Parameters:
   g: Group
 Returns:
@@ -5354,7 +5375,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:911
 
 ●Group Group.__sub(Group|Card left, Group|Card right)
-TODO document.
+Create a new card group, add all cards from target1 to this group, then remove all cards from target2, and return the resulting group; target1 and target2 remain unchanged
 Parameters:
   left: Group|Card
   right: Group|Card
@@ -5495,7 +5516,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:904
 
 ●int Group.GetBinClassCount(Group g, function f, ... any)
-TODO document.
+Similar to Group.GetClassCount, but uses a different algorithm (bitwise operations)
 Parameters:
   g: Group
   f: function
@@ -5661,7 +5682,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:915
 
 ●Card|nil Group.SelectUnselect(Group cg, [Group|nil sg], int player, bool btok, bool cancelable, int minc, int maxc)
-TODO document.
+Have player select 1 card from cg to add to sg and return the selected card
+btok indicates whether the confirm selection button is available, cancelable indicates whether selected cards can be canceled
+minc and maxc are client-side text buffer prompts indicating the need to select minc-maxc cards, but this only affects visual display and does not enforce the selection count
 Parameters:
   cg: Group
   sg: Group|nil optional - 已选的卡，可以从中取消选择
@@ -5924,7 +5947,11 @@ Parameters:
 Source: Utilities/utility.lua:1946
 
 ●void Auxiliary.bdcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Check if e:GetHandler() is related to the current battle, typically used for the condition of EVENT_BATTLE_DESTROYING
+function Auxiliary.bdcon(e, tp, eg, ep, ev, re, r, rp)
+  local c=e:GetHandler()
+  return c:IsRelateToBattle()
+end
 Parameters:
   e: Effect
   tp: int
@@ -5937,7 +5964,12 @@ Parameters:
 Source: Utilities/utility.lua:764
 
 ●void Auxiliary.bdgcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Check if e:GetHandler() is related to the current battle, typically used for EVENT_BATTLE_DESTROYING and when an opponent's monster is destroyed by battle and sent to the Graveyard, as a condition
+function Auxiliary.bdgcon(e, tp, eg, ep, ev, re, r, rp)
+  local c=e:GetHandler()
+  local bc=c:GetBattleTarget()
+  return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
+end
 Parameters:
   e: Effect
   tp: int
@@ -5950,7 +5982,11 @@ Parameters:
 Source: Utilities/utility.lua:774
 
 ●void Auxiliary.bdocon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Check if e:GetHandler() is related to the current battle, typically used for EVENT_BATTLE_DESTROYING and when battling an opponent's monster, as a condition
+function Auxiliary.bdocon(e, tp, eg, ep, ev, re, r, rp)
+  local c=e:GetHandler()
+  return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE)
+end
 Parameters:
   e: Effect
   tp: int
@@ -5963,7 +5999,12 @@ Parameters:
 Source: Utilities/utility.lua:769
 
 ●void Auxiliary.bdogcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Check if e:GetHandler() is related to the current battle, typically used for EVENT_BATTLE_DESTROYING, when battling an opponent's monster and destroying it by battle, sending it to the Graveyard, as a condition
+function Auxiliary.bdogcon(e, tp, eg, ep, ev, re, r, rp)
+  local c=e:GetHandler()
+  local bc=c:GetBattleTarget()
+  return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
+end
 Parameters:
   e: Effect
   tp: int
@@ -6033,7 +6074,11 @@ Parameters:
 Source: Utilities/utility.lua:1807
 
 ●void Auxiliary.bfgcost(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+Simplified method for the filter condition of banishing this card, used in effect registration for cost
+function aux.bfgcost(e, tp, eg, ep, ev, re, r, rp, chk)
+  if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
+  Duel.Remove(e:GetHandler(), POS_FACEUP, REASON_COST)
+end
 Parameters:
   e: Effect
   tp: int
@@ -6060,7 +6105,12 @@ Parameters:
 Source: Utilities/utility.lua:806
 
 ●void Auxiliary.chainreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Used by Dark Armed Dragon (81059524), equivalent to
+function aux.chainreg(e, tp, eg, ep, ev, re, r, rp)
+  if e:GetHandler():GetFlagEffect(1)==0 then
+    e:GetHandler():RegisterFlagEffect(1, RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN, 0, 1)
+  end
+end
 Parameters:
   e: Effect
   tp: int
@@ -6115,7 +6165,7 @@ Parameters:
 Source: Utilities/utility.lua:1314
 
 ●void Auxiliary.CheckUnionEquip(any uc, Card tc, any exclude_modern_count)
-TODO document.
+Check if Union Monster uc can be equipped to monster tc as a Union Equip
 Parameters:
   uc: any
   tc: Card
@@ -6123,7 +6173,7 @@ Parameters:
 Source: Utilities/utility.lua:335
 
 ●table Auxiliary.CreateChecks(function f, table list)
-TODO document.
+Create a table of filter functions
 Parameters:
   f: function
   list: table
@@ -6145,7 +6195,19 @@ Parameters:
 Source: Utilities/utility.lua:1142
 
 ●void Auxiliary.damcon1(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Simplified method for the condition of player tp taking damage, used in effect registration for SetCondition
+function aux.damcon1(e, tp, eg, ep, ev, re, r, rp)
+  local e1=Duel.IsPlayerAffectedByEffect(tp, EFFECT_REVERSE_DAMAGE)
+  local e2=Duel.IsPlayerAffectedByEffect(tp, EFFECT_REVERSE_RECOVER)
+  local rd=e1 and not e2
+  local rr=not e1 and e2
+  local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev, CATEGORY_DAMAGE)
+  if ex and (cp==tp or cp==PLAYER_ALL) and not rd and not Duel.IsPlayerAffectedByEffect(tp, EFFECT_NO_EFFECT_DAMAGE) then
+    return true
+  end
+  ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev, CATEGORY_RECOVER)
+  return ex and (cp==tp or cp==PLAYER_ALL) and rr and not Duel.IsPlayerAffectedByEffect(tp, EFFECT_NO_EFFECT_DAMAGE)
+end
 Parameters:
   e: Effect
   tp: int
@@ -6183,7 +6245,11 @@ Parameters:
 Source: Utilities/utility.lua:1126
 
 ●void Auxiliary.dogcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Check if e:GetHandler() was destroyed by the opponent and sent to the Graveyard from your field, used for SetCondition
+function Auxiliary.dogcon(e, tp, eg, ep, ev, re, r, rp)
+  local c=e:GetHandler()
+  return c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY) and rp==1-tp
+end
 Parameters:
   e: Effect
   tp: int
@@ -6381,7 +6447,7 @@ Parameters:
 Source: Utilities/utility.lua:222
 
 ●void Auxiliary.EnableSpiritReturn(Card c, any event1, ... any)
-TODO document.
+Add an effect to c for Spirit Monsters to return to the hand during the End Phase of turns when events event1,... occur
 Parameters:
   c: Card
   event1: any
@@ -6389,7 +6455,7 @@ Parameters:
 Source: Utilities/utility.lua:167
 
 ●void Auxiliary.EnableUnionAttribute(Card c, function filter)
-TODO document.
+add effect to modern union monsters
 Parameters:
   c: Card
   filter: function
@@ -6424,7 +6490,11 @@ Parameters:
 Source: Utilities/utility.lua:1909
 
 ●void Auxiliary.evospcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Simplified method for the filter condition of Evolsaur general effects (Special Summoned by the effect of an "Evolsaur" monster), used in effect registration for SetCondition
+function aux.evospcon(e, tp, eg, ep, ev, re, r, rp)
+  local st=e:GetHandler():GetSummonType()
+  return st>=(SUMMON_TYPE_SPECIAL+150) and st<(SUMMON_TYPE_SPECIAL+180)
+end
 Parameters:
   e: Effect
   tp: int
@@ -6437,13 +6507,20 @@ Parameters:
 Source: Utilities/utility.lua:914
 
 ●void Auxiliary.exccon(Effect e)
-TODO document.
+Simplified method for the condition that this card cannot activate its effect during the turn it was sent to the Graveyard, used for SetCondition
+function aux.exccon(e)
+  return Duel.GetTurnCount()~=e:GetHandler():GetTurnID() or e:GetHandler():IsReason(REASON_RETURN)
+end
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:802
 
 ●void Auxiliary.ExceptThisCard(Effect e)
-TODO document.
+If e:GetHandler() is related to effect e, return e:GetHandler(); otherwise return nil
+function aux.ExceptThisCard(e)
+  local c=e:GetHandler()
+  if c:IsRelateToEffect(e) then return c else return nil end
+end
 Parameters:
   e: Effect
 Source: Utilities/utility.lua:1176
@@ -6464,14 +6541,26 @@ TODO document.
 Source: Utilities/utility.lua:94
 
 ●void Auxiliary.FilterBoolFunction(function f, ... any)
-TODO document.
+Filter cards satisfying a single filter condition f, returning a function with a bool return type; additional parameters start from the second parameter
+function Auxiliary.FilterBoolFunction(f,...)
+  local ext_params={...}
+  return function(target)
+    return f(target,table.unpack(ext_params))
+  end
+end
 Parameters:
   f: function
   ...: any
 Source: Utilities/utility.lua:466
 
 ●void Auxiliary.FilterEqualFunction(function f, Effect value, ... any)
-TODO document.
+Filter cards satisfying a single filter condition f with value value, returning a function with a bool return type; additional parameters start from the third parameter
+function Auxiliary.FilterEqualFunction(f, value, ...)
+  local ext_params={...}
+  return function(target)
+    return f(target, table.unpack(ext_params))==value
+  end
+end
 Parameters:
   f: function
   value: Effect
@@ -6479,7 +6568,12 @@ Parameters:
 Source: Utilities/utility.lua:460
 
 ●void Auxiliary.gbspcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Simplified method for the filter condition of Gladiator Beast general effects (Special Summoned by the effect of a "Gladiator Beast" monster), used in effect registration for SetCondition
+2619149, 4253484, 31247589, 42592719, 65984457, 78868776, though written differently, work fine
+function aux.gbspcon(e, tp, eg, ep, ev, re, r, rp)
+  local st=e:GetHandler():GetSummonType()
+  return st>=(SUMMON_TYPE_SPECIAL+100) and st<(SUMMON_TYPE_SPECIAL+150)
+end
 Parameters:
   e: Effect
   tp: int
@@ -6538,7 +6632,7 @@ Parameters:
 Source: Utilities/utility.lua:1528
 
 ●int Auxiliary.GetColumn(Card c, [int p])
-TODO document.
+Return the column sequence number of card c from player's perspective, excluding the Field Zone; from left to right, columns are 0-4
 Parameters:
   c: Card
   p: int optional - default: 0
@@ -6598,7 +6692,7 @@ Parameters:
 Source: Utilities/utility.lua:1181
 
 ●void Auxiliary.GetValueType(any v)
-TODO document.
+Return the Lua type of value
 Parameters:
   v: any
 Source: Utilities/utility.lua:472
@@ -6645,14 +6739,20 @@ Returns:
 Source: Utilities/utility.lua:1969
 
 ●void Auxiliary.imval1(Effect e, Card c)
-TODO document.
+Simplified method for the filter function preventing a card from being targeted for attacks, used in effect registration for SetValue
+function aux.imval1(e, c)
+  return not c:IsImmuneToEffect(e)
+end
 Parameters:
   e: Effect
   c: Card
 Source: Utilities/utility.lua:820
 
 ●void Auxiliary.indoval(Effect e, Effect re, int rp)
-TODO document.
+Simplified method for the filter function preventing destruction by opponent's card effects, used in effect registration for SetValue
+function aux.indoval(e, re, rp)
+  return rp==1-e:GetHandlerPlayer()
+end
 Parameters:
   e: Effect
   re: Effect
@@ -6660,7 +6760,10 @@ Parameters:
 Source: Utilities/utility.lua:828
 
 ●void Auxiliary.indsval(Effect e, Effect re, int rp)
-TODO document.
+Simplified method for the filter function preventing destruction by your own card effects, used in effect registration for SetValue
+function aux.indsval(e, re, rp)
+  return rp==e:GetHandlerPlayer()
+end
 Parameters:
   e: Effect
   re: Effect
@@ -6678,7 +6781,7 @@ Returns:
 Source: Utilities/utility.lua:1981
 
 ●void Auxiliary.IsCodeListed(Card c, Effect code)
-TODO document.
+Check if card c lists card code in its card_code_list
 Parameters:
   c: Card
   code: Effect
@@ -6706,14 +6809,14 @@ Parameters:
 Source: Utilities/utility.lua:597
 
 ●void Auxiliary.IsMaterialListCode(Card c, Effect code)
-TODO document.
+Check if card c lists card code as a material in its material list
 Parameters:
   c: Card
   code: Effect
 Source: Utilities/utility.lua:512
 
 ●void Auxiliary.IsMaterialListSetCard(Card c, Effect setcode)
-TODO document.
+Check if card c lists setcode as a material in its material_setcode
 Parameters:
   c: Card
   setcode: Effect
@@ -6758,7 +6861,7 @@ Parameters:
 Source: Utilities/utility.lua:581
 
 ●void Auxiliary.IsUnionState(Effect effect)
-TODO document.
+Check if the Union Monster e:GetHandler() is in a Union Equip state (used for the Condition property of effects)
 Parameters:
   effect: Effect
 Source: Utilities/utility.lua:307
@@ -6865,7 +6968,7 @@ Parameters:
 Source: Utilities/utility.lua:1163
 
 ●bool Auxiliary.mzctcheckrel(Group g, int tp, [int reason])
-TODO document.
+Check if there is space in mzone after tp releases g by reason
 Parameters:
   g: Group
   tp: int
@@ -6875,7 +6978,7 @@ Returns:
 Source: Utilities/utility.lua:1171
 
 ●void Auxiliary.MZoneSequence(int seq)
-TODO document.
+Return the Monster Zone sequence number; from left to right, zones are 0-4; for Extra Monster Zones, return left as 1 or right as 3
 Parameters:
   seq: int
 Source: Utilities/utility.lua:718
@@ -6909,7 +7012,12 @@ Parameters:
 Source: Utilities/utility.lua:1482
 
 ●void Auxiliary.NecroValleyFilter(function f)
-TODO document.
+Return a new filter condition based on filter condition f: cards that satisfy f and are not affected by Necrovalley
+function Auxiliary.NecroValleyFilter(f)
+  return function(target,...)
+    return f(target,...) and not (target:IsHasEffect(EFFECT_NECRO_VALLEY) and Duel.IsChainDisablable(0))
+  end
+end
 Parameters:
   f: function
 Source: Utilities/utility.lua:920
@@ -6981,7 +7089,17 @@ Parameters:
 Source: Utilities/utility.lua:255
 
 ●void Auxiliary.Next(Group g)
-TODO document.
+Iterator for group g; the pointer starts at the first card and moves to the next card with each call, typically used when operating on cards in g
+For example:
+local g=Group.CreateGroup()
+for tc in aux.Next(g) do
+end
+Equivalent to:
+local g=Group.CreateGroup()
+local tc=g:GetFirst()
+while tc do
+  tc=g:GetNext()
+end
 Parameters:
   g: Group
 Source: Utilities/utility.lua:82
@@ -6997,13 +7115,19 @@ TODO document.
 Source: Utilities/utility.lua:89
 
 ●void Auxiliary.nzatk(Card c)
-TODO document.
+Simplified method for the filter function for face-up monsters with non-zero ATK
+function aux.nzatk(c)
+  return c:IsFaceup() and c:GetAttack()>0
+end
 Parameters:
   c: Card
 Source: Utilities/utility.lua:840
 
 ●void Auxiliary.nzdef(Card c)
-TODO document.
+Simplified method for the filter function for face-up monsters with non-zero DEF
+function aux.nzdef(c)
+  return c:IsFaceup() and c:GetDefense()>0
+end
 Parameters:
   c: Card
 Source: Utilities/utility.lua:844
@@ -7054,7 +7178,23 @@ Parameters:
 Source: Utilities/utility.lua:144
 
 ●void Auxiliary.qlifilter(Effect e, Effect te)
-TODO document.
+Simplified method for the filter function for Qli Monster general immunity (unaffected by effects of monsters with lower original Level/Rank than this card's Level), used in effect registration for SetValue
+te is the effect that would affect e:GetHandler()
+function aux.qlifilter(e, te)
+  if te:IsActiveType(TYPE_MONSTER) and te:IsActivated() then
+    local lv=e:GetHandler():GetLevel()
+    local ec=te:GetOwner()
+    if ec:IsType(TYPE_LINK) then
+      return false
+    elseif ec:IsType(TYPE_XYZ) then
+      return ec:GetOriginalRank()<lv
+    else
+      return ec:GetOriginalLevel()<lv
+    end
+  else
+    return false
+  end
+end
 Parameters:
   e: Effect
   te: Effect
@@ -7175,7 +7315,7 @@ Parameters:
 Source: Utilities/utility.lua:1487
 
 ●void Auxiliary.SetUnionState(Card c)
-TODO document.
+Add Union Monster attributes to c
 Parameters:
   c: Card
 Source: Utilities/utility.lua:312
@@ -7268,7 +7408,18 @@ Parameters:
 Source: Utilities/utility.lua:79
 
 ●void Auxiliary.sumreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Used by Yosenju Yamamisaki (39853199) and some other cards (49249907, 93368494), though the purpose of this function is unclear (★意★义★不★明★)
+Card 54109233, while not using this function, uses a similar implementation, also with unclear purpose (★意★义★不★明★), equivalent to
+function aux.sumreg(e, tp, eg, ep, ev, re, r, rp)
+  local tc=eg:GetFirst()
+  local code=e:GetLabel()
+  while tc do
+    if tc:GetOriginalCode()==code then
+      tc:RegisterFlagEffect(code, RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END, 0, 1)
+    end
+    tc=eg:GetNext()
+  end
+end
 Parameters:
   e: Effect
   tp: int
@@ -7287,14 +7438,26 @@ Parameters:
 Source: Utilities/utility.lua:722
 
 ●void Auxiliary.TargetBoolFunction(function f, ... any)
-TODO document.
+Used in effect registration, returns a function with a bool return type; additional parameters start from the second parameter
+function Auxiliary.TargetBoolFunction(f,...)
+  local ext_params={...}
+  return function(effect,target)
+    return f(target,table.unpack(ext_params))
+  end
+end
 Parameters:
   f: function
   ...: any
 Source: Utilities/utility.lua:454
 
 ●void Auxiliary.TargetEqualFunction(function f, Effect value, ... any)
-TODO document.
+Used in effect registration, returns a function with a bool return type; additional parameters start from the third parameter
+function Auxiliary.TargetEqualFunction(f, value, ...)
+  local ext_params={...}
+  return function(effect,target)
+    return f(target,table.unpack(ext_params))==value
+  end
+end
 Parameters:
   f: function
   value: Effect
@@ -7302,7 +7465,10 @@ Parameters:
 Source: Utilities/utility.lua:448
 
 ●void Auxiliary.tgoval(Effect e, Effect re, int rp)
-TODO document.
+Simplified method for the filter function preventing being targeted by opponent's card effects, used in effect registration for SetValue
+function aux.tgoval(e, re, rp)
+  return rp==e:GetHandlerPlayer()
+end
 Parameters:
   e: Effect
   re: Effect
@@ -7310,7 +7476,10 @@ Parameters:
 Source: Utilities/utility.lua:836
 
 ●void Auxiliary.tgsval(Effect e, Effect re, int rp)
-TODO document.
+Simplified method for the filter function preventing being targeted by your own card effects, used in effect registration for SetValue
+function aux.tgsval(e, re, rp)
+  return rp==e:GetHandlerPlayer()
+end
 Parameters:
   e: Effect
   re: Effect
@@ -7678,7 +7847,9 @@ Parameters:
 Source: Utilities/procedure.lua:1209
 
 ●void Auxiliary.AddFusionProcCode2FunRep(Card c, int|table code1, int|table code2, function|table f, int minc, int maxc, bool sub, bool insf)
-TODO document.
+Add a Fusion Summon procedure for c
+Use 1 monster each with codes code1 and code2, and minc-maxc monsters satisfying filter condition f as Fusion Materials
+Equivalent to aux.AddFusionProcMixRep(c, sub, insf, f, minc, maxc, code1, code2)
 Parameters:
   c: Card
   code1: int|table
@@ -7725,7 +7896,9 @@ Parameters:
 Source: Utilities/procedure.lua:1263
 
 ●void Auxiliary.AddFusionProcCodeFunRep(Card c, int|table code1, function|table f, int minc, int maxc, bool sub, bool insf)
-TODO document.
+Add a Fusion Summon procedure for c
+Use 1 monster with code and minc-maxc monsters satisfying filter condition f as Fusion Materials
+Equivalent to aux.AddFusionProcMixRep(c, sub, insf, f, minc, maxc, code1)
 Parameters:
   c: Card
   code1: int|table
@@ -7747,7 +7920,9 @@ Parameters:
 Source: Utilities/procedure.lua:1239
 
 ●void Auxiliary.AddFusionProcCodeRep2(Card c, int|table code1, int minc, int maxc, bool sub, bool insf)
-TODO document.
+Add a Fusion Summon procedure for c
+Use minc-maxc identical monsters with code as Fusion Materials
+Equivalent to aux.AddFusionProcMixRep(c, sub, insf, code1, minc, maxc)
 Parameters:
   c: Card
   code1: int|table
@@ -7767,7 +7942,9 @@ Parameters:
 Source: Utilities/procedure.lua:1275
 
 ●void Auxiliary.AddFusionProcFunFun(Card c, function|table f1, function|table f2, int cc, bool insf)
-TODO document.
+Add a Fusion Summon procedure for c
+Use 1 monster satisfying filter condition f1 and cc monsters satisfying filter condition f2 as Fusion Materials
+Equivalent to aux.AddFusionProcMix(c, false, insf, f1, table.unpack(fun)), where fun is a table of cc cards satisfying condition f2
 Parameters:
   c: Card
   f1: function|table
@@ -7777,7 +7954,9 @@ Parameters:
 Source: Utilities/procedure.lua:1305
 
 ●void Auxiliary.AddFusionProcFunFunRep(Card c, any f1, any f2, any minc, any maxc, any insf)
-TODO document.
+Add a Fusion Summon procedure for c
+Use 1 monster satisfying filter condition f1 and minc-maxc monsters satisfying filter condition f2 as Fusion Materials
+Equivalent to aux.AddFusionProcMixRep(c, false, insf, f2, minc, maxc, f1)
 Parameters:
   c: Card
   f1: any
@@ -7797,7 +7976,9 @@ Parameters:
 Source: Utilities/procedure.lua:1283
 
 ●void Auxiliary.AddFusionProcFunRep2(Card c, function|table f, int minc, int maxc, bool insf)
-TODO document.
+Add a Fusion Summon procedure for c
+Use minc-maxc monsters satisfying the same condition f as Fusion Materials
+Equivalent to aux.AddFusionProcMixRep(c, false, insf, f, minc, maxc)
 Parameters:
   c: Card
   f: function|table
@@ -7807,7 +7988,9 @@ Parameters:
 Source: Utilities/procedure.lua:1296
 
 ●void Auxiliary.AddFusionProcMix(Card fcard, bool sub, bool insf, ... number|function|table)
-TODO document.
+Add a Fusion Summon procedure for c
+Use 1 of each card in the additional parameters as Fusion Materials; additional parameters can be function or card code (int code), where passing a code is equivalent to passing function(code) return c:IsFusionCode(code) end
+sub indicates whether Fusion Substitute Materials can be used; insf=false means the Fusion Summon must use the specified materials. If this monster can only be Fusion Summoned with the specified cards, both sub and insf must be false
 Parameters:
   fcard: Card
   sub: bool - Can be fusion summoned with substitute material
@@ -7816,7 +7999,9 @@ Parameters:
 Source: Utilities/procedure.lua:862
 
 ●void Auxiliary.AddFusionProcMixRep(Card fcard, bool sub, bool insf, number|function|table fun1, int minc, int maxc, ... number|function|table)
-TODO document.
+Add a Fusion Summon procedure for c
+Use minc-maxc monsters satisfying f1 and 1 of each monster in the additional parameters as Fusion Materials
+Additional parameters can be function or card code (int code), where passing a code is equivalent to passing function(code) return c:IsFusionCode(code) end
 Parameters:
   fcard: Card
   sub: bool - Can be fusion summoned with substitute material
@@ -7828,14 +8013,15 @@ Parameters:
 Source: Utilities/procedure.lua:991
 
 ●void Auxiliary.AddFusionProcShaddoll(Card c, int attr)
-TODO document.
+Exclusive to Shaddoll Fusion Monsters; attribute is the required Attribute
 Parameters:
   c: Card
   attr: int
 Source: Utilities/procedure.lua:1342
 
 ●Effect Auxiliary.AddLinkProcedure(Card c, [function|nil f], int min, [int max], [function gf])
-TODO document.
+Add a Link Summon procedure for c
+Use minc-maxc monsters satisfying filter condition f [and within the group satisfying filter condition gf] as Link Materials
 Parameters:
   c: Card
   f: function|nil optional
@@ -7861,7 +8047,8 @@ Parameters:
 Source: Utilities/procedure.lua:1914
 
 ●void Auxiliary.AddRitualProcEqual2(Card c, function filter, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+Add a Ritual Summon effect for c
+filter is the condition the Ritual Monster must satisfy; the sum of the Ritual Levels of the materials must equal the Ritual Monster's Level (which may be altered by other card effects)
 Parameters:
   c: Card
   filter: function
@@ -7874,7 +8061,9 @@ Parameters:
 Source: Utilities/procedure.lua:1922
 
 ●void Auxiliary.AddRitualProcEqual2Code(Card c, any code1, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+Add a Ritual Summon effect for c
+code is the card code of the Ritual Monster; the sum of the Levels of the materials must equal the Ritual Monster's Level
+Equivalent to: aux.AddRitualProcEqual2(c, aux.FilterBoolFunction(Card.IsCode, code)), with fit_monster=code added
 Parameters:
   c: Card
   code1: any
@@ -7887,7 +8076,9 @@ Parameters:
 Source: Utilities/procedure.lua:1925
 
 ●void Auxiliary.AddRitualProcEqual2Code2(Card c, any code1, any code2, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+Add a Ritual Summon effect for c
+code1, code2 are the card codes of the Ritual Monsters; the sum of the Levels of the materials must equal the Ritual Monster's Level
+Equivalent to: aux.AddRitualProcEqual2(c, aux.FilterBoolFunction(Card.IsCode, code1, code2)), with fit_monster={code1, code2} added
 Parameters:
   c: Card
   code1: any
@@ -7901,7 +8092,9 @@ Parameters:
 Source: Utilities/procedure.lua:1929
 
 ●void Auxiliary.AddRitualProcEqualCode(Card c, any code1, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+Add a Ritual Summon effect for c
+code is the card code of the Ritual Monster; the sum of the Ritual Levels of the materials must equal the original Level of the Ritual Monster
+Equivalent to: aux.AddRitualProcEqual(c, aux.FilterBoolFunction(Card.IsCode, code)), with fit_monster=code added
 Parameters:
   c: Card
   code1: any
@@ -7968,7 +8161,9 @@ Parameters:
 Source: Utilities/procedure.lua:1941
 
 ●void Auxiliary.AddRitualProcGreaterCode(Card c, any code1, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-TODO document.
+Add a Ritual Summon effect for c
+code is the card code of the Ritual Monster; the sum of the Ritual Levels of the materials can exceed the original Level of the Ritual Monster
+Equivalent to: aux.AddRitualProcGreater(c, aux.FilterBoolFunction(Card.IsCode, code)), with fit_monster=code added
 Parameters:
   c: Card
   code1: any
@@ -7996,7 +8191,10 @@ Parameters:
 Source: Utilities/procedure.lua:1750
 
 ●void Auxiliary.AddSynchroMixProcedure(Card c, [function|nil f1], [function|nil f2], [function|nil f3], [function|nil f4], int minc, int maxc, [function gc])
-TODO document.
+Add a Synchro Summon procedure for c
+f1, f2, f3 are filter conditions satisfied by 1 card each, f4 is a filter condition satisfied by minc [to maxc] cards
+At least one of f1, f2, f3, f4 must be a Tuner condition
+If f2 and f3 are nil, equivalent to aux.AddSynchroProcedure(c, f1, f4, minc[, maxc])
 Parameters:
   c: Card
   f1: function|nil optional
@@ -8047,7 +8245,10 @@ Parameters:
 Source: Utilities/procedure.lua:485
 
 ●void Auxiliary.AddXyzProcedureLevelFree(Card c, [function|nil f], [function|nil gf], int minc, int maxc, [function alterf], [string alterdesc], [function alterop])
-TODO document.
+Add an Xyz Summon procedure for c
+Use minc [to maxc] monsters satisfying condition f, and within the group satisfying condition gf, for overlay; f is a required condition, gf is an additional condition
+Or overlay on a single monster (typically an Xyz Monster)
+alterf is the condition this monster must satisfy, desc is the description, op is the operation required during overlay (e.g., Number F0: Utopic Future)
 Parameters:
   c: Card
   f: function|nil optional
@@ -8138,14 +8339,16 @@ Parameters:
 Source: Utilities/procedure.lua:22
 
 ●void Auxiliary.EnablePendulumAttribute(Card c, Group reg)
-TODO document.
+Add Pendulum Monster attributes to c (Pendulum Summon, Pendulum Card activation)
+If active_effect=false, do not register the Pendulum Card's "card activation" effect
 Parameters:
   c: Card
   reg: Group
 Source: Utilities/procedure.lua:1948
 
 ●void Auxiliary.EnableReviveLimitPendulumSummonable(Card c, int loc)
-TODO document.
+If monster c is Pendulum Summoned from location, it can bypass revival restrictions
+NOTE: The original description includes a question mark (?), indicating potential uncertainty; translated as written (e.g., Odd-Eyes Revolution Dragon (16306932))
 Parameters:
   c: Card
   loc: int
@@ -8528,7 +8731,11 @@ Parameters:
 Source: Utilities/procedure.lua:1499
 
 ●void Auxiliary.fuslimit(Effect e, Effect se, any sp, any st)
-TODO document.
+Simplified method for the filter function preventing summoning (broadly) by methods other than Fusion Summon, used in effect registration for SetValue
+se is the effect used to summon the card, sp is the summoning player, st is the summon type
+function aux.fuslimit(e, se, sp, st)
+  return st&SUMMON_TYPE_FUSION==SUMMON_TYPE_FUSION
+end
 Parameters:
   e: Effect
   se: Effect
@@ -8537,7 +8744,12 @@ Parameters:
 Source: Utilities/procedure.lua:2289
 
 ●void Auxiliary.GetLinkCount(Card c)
-TODO document.
+Return the number of materials card c counts as when used as a Link Material
+function Auxiliary.GetLinkCount(c)
+  if c:IsType(TYPE_LINK) and c:GetLink()>1 then
+    return 1+0x10000*c:GetLink()
+  else return 1 end
+end
 Parameters:
   c: Card
 Source: Utilities/procedure.lua:2158
@@ -8639,7 +8851,11 @@ Parameters:
 Source: Utilities/procedure.lua:2204
 
 ●void Auxiliary.linklimit(Effect e, Effect se, any sp, any st)
-TODO document.
+Simplified method for the filter function preventing summoning (broadly) by methods other than Link Summon, used in effect registration for SetValue
+se is the effect used to summon the card, sp is the summoning player, st is the summon type
+function aux.linklimit(e, se, sp, st)
+  return st&SUMMON_TYPE_LINK==SUMMON_TYPE_LINK
+end
 Parameters:
   e: Effect
   se: Effect
@@ -8684,7 +8900,13 @@ Parameters:
 Source: Utilities/procedure.lua:2317
 
 ●void Auxiliary.MustMaterialCheck(any v, int tp, Effect code)
-TODO document.
+Check if value contains cards or a group affected by player's effect type code
+Currently involved codes are:
+EFFECT_MUST_BE_SMATERIAL
+EFFECT_MUST_BE_XMATERIAL
+EFFECT_MUST_BE_FMATERIAL
+EFFECT_MUST_BE_LMATERIAL
+All are checks for required materials
 Parameters:
   v: any
   tp: int
@@ -8692,14 +8914,15 @@ Parameters:
 Source: Utilities/procedure.lua:2274
 
 ●void Auxiliary.MustMaterialCounterFilter(Card c, Group g)
-TODO document.
+If group g contains card c, return false
 Parameters:
   c: Card
   g: Group
 Source: Utilities/procedure.lua:2283
 
 ●void Auxiliary.NonTuner(function f, ... any)
-TODO document.
+Filter non-Tuner monsters satisfying a single filter condition f, returning a function with a bool return type; if only non-Tuner monsters are required, use aux.NonTuner(nil)
+Additional parameters start from the second parameter
 Parameters:
   f: function
   ...: any
@@ -8790,7 +9013,11 @@ Parameters:
 Source: Utilities/procedure.lua:2111
 
 ●void Auxiliary.penlimit(Effect e, Effect se, any sp, any st)
-TODO document.
+Simplified method for the filter function preventing summoning (broadly) by methods other than Pendulum Summon, used in effect registration for SetValue
+se is the effect used to summon the card, sp is the summoning player, st is the summon type
+function aux.penlimit(e, se, sp, st)
+  return st&SUMMON_TYPE_PENDULUM==SUMMON_TYPE_PENDULUM
+end
 Parameters:
   e: Effect
   se: Effect
@@ -8812,7 +9039,11 @@ Parameters:
 Source: Utilities/procedure.lua:2114
 
 ●void Auxiliary.ritlimit(Effect e, Effect se, any sp, any st)
-TODO document.
+Simplified method for the filter function preventing summoning (broadly) by methods other than Ritual Summon, used in effect registration for SetValue
+se is the effect used to summon the card, sp is the summoning player, st is the summon type
+function aux.ritlimit(e, se, sp, st)
+  return st&SUMMON_TYPE_RITUAL==SUMMON_TYPE_RITUAL
+end
 Parameters:
   e: Effect
   se: Effect
@@ -8929,7 +9160,11 @@ Parameters:
 Source: Utilities/procedure.lua:463
 
 ●void Auxiliary.synlimit(Effect e, Effect se, any sp, any st)
-TODO document.
+Simplified method for the filter function preventing summoning (broadly) by methods other than Synchro Summon, used in effect registration for SetValue
+se is the effect used to summon the card, sp is the summoning player, st is the summon type
+function aux.synlimit(e, se, sp, st)
+  return st&SUMMON_TYPE_SYNCHRO==SUMMON_TYPE_SYNCHRO
+end
 Parameters:
   e: Effect
   se: Effect
@@ -9165,7 +9400,7 @@ Parameters:
 Source: Utilities/procedure.lua:454
 
 ●void Auxiliary.TuneMagicianCheckX(Card c, Group sg, Effect ecode)
-TODO document.
+Exclusive to Tuning Magician (73941492)
 Parameters:
   c: Card
   sg: Group
@@ -9173,14 +9408,15 @@ Parameters:
 Source: Utilities/procedure.lua:447
 
 ●void Auxiliary.TuneMagicianFilter(Card c, Effect e)
-TODO document.
+Exclusive to Tuning Magician (73941492), returning a function f(e, c) with a bool return type
 Parameters:
   c: Card
   e: Effect
 Source: Utilities/procedure.lua:443
 
 ●void Auxiliary.Tuner(function f, ... any)
-TODO document.
+Filter Tuner monsters satisfying a single filter condition f, returning a function with a bool return type; if only Tuner monsters are required, use aux.Tuner(nil)
+Additional parameters start from the second parameter
 Parameters:
   f: function
   ...: any
@@ -9302,7 +9538,11 @@ Parameters:
 Source: Utilities/procedure.lua:761
 
 ●void Auxiliary.xyzlimit(Effect e, Effect se, any sp, any st)
-TODO document.
+Simplified method for the filter function preventing summoning (broadly) by methods other than Xyz Summon, used in effect registration for SetValue
+se is the effect used to summon the card, sp is the summoning player, st is the summon type
+function aux.xyzlimit(e, se, sp, st)
+  return st&SUMMON_TYPE_XYZ==SUMMON_TYPE_XYZ
+end
 Parameters:
   e: Effect
   se: Effect
