@@ -179,7 +179,7 @@ def parse_mdpro3_strings(path: Path) -> tuple[dict[int, str], list[tuple[int, st
     systems: dict[int, str] = {}
     setnames: list[tuple[int, str]] = []
     for line in read_text(path).splitlines():
-        if not line.startswith("!"):
+        if not (line.startswith("!") or line.startswith("#setname ") or line.startswith("#!setname ")):
             continue
 
         parts = line.split(maxsplit=2)
@@ -189,7 +189,7 @@ def parse_mdpro3_strings(path: Path) -> tuple[dict[int, str], list[tuple[int, st
         tag, key, value = parts
         if tag == "!system":
             systems[parse_id(key)] = value.strip()
-        elif tag == "!setname":
+        elif tag in ("!setname", "#setname", "#!setname"):
             setnames.append((parse_id(key), value.strip()))
 
     return systems, setnames
@@ -280,11 +280,6 @@ def merge_setnames(
         seen.add(key)
 
     for key, value in md_setnames:
-        if key not in seen:
-            result.append((key, value))
-            seen.add(key)
-
-    for key, value in base_entries:
         if key not in seen:
             result.append((key, value))
             seen.add(key)

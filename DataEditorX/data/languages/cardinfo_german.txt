@@ -170,6 +170,7 @@
 0x1	Verbündeter der Gerechtigkeit
 0x2	Genex
 0x1002	R-Genex
+0x2002	Genex-Verbündeter
 0x3	Verlockende Königin
 0x4	Amazonische
 0x5	Arkane Macht
@@ -188,6 +189,7 @@
 0xc	Außerirdisch
 0xd	Säbel
 0x100d	X-Säbel
+0x300d	XX-Säbel
 0x400d	Elementsäbel
 0xe	Watt
 0xf	Ojama
@@ -198,6 +200,7 @@
 0x3013	Meklord-Imperator
 0x5013	Meklord-Astro
 0x6013	Meklord-Armee
+0x14	N/A
 0x15	B.E.S.
 0x16	roid
 0x1016	Vehicroid
@@ -229,6 +232,7 @@
 0x2a	Naturia
 0x2b	Ninja
 0x2c	Flamvell
+0x2d	N/A
 0x2e	Grabwächter
 0x2f	Eisbarriere
 0x30	Vylon
@@ -248,8 +252,10 @@
 0x3a	Gishki
 0x3b	Rotäugig
 0x3c	Reptilianisch
+0x3d	Six
 0x103d	Sechs Samurai
 0x203d	Sechserangriff
+0x503d	Legendary Six Samurai
 0x903d	Geheime Sechs Samurai
 0x3e	Wurm
 0x3f	Majestätisch
@@ -275,9 +281,12 @@
 0x4a	Herr der Zeit
 0x4b	Der Asen
 0x4c	Fallgrube
+0x4d	N/A
+0x4e	Evol
 0x304e	Evoltil
 0x504e	Evolzar
 0x604e	Evolsaurier
+0x4f	Buster
 0x104f	/Angriffsmodus
 0x50	Gift
 0x1050	Hungergift
@@ -295,6 +304,9 @@
 0x5a	Pinguin
 0x5b	Insassomate
 0x5c	sphinx
+0x5d	N/A
+0x5e	N/A
+0x5f	N/A
 0x60	Bambusschwert
 0x61	Ninjitsu-Kunst
 0x62	Toon
@@ -305,9 +317,12 @@
 0x1066	Symphonischer Krieger
 0x2066	Magnetkrieger
 0x6066	Magnetkrieger Σ
+0x67	Iron
+0x68	Tin
 0x69	Priesterlich
 0x6a	Spionling
 0x6b	Rausschmeißer
+0x6c	Lichtstrahl
 0x6d	Dschinn
 0x6e	Prophezeiung
 0x106e	Magiebuch
@@ -328,6 +343,7 @@
 0x77	atlantisch
 0x78	Flink
 0x79	Feuerfaust
+0x7a	Noble
 0x107a	Edler Ritter
 0x207a	Edle Waffen
 0x507a	Flammedler Ritter
@@ -350,6 +366,7 @@
 0x82	Dododo
 0x83	Puppen
 0x1083	Gimmick Marionette
+0x84	Battlin' Box
 0x1084	Unermüdlicher Boxer
 0x2084	Unermüdliche Box
 0x85	Superverteidigungsroboter
@@ -357,9 +374,11 @@
 0x87	Schattenhorror
 0x88	Bujin
 0x89	Fallgrube
+0x8a	Fascinating
 0x108a	Fallenstellerin
 0x8b	Bosheitsfresser
 0x8d	Geistertrick
+0x8c	Druide
 0x8e	Vampir
 0x8f	Zubaba
 0x90	Sylvanisch
@@ -386,6 +405,7 @@
 0x9f	Künstlerkumpel
 0xa0	Legendärer Ritter
 0xa1	Legendärer Drache
+0xa2	Magier
 0x10a2	Dunkler/s Magier
 0x20a2	Magier-Mädchen
 0x30a2	Dunkles Magier-Mädchen
@@ -414,6 +434,7 @@
 0xb5	Geistungeheuer
 0x10b5	Geistungeheuer-Zähmer/in
 0x20b5	Geistungeheuer-Avatar
+0x30b5	Spirit Beast Tamer
 0x40b5	Geistungeheuer Ulti
 0xb6	Äußeres Wesen
 0xb7	Ältestes Wesen
@@ -477,6 +498,7 @@
 0xe9	Magnetkrieger
 0xea	Kristron
 0xeb	Chemiwesen
+0xec	Abyss
 0x10ec	Abgrundschauspieler
 0x20ec	Abgrundskript
 0xed	Unterterror
@@ -575,6 +597,7 @@
 0x13f	Plünderpatrouillen
 0x140	Steinbefreier
 0x141	Rikka
+0x142	Eld
 0x1142	Eldlich
 0x2142	Eldlixir
 0x143	Goldenen Landes
@@ -588,15 +611,19 @@
 0x14a	Numeron
 0x114a	Numeron-Tor
 0x14b	Gerätewesen
+0x14c	Spiritual Art
 0x314c	Spiritistische Erdkunst
 0x514c	Spiritistische Wasserkunst
 0x614c	Spiritistische Feuerkunst
 0x914c	Spiritistische Windkunst
+0xa14c	Spiritual Light Art
+0xc14c	Dark Spirit Art
 0x14d	Sta-Brigade
 0x14e	Virtualwelt
 0x114e	Tor de Virtualwelt
 0x14f	Doppelavatar
 0x150	Magistus
+0x151	Twin
 0x1151	Live☆Zwilling
 0x2151	Evil★Zwilling
 0x152	Ki-sikil
@@ -605,6 +632,7 @@
 0x155	Springans
 0x156	S-Kraft
 0x157	Myutant
+0x158	Sonne
 0x1158	Sonnenranken
 0x2158	Sonnenavalon
 0x4158	Sonnensamen
@@ -655,6 +683,7 @@
 0x182	Frühlingssylphe
 0x183	Mokey Mokey
 0x184	Wingman
+0x185	Doodle
 0x1185	Gekritzeltes Ungeheuer
 0x2185	Kritzelheft
 0x186	G-Golem
@@ -752,34 +781,4 @@
 0x1df	Blitzclique
 0x1e0	Theorealisier
 0x1e1	Aleister
-0x2002	Genex Ally
-0x300d	XX-Saber
-0x14	N/A
-0x2d	N/A
-0x3d	Six
-0x503d	Legendary Six Samurai
-0x4d	N/A
-0x4e	Evol
-0x4f	Buster
-0x5d	N/A
-0x5e	N/A
-0x5f	N/A
-0x67	Iron
-0x68	Tin
-0x6c	Lightray
-0x7a	Noble
-0x84	Battlin' Box
-0x8a	Fascinating
-0x8c	Druid
-0xa2	Magician
-0x30b5	Spirit Beast Tamer
-0xec	Abyss-
-0xf8	Supreme King
-0x142	Eld
-0x14c	Spiritual Art
-0xa14c	Spiritual Light	Art
-0xc14c	Dark Spirit Art
-0x151	Twin
-0x158	Sun
-0x185	Doodle
 #end

@@ -170,6 +170,7 @@
 0x1	Alleato delle Giustizia
 0x2	Genex
 0x1002	R-Genex
+0x2002	Genex Alleato
 0x3	Regina della Seduzione
 0x4	Amazoness
 0x5	Energia Arcana
@@ -188,6 +189,7 @@
 0xc	Alieno
 0xd	Sciabola
 0x100d	Sciabola-X
+0x300d	Sciabola-XX
 0x400d	Elementsciabola
 0xe	Watt
 0xf	Ojama
@@ -198,6 +200,7 @@
 0x3013	Imperatore Meklord
 0x5013	Astro Meklord
 0x6013	Esercito Meklord
+0x14	N/A
 0x15	B.E.S.
 0x16	roid
 0x1016	Vehicroid
@@ -229,6 +232,7 @@
 0x2a	Naturia
 0x2b	Ninja
 0x2c	Flamvell
+0x2d	N/A
 0x2e	Custode di Tombe
 0x2f	Barriera di Ghiaccio
 0x30	Vylon
@@ -248,8 +252,10 @@
 0x3a	Gishki
 0x3b	Occhi Rossi
 0x3c	Rettiliano
+0x3d	Six
 0x103d	Sei Samurai
 0x203d	Sei Colpi
+0x503d	Legendary Six Samurai
 0x903d	Sei Samurai Segreto
 0x3e	Verme
 0x3f	Maestoso
@@ -275,9 +281,12 @@
 0x4a	Signore del Tempo
 0x4b	Aesir
 0x4c	Buco Trappola
+0x4d	N/A
+0x4e	Evol
 0x304e	Evoltile
 0x504e	Evolzar
 0x604e	Evolsauro
+0x4f	Buster
 0x104f	/Assalto
 0x50	Veleno
 0x1050	Veleno Affamato
@@ -295,6 +304,9 @@
 0x5a	Pinguino
 0x5b	Pomodoro Prigioniero
 0x5c	sfinge
+0x5d	N/A
+0x5e	N/A
+0x5f	N/A
 0x60	Spada di Bambù
 0x61	Ninjitsu
 0x62	Toon
@@ -305,9 +317,12 @@
 0x1066	Guerriero Sinfonico
 0x2066	Guerriero Magnetico
 0x6066	Guerriero Magnetico Sigma
+0x67	Iron
+0x68	Tin
 0x69	Ieratico
 0x6a	Farfallospia
 0x6b	Buttafuori
+0x6c	Raggiodiluce
 0x6d	Djinn
 0x6e	Profezia
 0x106e	Libro di Magia
@@ -328,6 +343,7 @@
 0x77	Atlantico
 0x78	Agile
 0x79	Pugno di Fuoco
+0x7a	Noble
 0x107a	Nobile Cavaliere
 0x207a	Nobili Armi
 0x507a	Infernobile Cavaliere
@@ -350,6 +366,7 @@
 0x82	Dododo
 0x83	Burattino
 0x1083	Burattino Arnese
+0x84	Battlin' Box
 0x1084	Pugile Indomito
 0x2084	Pugilistico Indomito
 0x85	Super Robot da Difesa
@@ -357,9 +374,11 @@
 0x87	Orrore Umbral
 0x88	Bujin
 0x89	Buco
+0x8a	Fascinating
 0x108a	Trappolatrice
 0x8b	Divoramalizia
 0x8d	Fantasmatrucco
+0x8c	Druido
 0x8e	Vampiro
 0x8f	Zubaba
 0x90	Silvan
@@ -386,6 +405,7 @@
 0x9f	Artistamico
 0xa0	Leggendario Cavaliere
 0xa1	Leggendario Drago
+0xa2	Mago
 0x10a2	Mago Nero
 0x20a2	Ragazza Maga
 0x30a2	Ragazza Maga Nera
@@ -414,6 +434,7 @@
 0xb5	Bestia Spirito
 0x10b5	Domatore Bestia Spirito
 0x20b5	Avatar Bestia Spirito
+0x30b5	Spirit Beast Tamer
 0x40b5	Bestia Spirito Ulti
 0xb6	Entità Esterna
 0xb7	Entità Maggiore
@@ -477,6 +498,7 @@
 0xe9	Guerriero Magnetico
 0xea	Crystron
 0xeb	Chimicreatura
+0xec	Abisso-
 0x10ec	Attore dell'Abisso
 0x20ec	Sceneggiatura dell'Abisso
 0xed	Subterrore
@@ -575,6 +597,7 @@
 0x13f	ConTrollo Bottino
 0x140	Irremovibilatore
 0x141	Rikka
+0x142	Eld
 0x1142	Spettralich
 0x2142	Spettrolisir
 0x143	Terra Dorata
@@ -588,15 +611,19 @@
 0x14a	Numeron
 0x114a	Cancello Numeron
 0x14b	Apparecchio
+0x14c	Spiritual Art
 0x314c	Arte Spirituale della Terra
 0x514c	Arte Spirituale dell'Acqua
 0x614c	Arte Spirituale del Fuoco
 0x914c	Arte Spirituale del Vento
+0xa14c	Spiritual Light Art
+0xc14c	Dark Spirit Art
 0x14d	Tri-Brigata
 0x14e	Mondo Virtuale
 0x114e	Cancello Mondo Virtuale
 0x14f	Duplice Avatar
 0x150	Magistus
+0x151	Twin
 0x1151	Live☆Gemella
 0x2151	Evil★Gemella
 0x152	Ki-sikil
@@ -605,6 +632,7 @@
 0x155	Springans
 0x156	S-Forza
 0x157	Myutante
+0x158	Solar
 0x1158	Solarvite
 0x2158	Solaravalon
 0x4158	Solarseme
@@ -655,6 +683,7 @@
 0x182	Vernasilfide
 0x183	Mokey Mokey
 0x184	Uomo Alato
+0x185	Doodle
 0x1185	Bestiascarabocchio
 0x2185	Albumscarabocchio
 0x186	G Golem
@@ -752,35 +781,4 @@
 0x1e0	Teorealizzare
 0x1e1	Aleister
 0x2de	Tuner Oscuro
-0x2002	Genex Ally
-0x300d	XX-Saber
-0x14	N/A
-0x2d	N/A
-0x3d	Six
-0x503d	Legendary Six Samurai
-0x4d	N/A
-0x4e	Evol
-0x4f	Buster
-0x5d	N/A
-0x5e	N/A
-0x5f	N/A
-0x67	Iron
-0x68	Tin
-0x6c	Lightray
-0x7a	Noble
-0x84	Battlin' Box
-0x8a	Fascinating
-0x8c	Druid
-0xa2	Magician
-0x30b5	Spirit Beast Tamer
-0xec	Abyss-
-0xf8	Supreme King
-0x142	Eld
-0x14c	Spiritual Art
-0xa14c	Spiritual Light	Art
-0xc14c	Dark Spirit Art
-0x151	Twin
-0x158	Sun
-0x185	Doodle
-0x1de	Dark Tuner
 #end
