@@ -8,12 +8,11 @@ namespace DataEditorX
     public class AboutForm : Form
     {
         private readonly Action checkForUpdates;
-        private readonly LinkLabel repositoryLink;
+        private readonly List<LinkLabel> detailLinks = new();
 
         public AboutForm(Action checkForUpdates = null)
         {
             this.checkForUpdates = checkForUpdates;
-            repositoryLink = new LinkLabel();
             InitializeComponent();
             ApplyTheme();
         }
@@ -33,7 +32,7 @@ namespace DataEditorX
             MinimizeBox = false;
             ShowIcon = true;
             Icon = SystemIcons.Information;
-            ClientSize = new Size(560, 320);
+            ClientSize = new Size(580, 350);
 
             TableLayoutPanel root = new()
             {
@@ -103,8 +102,9 @@ namespace DataEditorX
 
             AddDetail(details, "Version", CleanVersion(Application.ProductVersion));
             AddDetail(details, "Maintainer", "ElderLich");
-            AddDetail(details, "Original Author", "Lyris");
-            AddDetail(details, "Repository", DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL), true);
+            AddDetail(details, "Original Author", "purerosefallen/DataEditorX", "https://github.com/purerosefallen/DataEditorX");
+            AddDetail(details, "Based On", "Lyris12 fork", "https://github.com/Lyris12/DataEditorX");
+            AddDetail(details, "Repository", DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL), DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL));
             AddDetail(details, "Runtime", RuntimeInformation.FrameworkDescription);
             AddDetail(details, "Process", Environment.Is64BitProcess ? "64-bit" : "32-bit");
 
@@ -150,7 +150,7 @@ namespace DataEditorX
             Controls.Add(root);
         }
 
-        private void AddDetail(TableLayoutPanel details, string label, string value, bool isRepository = false)
+        private void AddDetail(TableLayoutPanel details, string label, string value, string linkUrl = null)
         {
             int row = details.RowCount++;
             details.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -165,13 +165,17 @@ namespace DataEditorX
             details.Controls.Add(nameLabel, 0, row);
 
             Control valueControl;
-            if (isRepository)
+            if (!string.IsNullOrWhiteSpace(linkUrl))
             {
-                repositoryLink.AutoSize = true;
-                repositoryLink.Text = value;
-                repositoryLink.Margin = new Padding(0, 0, 0, 10);
-                repositoryLink.LinkClicked += delegate { OpenRepository(); };
-                valueControl = repositoryLink;
+                LinkLabel link = new()
+                {
+                    AutoSize = true,
+                    Text = value,
+                    Margin = new Padding(0, 0, 0, 10)
+                };
+                link.LinkClicked += delegate { OpenLink(linkUrl); };
+                detailLinks.Add(link);
+                valueControl = link;
             }
             else
             {
@@ -191,9 +195,12 @@ namespace DataEditorX
             ThemeManager.ApplyControlTree(this);
             if (ThemeManager.IsDarkTheme)
             {
-                repositoryLink.LinkColor = Color.LightSkyBlue;
-                repositoryLink.ActiveLinkColor = Color.White;
-                repositoryLink.VisitedLinkColor = Color.LightSteelBlue;
+                foreach (LinkLabel link in detailLinks)
+                {
+                    link.LinkColor = Color.LightSkyBlue;
+                    link.ActiveLinkColor = Color.White;
+                    link.VisitedLinkColor = Color.LightSteelBlue;
+                }
             }
         }
 
@@ -204,7 +211,12 @@ namespace DataEditorX
 
         private static void OpenRepository()
         {
-            _ = MyUtils.OpenShellTarget(DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL));
+            OpenLink(DEXConfig.ReadString(DEXConfig.TAG_SOURCE_URL));
+        }
+
+        private static void OpenLink(string url)
+        {
+            _ = MyUtils.OpenShellTarget(url);
         }
     }
 }

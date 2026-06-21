@@ -64,6 +64,7 @@ build/
 artifacts/
 [Bb]in/
 [Oo]bj/
+/tools/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

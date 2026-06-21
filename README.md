@@ -1,101 +1,76 @@
 # DataEditorX
-DataEditorX is a card database and Lua script editor for [ygopro](https://github.com/Fluorohydride/ygopro), MDPro3, and related custom card workflows.
+DataEditorX is a card database and Lua script editor for ygopro, MDPro3, and custom card projects.
 
 ## Downloads
 * Windows 32-bit: https://github.com/ElderLich/DataEditorX/releases/download/MDPro3/DataEditorX_win32.zip
 * Windows 64-bit: https://github.com/ElderLich/DataEditorX/releases/download/MDPro3/DataEditorX_win64.zip
 
-> **FAQ**   
-Q: I can't run the program.   
-A: Please install the [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0).
+## Requirements
+Install the [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) if Windows cannot start the app.
 
 ## Features
-* Create and edit card databases.
-* Compare, copy, and paste card records across databases.
-* Read card records from ygopro deck files(.ydk) or card picture folders.
-* Create and edit card scripts(.lua).
-* Use autocomplete and function/card tooltips while editing Lua scripts.
-* Export and import [MSE](https://github.com/247321453/MagicSetEditor2) sets.
-* Open the project source from Help-->Source Code.
-* Switch between light and dark theme from View-->Dark Theme.
-* Check for updates with download progress, cancellation, and in-app install handoff.
+* Create and edit `.cdb`, `.db`, and `.lua` files.
+* Compare, copy, paste, add, modify, and delete card records across databases.
+* Edit Lua scripts with syntax highlighting, autocomplete, constants, function hints, card names, setnames, and counter tooltips.
+* Switch between light, dark, and custom theme profiles from `View -> Theme`; theme choices are saved.
+* Manage MDPro3 custom card projects from `Workspace -> Project Manager`.
+* Add custom archetypes and counters through the editor menu, with duplicate ID checks against bundled and project `strings.conf` files.
+* Sync special-frame card IDs such as Egyptian Gods, Sacred Beasts, and Dark Synchro cards to MDPro3 `SpecialCards.json`.
+* Check for updates in-app and install downloaded release zips without manually replacing files.
 
-## Dark Theme
-Open View-->Dark Theme to toggle the app theme. The setting is saved in the app config, so the next launch keeps your preference.
+## Project Manager
+Open `Workspace -> Project Manager` to configure:
+* `MDPro3 Directory`
+* `MDPro3 Data Directory`
+* `Custom Project Directory`
+* `Voice Pack Directory`
 
-The dark theme updates the main window, dock area, database editor, script editor, autocomplete popup, card list, and editor controls. It can be toggled while editor tabs are open.
+Directory fields keep the latest five paths for faster switching between projects.
+
+The Custom Project tab can install, uninstall, restart MDPro3, open the current custom `.cdb`, and enable active sync. The resolved path list shows where card databases, scripts, pictures, overframe images, and `SpecialCards.json` will be read or written.
+
+## Archetypes and Counters
+Use `Add Archetype` or `Add Counter` from the DataEditor menu bar.
+
+Enter a hexadecimal ID, for example `fae` or `0xfae`, then enter the display name. DataEditorX checks bundled `data/lua/strings.conf`, the custom project `Expansions/strings.conf`, and the MDPro3 `Expansions/strings.conf` before saving.
+
+New entries are written to the custom project:
+
+```text
+<Custom Project>/Expansions/strings.conf
+```
+
+If an MDPro3 directory is configured, that `strings.conf` is synced to:
+
+```text
+<MDPro3>/Expansions/strings.conf
+```
+
+## Themes
+Open `View -> Theme` to choose a built-in profile or open the theme editor. The theme applies to the main window, dock panel, database editor, script editor, autocomplete popup, card list, Project Manager, and dialogs.
 
 ## Version Info and Updates
-Open Help-->Version Info to see the current DataEditorX version, maintainer, original author, repository, runtime, and process architecture.
+Open `Help -> Version Info` to see the app version, maintainer, original author, source fork, repository, runtime, and process architecture.
 
-Use Help-->Check for Updates to check the update metadata in `DataEditorX/version` on GitHub. Manual update checks open a progress dialog, can be cancelled while checking/downloading, and show detailed failure information when GitHub metadata or release assets cannot be reached.
-
-If a newer version is available, DataEditorX downloads the matching win32 or win64 zip, offers to install it, closes the app, extracts the update, and restarts.
-The update metadata file must be pushed to GitHub and readable from the configured `updateURL`; release zip assets are only checked after that metadata is available.
-
-## Common Workflows
-* Open `.cdb`, `.db`, or `.lua` files with File-->Open, or drag files/folders into the app.
-* Create a new database or script with File-->New.
-* Use the DataEditor tab to search, compare, copy, paste, modify, and export cards.
-* Use the CodeEditor tab to edit scripts, check syntax, find/replace text, and connect card names from a selected database.
-* Use Help-->Language to choose a UI language, then restart the application.
+Use `Help -> Check for Updates` to read the GitHub version metadata. If a newer version is available, DataEditorX downloads the matching win32 or win64 release zip, offers to install it, extracts the update, and restarts.
 
 ## Data Folder Layout
 Bundled data files are grouped by purpose:
 * `data/languages`: UI language files and card info definitions.
 * `data/lua`: Lua constants, strings, script templates, and function autocomplete data.
-* `data/mse`: Magic Set Editor export templates, including English, Chinese, French, German, Italian, Japanese, and Portuguese.
-* `data/editor`: editor syntax/highlighting resources.
+* `data/editor`: syntax highlighting resources.
 * `data/assets`: shared bundled images.
 
-## Add a New Archetype
-First decide the setcode, as a hex number, for the new archetype. Avoid conflicts with existing setcodes.
-
-Type the setcode in the text box to the right of the archetype combo box and click Modify. To show the archetype name in the combo box, open `data/languages/cardinfo_xxx.txt`, where `xxx` is the language, then add a new line between `##setname` and `#end`. Write the setcode starting with `0x`, then a tab, then the archetype name.
-
 ## Language
-Open Help-->Language to choose a language, then restart the application.
+Open `Help -> Language` to choose a UI language, then restart the application.
 
 To add a language named `xxx`, add both files:
-* `data/languages/language_xxx.txt` for the graphic interface.
+* `data/languages/language_xxx.txt` for the interface.
 * `data/languages/cardinfo_xxx.txt` for card information.
 
 Each line in `language_english.txt` and `cardinfo_english.txt` is separated by a tab. Translate the content on the right side of the tab, then put the translated files in `data/languages`.
 
-## Fork Additions
-* Persistent dark theme toggle.
-* Updated project links for https://github.com/ElderLich/DataEditorX.
-* Source Code and external Lua file launches use the Windows shell, avoiding URL/file launch exceptions.
-* SQLitePCLRaw package updates remove the known vulnerable package warning.
-* In-app updater can install downloaded releases and restart DataEditorX.
-* Bundled data files are organized into purpose-specific subfolders.
-
-## Release Script
-Use `tools/release.py` to prepare release builds and keep version metadata in sync.
-
-Build both zip assets for the `MDPro3` release tag:
-
-```powershell
-python tools/release.py --version 1.0.0
-```
-
-Build and upload both assets to GitHub:
-
-```powershell
-python tools/release.py --version 1.0.0 --upload
-```
-
-Upload uses the GitHub CLI, so run `gh auth login` first. The script creates or updates these assets:
-* `DataEditorX_win32.zip`
-* `DataEditorX_win64.zip`
-
-After a successful `--upload`, the script commits and pushes the updated `DataEditorX/version`, `DataEditorX.csproj`, and `app.config` metadata so the app can fetch the new version info from GitHub. Add `--no-push-version` if you only want to upload assets.
-
-Release zips omit `.pdb` debug symbol files by default. Add `--include-symbols` only when preparing a build for debugging.
-Release builds also bundle managed dependencies into `DataEditorX.exe` by default, keeping the extracted folder close to the original layout. Add `--multi-file` only when you need separate dependency DLLs for troubleshooting.
-Before upload, the script validates both zip files, checks that they contain `DataEditorX.exe`, `pack.db`, and bundled `data` files, and fails if debug symbols slipped into a normal release.
-
-## Special Features of KoishiDEX
-1. The format of scripts will be in Koishi-Style when creating new scripts. Also the module script to be required will be adjustable, and will be packed when exporting zip files.
-2. Scripts of Non-Pendulum Normal monsters will be openable, for creating module scripts.
-3. Will ignore the card alias when opening a script.
+## Credits
+* Original author: [purerosefallen/DataEditorX](https://github.com/purerosefallen/DataEditorX)
+* Based on the [Lyris12 fork](https://github.com/Lyris12/DataEditorX).
+* Maintained for MDPro3 custom card workflows by [ElderLich](https://github.com/ElderLich/DataEditorX).
