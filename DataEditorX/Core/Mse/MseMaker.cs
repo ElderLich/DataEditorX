@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-12
- * 时间: 12:48
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-12
+ * Time: 12:48
  * 
  */
 using DataEditorX.Common;
@@ -15,24 +15,24 @@ using System.Text.RegularExpressions;
 namespace DataEditorX.Core.Mse
 {
     /// <summary>
-    /// MSE制作
+    /// MSE generation
     /// </summary>
     public class MseMaker
     {
-        #region 常量
+        #region Constants
         public const string TAG_CARD = "card";
         public const string TAG_CARDTYPE = "card type";
         public const string TAG_NAME = "name";
         public const string TAG_ATTRIBUTE = "attribute";
         public const string TAG_LEVEL = "level";
         public const string TAG_IMAGE = "image";
-        /// <summary>种族</summary>
+        /// <summary>Race</summary>
         public const string TAG_TYPE1 = "type 1";
-        /// <summary>效果1</summary>
+        /// <summary>Effect1</summary>
         public const string TAG_TYPE2 = "type 2";
-        /// <summary>效果2/summary>
+        /// <summary>Effect2/summary>
         public const string TAG_TYPE3 = "type 3";
-        /// <summary>效果3</summary>
+        /// <summary>Effect3</summary>
         public const string TAG_TYPE4 = "type 4";
         public const string TAG_TYPE5 = "type 5";
         public const string TAG_TEXT = "rule text";
@@ -61,7 +61,7 @@ namespace DataEditorX.Core.Mse
         public const string TAG_Link_Number = "link number";
         #endregion
 
-        #region 成员，初始化
+        #region Fields and initialization
         MSEConfig cfg;
         public int MaxNum
         {
@@ -87,13 +87,13 @@ namespace DataEditorX.Core.Mse
         }
         #endregion
 
-        #region 数据处理
-        //合并
+        #region Data processing
+        //Merge
         public static string GetLine(string key, string word)
         {
             return "	" + key + ": " + word;
         }
-        //特殊字
+        //Special character replacements
         public string ReItalic(string str)
         {
             str = CN2TW(str);
@@ -103,7 +103,7 @@ namespace DataEditorX.Core.Mse
             }
             return str;
         }
-        //简体转繁体
+        //Simplified-to-Traditional conversion
         public string CN2TW(string str)
         {
             if (cfg.Iscn2tw)
@@ -113,7 +113,7 @@ namespace DataEditorX.Core.Mse
             }
             return str;
         }
-        //获取魔法陷阱的类型符号
+        //Get the spell/trap type symbol
         public string GetSpellTrapSymbol(Card c, bool isSpell)
         {
             string level;
@@ -143,7 +143,7 @@ namespace DataEditorX.Core.Mse
             }
             else if (cfg.str_spell == MSEConfig.TAG_REP && cfg.str_trap == MSEConfig.TAG_REP)
             {
-                level = MseSpellTrap.NORMAL;//带文字的图片
+                level = MseSpellTrap.NORMAL;//Image with text
             }
             else
             {
@@ -161,10 +161,10 @@ namespace DataEditorX.Core.Mse
 
             return level;
         }
-        //获取图片路径
+        //Get image path
         public static string GetCardImagePath(string picpath, Card c)
         {
-            //密码，带0密码，卡名
+            //Card ID, zero-padded ID, and card name
             string jpg = MyPath.Combine(picpath, c.id + ".jpg");
             string jpg2 = MyPath.Combine(picpath, c.IdString + ".jpg");
             string jpg3 = MyPath.Combine(picpath, c.name + ".jpg");
@@ -183,7 +183,7 @@ namespace DataEditorX.Core.Mse
             {
                 File.Copy(jpg3, jpg, true);
                 if (File.Exists(jpg))
-                {//复制失败
+                {//Copy failed
                     return jpg;
                 }
             }
@@ -199,13 +199,13 @@ namespace DataEditorX.Core.Mse
             {
                 File.Copy(png3, png, true);
                 if (File.Exists(png))
-                {//复制失败
+                {//Copy failed
                     return png;
                 }
             }
             return "";
         }
-        //获取属性
+        //Get attribute
         public static string GetAttribute(int attr)
         {
             CardAttribute cattr = (CardAttribute)attr;
@@ -236,7 +236,7 @@ namespace DataEditorX.Core.Mse
             }
             return sattr;
         }
-        //获取效果文本
+        //Get effect text
         public static string GetDesc(string cdesc, string regx)
         {
             string desc = cdesc.Replace("\r\n", "\n").Replace("\r", "\n");
@@ -260,7 +260,7 @@ namespace DataEditorX.Core.Mse
             _ = sb.Replace("\n", "\n\t\t");
             return Regex.Replace(sb.ToString().Trim('\n'), "</?[bi]>", "");
         }
-        //获取星星
+        //Get level/rank stars
         public static string GetStar(long level)
         {
             long j = level & 0xff;
@@ -271,7 +271,7 @@ namespace DataEditorX.Core.Mse
             }
             return star;
         }
-        //获取种族
+        //Get race
         public string GetRace(long race)
         {
             if (cfg.raceDic.ContainsKey(race))
@@ -281,7 +281,7 @@ namespace DataEditorX.Core.Mse
 
             return race.ToString("x");
         }
-        //获取类型文字
+        //Get type text
         public string GetType(CardType ctype)
         {
             long type = (long)ctype;
@@ -293,10 +293,10 @@ namespace DataEditorX.Core.Mse
             return type.ToString("x");
         }
 
-        //获取卡片类型
+        //Read card type
         public string[] GetTypes(Card c)
         {
-            //卡片类型，效果1，效果2，效果3
+            // Card type, effect 1, effect 2, effect 3
             int MAX_TYPE = 5;
             var types = new string[MAX_TYPE + 1];
             types[0] = MseCardType.CARD_NORMAL;
@@ -349,12 +349,12 @@ namespace DataEditorX.Core.Mse
                         types[0] = MseCardType.CARD_NORMAL;
                         if (cardTypes.Length == 1)
                         {
-                            //xxx/通常
+                            //xxx/Normal
                         }
                     }
                 }
             }
-            if (c.race == 0)//如果没有种族
+            if (c.race == 0)//When race is missing
             {
                 types[1] = "";
                 types[2] = "";
@@ -365,8 +365,8 @@ namespace DataEditorX.Core.Mse
         }
         #endregion
 
-        #region 写存档
-        //写存档
+        #region Write save file
+        //Write save file
         public Dictionary<Card, string> WriteSet(string file, Card[] cards, string cardpack_db, bool rarity = true)
         {
             Dictionary<Card, string> list = new();
@@ -414,7 +414,7 @@ namespace DataEditorX.Core.Mse
             }
             return i;
         }
-        //怪兽，pendulum怪兽
+        //Monster and Pendulum monster
         string GetMonster(Card c, string img, CardPack cardpack = null, bool rarity = true)
         {
             StringBuilder sb = new();
@@ -506,7 +506,7 @@ namespace DataEditorX.Core.Mse
             }
             else
             {
-                if (c.IsType(CardType.TYPE_PENDULUM))//P怪兽
+                if (c.IsType(CardType.TYPE_PENDULUM))//Pendulum monster
                 {
                     _ = sb.AppendLine("	" + TAG_TEXT + ":");
                     //sb.AppendLine(cfg.regx_monster + ":" + cfg.regx_pendulum);
@@ -517,7 +517,7 @@ namespace DataEditorX.Core.Mse
                     _ = sb.AppendLine("	" + TAG_PEND_TEXT + ":");
                     _ = sb.AppendLine("		" + ReText(ReItalic(ptx)));
                 }
-                else//一般怪兽
+                else//Regular monster
                 {
                     _ = sb.AppendLine("	" + TAG_TEXT + ":");
                     _ = sb.AppendLine("		" + ReText(ReItalic(txt)));
@@ -529,7 +529,7 @@ namespace DataEditorX.Core.Mse
             _ = sb.AppendLine(GetLine(TAG_CODE, c.IdString));
             return sb.ToString();
         }
-        //魔法陷阱
+        //Spell/trap
         string GetSpellTrap(Card c, string img, bool isSpell, CardPack cardpack = null, bool rarity = true)
         {
             StringBuilder sb = new();
@@ -556,7 +556,7 @@ namespace DataEditorX.Core.Mse
         }
         #endregion
 
-        #region 读存档
+        #region Read save file
         public static int GetAttributeInt(string cattr)
         {
             int iattr = 0;
@@ -627,7 +627,7 @@ namespace DataEditorX.Core.Mse
             }
             return "";
         }
-        //多行
+        //Multiline text
         static string GetMultiValue(string content, string tag)
         {
             //TODO
@@ -648,7 +648,7 @@ namespace DataEditorX.Core.Mse
         static long GetSpellTrapType(string level)
         {
             long type = 0;
-            //魔法陷阱
+            //Spell/trap
             if (level.Contains(MseSpellTrap.EQUIP))
             {
                 type = (long)CardType.TYPE_EQUIP;
@@ -710,15 +710,15 @@ namespace DataEditorX.Core.Mse
             }
             return type;
         }
-        //卡片类型
+        //Card types
         long GetCardType(string cardtype, string level, params string[] types)
         {
             long type = 0;
-            //魔法陷阱
+            //Spell/trap
             type |= GetSpellTrapType(level);
-            //怪兽
+            //Monster
             type |= GetMonsterType(cardtype);
-            //types是识别怪兽效果类型
+            //types identifies monster effect types
             foreach (string typ in types)
             {
                 type |= GetTypeInt(typ);
@@ -729,40 +729,40 @@ namespace DataEditorX.Core.Mse
 
         static string RemoveTag(string word)
         {
-            //移除标签<>
+            //Remove angle-bracket tags
             word = Regex.Replace(word, "<[^>]+?>", "");
             return word.Trim().Replace("\t", "");
         }
-        //解析卡片
+        //Parse card
         public Card ReadCard(string content, out string img)
         {
             string tmp;
             Card c = new()
             {
                 ot = (int)CardRule.OCGTCG,
-                //卡名
+                //Card name
                 name = GetValue(content, TAG_NAME)
             };
             tmp = GetValue(content, TAG_LEVEL);
-            //卡片种族
+            //Card races
             c.race = GetRaceInt(GetValue(content, TAG_TYPE1));
-            //卡片类型
+            //Card types
             c.type = GetCardType(GetValue(content, TAG_CARDTYPE), tmp,
                                  GetValue(content, TAG_TYPE2),
                                  GetValue(content, TAG_TYPE3),
                                  GetValue(content, TAG_TYPE4),
                                  GetValue(content, TAG_TYPE5));
             long t = GetSpellTrapType(GetValue(content, TAG_LEVEL));
-            //不是魔法，陷阱卡片的星数
+            //Stars for non-spell/trap cards
             if (!(c.IsType(CardType.TYPE_SPELL)
                   || c.IsType(CardType.TYPE_TRAP)) && t == 0)
             {
                 c.level = GetValue(content, TAG_LEVEL).Length;
             }
 
-            //属性
+            //Attribute
             c.attribute = GetAttributeInt(GetValue(content, TAG_ATTRIBUTE));
-            //密码
+            //Card ID
             _ = uint.TryParse(GetValue(content, TAG_CODE), out c.id);
             //ATK
             tmp = GetValue(content, TAG_ATK);
@@ -784,11 +784,11 @@ namespace DataEditorX.Core.Mse
             {
                 _ = int.TryParse(tmp, out c.def);
             }
-            //图片
+            //Image
             img = GetValue(content, TAG_IMAGE);
-            //摇摆
+            //Pendulum
             if (c.IsType(CardType.TYPE_PENDULUM))
-            {//根据预设的模版，替换内容
+            {//Replace content using the configured template
                 tmp = cfg.temp_text.Replace(TAG_REP_TEXT,
                                             GetMultiValue(content, TAG_TEXT));
                 tmp = tmp.Replace(TAG_REP_PTEXT,
@@ -799,14 +799,14 @@ namespace DataEditorX.Core.Mse
             {
                 c.desc = GetMultiValue(content, TAG_TEXT);
             }
-            //摇摆刻度
+            //Pendulum scales
             _ = int.TryParse(GetValue(content, TAG_PSCALE1), out int itmp);
             c.level += itmp << 0x18;
             _ = int.TryParse(GetValue(content, TAG_PSCALE2), out itmp);
             c.level += itmp << 0x10;
             return c;
         }
-        //读取所有卡片
+        //Read all cards
         public Card[] ReadCards(string set, bool repalceOld)
         {
             List<Card> cards = new();
@@ -831,28 +831,28 @@ namespace DataEditorX.Core.Mse
                 {
                     c.id = i;
                 }
-                //添加卡片
+                //Add card
                 cards.Add(c);
-                //已经解压出来的图片
+                //Image already extracted from the archive
                 string saveimg = MyPath.Combine(cfg.imagepath, img);
-                if (!File.Exists(saveimg))//没有解压相应的图片
+                if (!File.Exists(saveimg))//Matching image was not extracted
                 {
                     continue;
                 }
-                //改名后的图片
+                //Renamed image
                 img = MyPath.Combine(cfg.imagepath, c.IdString + ".jpg");
-                if (img == saveimg)//文件名相同
+                if (img == saveimg)//File names are the same
                 {
                     continue;
                 }
 
                 if (File.Exists(img))
                 {
-                    if (repalceOld)//如果存在，则备份原图
+                    if (repalceOld)//Back up the existing image when present
                     {
-                        File.Delete(img + ".bak");//删除备份
-                        File.Move(img, img + ".bak");//备份
-                        File.Move(saveimg, img);//改名
+                        File.Delete(img + ".bak");// Delete old backup.
+                        File.Move(img, img + ".bak");//Back up existing file
+                        File.Move(saveimg, img);//Rename extracted file
                     }
                 }
                 else
@@ -867,7 +867,7 @@ namespace DataEditorX.Core.Mse
 
         #region images
         /// <summary>
-        /// 图片缓存
+        /// Image cache
         /// </summary>
         /// <param name="img"></param>
         /// <param name="card"></param>
@@ -876,7 +876,7 @@ namespace DataEditorX.Core.Mse
         {
             if (!cfg.reimage)
             {
-                //不需要调整
+                //No resize needed
                 return img;
             }
             bool isPendulum = card.IsType(CardType.TYPE_PENDULUM);
@@ -897,15 +897,15 @@ namespace DataEditorX.Core.Mse
             string md5 = MyUtils.GetMD5HashFromFile(img);
             if (MyUtils.Md5isEmpty(md5) || cfg.imagecache == null)
             {
-                //md5为空
+                //MD5 is empty
                 return img;
             }
             string file = MyPath.Combine(cfg.imagecache, md5);
             if (!File.Exists(file))
             {
-                //生成缓存
+                //Create cache
                 Bitmap bmp = MyBitmap.ReadImage(img);
-                //缩放
+                //Resize
                 if (isPendulum)
                 {
                     bmp = MyBitmap.Zoom(bmp, cfg.pwidth, cfg.pheight);
@@ -914,7 +914,7 @@ namespace DataEditorX.Core.Mse
                 {
                     bmp = MyBitmap.Zoom(bmp, cfg.width, cfg.height);
                 }
-                //保存文件
+                //Save file
                 _ = MyBitmap.SaveAsJPEG(bmp, file, 100);
             }
             return file;
@@ -952,7 +952,7 @@ namespace DataEditorX.Core.Mse
                 try
                 {
                     _ = _mseProcess.Start();
-                    //等待结束，需要把当前方法放到线程里面
+                    //Wait for completion; this method should run on a worker thread
                     _mseProcess.WaitForExit();
                     _mseProcess.Exited += new EventHandler(_exitHandler);
                     _mseProcess.Close();

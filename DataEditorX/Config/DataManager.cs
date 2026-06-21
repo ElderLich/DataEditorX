@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 5月18 星期日
- * 时间: 18:08
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: May 18, Sunday
+ * Time: 18:08
  * 
  */
 using System.Globalization;
@@ -14,19 +14,19 @@ namespace DataEditorX.Config
     public class DataManager
     {
         /// <summary>
-        /// 内容开头
+        /// Content start tag
         /// </summary>
         public const string TAG_START = "##";
         /// <summary>
-        /// 内容结尾
+        /// Content end tag
         /// </summary>
         public const string TAG_END = "#";
         /// <summary>
-        /// 行分隔符
+        /// Line separator
         /// </summary>
         public const char SEP_LINE = '\t';
 
-        #region 根据tag获取内容
+        #region Read content by tag
         static string reReturn(string content)
         {
             string text = content.Replace("\r\n", "\n");
@@ -37,7 +37,7 @@ namespace DataEditorX.Config
         {
             Regex reg = new(string.Format(@"{0}{1}\n([\S\s]*?)\n{2}", TAG_START, tag, TAG_END), RegexOptions.Multiline);
             Match mac = reg.Match(reReturn(content));
-            if (mac.Success)//把相应的内容提取出来
+            if (mac.Success)//Extract matching content
             {
                 return mac.Groups[1].Value.Replace("\n", Environment.NewLine);
             }
@@ -45,19 +45,19 @@ namespace DataEditorX.Config
         }
         #endregion
 
-        #region 读取
+        #region Read
         /// <summary>
-        /// 从字符串中，按tag来分割内容，并读取内容
+        /// Split string content by tag and read it
         /// </summary>
-        /// <param name="content">字符串</param>
-        /// <param name="tag">开始的标志</param>
+        /// <param name="content">String</param>
+        /// <param name="tag">Start tag</param>
         /// <returns></returns>
         public static Dictionary<long, string> Read(string content, string tag)
         {
             return Read(SubString(content, tag));
         }
         /// <summary>
-        /// 从文件读取内容，按行读取
+        /// Read content from a file line by line
         /// </summary>
         /// <param name="strFile"></param>
         /// <param name="encode"></param>
@@ -67,7 +67,7 @@ namespace DataEditorX.Config
             return Read(File.ReadAllLines(strFile, encode));
         }
         /// <summary>
-        /// 从字符串中读取内容，需要分行
+        /// Read line-based content from a string
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
@@ -75,11 +75,11 @@ namespace DataEditorX.Config
         {
             string text = reReturn(content);
             text = text.Replace("\r", "\n");
-            text = text.Replace("\n\n", "\n"); //Linux & MacOS 适配 190324 by JoyJ
+            text = text.Replace("\n\n", "\n"); //Linux and macOS compatibility, 2019-03-24 by JoyJ
             return Read(text.Split('\n'));
         }
         /// <summary>
-        /// 从行读取内容
+        /// Read content from a line
         /// </summary>
         /// <param name="lines"></param>
         /// <returns></returns>
@@ -109,7 +109,7 @@ namespace DataEditorX.Config
                 {
                     _ = long.TryParse(words[0], out lkey);
                 }
-                // N/A 的数据不显示
+                // Hide N/A data
                 if (!tempDic.ContainsKey(lkey) && words[1] != "N/A")
                 {
                     tempDic.Add(lkey, string.Join(' ', words[1..]));
@@ -120,7 +120,7 @@ namespace DataEditorX.Config
 
         #endregion
 
-        #region 查找
+        #region Find
         public static List<long> GetKeys(Dictionary<long, string> dic)
         {
             List<long> list = new();
@@ -140,7 +140,7 @@ namespace DataEditorX.Config
             return list.ToArray();
         }
         /// <summary>
-        /// 获取值
+        /// Get value
         /// </summary>
         /// <param name="dic"></param>
         /// <param name="key"></param>

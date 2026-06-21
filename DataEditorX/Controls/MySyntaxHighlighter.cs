@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-23
- * 时间: 23:14
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-23
+ * Time: 23:14
  * 
  */
 using System.Text.RegularExpressions;
@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace FastColoredTextBoxNS
 {
     /// <summary>
-    /// ygocore的lua高亮，夜间
+    /// Lua syntax highlighting for ygocore scripts.
     /// </summary>
     public class MySyntaxHighlighter : SyntaxHighlighter
     {

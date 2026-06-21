@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 
 namespace DataEditorX.Common
@@ -6,11 +6,11 @@ namespace DataEditorX.Common
     public class ConfHelper
     {
         /// <summary>
-        /// 内容分隔符
+        /// Content delimiter
         /// </summary>
         public const string SEP_LINE = " ";
         /// <summary>
-        /// 从行获取值
+        /// Read value from a line
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
@@ -25,7 +25,7 @@ namespace DataEditorX.Common
             return "";
         }
         /// <summary>
-        /// 从词中获取第一个值
+        /// Read the first value from tokens
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
@@ -40,7 +40,7 @@ namespace DataEditorX.Common
             return word;
         }
         /// <summary>
-        /// 从词中获取第二个值
+        /// Read the second value from tokens
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
@@ -55,7 +55,7 @@ namespace DataEditorX.Common
             return "";
         }
         /// <summary>
-        /// 获取多行值，替换\n \t
+        /// Read multiline value and unescape \n / \t
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
@@ -64,7 +64,7 @@ namespace DataEditorX.Common
             return GetRegex(GetValue(line));
         }
         /// <summary>
-        /// 替换特殊符
+        /// Replace escape sequences
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
@@ -78,7 +78,7 @@ namespace DataEditorX.Common
             return sb.ToString();
         }
         /// <summary>
-        /// 获取boolean值
+        /// Read boolean value
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
@@ -94,10 +94,10 @@ namespace DataEditorX.Common
             }
         }
         /// <summary>
-        /// 获取int值
+        /// Read integer value
         /// </summary>
         /// <param name="line"></param>
-        /// <param name="defalut">失败的值</param>
+        /// <param name="defalut">Fallback value</param>
         /// <returns></returns>
         public static int GetIntegerValue(string line, int defalut)
         {
@@ -111,7 +111,7 @@ namespace DataEditorX.Common
             return defalut;
         }
         /// <summary>
-        /// 从行获取内容添加到字典
+        /// Read content from a line and add it to the dictionary
         /// race 0x1 xxx
         /// </summary>
         /// <param name="dic"></param>

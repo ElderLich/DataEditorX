@@ -1,24 +1,24 @@
-﻿
+
 namespace DataEditorX.Core
 {
     /// <summary>
-    /// 任务
+    /// Task
     /// </summary>
     public enum MyTask
     {
-        ///<summary>空</summary>
+        ///<summary>None</summary>
         NONE,
-        ///<summary>检查更新</summary>
+        ///<summary>Check for updates</summary>
         CheckUpdate,
-        ///<summary>导出数据</summary>
+        ///<summary>Export data</summary>
         ExportData,
-        ///<summary>保存为MSE存档</summary>
+        ///<summary>Save as MSE file</summary>
         SaveAsMSE,
-        ///<summary>裁剪图片</summary>
+        ///<summary>Crop images</summary>
         CutImages,
-        ///<summary>转换图片</summary>
+        ///<summary>Convert images</summary>
         ConvertImages,
-        ///<summary>读取MSE存档</summary>
+        ///<summary>Read MSE file</summary>
         ReadMSE,
     }
 }

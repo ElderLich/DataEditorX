@@ -1,8 +1,8 @@
 ﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 5月18 星期日
- * 时间: 20:22
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: May 18, Sunday
+ * Time: 20:22
  * 
  */
 namespace DataEditorX

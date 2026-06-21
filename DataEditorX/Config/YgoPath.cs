@@ -1,4 +1,4 @@
-﻿namespace DataEditorX.Config
+namespace DataEditorX.Config
 {
     public class YgoPath
     {
@@ -16,19 +16,19 @@
             ydkpath = MyPath.Combine(gamepath, "deck");
             replaypath = MyPath.Combine(gamepath, "replay");
         }
-        /// <summary>游戏目录</summary>
+        /// <summary>Game directory</summary>
         public string gamepath;
-        /// <summary>大图目录</summary>
+        /// <summary>Full-size image directory</summary>
         public string picpath;
-        /// <summary>小图目录</summary>
+        /// <summary>Thumbnail directory</summary>
         public string picpath2;
-        /// <summary>场地图目录</summary>
+        /// <summary>Field image directory</summary>
         public string fieldpath;
-        /// <summary>脚本目录</summary>
+        /// <summary>Script directory</summary>
         public string luapath;
-        /// <summary>卡组目录</summary>
+        /// <summary>Deck directory</summary>
         public string ydkpath;
-        /// <summary>录像目录</summary>
+        /// <summary>Replay directory</summary>
         public string replaypath;
 
         public string GetImage(long id)
@@ -41,7 +41,7 @@
         //}
         public string GetImageField(long id)
         {
-            return GetImageField(id.ToString());//场地图
+            return GetImageField(id.ToString());//Field image
         }
         public string GetScript(long id)
         {
@@ -51,7 +51,7 @@
         {
             return MyPath.Combine(ydkpath, name + ".ydk");
         }
-        //字符串id
+        //String ID
         public string GetImage(string id)
         {
             string img = MyPath.Combine(picpath, id + ".png");
@@ -64,7 +64,7 @@
         //}
         public string GetImageField(string id)
         {
-            return MyPath.Combine(fieldpath, id + ".png");//场地图
+            return MyPath.Combine(fieldpath, id + ".png");//Field image
         }
         public string GetScript(string id)
         {
@@ -78,9 +78,9 @@
         public string[] GetCardfiles(long id)
         {
             string[] files = [
-                GetImage(id),//大图
-				//GetImageThum(id),//小图
-				GetImageField(id),//场地图
+                GetImage(id),//Full-size image
+				//GetImageThum(id),//Thumbnail
+				GetImageField(id),//Field image
 				GetScript(id)
            ];
             return files;
@@ -88,9 +88,9 @@
         public string[] GetCardfiles(string id)
         {
             string[] files = [
-                GetImage(id),//大图
-				//GetImageThum(id),//小图
-				GetImageField(id),//场地图
+                GetImage(id),//Full-size image
+				//GetImageThum(id),//Thumbnail
+				GetImageField(id),//Field image
 				GetScript(id)
            ];
             return files;

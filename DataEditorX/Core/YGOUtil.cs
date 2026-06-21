@@ -1,4 +1,4 @@
-﻿using DataEditorX.Config;
+using DataEditorX.Config;
 using DataEditorX.Core.Info;
 using Microsoft.VisualBasic.FileIO;
 using System.Text;
@@ -17,7 +17,7 @@ namespace DataEditorX.Core
             _datacfg = dcfg;
         }
 
-        #region 判断文件类型
+        #region File type detection
         public static bool IsScript(string file)
         {
             if (file != null && file.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
@@ -38,7 +38,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 获取属性，种族
+        #region Get attribute and race
         public static string GetAttributeString(int attr)
         {
             return DataManager.GetValue(_datacfg.dicCardAttributes, attr);
@@ -51,12 +51,12 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 获取卡片类型
+        #region Read card type
         public static string GetCardType(Card c)
         {
             string str = "???";
             if (c.IsType(CardType.TYPE_MONSTER))
-            {//卡片类型和第1效果
+            {//Card type and first effect flag
                 if (c.IsType(CardType.TYPE_XYZ))
                 {
                     str = GetType(CardType.TYPE_XYZ);
@@ -165,7 +165,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 系列名
+        #region Archetype/setcode names
         public static string GetSetNameString(long setcode)
         {
             long sc1 = setcode & 0xffff;
@@ -181,12 +181,12 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 根据文件读取数据库
+        #region Read database input from files
         /// <summary>
-        /// 读取ydk文件为密码数组
+        /// Read a YDK file as a card ID array
         /// </summary>
-        /// <param name="file">ydk文件</param>
-        /// <returns>密码数组</returns>
+        /// <param name="file">YDK file</param>
+        /// <returns>Card ID array</returns>
         public static string[] ReadYDK(string ydkfile)
         {
             string str;
@@ -219,7 +219,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 图像
+        #region Images
         public static string[] ReadImage(string path)
         {
             List<string> list = new();
@@ -247,8 +247,8 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 删除资源
-        //删除资源
+        #region Load related-file deletion setting
+        //Load related-file deletion setting
         public static void CardDelete(long id, YgoPath ygopath)
         {
             string[] files = ygopath.GetCardfiles(id);
@@ -262,8 +262,8 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 资源改名
-        //资源改名
+        #region Resource rename
+        //Resource rename
         public static void CardRename(long newid, long oldid, YgoPath ygopath)
         {
             string[] newfiles = ygopath.GetCardfiles(newid);
@@ -283,7 +283,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 复制资源
+        #region Copy resources
         public static void CardCopy(long newid, long oldid, YgoPath ygopath)
         {
             string[] newfiles = ygopath.GetCardfiles(newid);

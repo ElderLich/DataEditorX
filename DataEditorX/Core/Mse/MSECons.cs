@@ -1,66 +1,66 @@
-﻿namespace DataEditorX.Core.Mse
+namespace DataEditorX.Core.Mse
 {
     public class MseAttribute
     {
-        /// <summary>无</summary>
+        /// <summary>None</summary>
         public const string NONE = "none";
-        /// <summary>暗</summary>
+        /// <summary>Dark</summary>
         public const string DARK = "dark";
-        /// <summary>神</summary>
+        /// <summary>Divine</summary>
         public const string DIVINE = "divine";
-        /// <summary>地</summary>
+        /// <summary>Earth</summary>
         public const string EARTH = "earth";
-        /// <summary>火</summary>
+        /// <summary>Fire</summary>
         public const string FIRE = "fire";
-        /// <summary>光</summary>
+        /// <summary>Light</summary>
         public const string LIGHT = "light";
-        /// <summary>水</summary>
+        /// <summary>Water</summary>
         public const string WATER = "water";
-        /// <summary>风</summary>
+        /// <summary>Wind</summary>
         public const string WIND = "wind";
-        /// <summary>魔法</summary>
+        /// <summary>Spell</summary>
         public const string SPELL = "spell";
-        /// <summary>陷阱</summary>
+        /// <summary>Trap</summary>
         public const string TRAP = "trap";
     }
     public class MseSpellTrap
     {
-        /// <summary>装备</summary>
+        /// <summary>Equip</summary>
         public const string EQUIP = "+";
-        /// <summary>速攻</summary>
+        /// <summary>Quick-Play</summary>
         public const string QUICKPLAY = "$";
-        /// <summary>场地</summary>
+        /// <summary>Field</summary>
         public const string FIELD = "&";
-        /// <summary>永续</summary>
+        /// <summary>Continuous</summary>
         public const string CONTINUOUS = "%";
-        /// <summary>仪式</summary>
+        /// <summary>Ritual</summary>
         public const string RITUAL = "#";
-        /// <summary>反击</summary>
+        /// <summary>Counter</summary>
         public const string COUNTER = "!";
-        /// <summary>通常</summary>
+        /// <summary>Normal</summary>
         public const string NORMAL = "^";
     }
     public class MseCardType
     {
-        /// <summary>通常</summary>
+        /// <summary>Normal</summary>
         public const string CARD_NORMAL = "normal monster";
-        /// <summary>效果</summary>
+        /// <summary>Effect</summary>
         public const string CARD_EFFECT = "effect monster";
-        /// <summary>超量</summary>
+        /// <summary>Xyz</summary>
         public const string CARD_XYZ = "xyz monster";
-        /// <summary>仪式</summary>
+        /// <summary>Ritual</summary>
         public const string CARD_RITUAL = "ritual monster";
-        /// <summary>融合</summary>
+        /// <summary>Fusion</summary>
         public const string CARD_FUSION = "fusion monster";
-        /// <summary>衍生物</summary>
+        /// <summary>Token</summary>
         public const string CARD_TOKEN = "token monster";
-        /// <summary>衍生物无种族</summary>
+        /// <summary>Token without race</summary>
         public const string CARD_TOKEN2 = "token card";
-        /// <summary>同调</summary>
+        /// <summary>Synchro</summary>
         public const string CARD_SYNCHRO = "synchro monster";
-        /// <summary>魔法</summary>
+        /// <summary>Spell</summary>
         public const string CARD_SPELL = "spell card";
-        /// <summary>陷阱</summary>
+        /// <summary>Trap</summary>
         public const string CARD_TRAP = "trap card";
         /// <summary>
         /// link

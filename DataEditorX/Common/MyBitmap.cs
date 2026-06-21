@@ -1,6 +1,6 @@
-﻿/*
+/*
  * date :2014-02-07
- * desc :图像处理，裁剪，缩放，保存
+ * desc: image processing, crop, resize, and save
  */
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -8,7 +8,7 @@ using System.Drawing.Imaging;
 namespace DataEditorX.Common
 {
     /// <summary>
-    /// 图片裁剪，缩放，保存高质量jpg
+    /// Image crop, resize, and high-quality JPEG save helpers
     /// </summary>
     public static class MyBitmap
     {
@@ -23,27 +23,27 @@ namespace DataEditorX.Common
             return (Bitmap)Image.FromStream(ms);
         }
 
-        #region 缩放
+        #region Resize
         /// <summary>
-        /// 缩放图像
+        /// Resize image
         /// </summary>
-        /// <param name="img">源图像</param>
-        /// <param name="newW">新宽度</param>
-        /// <param name="newH">新高度</param>
-        /// <returns>处理好的图像</returns>
+        /// <param name="img">Source image</param>
+        /// <param name="newW">New width</param>
+        /// <param name="newH">New height</param>
+        /// <returns>Processed image</returns>
         public static Bitmap Zoom(Bitmap sourceBitmap, int newWidth, int newHeight)
         {
             if (sourceBitmap != null)
             {
                 Bitmap b = new(newWidth, newHeight);
                 Graphics graphics = Graphics.FromImage(b);
-                //合成：高质量，低速度
+                //Compositing: high quality, lower speed
                 graphics.CompositingQuality = CompositingQuality.HighQuality;
-                //去除锯齿
+                //Antialiasing
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
-                //偏移：高质量，低速度
+                //Pixel offset: high quality, lower speed
                 graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                //插补算法
+                //Interpolation mode
                 graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 Rectangle newRect = new(0, 0, newWidth, newHeight);
                 Rectangle srcRect = new(0, 0, sourceBitmap.Width, sourceBitmap.Height);
@@ -55,51 +55,51 @@ namespace DataEditorX.Common
         }
         #endregion
 
-        #region 裁剪
+        #region Crop
         /// <summary>
-        /// 裁剪图片
+        /// Crop images
         /// </summary>
-        /// <param name="sourceBitmap">图片源</param>
-        /// <param name="area">区域</param>
+        /// <param name="sourceBitmap">Source image</param>
+        /// <param name="area">Rectangle area</param>
         /// <returns></returns>
         public static Bitmap Cut(Bitmap sourceBitmap, Area area)
         {
             return Cut(sourceBitmap, area.left, area.top, area.width, area.height);
         }
         /// <summary>
-        /// 裁剪图像
+        /// Crop image
         /// </summary>
-        /// <param name="img">源图像</param>
-        /// <param name="StartX">开始x</param>
-        /// <param name="StartY">开始y</param>
-        /// <param name="iWidth">裁剪宽</param>
-        /// <param name="iHeight">裁剪高</param>
-        /// <returns>处理好的图像</returns>
+        /// <param name="img">Source image</param>
+        /// <param name="StartX">Start X</param>
+        /// <param name="StartY">Start Y</param>
+        /// <param name="iWidth">Crop width</param>
+        /// <param name="iHeight">Crop height</param>
+        /// <returns>Processed image</returns>
         public static Bitmap Cut(Bitmap sourceBitmap, int StartX, int StartY, int cutWidth, int cutHeight)
         {
             if (sourceBitmap != null)
             {
                 int w = sourceBitmap.Width;
                 int h = sourceBitmap.Height;
-                //裁剪的区域宽度调整
+                //Adjust crop rectangle width
                 if ((StartX + cutWidth) > w)
                 {
                     cutWidth = w - StartX;
                 }
-                //裁剪的区域高度调整
+                //Adjust crop rectangle height
                 if ((StartY + cutHeight) > h)
                 {
                     cutHeight = h - StartY;
                 }
                 Bitmap bitmap = new(cutWidth, cutHeight);
                 Graphics graphics = Graphics.FromImage(bitmap);
-                //合成：高质量，低速度
+                //Compositing: high quality, lower speed
                 graphics.CompositingQuality = CompositingQuality.HighQuality;
-                //去除锯齿
+                //Antialiasing
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
-                //偏移：高质量，低速度
+                //Pixel offset: high quality, lower speed
                 graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                //插补算法
+                //Interpolation mode
                 graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 Rectangle cutRect = new(0, 0, cutWidth, cutHeight);
                 Rectangle srcRect = new(StartX, StartY, cutWidth, cutHeight);
@@ -111,25 +111,25 @@ namespace DataEditorX.Common
         }
         #endregion
 
-        #region 保存
+        #region Save
         /// <summary>
-        /// 保存jpg图像
+        /// Save JPEG image
         /// </summary>
-        /// <param name="bmp">源图像</param>
-        /// <param name="filename">保存路径</param>
-        /// <param name="quality">质量</param>
-        /// <returns>是否保存成功</returns>
+        /// <param name="bmp">Source image</param>
+        /// <param name="filename">Destination path</param>
+        /// <param name="quality">Quality</param>
+        /// <returns>Check whether save succeeded</returns>
         public static bool SaveAsJPEG(Bitmap bitmap, string filename, int quality = 90)
         {
             if (bitmap != null)
             {
                 string path = Path.GetDirectoryName(filename);
-                if (!Directory.Exists(path))//创建文件夹
+                if (!Directory.Exists(path))//Create directory
                 {
                     _ = Directory.CreateDirectory(path);
                 }
 
-                if (File.Exists(filename))//删除旧文件
+                if (File.Exists(filename))//Delete old file
                 {
                     File.Delete(filename);
                 }

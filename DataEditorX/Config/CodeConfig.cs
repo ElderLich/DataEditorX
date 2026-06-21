@@ -1,14 +1,14 @@
-﻿using FastColoredTextBoxNS;
+using FastColoredTextBoxNS;
 
 namespace DataEditorX.Config
 {
     /// <summary>
-    /// CodeEditor的配置
+    /// Code editor configuration
     /// </summary>
     public class CodeConfig
     {
 
-        #region 成员
+        #region Fields
         public CodeConfig()
         {
             tooltipDic = new SortedList<string, string>();
@@ -16,12 +16,12 @@ namespace DataEditorX.Config
             items = new List<AutocompleteItem>();
         }
 
-        //函数提示
+        //Function hints
         readonly SortedList<string, string> tooltipDic;
         readonly SortedList<string, string> longTooltipDic;
         readonly List<AutocompleteItem> items;
         /// <summary>
-        /// 输入提示
+        /// Input hints
         /// </summary>
         public SortedList<string, string> TooltipDic
         {
@@ -37,9 +37,9 @@ namespace DataEditorX.Config
         }
         #endregion
 
-        #region 系列名/指示物
+        #region Set names and counters
         /// <summary>
-        /// 设置系列名
+        /// Set archetype/setcode names
         /// </summary>
         /// <param name="dic"></param>
         public void SetNames(Dictionary<long, string> dic)
@@ -54,7 +54,7 @@ namespace DataEditorX.Config
             }
         }
         /// <summary>
-        /// 读取指示物
+        /// Read counters
         /// </summary>
         /// <param name="file"></param>
         public void AddStrings(string file)
@@ -64,7 +64,7 @@ namespace DataEditorX.Config
                 string[] lines = File.ReadAllLines(file);
                 foreach (string line in lines)
                 {
-                    //特殊胜利和指示物
+                    //Special victories and counters
                     if (line.StartsWith("!victory")
                        || line.StartsWith("!counter"))
                     {
@@ -110,7 +110,7 @@ namespace DataEditorX.Config
 
                     if (t < w && t > 0)
                     {
-                        //找到函数
+                        //Found function
                         name = line.Substring(t + 1, w - t - 1);
                         isFind = true;
                         desc = line;
@@ -125,7 +125,7 @@ namespace DataEditorX.Config
         }
         #endregion
 
-        #region 常量
+        #region Constants
         public void AddConstant(string conlua)
         {
             //conList.Add("con");
@@ -144,7 +144,7 @@ namespace DataEditorX.Config
 
                 int t = line.IndexOf("=");
                 _ = line.IndexOf("--");
-                //常量 = 0x1 ---注释
+                //Constants = 0x1 ---Comment
                 string k = (t > 0) ? line[..t].TrimEnd([' ', '\t'])
                     : line;
                 string desc = (t > 0) ? line[(t + 1)..].Replace("--", "\n")
@@ -154,7 +154,7 @@ namespace DataEditorX.Config
         }
         #endregion
 
-        #region 处理
+        #region Processing
         public void InitAutoMenus()
         {
             items.Clear();
@@ -198,7 +198,7 @@ namespace DataEditorX.Config
         void AddToolIipDic(string key, string val)
         {
             string skey = GetShortName(key);
-            if (tooltipDic.ContainsKey(skey))//存在
+            if (tooltipDic.ContainsKey(skey))//Exists
             {
                 string nval = tooltipDic[skey];
                 if (!nval.EndsWith(Environment.NewLine))
@@ -218,7 +218,7 @@ namespace DataEditorX.Config
         }
         void AddLongToolIipDic(string key, string val)
         {
-            if (longTooltipDic.ContainsKey(key))//存在
+            if (longTooltipDic.ContainsKey(key))//Exists
             {
                 string nval = longTooltipDic[key];
                 if (!nval.EndsWith(Environment.NewLine))

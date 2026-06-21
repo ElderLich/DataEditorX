@@ -1,18 +1,18 @@
-﻿namespace DataEditorX.Controls
+namespace DataEditorX.Controls
 {
     public interface IEditForm
     {
-        //获取打开的文件路径
+        //Get opened file path
         string GetOpenFile();
-        //创建文件
+        //Create file
         bool Create(string file);
-        //打开文件
+        //Open file
         bool Open(string file, string name);
-        //是否能打开某个文件
+        //Check whether a file can be opened
         bool CanOpen(string file);
-        //保存
+        //Save
         bool Save(bool shift = false);
-        //设置为活动窗口
+        //Mark as active window
         void SetActived();
     }
 }

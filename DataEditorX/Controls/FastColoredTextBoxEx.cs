@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-24
- * 时间: 7:19
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-24
+ * Time: 7:19
  * 
  */
 
@@ -29,7 +29,7 @@ namespace FastColoredTextBoxNS
             base.OnMouseMove(e);
             lastMouseCoord = e.Location;
         }
-        //函数悬停提示
+        //Function hover tooltip
         protected override void OnToolTip()
         {
             if (ToolTip == null)
@@ -80,7 +80,7 @@ namespace FastColoredTextBoxNS
             ShowTooltipWithLabel(title, text, lastMouseCoord.Y + CharHeight);
         }
 
-        //高亮当前词
+        //Highlight the current word
         void FctbTextChanged(object sender, TextChangedEventArgs e)
         {
             //delete all markers

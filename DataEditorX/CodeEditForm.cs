@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-22
- * 时间: 19:16
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-22
+ * Time: 19:16
  * 
  */
 using DataEditorX.Common;
@@ -29,8 +29,8 @@ namespace DataEditorX
         readonly MarkerStyle sameWordsStyle = new(new SolidBrush(Color.FromArgb(40, Color.White)));
         #endregion
 
-        #region init 函数提示菜单
-        //自动完成
+        #region init Function tooltip menu
+        //Autocomplete
         AutocompleteMenu popupMenu;
         string nowFile;
         public long nowCode;
@@ -50,7 +50,7 @@ namespace DataEditorX
             cardlist = new SortedDictionary<long, string>();
             tooltipDic = new SortedList<string, string>();
             InitializeComponent();
-            //设置字体，大小
+            //Apply font name and size
             string fontname = DEXConfig.ReadString(DEXConfig.TAG_FONT_NAME);
             float fontsize = DEXConfig.ReadFloat(DEXConfig.TAG_FONT_SIZE, fctb.Font.Size);
             fctb.Font = new Font(fontname, fontsize);
@@ -161,7 +161,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region IEditForm接口
+        #region IEditFormInterfaces
         public void SetActived()
         {
             Activate();
@@ -214,7 +214,7 @@ namespace DataEditorX
                     Path.GetDirectoryName(file), "../Databases", dbname + ".bytes");
                 if (!File.Exists(cdb)) cdb = MyPath.Combine(
                     Path.GetDirectoryName(file), "../Databases", dbname + ".db");
-                SetCardDB(cdb);//后台加载卡片数据
+                SetCardDB(cdb);//Load card data in the background
                 fctb.OpenFile(nowFile, new UTF8Encoding(false));
                 oldtext = fctb.Text;
                 SetTitle();
@@ -225,8 +225,8 @@ namespace DataEditorX
 
         #endregion
 
-        #region 文档视图
-        //文档视图
+        #region Document map view
+        //Document map view
         void ShowMapToolStripMenuItemClick(object sender, EventArgs e)
         {
             if (menuitem_showmap.Checked)
@@ -244,7 +244,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 设置标题
+        #region Update the title
         void SetTitle()
         {
             string str;
@@ -257,7 +257,7 @@ namespace DataEditorX
                 str = new FileInfo(nowFile).Name;
             }
 
-            if (MdiParent != null)//如果父容器不为空
+            if (MdiParent != null)//Running inside the main MDI container
             {
                 if (string.IsNullOrEmpty(nowFile))
                 {
@@ -283,7 +283,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 自动完成
+        #region Autocomplete
         public void LoadXml(string xmlfile)
         {
             fctb.DescriptionFile = xmlfile;
@@ -300,8 +300,8 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 悬停的函数说明
-        //查找函数说明
+        #region Hovered function description
+        //Find function description
         string FindTooltip(string word)
         {
             string desc = "";
@@ -322,7 +322,7 @@ namespace DataEditorX
             return desc;
         }
 
-        //悬停的函数说明
+        //Hovered function description
         void FctbToolTipNeeded(object sender, ToolTipNeededEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.HoveredWord))
@@ -338,7 +338,7 @@ namespace DataEditorX
 
                 if (tl > 0)
                 {
-                    //获取卡片信息
+                    //Get card info
                     if (cardlist.ContainsKey(tl))
                     {
                         desc = cardlist[tl];
@@ -358,7 +358,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 保存文件
+        #region Save file
         bool SaveFile(bool saveas)
         {
             string alltext = fctb.Text;
@@ -401,8 +401,8 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 菜单
-        //显示/隐藏输入框
+        #region Menu
+        //Show or hide the input box
         void Menuitem_showinputClick(object sender, EventArgs e)
         {
             if (menuitem_showinput.Checked)
@@ -458,8 +458,8 @@ namespace DataEditorX
 
         #endregion
 
-        #region 搜索函数
-        //搜索函数
+        #region Search functions
+        //Search functions
         void Tb_inputKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -479,7 +479,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 提示保存
+        #region Save prompt
         void CodeEditFormFormClosing(object sender, FormClosingEventArgs e)
         {
             if (!string.IsNullOrEmpty(oldtext))
@@ -502,7 +502,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 卡片提示
+        #region Card tooltip
         public void SetCDBList(string[] cdbs)
         {
             if (cdbs == null)
@@ -556,7 +556,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 选择高亮
+        #region Selection highlighting
         void FctbSelectionChangedDelayed(object sender, EventArgs e)
         {
             tb_input.Text = fctb.SelectedText;
@@ -582,7 +582,7 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 调转函数
+        #region Jump to function
         void FctbMouseClick(object sender, MouseEventArgs e)
         {
             var fragment = fctb.Selection.GetFragment(@"\w");

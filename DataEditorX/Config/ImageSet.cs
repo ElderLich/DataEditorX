@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-13
- * 时间: 9:02
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-13
+ * Time: 9:02
  * 
  */
 using DataEditorX.Common;
@@ -10,7 +10,7 @@ using DataEditorX.Common;
 namespace DataEditorX.Config
 {
     /// <summary>
-    /// 裁剪图片是、配置
+    /// Image crop configuration
     /// </summary>
 	public class ImageSet
     {
@@ -18,7 +18,7 @@ namespace DataEditorX.Config
         {
             Init();
         }
-        //初始化
+        // Initialize defaults.
         void Init()
         {
             normalArea = DEXConfig.ReadArea(DEXConfig.TAG_IMAGE_OTHER);
@@ -37,35 +37,35 @@ namespace DataEditorX.Config
             quality = DEXConfig.ReadInteger(DEXConfig.TAG_IMAGE_QUALITY, 95);
         }
         /// <summary>
-        /// jpeg质量
+        /// jpegQuality
         /// </summary>
 		public int quality;
         /// <summary>
-        /// 小图的宽
+        /// Thumbnail width
         /// </summary>
         public int w;
         /// <summary>
-        /// 小图的高
+        /// Thumbnail height
         /// </summary>
         public int h;
         /// <summary>
-        /// 大图的宽
+        /// Full image width
         /// </summary>
         public int W;
         /// <summary>
-        /// 大图的高
+        /// Full image height
         /// </summary>
         public int H;
         /// <summary>
-        /// 怪兽的中间图
+        /// Monster middle image
         /// </summary>
         public Area normalArea;
         /// <summary>
-        /// xyz怪兽的中间图
+        /// Xyz monster middle image
         /// </summary>
         public Area xyzArea;
         /// <summary>
-        /// p怪的中间图
+        /// Pendulum monster middle image
         /// </summary>
         public Area pendulumArea;
     }

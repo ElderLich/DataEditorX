@@ -1,34 +1,34 @@
-﻿using DataEditorX.Common;
+using DataEditorX.Common;
 using System.Diagnostics;
 using System.Globalization;
 
 namespace DataEditorX.Config
 {
     /// <summary>
-    /// 配置
+    /// Configuration
     /// </summary>
     public class DEXConfig : XMLReader
     {
-        #region 常量
+        #region Constants
         public const string TAG_SAVE_LAGN = "-savelanguage";
         public const string TAG_SAVE_LAGN2 = "-sl";
         public const string TAG_MSE_PATH = "mse_path";
         public const string TAG_MSE_EXPORT = "mse_exportpath";
         public const string TAG_AUTO_LEN = "autolength";
         /// <summary>
-        /// 窗口消息 打开文件
+        /// Window message for opening files
         /// </summary>
         public const int WM_OPEN = 0x0401;
         /// <summary>
-        /// 最大历史数量
+        /// Maximum history entries
         /// </summary>
         public const int MAX_HISTORY = 0x10;
         /// <summary>
-        /// 数据目录
+        /// Data directory
         /// </summary>
         public const string TAG_DATA = "data";
         /// <summary>
-        /// 将要打开
+        /// Pending open file
         /// </summary>
         //public const string TAG_OPEN = "open";
         /// <summary>
@@ -36,60 +36,60 @@ namespace DataEditorX.Config
         /// </summary>
         public const string TAG_MSE = "mse";
         /// <summary>
-        /// 卡片信息
+        /// Card info
         /// </summary>
         public const string TAG_CARDINFO = "cardinfo";
         /// <summary>
-        /// 语言
+        /// Language
         /// </summary>
         public const string TAG_LANGUAGE = "language";
         /// <summary>
-        /// 临时文件
+        /// Temporary file
         /// </summary>
         public const string FILE_TEMP = "open.tmp";
         /// <summary>
-        /// 历史记录
+        /// History file
         /// </summary>
         public const string FILE_HISTORY = "history.txt";
         /// <summary>
-        /// 函数
+        /// Functions
         /// </summary>
         public const string FILE_FUNCTION = "_functions.txt";
         public const string FILE_FUNCTION_ENGLISH = "_function_english.txt";
         /// <summary>
-        /// 常量
+        /// Constants
         /// </summary>
         public const string FILE_CONSTANT = "constant.lua";
         /// <summary>
-        /// 指示物，胜利提示
+        /// Counters and victory messages
         /// </summary>
         public const string FILE_STRINGS = "strings.conf";
         /// <summary>
-        /// 源码链接
+        /// Source URL
         /// </summary>
         public const string TAG_SOURCE_URL = "sourceURL";
         /// <summary>
-        /// 升级链接
+        /// Update URL
         /// </summary>
         public const string TAG_UPDATE_URL = "updateURL";
         /// <summary>
-        /// 删除卡片的时候，删除图片脚本
+        /// Delete image and script files when deleting a card
         /// </summary>
         public const string TAG_DELETE_WITH = "opera_with_cards_file";
         /// <summary>
-        /// 异步加载数据
+        /// Load data asynchronously
         /// </summary>
         public const string TAG_ASYNC = "async";
         /// <summary>
-        /// 用本程序打开文件
+        /// Open files in this program
         /// </summary>
         public const string TAG_OPEN_IN_THIS = "open_file_in_this";
         /// <summary>
-        /// 自动检查更新
+        /// Load auto-update setting
         /// </summary>
         public const string TAG_AUTO_CHECK_UPDATE = "auto_check_update";
         /// <summary>
-        /// 深色主题
+        /// Dark theme
         /// </summary>
         public const string TAG_DARK_THEME = "dark_theme";
         /// <summary>
@@ -97,75 +97,75 @@ namespace DataEditorX.Config
         /// </summary>
         public const string TAG_ADD_REQUIRE = "add_require";
         /// <summary>
-        /// 检查系统语言
+        /// Check system language
         /// </summary>
         public const string TAG_CHECK_SYSLANG = "check_system_language";
         /// <summary>
-        /// 一般的裁剪
+        /// Default crop settings
         /// </summary>
         public const string TAG_IMAGE_OTHER = "image_other";
         /// <summary>
-        /// xyz的裁剪
+        /// Xyz crop settings
         /// </summary>
         public const string TAG_IMAGE_XYZ = "image_xyz";
         /// <summary>
-        /// Pendulum的裁剪
+        /// Pendulum crop settings
         /// </summary>
         public const string TAG_IMAGE_PENDULUM = "image_pendulum";
         /// <summary>
-        /// 图片的宽高，小图w,h大图W,H，共4个
+        /// Image dimensions: thumbnail w/h and full-size W/H
         /// </summary>
         public const string TAG_IMAGE_SIZE = "image";
         /// <summary>
-        /// 图片质量
+        /// ImageQuality
         /// </summary>
         public const string TAG_IMAGE_QUALITY = "image_quality";
         //CodeEditor
         /// <summary>
-        /// 字体名
+        /// Font name
         /// </summary>
         public const string TAG_FONT_NAME = "fontname";
         /// <summary>
-        /// 使用的编辑器
+        /// Selected editor
         /// </summary>
         public const string USE_EDITOR = "editor";
         /// <summary>
-        /// 字体大小
+        /// Font size
         /// </summary>
         public const string TAG_FONT_SIZE = "fontsize";
         /// <summary>
-        /// 支持中文
+        /// Enable Chinese IME
         /// </summary>
         public const string TAG_IME = "IME";
         /// <summary>
-        /// 自动换行
+        /// Word wrap
         /// </summary>
         public const string TAG_WORDWRAP = "wordwrap";
         /// <summary>
-        /// tab替换为空格
+        /// Replace tabs with spaces
         /// </summary>
         public const string TAG_TAB2SPACES = "tabisspace";
         /// <summary>
         /// </summary>
         public const string TAG_SAVE2DB = "save_to_db";
         /// <summary>
-        /// 规则
+        /// Rule
         /// </summary>
         public const string TAG_RULE = "rule";
         /// <summary>
-        /// 种族
+        /// Race
         /// </summary>
         public const string TAG_RACE = "race";
         /// <summary>
-        /// 属性
+        /// Attribute
         /// </summary>
         public const string TAG_ATTRIBUTE = "attribute";
         /// <summary>
-        /// 等级
+        /// Level
         /// </summary>
         public const string TAG_LEVEL = "level";
         /// <summary>
-        /// 效果分类
+        /// Effect categories
         /// </summary>
         public const string TAG_CATEGORY = "category \\(genre\\)";
         /// <summary>
@@ -173,26 +173,26 @@ namespace DataEditorX.Config
         /// </summary>
         public const string TAG_FLAGS = "flags \\(category\\)";
         /// <summary>
-        /// 类型
+        /// Types
         /// </summary>
         public const string TAG_TYPE = "type";
         /// <summary>
-        /// 系列名
+        /// Archetype/setcode names
         /// </summary>
         public const string TAG_SETNAME = "setname";
         /// <summary>
-        /// 连接标志
+        /// Link markers
         /// </summary>
         public const string TAG_MARKER = "link marker";
         /// <summary>
-        /// 临时文件
+        /// Temporary file
         /// </summary>
         public const string TOOLTIP_FONT = "tooltip_font";
         #endregion
 
-        #region 读取内容
+        #region Read config content
         /// <summary>
-        /// 读取字符串值
+        /// Read string value
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -201,7 +201,7 @@ namespace DataEditorX.Config
             return GetAppConfig(key);
         }
         /// <summary>
-        /// 读取int值
+        /// Read integer value
         /// </summary>
         /// <param name="key"></param>
         /// <param name="def"></param>
@@ -216,7 +216,7 @@ namespace DataEditorX.Config
             return def;
         }
         /// <summary>
-        /// 读取float值
+        /// Read float value
         /// </summary>
         /// <param name="key"></param>
         /// <param name="def"></param>
@@ -231,7 +231,7 @@ namespace DataEditorX.Config
             return def;
         }
         /// <summary>
-        /// 读取int数组
+        /// Read integer array
         /// </summary>
         /// <param name="key"></param>
         /// <param name="length"></param>
@@ -252,7 +252,7 @@ namespace DataEditorX.Config
             return ints;
         }
         /// <summary>
-        /// 读取区域
+        /// Read rectangle area
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -270,7 +270,7 @@ namespace DataEditorX.Config
             return a;
         }
         /// <summary>
-        /// 读取boolean
+        /// Read boolean value
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -291,7 +291,7 @@ namespace DataEditorX.Config
 
 
         /// <summary>
-        /// 语言配置文件名
+        /// Language configuration file name
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -321,7 +321,7 @@ namespace DataEditorX.Config
             return File.Exists(englishFile) ? englishFile : languageFile;
         }
         /// <summary>
-        /// 卡片信息配置文件名
+        /// Card info configuration file name
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -401,7 +401,7 @@ namespace DataEditorX.Config
             return names.ToArray();
         }
         /// <summary>
-        /// 发送消息打开文件
+        /// Send open-file message
         /// </summary>
         /// <param name="file"></param>
         public static bool OpenOnExistForm(string file)
@@ -414,20 +414,20 @@ namespace DataEditorX.Config
             }
             else
             {
-                //把需要打开的文件写入临时文件
+                //Write the pending file path to the temp file
                 string tmpfile = Path.Combine(Application.StartupPath, FILE_TEMP);
                 File.WriteAllText(tmpfile, file);
-                //发送消息
+                //Send message
                 _ = User32.SendMessage(instance.MainWindowHandle, WM_OPEN, 0, 0);
                 return true;
             }
         }
         public static void OpenFileInThis(string file)
         {
-            //把需要打开的文件写入临时文件
+            //Write the pending file path to the temp file
             string tmpfile = Path.Combine(Application.StartupPath, FILE_TEMP);
             File.WriteAllText(tmpfile, file);
-            //发送消息
+            //Send message
             _ = User32.SendMessage(Process.GetCurrentProcess().MainWindowHandle, WM_OPEN, 0, 0);
             File.Delete(tmpfile);
         }
@@ -435,16 +435,16 @@ namespace DataEditorX.Config
         {
             Process current = Process.GetCurrentProcess();
             Process[] processes = Process.GetProcessesByName(current.ProcessName);
-            //遍历与当前进程名称相同的进程列表
+            //Scan processes with the same process name
             foreach (Process process in processes)
             {
-                //如果实例已经存在则忽略当前进程
+                //Ignore the current process when another instance exists
                 if (process.Id != current.Id)
                 {
-                    //保证要打开的进程同已经存在的进程来自同一文件路径
+                    //Ensure both processes come from the same file path
                     if (filename == current.MainModule.FileName)
                     {
-                        //返回已经存在的进程
+                        //Return the existing process
                         return process;
                     }
                 }

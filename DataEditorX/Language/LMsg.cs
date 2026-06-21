@@ -1,8 +1,8 @@
 ﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 7月8 星期二
- * 时间: 10:21
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: July 8, Tuesday
+ * Time: 10:21
  * 
  */
 

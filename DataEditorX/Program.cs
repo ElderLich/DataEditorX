@@ -1,8 +1,8 @@
 ﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 5月12 星期一
- * 时间: 12:00
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: May 12, Monday
+ * Time: 12:00
  * 
  */
 using DataEditorX.Config;
@@ -20,23 +20,23 @@ namespace DataEditorX
             string arg = (args.Length > 0) ? args[0] : "";
             if (arg == DEXConfig.TAG_SAVE_LAGN || arg == DEXConfig.TAG_SAVE_LAGN2)
             {
-                //保存语言
+                // Save generated language data.
                 SaveLanguage();
                 _ = MessageBox.Show("Save Language OK.");
                 Environment.Exit(1);
             }
-            if (DEXConfig.OpenOnExistForm(arg))//在已经存在的窗口打开文件
+            if (DEXConfig.OpenOnExistForm(arg))// Open the file in an existing window.
             {
                 Environment.Exit(1);
             }
-            else//新建窗口
+            else// Create a new window.
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 MainForm mainForm = new();
-                //设置将要打开的文件
+                // Set pending file to open.
                 mainForm.SetOpenFile(arg);
-                //数据目录
+                // Set data directory.
                 mainForm.SetDataPath(MyPath.Combine(Application.StartupPath, DEXConfig.TAG_DATA));
 
                 Application.Run(mainForm);
@@ -99,7 +99,7 @@ namespace DataEditorX
             LanguageHelper.SetFormLabel(form3);
             langhelper.GetFormLabel(form3);
             // LANG.GetFormLabel(this);
-            //获取窗体文字
+            // Read form text.
             _ = langhelper.SaveLanguage(conflang + ".bak");
         }
 

@@ -1,12 +1,12 @@
-﻿using System.Xml;
+using System.Xml;
 
 namespace DataEditorX.Common
 {
     public class XMLReader
     {
-        #region XML操作config
+        #region XML config operations
         /// <summary>
-        /// 保存值
+        /// SaveValue
         /// </summary>
         /// <param name="appKey"></param>
         /// <param name="appValue"></param>
@@ -18,11 +18,11 @@ namespace DataEditorX.Common
             XmlNode xNode = xDoc.SelectSingleNode("//appSettings");
 
             XmlElement xElem = (XmlElement)xNode.SelectSingleNode("//add[@key='" + appKey + "']");
-            if (xElem != null) //存在，则更新
+            if (xElem != null) //Update when the entry exists
             {
                 xElem.SetAttribute("value", appValue);
             }
-            else//不存在，则插入
+            else//Insert when the entry is missing
             {
                 XmlElement xNewElem = xDoc.CreateElement("add");
                 xNewElem.SetAttribute("key", appKey);
@@ -42,7 +42,7 @@ namespace DataEditorX.Common
             } 
         }
         /// <summary>
-        /// 获取值
+        /// Get value
         /// </summary>
         /// <param name="appKey"></param>
         /// <returns></returns>

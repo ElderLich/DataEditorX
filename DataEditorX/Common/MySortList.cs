@@ -1,11 +1,11 @@
-﻿#pragma warning disable
+#pragma warning disable
 namespace DataEditorX
 {
     class MyComparer<K> : IComparer<K>
     {
         public int Compare(K x, K y)
         {
-            return 1;   //永远不等，允许重复
+            return 1;   // Never equal, allowing duplicate keys.
         }
     }
 
@@ -18,9 +18,9 @@ namespace DataEditorX
 
         public new void Add(K key, V value)
         {
-            //falg用于跳出函数
+            // Used to skip duplicate key/value pairs.
             int flag = 0;
-            //检查是否具备这个key，并且检查value是否重复
+            // Check whether the same key/value pair already exists.
             foreach (KeyValuePair<K, V> item in this)
             {
                 if (item.Key.ToString() == key.ToString() && item.Value.ToString() == value.ToString())
@@ -30,9 +30,9 @@ namespace DataEditorX
             }
             if (flag == 1)
             {
-                return;  //跳出函数
+                return;  // Skip duplicate pair.
             }
-            //否则就加入
+            // Otherwise add the new pair.
             base.Add(key, value);
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace DataEditorX.Core
+namespace DataEditorX.Core
 {
     public delegate void StatusBool(bool val);
     public interface ICommand : ICloneable
@@ -13,7 +13,7 @@
     {
         void ExcuteCommand(ICommand command, params object[] args);
         void Undo();
-        void ReverseUndo();//反撤销
+        void ReverseUndo();//Redo the last undo
 
         event StatusBool UndoStateChanged;
     }
@@ -40,7 +40,7 @@
 
         }
 
-        #region ICommandManager 成员
+        #region ICommandManager members
         public void ExcuteCommand(ICommand command, params object[] args)
         {
             if (!command.Execute(args))

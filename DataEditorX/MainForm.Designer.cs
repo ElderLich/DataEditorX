@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-20
- * 时间: 9:19
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-20
+ * Time: 9:19
  * 
  */
 using DataEditorX.Config;

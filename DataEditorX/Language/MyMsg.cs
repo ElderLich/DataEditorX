@@ -1,15 +1,15 @@
 ﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 5月20 星期二
- * 时间: 7:40
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: May 20, Tuesday
+ * Time: 7:40
  * 
  */
 
 namespace DataEditorX.Language
 {
     /// <summary>
-    /// 消息
+    /// Message box helpers.
     /// </summary>
     public static class MyMsg
     {

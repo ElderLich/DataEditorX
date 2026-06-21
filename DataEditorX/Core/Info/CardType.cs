@@ -1,70 +1,70 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-13
- * 时间: 9:08
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-13
+ * Time: 9:08
  * 
  */
 
 namespace DataEditorX.Core.Info
 {
     /// <summary>
-    /// 卡片类型
+    /// Card types
     /// </summary>
     public enum CardType : long
     {
-        ///<summary>怪兽卡</summary>
+        ///<summary>Monster Card</summary>
         TYPE_MONSTER = 0x1,
-        ///<summary>魔法卡</summary>
+        ///<summary>Spell Card</summary>
         TYPE_SPELL = 0x2,
-        ///<summary>陷阱卡</summary>
+        ///<summary>Trap Card</summary>
         TYPE_TRAP = 0x4,
 
-        ///<summary>通常</summary>
+        ///<summary>Normal</summary>
         TYPE_NORMAL = 0x10,
-        ///<summary>效果</summary>
+        ///<summary>Effect</summary>
         TYPE_EFFECT = 0x20,
-        ///<summary>融合</summary>
+        ///<summary>Fusion</summary>
         TYPE_FUSION = 0x40,
-        ///<summary>仪式</summary>
+        ///<summary>Ritual</summary>
         TYPE_RITUAL = 0x80,
-        ///<summary>陷阱怪兽</summary>
+        ///<summary>Trap Monster</summary>
         TYPE_TRAPMONSTER = 0x100,
-        ///<summary>灵魂</summary>
+        ///<summary>Spirit</summary>
         TYPE_SPIRIT = 0x200,
-        ///<summary>同盟</summary>
+        ///<summary>Union</summary>
         TYPE_UNION = 0x400,
-        ///<summary>二重</summary>
+        ///<summary>Gemini</summary>
         TYPE_DUAL = 0x800,
-        ///<summary>调整</summary>
+        ///<summary>Tuner</summary>
         TYPE_TUNER = 0x1000,
-        ///<summary>同调</summary>
+        ///<summary>Synchro</summary>
         TYPE_SYNCHRO = 0x2000,
-        ///<summary>衍生物</summary>
+        ///<summary>Token</summary>
         TYPE_TOKEN = 0x4000,
 
-        ///<summary>速攻</summary>
+        ///<summary>Quick-Play</summary>
         TYPE_QUICKPLAY = 0x10000,
-        ///<summary>永续</summary>
+        ///<summary>Continuous</summary>
         TYPE_CONTINUOUS = 0x20000,
-        ///<summary>装备</summary>
+        ///<summary>Equip</summary>
         TYPE_EQUIP = 0x40000,
-        ///<summary>场地</summary>
+        ///<summary>Field</summary>
         TYPE_FIELD = 0x80000,
-        ///<summary>反击</summary>
+        ///<summary>Counter</summary>
         TYPE_COUNTER = 0x100000,
 
-        ///<summary>反转</summary>
+        ///<summary>Flip</summary>
         TYPE_FLIP = 0x200000,
-        ///<summary>卡通</summary>
+        ///<summary>Toon</summary>
         TYPE_TOON = 0x400000,
-        ///<summary>超量</summary>
+        ///<summary>Xyz</summary>
         TYPE_XYZ = 0x800000,
-        ///<summary>灵摆</summary>
+        ///<summary>Pendulum</summary>
         TYPE_PENDULUM = 0x1000000,
-        ///<summary>特殊召唤</summary>
+        ///<summary>Special Summon</summary>
         TYPE_SPSUMMON = 0x2000000,
-        ///<summary>连接</summary>
+        ///<summary>Link</summary>
         TYPE_LINK = 0x4000000,
 
     }

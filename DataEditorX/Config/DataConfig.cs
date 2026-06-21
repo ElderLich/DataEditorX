@@ -1,15 +1,15 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-23
- * 时间: 7:54
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-23
+ * Time: 7:54
  * 
  */
 
 namespace DataEditorX.Config
 {
     /// <summary>
-    /// DataEditor的数据
+    /// DataEditor data
     /// </summary>
     public class DataConfig
     {
@@ -22,7 +22,7 @@ namespace DataEditorX.Config
             InitMember(conf);
         }
         /// <summary>
-        /// 初始化成员
+        /// Initialize members
         /// </summary>
         /// <param name="conf"></param>
         public void InitMember(string conf)
@@ -41,7 +41,7 @@ namespace DataEditorX.Config
                 dicCardLevels = new Dictionary<long, string>();
                 return;
             }
-            //提取内容
+            //Extract content
             string text = File.ReadAllText(conf);
             dicCardRules = DataManager.Read(text, DEXConfig.TAG_RULE);
             dicSetnames = DataManager.Read(text, DEXConfig.TAG_SETNAME);
@@ -55,35 +55,35 @@ namespace DataEditorX.Config
 
         }
         /// <summary>
-        /// 规则
+        /// Rule
         /// </summary>
         public Dictionary<long, string> dicCardRules = null;
         /// <summary>
-        /// 属性
+        /// Attribute
         /// </summary>
         public Dictionary<long, string> dicCardAttributes = null;
         /// <summary>
-        /// 种族
+        /// Race
         /// </summary>
         public Dictionary<long, string> dicCardRaces = null;
         /// <summary>
-        /// 等级
+        /// Level
         /// </summary>
         public Dictionary<long, string> dicCardLevels = null;
         /// <summary>
-        /// 系列名
+        /// Archetype/setcode names
         /// </summary>
         public Dictionary<long, string> dicSetnames = null;
         /// <summary>
-        /// 卡片类型
+        /// Card types
         /// </summary>
         public Dictionary<long, string> dicCardTypes = null;
         /// <summary>
-        /// 连接标志
+        /// Link markers
         /// </summary>
         public Dictionary<long, string> dicLinkMarkers = null;
         /// <summary>
-        /// 效果类型
+        /// Effect categories
         /// </summary>
         public Dictionary<long, string> dicCardcategorys = null;
         /// <summary>

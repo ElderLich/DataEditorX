@@ -1,8 +1,8 @@
 ﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-20
- * 时间: 9:19
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-20
+ * Time: 9:19
  * 
  */
 using DataEditorX.Config;
@@ -16,21 +16,21 @@ namespace DataEditorX
     public partial class MainForm : Form, IMainForm
     {
         #region member
-        //历史
+        // History.
         History history;
-        //数据目录
+        // Data directory.
         string datapath;
-        //语言配置
+        // Language configuration.
         string conflang;
-        //数据库对比
+        // Database comparison tabs.
         DataEditForm compare1, compare2;
-        //临时卡片
+        // Temporary card buffer.
         Card[] tCards;
-        //编辑器配置
+        // Editor configuration.
         DataConfig datacfg = null;
         private DataConfig olddatacfg = null;
         CodeConfig codecfg = null;
-        //将要打开的文件
+        // Pending file to open.
         string openfile;
         #endregion
         public DataConfig GetDataConfig(bool old = false) {
@@ -39,27 +39,27 @@ namespace DataEditorX
         public CodeConfig GetCodeConfig() {
             return codecfg;
         }
-        #region 设置界面，消息语言
+        #region UI and language initialization
         public MainForm()
         {
-            //初始化控件
+            // Initialize controls.
             InitializeComponent();
             ApplyTheme();
         }
         public void SetDataPath(string datapath)
         {
-            //判断是否合法
+            // Validate the configured path.
             if (string.IsNullOrEmpty(datapath))
             {
                 return;
             }
 
             tCards = null;
-            //数据目录
+            // Data directory.
             this.datapath = datapath;
             if (DEXConfig.ReadBoolean(DEXConfig.TAG_ASYNC))
             {
-                //后台加载数据
+                // Load data in the background.
                 bgWorker1.RunWorkerAsync();
             }
             else
@@ -78,9 +78,9 @@ namespace DataEditorX
         }
         void Init()
         {
-            //文件路径
+            // File paths.
             conflang = DEXConfig.GetLanguageFile(datapath);
-            //游戏数据,MSE数据
+            // Game and MSE data.
             olddatacfg = datacfg = new DataConfig(DEXConfig.GetCardInfoFile(datapath));
             string confstring = MyPath.FindFile(datapath, DEXConfig.FILE_STRINGS, "lua");
             if (File.Exists(confstring))
@@ -98,33 +98,33 @@ namespace DataEditorX
                     }
                 }
             }
-            //初始化YGOUtil的数据
+            // Initialize YGOUtil data.
             YGOUtil.SetConfig(datacfg);
 
-            //代码提示
+            // Code hints.
             string funtxt = DEXConfig.GetFunctionFile(datapath);
             string conlua = MyPath.FindFile(datapath, DEXConfig.FILE_CONSTANT, "lua");
             codecfg = new CodeConfig();
-            //添加函数
+            // Add functions.
             codecfg.AddFunction(funtxt);
-            //添加指示物
+            // Add counters.
             codecfg.AddStrings(confstring);
-            //添加常量
+            // Add constants.
             codecfg.AddConstant(conlua);
             codecfg.SetNames(datacfg.dicSetnames);
-            //生成菜单
+            // Build menus.
             codecfg.InitAutoMenus();
             history = new History(this);
-            //读取历史记录
+            // Read history.
             history.ReadHistory(MyPath.Combine(datapath, DEXConfig.FILE_HISTORY));
-            //加载多语言
+            // Load localization.
             LanguageHelper.LoadFormLabels(conflang);
         }
         void InitForm()
         {
             LanguageHelper.SetFormLabel(this);
 
-            //设置所有窗口的语言
+            // Apply language to all open windows.
             DockContentCollection contents = dockPanel.Contents;
             foreach (DockContent dc in contents.Cast<DockContent>())
             {
@@ -133,11 +133,11 @@ namespace DataEditorX
                     LanguageHelper.SetFormLabel(dc);
                 }
             }
-            //添加历史菜单
+            // Build history menus.
             history.MenuHistory();
             ApplyTheme();
 
-            //如果没有将要打开的文件，则打开一个空数据库标签
+            // Open an empty database tab when no file is pending.
             if (string.IsNullOrEmpty(openfile))
             {
                 OpenDataBase(null);
@@ -149,24 +149,24 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 打开历史
-        //清除cdb历史
+        #region Open history
+        // Clear CDB history.
         public void CdbMenuClear()
         {
             menuitem_history.DropDownItems.Clear();
         }
-        //清除lua历史
+        // Clear Lua history.
         public void LuaMenuClear()
         {
             menuitem_shistory.DropDownItems.Clear();
         }
-        //添加cdb历史
+        // Add CDB history item.
         public void AddCdbMenu(ToolStripItem item)
         {
             _ = menuitem_history.DropDownItems.Add(item);
             ThemeManager.ApplyToolStripItem(item);
         }
-        //添加lua历史
+        // Add Lua history item.
         public void AddLuaMenu(ToolStripItem item)
         {
             _ = menuitem_shistory.DropDownItems.Add(item);
@@ -174,18 +174,18 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 处理窗口消息
+        #region Window messages
         protected override void DefWndProc(ref Message m)
         {
             switch (m.Msg)
             {
-                case DEXConfig.WM_OPEN://处理消息
+                case DEXConfig.WM_OPEN:// Handle open-file message.
                     string file = MyPath.Combine(Application.StartupPath, DEXConfig.FILE_TEMP);
                     if (File.Exists(file))
                     {
                         Activate();
                         string openfile = File.ReadAllText(file);
-                        //获取需要打开的文件路径
+                        // Read the file path to open.
                         Open(openfile);
                         //File.Delete(file);
                     }
@@ -197,18 +197,18 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 打开文件
-        //打开脚本
+        #region Open files
+        // Open script.
         void OpenScript(string file)
         {
             CodeEditForm cf = new();
-            //设置界面语言
+            // Apply UI language.
             LanguageHelper.SetFormLabel(cf);
-            //设置cdb列表
+            // Set CDB history list.
             cf.SetCDBList(history.GetcdbHistory());
-            //初始化函数提示
+            // Initialize function hints.
             cf.InitTooltip(codecfg);
-            //打开文件
+            // Open file.
             DataEditForm df;
             try { df = (DataEditForm)dockPanel.ActiveContent; }
             catch { df = null; }
@@ -222,7 +222,7 @@ namespace DataEditorX
             cf.ApplyTheme();
             cf.Show(dockPanel, DockState.Document);
         }
-        //打开数据库
+        // Open database.
         void OpenDataBase(string file)
         {
             DataEditForm def;
@@ -234,14 +234,14 @@ namespace DataEditorX
             {
                 def = new DataEditForm(datapath, file, datacfg);
             }
-            //设置语言
+            // Apply language.
             LanguageHelper.SetFormLabel(def);
-            //初始化界面数据
+            // Initialize UI data.
             def.InitControl(datacfg);
             def.ApplyTheme();
             def.Show(dockPanel, DockState.Document);
         }
-        //打开文件
+        // Open file.
         public void Open(string file)
         {
             if (file.IndexOf('\n') > -1)
@@ -253,14 +253,14 @@ namespace DataEditorX
             {
                 return;
             }
-            //添加历史
+            // Add history.
             history.AddHistory(file);
-            //检查是否已经打开
+            // Check whether the file is already open.
             if (FindEditForm(file, true))
             {
                 return;
             }
-            //检查可用的
+            // Reuse a compatible blank editor when available.
             if (FindEditForm(file, false))
             {
                 return;
@@ -275,11 +275,11 @@ namespace DataEditorX
                 OpenDataBase(file);
             }
         }
-        //检查是否打开
+        // Check whether a matching editor is open.
         bool FindEditForm(string file, bool isOpen)
         {
             DockContentCollection contents = dockPanel.Contents;
-            //遍历所有标签
+            // Scan all tabs.
             foreach (DockContent dc in contents.Cast<DockContent>())
             {
                 IEditForm edform = (IEditForm)dc;
@@ -288,7 +288,7 @@ namespace DataEditorX
                     continue;
                 }
 
-                if (isOpen)//是否检查打开
+                if (isOpen)// Check opened files.
                 {
                     if (file != null && file.Equals(edform.GetOpenFile()))
                     {
@@ -296,7 +296,7 @@ namespace DataEditorX
                         return true;
                     }
                 }
-                else//检查是否空白，如果为空，则打开文件
+                else// Use a blank compatible tab for the file.
                 {
                     if (string.IsNullOrEmpty(edform.GetOpenFile()) && edform.CanOpen(file))
                     {
@@ -310,8 +310,8 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 窗口管理
-        //关闭当前
+        #region Window management
+        // Close current tab.
         void CloseToolStripMenuItemClick(object sender, EventArgs e)
         {
             if (dockPanel.ActiveContent != null && dockPanel.ActiveContent.DockHandler != null)
@@ -319,18 +319,18 @@ namespace DataEditorX
                 dockPanel.ActiveContent.DockHandler.Close();
             }
         }
-        //打开脚本编辑
+        // Open script editor.
         void Menuitem_codeeditorClick(object sender, EventArgs e)
         {
             OpenScript(null);
         }
 
-        //新建DataEditorX
+        // Create DataEditorX database.
         void DataEditorToolStripMenuItemClick(object sender, EventArgs e)
         {
             OpenDataBase(null);
         }
-        //关闭其他或者所有
+        // Close other or all tabs.
         void CloseMdi(bool isall)
         {
             DockContentCollection contents = dockPanel.Contents;
@@ -355,31 +355,31 @@ namespace DataEditorX
             }
             catch { }
         }
-        //关闭其他
+        // Close other tabs.
         void CloseOtherToolStripMenuItemClick(object sender, EventArgs e)
         {
             CloseMdi(false);
         }
-        //关闭所有
+        // Close all tabs.
         void CloseAllToolStripMenuItemClick(object sender, EventArgs e)
         {
             CloseMdi(true);
         }
         #endregion
 
-        #region 文件菜单
-        //得到当前的数据编辑
+        #region File menu
+        // Get the active data editor.
         DataEditForm GetActive()
         {
             DataEditForm df = dockPanel.ActiveContent as DataEditForm;
             return df;
         }
-        //打开文件
+        // Open file.
         void Menuitem_openClick(object sender, EventArgs e)
         {
             using OpenFileDialog dlg = new();
             dlg.Title = LanguageHelper.GetMsg(LMSG.OpenFile);
-            if (GetActive() != null || dockPanel.Contents.Count == 0)//判断当前窗口是不是DataEditor
+            if (GetActive() != null || dockPanel.Contents.Count == 0)// Check whether the active tab is a data editor.
             {
                 try
                 {
@@ -403,17 +403,17 @@ namespace DataEditorX
             }
         }
 
-        //退出
+        // Exit.
         void QuitToolStripMenuItemClick(object sender, EventArgs e)
         {
             Close();
         }
-        //新建文件
+        // New file.
         void Menuitem_newClick(object sender, EventArgs e)
         {
             using SaveFileDialog dlg = new();
             dlg.Title = LanguageHelper.GetMsg(LMSG.NewFile);
-            if (GetActive() != null)//判断当前窗口是不是DataEditor
+            if (GetActive() != null)// Check whether the active tab is a data editor.
             {
                 try
                 {
@@ -437,12 +437,12 @@ namespace DataEditorX
                 {
                     File.Delete(file);
                 }
-                //是否是数据库
+                // Check whether the target is a database.
                 if (YGOUtil.IsDataBase(file))
                 {
-                    if (DataBase.Create(file))//是否创建成功
+                    if (DataBase.Create(file))// Check whether creation succeeded.
                     {
-                        if (MyMsg.Question(LMSG.IfOpenDataBase))//是否打开新建的数据库
+                        if (MyMsg.Question(LMSG.IfOpenDataBase))// Ask whether to open the new database.
                         {
                             Open(file);
                         }
@@ -459,12 +459,12 @@ namespace DataEditorX
                 }
             }
         }
-        //保存文件
+        // Save file.
         void Menuitem_saveClick(object sender, EventArgs e)
         {
             if (dockPanel.ActiveContent is IEditForm cf)
             {
-                if (cf.Save(false))//是否保存成功
+                if (cf.Save(false))// Check whether save succeeded.
                 {
                     MyMsg.Show(LMSG.SaveFileOK);
                 }
@@ -474,7 +474,7 @@ namespace DataEditorX
         {
             if (dockPanel.ActiveContent is IEditForm cf)
             {
-                if (cf.Save(true))//是否保存成功
+                if (cf.Save(true))// Check whether save succeeded.
                 {
                     history.AddHistory(cf.GetOpenFile());
                     MyMsg.Show(LMSG.SaveFileOK);
@@ -483,36 +483,36 @@ namespace DataEditorX
         }
         #endregion
 
-        #region 卡片复制粘贴
-        //复制选中
+        #region Card copy and paste
+        // Copy selected cards.
         void Menuitem_copyselecttoClick(object sender, EventArgs e)
         {
-            DataEditForm df = GetActive();//获取当前的数据库编辑
+            DataEditForm df = GetActive();// Get the active data editor.
             if (df != null)
             {
-                tCards = df.GetCardList(true); //获取选中的卡片
+                tCards = df.GetCardList(true); // Get selected cards.
                 if (tCards != null)
                 {
-                    SetCopyNumber(tCards.Length);//显示复制卡片的数量
+                    SetCopyNumber(tCards.Length);// Show copied card count.
                     MyMsg.Show(LMSG.CopyCards);
                 }
             }
         }
-        //复制当前结果
+        // Copy current result set.
         void Menuitem_copyallClick(object sender, EventArgs e)
         {
-            DataEditForm df = GetActive();//获取当前的数据库编辑
+            DataEditForm df = GetActive();// Get the active data editor.
             if (df != null)
             {
-                tCards = df.GetCardList(false);//获取结果的所有卡片
+                tCards = df.GetCardList(false);// Get all cards from the current results.
                 if (tCards != null)
                 {
-                    SetCopyNumber(tCards.Length);//显示复制卡片的数量
+                    SetCopyNumber(tCards.Length);// Show copied card count.
                     MyMsg.Show(LMSG.CopyCards);
                 }
             }
         }
-        //显示复制卡片的数量
+        // Show copied card count.
         void SetCopyNumber(int c)
         {
             string tmp = menuitem_pastecards.Text;
@@ -525,7 +525,7 @@ namespace DataEditorX
             tmp = tmp + " (" + c.ToString() + ")";
             menuitem_pastecards.Text = tmp;
         }
-        //粘贴卡片
+        // Paste cards.
         void Menuitem_pastecardsClick(object sender, EventArgs e)
         {
             if (tCards == null)
@@ -539,14 +539,14 @@ namespace DataEditorX
                 return;
             }
 
-            df.SaveCards(tCards);//保存卡片
+            df.SaveCards(tCards);// Save cards.
             MyMsg.Show(LMSG.PasteCards);
         }
 
         #endregion
 
-        #region 数据对比
-        //设置数据库1
+        #region Database comparison
+        // Set first database.
         void Menuitem_comp1Click(object sender, EventArgs e)
         {
             compare1 = GetActive();
@@ -556,7 +556,7 @@ namespace DataEditorX
                 CompareDB();
             }
         }
-        //设置数据库2
+        // Set second database.
         void Menuitem_comp2Click(object sender, EventArgs e)
         {
             compare2 = GetActive();
@@ -565,7 +565,7 @@ namespace DataEditorX
                 CompareDB();
             }
         }
-        //对比数据库
+        // Compare databases.
         void CompareDB()
         {
             if (compare1 == null || compare2 == null)
@@ -583,7 +583,7 @@ namespace DataEditorX
             }
 
             bool checktext = MyMsg.Question(LMSG.CheckText);
-            //分别对比数据库
+            // Compare both databases.
             compare1.CompareCards(cdb2, checktext);
             compare2.CompareCards(cdb1, checktext);
             MyMsg.Show(LMSG.CompareOK);
@@ -594,7 +594,7 @@ namespace DataEditorX
 
         #endregion
 
-        #region 后台加载数据
+        #region Background data loading
         private void BgWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             Init();
@@ -602,7 +602,7 @@ namespace DataEditorX
 
         private void BgWorker1_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            //更新UI
+            // Update UI.
             InitForm();
         }
         #endregion
@@ -700,12 +700,12 @@ namespace DataEditorX
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            //检查更新
+            // Check for updates.
             if (DEXConfig.ReadBoolean(DEXConfig.TAG_AUTO_CHECK_UPDATE))
             {
                 Thread th = new(CheckUpdate)
                 {
-                    IsBackground = true//如果exe结束，则线程终止
+                    IsBackground = true// Stop the thread when the executable exits.
                 };
                 th.Start();
             }

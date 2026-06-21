@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-25
- * 时间: 8:12
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-25
+ * Time: 8:12
  * 
  */
 using System.Text;
@@ -11,11 +11,11 @@ using System.Text.RegularExpressions;
 namespace DataEditorX
 {
     /// <summary>
-    /// Lua 函数查找
+    /// Lua function discovery
     /// </summary>
     public class LuaFunction
     {
-        #region 日志log
+        #region Logging
         static void ResetLog()
         {
             File.Delete(_logtxt);
@@ -31,7 +31,7 @@ namespace DataEditorX
         static string _logtxt;
         static string _funclisttxt;
         static readonly SortedList<string, string> _funclist = new();
-        //读取旧函数
+        //Read existing functions
         public static void Read(string funtxt)
         {
             _funclist.Clear();
@@ -53,11 +53,11 @@ namespace DataEditorX
 
                     if (line.StartsWith("●"))
                     {
-                        //添加之前的函数
+                        //Add previous function
                         AddOldFun(name, desc);
                         int w = line.IndexOf("(");
                         int t = line.IndexOf(" ");
-                        //获取当前名字
+                        //Get current name
                         if (t < w && t > 0)
                         {
                             name = line.Substring(t + 1, w - t - 1);
@@ -78,12 +78,12 @@ namespace DataEditorX
         {
             if (!string.IsNullOrEmpty(name))
             {
-                if (_funclist.ContainsKey(name))//存在，则添加注释
+                if (_funclist.ContainsKey(name))//Append comment when the function exists
                 {
                     _funclist[name] += Environment.NewLine + desc;
                 }
                 else
-                {//不存在，则添加函数
+                {//Add missing function
                     _funclist.Add(name, desc);
                 }
             }
@@ -92,7 +92,7 @@ namespace DataEditorX
 
         #region find libs
         /// <summary>
-        /// 查找lua函数
+        /// Find Lua functions
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -106,7 +106,7 @@ namespace DataEditorX
             _funclisttxt = Path.Combine(path, "_functions.txt");
             File.Delete(_funclisttxt);
             if (!File.Exists(file))
-            {//判断用户选择的目录
+            {//Validate the selected user directory
                 Log("error: no find file " + file);
                 if (File.Exists(file2))
                 {
@@ -124,13 +124,13 @@ namespace DataEditorX
                                    , RegexOptions.Multiline);
             MatchCollection libsMatch = libRex.Matches(texts);
             Log("log:count " + libsMatch.Count.ToString());
-            foreach (Match m in libsMatch.Cast<Match>())//获取lib函数库
+            foreach (Match m in libsMatch.Cast<Match>())//Get lib function table
             {
                 if (m.Groups.Count > 2)
                 {
                     string word = m.Groups[1].Value;
                     Log("log:find " + word);
-                    //分别去获取函数库的函数
+                    //Read functions from each function table
                     GetFunctions(word, m.Groups[2].Value,
                                  Path.Combine(path, "lib" + word + ".cpp"));
                 }
@@ -138,7 +138,7 @@ namespace DataEditorX
             Save();
             return true;
         }
-        //保存
+        //Save
         static void Save()
         {
             if (string.IsNullOrEmpty(_oldfun))
@@ -164,7 +164,7 @@ namespace DataEditorX
         {
             return str[..1].ToUpper() + str[1..];
         }
-        //获取函数库的lua函数名,和对应的c++函数
+        //Get Lua function names and matching C++ handlers
         static Dictionary<string, string> GetFunctionNames(string texts, string name)
         {
             Dictionary<string, string> dic = new();
@@ -188,7 +188,7 @@ namespace DataEditorX
         #endregion
 
         #region find code
-        //查找c++代码
+        //Search C++ source
         static string FindCode(string texts, string name)
         {
             Regex reg = new(@"int32\s+?" + name
@@ -210,7 +210,7 @@ namespace DataEditorX
         #endregion
 
         #region find return
-        //查找返回类型
+        //Find return type
         static string FindReturn(string texts)
         {
             string restr = "";
@@ -263,7 +263,7 @@ namespace DataEditorX
         #endregion
 
         #region find args
-        //查找参数
+        //Find parameters
         static string getUserType(string str)
         {
             if (str.Contains("card", StringComparison.CurrentCulture))
@@ -356,7 +356,7 @@ namespace DataEditorX
         #endregion
 
         #region find old
-        //查找旧函数的描述
+        //Find previous function description
         static string FindOldDesc(string name)
         {
             if (_funclist.ContainsKey(name))
@@ -369,7 +369,7 @@ namespace DataEditorX
         #endregion
 
         #region Save Functions
-        //保存函数
+        //Save functions
         public static void GetFunctions(string name, string texts, string file)
         {
             if (!File.Exists(file))

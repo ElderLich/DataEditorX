@@ -1,4 +1,4 @@
-﻿using DataEditorX.Config;
+using DataEditorX.Config;
 using DataEditorX.Core;
 using DataEditorX.Language;
 
@@ -25,7 +25,7 @@ namespace DataEditorX.Controls
             cdbhistory = new List<string>();
             luahistory = new List<string>();
         }
-        //读取历史记录
+        //ReadHistory file
         public void ReadHistory(string historyFile)
         {
             this.historyFile = historyFile;
@@ -37,7 +37,7 @@ namespace DataEditorX.Controls
             string[] lines = File.ReadAllLines(historyFile);
             AddHistorys(lines);
         }
-        //添加历史记录
+        //AddHistory file
         void AddHistorys(string[] lines)
         {
             luahistory.Clear();
@@ -74,10 +74,10 @@ namespace DataEditorX.Controls
         {
             List<string> tmplist = new()
             {
-                //添加到开始
+                //Add to the front
                 file
             };
-            //添加旧记录
+            //Add old records
             tmplist.AddRange(cdbhistory.ToArray());
             tmplist.AddRange(luahistory.ToArray());
             //
@@ -85,7 +85,7 @@ namespace DataEditorX.Controls
             SaveHistory();
             MenuHistory();
         }
-        //保存历史
+        //SaveHistory
         void SaveHistory()
         {
             string texts = "# database history";
@@ -111,10 +111,10 @@ namespace DataEditorX.Controls
 
             File.WriteAllText(historyFile, texts);
         }
-        //添加历史记录菜单
+        //Build history menu
         public void MenuHistory()
         {
-            //cdb历史
+            //cdbHistory
             mainForm.CdbMenuClear();
             foreach (string str in cdbhistory)
             {
@@ -126,7 +126,7 @@ namespace DataEditorX.Controls
             ToolStripMenuItem tsmiclear = new(LanguageHelper.GetMsg(LMSG.ClearHistory));
             tsmiclear.Click += MenuHistoryClear_Click;
             mainForm.AddCdbMenu(tsmiclear);
-            //lua历史
+            //luaHistory
             mainForm.LuaMenuClear();
             foreach (string str in luahistory)
             {

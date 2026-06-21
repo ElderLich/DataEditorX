@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-26
- * 时间: 10:26
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-26
+ * Time: 10:26
  * 
  */
 using System.Text;
@@ -10,12 +10,12 @@ using System.Text;
 namespace System.IO
 {
     /// <summary>
-    /// 路径处理
+    /// Path helpers
     /// </summary>
     public class MyPath
     {
         /// <summary>
-        /// 从相对路径获取真实路径
+        /// Resolve a relative path
         /// </summary>
         /// <param name="dir"></param>
         /// <returns></returns>
@@ -29,7 +29,7 @@ namespace System.IO
             return dir;
         }
         /// <summary>
-        /// 合并路径
+        /// Combine paths
         /// </summary>
         /// <param name="paths"></param>
         /// <returns></returns>
@@ -77,10 +77,10 @@ namespace System.IO
             }
         }
         /// <summary>
-        /// 检查目录是否合法
+        /// Validate directory
         /// </summary>
-        /// <param name="dir">目录</param>
-        /// <param name="defalut">不合法时，采取的目录</param>
+        /// <param name="dir">Directory</param>
+        /// <param name="defalut">Fallback directory when invalid</param>
         /// <returns></returns>
         public static string CheckDir(string dir, string defalut)
         {
@@ -91,7 +91,7 @@ namespace System.IO
             }
             catch
             {
-                //路径不合法
+                //Path is invalid
                 fo = new DirectoryInfo(defalut);
             }
             if (!fo.Exists)
@@ -103,10 +103,10 @@ namespace System.IO
             return dir;
         }
         /// <summary>
-        /// 根据tag获取文件名
+        /// Get file name from tag
         /// tag_lang.txt
         /// </summary>
-        /// <param name="tag">前面</param>
+        /// <param name="tag">Prefix</param>
         /// <param name="lang"></param>
         /// <returns></returns>
         public static string GetFileName(string tag, string lang)
@@ -114,7 +114,7 @@ namespace System.IO
             return tag + "_" + lang + ".txt";
         }
         /// <summary>
-        /// 由tag和lang获取文件名
+        /// Get file name from tag and language
         /// </summary>
         /// <param name="tag"></param>
         /// <param name="file"></param>

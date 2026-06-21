@@ -1,8 +1,8 @@
 ﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 7月8 星期二
- * 时间: 9:52
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: July 8, Tuesday
+ * Time: 9:52
  * 
  */
 using System.Globalization;
@@ -21,7 +21,7 @@ namespace DataEditorX.Language
         const char SEP_LINE = '\t';
         readonly Dictionary<string, string> mWordslist = new();
 
-        #region 获取消息文字
+        #region Message lookup
         public static string GetMsg(LMSG lMsg)
         {
             if (_gMsgList.IndexOfKey(lMsg) >= 0)
@@ -35,9 +35,9 @@ namespace DataEditorX.Language
         }
         #endregion
 
-        #region 设置控件信息
+        #region Apply control labels
         /// <summary>
-        /// 设置控件文字
+        /// Applies localized text to a form and its child controls.
         /// </summary>
         /// <param name="fm"></param>
         public static void SetFormLabel(Form fm)
@@ -147,7 +147,7 @@ namespace DataEditorX.Language
 
         #endregion
 
-        #region 获取控件信息
+        #region Capture control labels
         public void GetFormLabel(Form fm)
         {
             if (fm == null)
@@ -247,7 +247,7 @@ namespace DataEditorX.Language
 
         #endregion
 
-        #region 保存语言文件
+        #region Save language file
         public bool SaveLanguage(string conf)
         {
             using (FileStream fs = new(conf, FileMode.Create, FileAccess.Write))
@@ -260,7 +260,7 @@ namespace DataEditorX.Language
                 sw.WriteLine("#");
                 foreach (LMSG k in _gMsgList.Keys)
                 {
-                    //记得替换换行符
+                    // Preserve escaped newlines in the language file.
                     sw.WriteLine("0x" + ((uint)k).ToString("x") + SEP_LINE + _gMsgList[k].Replace("\n", "\\n"));
                 }
                 foreach (LMSG k in Enum.GetValues(typeof(LMSG)))
@@ -277,7 +277,7 @@ namespace DataEditorX.Language
         }
         #endregion
 
-        #region 加载语言文件
+        #region Load language file
         public static void LoadFormLabels(string f)
         {
             if (!File.Exists(f))
@@ -304,16 +304,16 @@ namespace DataEditorX.Language
                     continue;
                 }
 
-                if (line.StartsWith("0x"))//加载消息文字
+                if (line.StartsWith("0x"))// Load message text.
                 {
                     _ = uint.TryParse(words[0].Replace("0x", ""), NumberStyles.HexNumber, null, out uint utemp);
                     ltemp = (LMSG)utemp;
-                    if (_gMsgList.IndexOfKey(ltemp) < 0)//记得替换换行符
+                    if (_gMsgList.IndexOfKey(ltemp) < 0)// Restore escaped newlines.
                     {
                         _gMsgList.Add(ltemp, words[1].Replace("\\n", "\n"));
                     }
                 }
-                else if (!line.StartsWith("#"))//加载界面语言
+                else if (!line.StartsWith("#"))// Load UI text.
                 {
                     if (!_gWordsList.ContainsKey(words[0]))
                     {

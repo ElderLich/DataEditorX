@@ -1,4 +1,4 @@
-﻿using DataEditorX.Config;
+using DataEditorX.Config;
 using DataEditorX.Language;
 using System.Text;
 
@@ -21,8 +21,8 @@ namespace DataEditorX.Core
             copyCard = new CopyCommand(this);
         }
 
-        #region 添加
-        //添加
+        #region Add
+        //Add
         public class AddCommand : IBackableCommand
         {
             private string undoSQL;
@@ -40,7 +40,7 @@ namespace DataEditorX.Core
                 }
 
                 Card c = dataform.GetCard();
-                if (c.id <= 0)//卡片密码不能小于等于0
+                if (c.id <= 0)//Card ID must be greater than 0
                 {
                     MyMsg.Error(LMSG.CodeCanNotIsZero);
                     return false;
@@ -61,7 +61,7 @@ namespace DataEditorX.Core
                         MyMsg.Warning("Strings will fail to show up for this passcode.");
                 }
                 Card[] cards = dataform.GetCardList(false);
-                foreach (Card ckey in cards)//卡片id存在
+                foreach (Card ckey in cards)//Card ID already exists
                 {
                     if (c.id == ckey.id)
                     {
@@ -93,8 +93,8 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 修改
-        //修改
+        #region Modify
+        //Modify
         public class ModCommand : IBackableCommand
         {
             private string undoSQL;
@@ -119,7 +119,7 @@ namespace DataEditorX.Core
 
                 Card c = dataform.GetCard();
                 Card oldCard = dataform.GetOldCard();
-                if (c.Equals(oldCard))//没有修改
+                if (c.Equals(oldCard))//No changes to save
                 {
                     MyMsg.Show(LMSG.ItIsNotChanged);
                     return false;
@@ -130,29 +130,29 @@ namespace DataEditorX.Core
                     return false;
                 }
                 string sql;
-                if (c.id != oldCard.id)//修改了id
+                if (c.id != oldCard.id)//ID was changed
                 {
-                    sql = dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(c, false) : DataBase.OmegaGetInsertSQL(c, false);//插入
+                    sql = dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(c, false) : DataBase.OmegaGetInsertSQL(c, false);// Restore by inserting the card.
                     bool delold = MyMsg.Question(LMSG.IfDeleteCard);
-                    if (delold)//是否删除旧卡片
+                    if (delold)//Whether to delete the old card
                     {
                         if (DataBase.Command(dataform.GetOpenFile(),
                             DataBase.GetDeleteSQL(oldCard)) < 2)
                         {
-                            //删除失败
+                            //Delete failed
                             MyMsg.Error(LMSG.DeleteFail);
                             delold = false;
                         }
                         else
-                        {//删除成功，添加还原sql
+                        {//Delete succeeded; add restore SQL
                             undoSQL = DataBase.GetDeleteSQL(c) + (dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(oldCard, false) : DataBase.OmegaGetInsertSQL(oldCard, false));
                         }
                     }
                     else
                     {
-                        undoSQL = DataBase.GetDeleteSQL(c);//还原就是删除
+                        undoSQL = DataBase.GetDeleteSQL(c);//Restore action is delete
                     }
-                    //如果删除旧卡片，则把资源修改名字,否则复制资源
+                    //Rename resources when deleting the old card; otherwise copy resources
                     if (modfiles)
                     {
                         if (delold)
@@ -171,7 +171,7 @@ namespace DataEditorX.Core
                     }
                 }
                 else
-                {//更新数据
+                {//Update data
                     sql = dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetUpdateSQL(c) : DataBase.OmegaGetUpdateSQL(c);
                     undoSQL = dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetUpdateSQL(oldCard) : DataBase.OmegaGetUpdateSQL(oldCard);
                 }
@@ -213,8 +213,8 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 删除
-        //删除
+        #region Delete
+        //Delete
         public class DelCommand : IBackableCommand
         {
             private string undoSQL;
@@ -248,9 +248,9 @@ namespace DataEditorX.Core
                 List<string> sql = new();
                 foreach (Card c in cards)
                 {
-                    sql.Add(DataBase.GetDeleteSQL(c));//删除
+                    sql.Add(DataBase.GetDeleteSQL(c));//Delete
                     undo += dataform.GetOpenFile().EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? DataBase.GetInsertSQL(c, true) : DataBase.OmegaGetInsertSQL(c, true);
-                    //删除资源
+                    //Load related-file deletion setting
                     if (deletefiles)
                     {
                         YGOUtil.CardDelete(c.id, dataform.GetPath());
@@ -282,8 +282,8 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 打开脚本
-        //打开脚本
+        #region Open script
+        //Open script
         public bool OpenScript(bool openinthis, string addrequire)
         {
             if (!dataform.CheckOpen())
@@ -329,7 +329,7 @@ namespace DataEditorX.Core
                     sw.Close();
                     fs.Close();
                 }
-                if (MyMsg.Question(LMSG.IfCreateScript))//是否创建脚本
+                if (MyMsg.Question(LMSG.IfCreateScript))//Ask whether to create the script
                 {
                     MyPath.CreateDirByFile(lua);
                     using FileStream fs = new(lua,
@@ -346,9 +346,9 @@ namespace DataEditorX.Core
                     fs.Close();
                 }
             }
-            if (File.Exists(lua))//如果存在，则打开文件
+            if (File.Exists(lua))//Open the file when it exists
             {
-                if (openinthis)//是否用本程序打开
+                if (openinthis)//Whether to open with this program
                 {
                     DEXConfig.OpenFileInThis(lua);
                 }
@@ -363,7 +363,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 复制卡片
+        #region Copy cards
         public class CopyCommand : IBackableCommand
         {
             bool copied = false;

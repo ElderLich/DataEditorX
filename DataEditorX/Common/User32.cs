@@ -1,8 +1,8 @@
-﻿/*
-* 由SharpDevelop创建。
-* 用户： Acer
-* 日期: 2014-10-25
-* 时间: 21:30
+/*
+* Created with SharpDevelop.
+* User: Acer
+* Date: 2014-10-25
+* Time: 21:30
 * 
 */
 using System.Runtime.InteropServices;
@@ -15,7 +15,7 @@ namespace System
     public class User32
     {
         /// <summary>
-        /// 发送窗口消息
+        /// Send a window message
         /// </summary>
         /// <param name="hWnd"></param>
         /// <param name="msg"></param>
@@ -25,7 +25,7 @@ namespace System
         [DllImport("User32.dll", EntryPoint = "SendMessage")]
         public static extern int SendMessage(IntPtr hWnd, int msg, uint wParam, uint lParam);
         /// <summary>
-        /// 设置窗口的位置
+        /// Set the window position
         /// </summary>
         /// <param name="hWnd"></param>
         /// <param name="hWndInsertAfter"></param>
@@ -38,7 +38,7 @@ namespace System
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int Width, int Height, int flags);
         /// <summary>
-        /// 得到当前活动的窗口
+        /// Get the active window
         /// </summary>
         /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto)]

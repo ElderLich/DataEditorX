@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-15
- * 时间: 15:47
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-15
+ * Time: 15:47
  * 
  */
 using DataEditorX.Common;
@@ -16,17 +16,17 @@ namespace DataEditorX.Core.Mse
     /// </summary>
     public class MSEConfig
     {
-        #region  常量
+        #region  Constants
         public const string TAG = "mse";
-        /// <summary>存档头部</summary>
+        /// <summary>Save file header</summary>
         public const string TAG_HEAD = "head";
-        /// <summary>存档尾部</summary>
+        /// <summary>Save file footer</summary>
         public const string TAG_END = "end";
-        /// <summary>简体转繁体</summary>
+        /// <summary>Simplified-to-Traditional conversion</summary>
         public const string TAG_CN2TW = "cn2tw";
-        /// <summary>魔法标志格式</summary>
+        /// <summary>Spell symbol format</summary>
         public const string TAG_SPELL = "spell";
-        /// <summary>陷阱标志格式</summary>
+        /// <summary>Trap symbol format</summary>
         public const string TAG_TRAP = "trap";
         public const string TAG_REG_PENDULUM = "pendulum-text";
         public const string TAG_REG_MONSTER = "monster-text";
@@ -51,7 +51,7 @@ namespace DataEditorX.Core.Mse
 
         public const string TAG_REP = "%%";
         public const string SEP_LINE = " ";
-        //默认的配置
+        //Default configuration
         public const string FILE_CONFIG_NAME = "Chinese-Simplified";
         public const string PATH_IMAGE = "Images";
         public string configName = FILE_CONFIG_NAME;
@@ -70,7 +70,7 @@ namespace DataEditorX.Core.Mse
             regx_monster = "(\\s\\S*?)";
             regx_pendulum = "(\\s\\S*?)";
             regx_rush = "(\\s\\S*?)";
-            //设置文件名
+            //Set file name
             configName = MyPath.GetFullFileName(TAG, config);
 
             replaces = new SortedList<string, string>();
@@ -159,14 +159,14 @@ namespace DataEditorX.Core.Mse
                 }
                 else if (line.StartsWith(TAG_IMAGE))
                 {
-                    //如果路径不合法，则为后面的路径
+                    //Use fallback path when configured path is invalid
                     imagepath = MyPath.CheckDir(ConfHelper.GetValue(line), MyPath.Combine(path, PATH_IMAGE));
-                    //图片缓存目录
+                    //Image cache directory
                     imagecache = MyPath.Combine(imagepath, "cache");
                     MyPath.CreateDir(imagecache);
                 }
                 else if (line.StartsWith(TAG_REPALCE))
-                {//特数字替换
+                {//Special character replacements
                     string word = ConfHelper.GetValue(line);
                     string p = ConfHelper.GetRegex(ConfHelper.GetValue1(word));
                     string r = ConfHelper.GetRegex(ConfHelper.GetValue2(word));
@@ -176,11 +176,11 @@ namespace DataEditorX.Core.Mse
                     }
                 }
                 else if (line.StartsWith(TAG_RACE))
-                {//种族
+                {//Race
                     ConfHelper.DicAdd(raceDic, line);
                 }
                 else if (line.StartsWith(TAG_TYPE))
-                {//类型
+                {//Types
                     ConfHelper.DicAdd(typeDic, line);
                 }
                 else if (line.StartsWith(TAG_REIMAGE))
@@ -193,7 +193,7 @@ namespace DataEditorX.Core.Mse
         {
             Iscn2tw = false;
 
-            //读取配置
+            //Read configuration
             string tmp = MyPath.FindFile(path, MyPath.GetFileName(TAG, DEXConfig.ReadString(DEXConfig.TAG_MSE)), "mse");
 
             if (!File.Exists(tmp))
@@ -201,59 +201,59 @@ namespace DataEditorX.Core.Mse
                 tmp = MyPath.FindFile(path, MyPath.GetFileName(TAG, FILE_CONFIG_NAME), "mse");
                 if (!File.Exists(tmp))
                 {
-                    return;//如果默认的也不存在
+                    return;//Return when even the default config is missing
                 }
             }
             SetConfig(tmp, path);
         }
         /// <summary>
-        /// 是否调整图片
+        /// Whether to resize images
         /// </summary>
         public bool reimage;
         /// <summary>
-        /// 中间图宽度
+        /// Middle image width
         /// </summary>
         public int width;
         /// <summary>
-        /// 中间图高度
+        /// Middle image height
         /// </summary>
         public int height;
 
         public int pwidth;
         public int pheight;
 
-        //没星星的卡
+        //Cards without stars
         public long[] noStartCards;
-        //第10期
+        //Series 10 layout
         public bool no10;
-        //每个存档最大数
+        //Maximum cards per save file
         public int maxcount;
-        //图片路径
+        //Image path
         public string imagepath;
         /// <summary>
-        /// 图片缓存路径
+        /// Image cache path
         /// </summary>
         public string imagecache;
-        //魔法标志
+        //Spell symbol
         public string str_spell;
-        //陷阱标志
+        //Trap symbol
         public string str_trap;
-        //效果格式
+        //Effect text format
         public string temp_text;
-        //简体转繁体？
+        // Simplified-to-Traditional conversion flag.
         public bool Iscn2tw;
-        //特数字替换
+        //Special character replacements
         public SortedList<string, string> replaces;
-        //效果文正则提取
+        //Effect text extraction regex
         public string regx_pendulum;
         public string regx_monster;
         public string regx_rush;
         public static string RegXPendulum { get; set; }
         public static string RegXMonster { get; set; }
         public static string RegXRush { get; set; }
-        //存档头部
+        //Save file header
         public string head;
-        //存档结尾
+        //Save file footer
         public string end;
         public SortedList<long, string> typeDic;
         public SortedList<long, string> raceDic;

@@ -1,8 +1,8 @@
 ﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 6月10 星期二
- * 时间: 9:58
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: June 10, Tuesday
+ * Time: 9:58
  * 
  */
 using System.Text;
@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace DataEditorX.Common
 {
     /// <summary>
-    /// 检查更新
+    /// Update checker and installer.
     /// </summary>
     public static class CheckUpdate
     {
@@ -25,22 +25,22 @@ namespace DataEditorX.Common
         }
 
         /// <summary>
-        /// 下载URL
+        /// Selected release download URL.
         /// </summary>
         public static string URL = "";
         public static UpdateInfoStatus LastInfoStatus { get; private set; } = UpdateInfoStatus.Ok;
         public static string LastInfoError { get; private set; } = "";
         /// <summary>
-        /// 从HEAD获取版本号
+        /// Default version when metadata cannot be read.
         /// </summary>
         public const string DEFAULT = "0.0.0.0";
 
-        #region 检查版本
+        #region Version check
         /// <summary>
-        /// 获取新版本
+        /// Reads the latest available version from update metadata.
         /// </summary>
-        /// <param name="VERURL">链接</param>
-        /// <returns>版本号</returns>
+        /// <param name="VERURL">Metadata URL.</param>
+        /// <returns>Version number.</returns>
         public static string GetNewVersion(string VERURL)
         {
             URL = "";
@@ -88,11 +88,11 @@ namespace DataEditorX.Common
             return urlver;
         }
         /// <summary>
-        /// 检查版本号，格式0.0.0.0
+        /// Compares version numbers in 0.0.0.0 format.
         /// </summary>
         /// <param name="ver">0.0.0.0</param>
         /// <param name="oldver">0.0.0.0</param>
-        /// <returns>是否有新版本</returns>
+        /// <returns>Whether a newer version is available.</returns>
         public static bool CheckVersion(string ver, string oldver)
         {
             bool hasNew = false;
@@ -102,12 +102,12 @@ namespace DataEditorX.Common
             int count = Math.Max(vers.Length, oldvers.Length);
             if (count > 0)
             {
-                //从左到右比较数字
+                // Compare numeric components from left to right.
                 for (int i = 0; i < count; i++)
                 {
                     int.TryParse(i < vers.Length ? vers[i] : "0", out int j);
                     int.TryParse(i < oldvers.Length ? oldvers[i] : "0", out int k);
-                    if (j > k)//新的版本号大于旧的
+                    if (j > k)// New version is greater than the old version.
                     {
                         hasNew = true;
                         break;
@@ -123,12 +123,12 @@ namespace DataEditorX.Common
         }
         #endregion
 
-        #region 获取网址内容
+        #region URL content
         /// <summary>
-        /// 获取网址内容
+        /// Reads text content from a URL.
         /// </summary>
-        /// <param name="url">网址</param>
-        /// <returns>内容</returns>
+        /// <param name="url">URL.</param>
+        /// <returns>Response content.</returns>
         public static string GetHtmlContentByUrl(string url)
         {
             return TryGetHtmlContentByUrl(url, out string htmlContent, out _) ? htmlContent : "";
@@ -164,12 +164,12 @@ namespace DataEditorX.Common
         }
         #endregion
 
-        #region 下载文件
+        #region Download
         /// <summary>
-        /// 下载文件
+        /// Downloads the selected update archive.
         /// </summary>
-        /// <param name="filename">保存文件路径</param>
-        /// <returns>是否下载成功</returns>
+        /// <param name="filename">Destination file path.</param>
+        /// <returns>Whether the download succeeded.</returns>
         public static bool DownLoad(string filename)
         {
             try

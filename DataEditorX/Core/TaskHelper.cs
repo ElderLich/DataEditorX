@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-12
- * 时间: 19:43
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-12
+ * Time: 19:43
  * 
  */
 using DataEditorX.Common;
@@ -16,52 +16,52 @@ using System.IO.Compression;
 namespace DataEditorX.Core
 {
     /// <summary>
-    /// 任务
+    /// Task
     /// </summary>
     public class TaskHelper
     {
         #region Member
         /// <summary>
-        /// 当前任务
+        /// Current task
         /// </summary>
         private MyTask nowTask = MyTask.NONE;
         /// <summary>
-        /// 上一次任务
+        /// Previous task
         /// </summary>
         private MyTask lastTask = MyTask.NONE;
         /// <summary>
-        /// 当前卡片列表
+        /// Card list
         /// </summary>
         private Card[] cardlist;
         /// <summary>
-        /// 当前卡片列表
+        /// Card list
         /// </summary>
         public Card[] CardList
         {
             get { return cardlist; }
         }
         /// <summary>
-        /// 任务参数
+        /// Task parameters
         /// </summary>
         private string[] mArgs;
         /// <summary>
-        /// 图片设置
+        /// Image settings
         /// </summary>
         private readonly ImageSet imgSet;
         /// <summary>
-        /// MSE转换
+        /// MSE conversion
         /// </summary>
         private readonly MseMaker mseHelper;
         /// <summary>
-        /// 是否取消
+        /// Whether cancelled
         /// </summary>
         private bool isCancel = false;
         /// <summary>
-        /// 是否在运行
+        /// Whether running
         /// </summary>
         private bool isRun = false;
         /// <summary>
-        /// 后台工作线程
+        /// Background worker
         /// </summary>
         private readonly BackgroundWorker worker;
 
@@ -101,14 +101,14 @@ namespace DataEditorX.Core
         #endregion
 
         #region Other
-        //设置任务
+        //Set task
         public void SetTask(MyTask myTask, Card[] cards, params string[] args)
         {
             nowTask = myTask;
             cardlist = cards;
             mArgs = args;
         }
-        //转换图片
+        //Convert images
         //public void ToImg(string img, string saveimg1, string saveimg2)
         public void ToImg(string img, string saveimg1)
         {
@@ -126,13 +126,13 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 检查更新
+        #region Check for updates
         public static void CheckVersion(bool showNew)
         {
             string updateUrl = DEXConfig.ReadString(DEXConfig.TAG_UPDATE_URL);
             string newver = CheckUpdate.GetNewVersion(updateUrl);
             if (newver == CheckUpdate.DEFAULT)
-            {   //检查失败
+            {   //Version check failed
                 if (!showNew)
                 {
                     return;
@@ -143,14 +143,14 @@ namespace DataEditorX.Core
             }
 
             if (CheckUpdate.CheckVersion(newver, Application.ProductVersion))
-            {//有最新版本
+            {//New version is available
                 if (!MyMsg.Question(LMSG.HaveNewVersion))
                 {
                     return;
                 }
             }
             else
-            {//现在就是最新版本
+            {//Already on the latest version
                 if (!showNew)
                 {
                     return;
@@ -162,7 +162,7 @@ namespace DataEditorX.Core
             string downloadDir = MyPath.Combine(Path.GetTempPath(), "DataEditorX");
             MyPath.CreateDir(downloadDir);
             string zipFile = MyPath.Combine(downloadDir, "DataEditorX_" + newver + ".zip");
-            //下载文件
+            //Download file
             if (CheckUpdate.DownLoad(zipFile))
             {
                 if (MyMsg.Question("Update downloaded.\n\nInstall it now? DataEditorX will close and restart."))
@@ -213,7 +213,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 裁剪图片
+        #region Crop images
         public void CutImages(string imgpath, bool isreplace)
         {
             int count = cardlist.Length;
@@ -233,15 +233,15 @@ namespace DataEditorX.Core
                 {
                     Bitmap bp = new(jpg);
                     Bitmap bmp;
-                    if (c.IsType(CardType.TYPE_XYZ))//超量
+                    if (c.IsType(CardType.TYPE_XYZ))//Xyz
                     {
                         bmp = MyBitmap.Cut(bp, imgSet.xyzArea);
                     }
-                    else if (c.IsType(CardType.TYPE_PENDULUM))//P怪兽
+                    else if (c.IsType(CardType.TYPE_PENDULUM))//Pendulum monster
                     {
                         bmp = MyBitmap.Cut(bp, imgSet.pendulumArea);
                     }
-                    else//一般
+                    else//Regular monster
                     {
                         bmp = MyBitmap.Cut(bp, imgSet.normalArea);
                     }
@@ -254,7 +254,7 @@ namespace DataEditorX.Core
         #endregion
 
         //removed thumbnail
-        #region 转换图片
+        #region Convert images
         public void ConvertImages(string imgpath, string gamepath, bool isreplace)
         {
             string picspath = MyPath.Combine(gamepath, "pics");
@@ -281,14 +281,14 @@ namespace DataEditorX.Core
                     if (File.Exists(f))
                     {
                         Bitmap bmp = new(f);
-                        //大图，如果替换，或者不存在
+                        //Full image when replacing or missing
                         if (isreplace || !File.Exists(jpg_b))
                         {
 
                             _ = MyBitmap.SaveAsJPEG(MyBitmap.Zoom(bmp, imgSet.W, imgSet.H),
                                                 jpg_b, imgSet.quality);
                         }
-                        //小图，如果替换，或者不存在
+                        //Thumbnail when replacing or missing
                         //if (isreplace || !File.Exists(jpg_s))
                         //{
                         //	MyBitmap.SaveAsJPEG(MyBitmap.Zoom(bmp, imgSet.w, imgSet.h),
@@ -301,7 +301,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region MSE存档
+        #region MSE files
         public string MSEImagePath
         {
             get { return mseHelper.ImagePath; }
@@ -318,7 +318,7 @@ namespace DataEditorX.Core
             string pack_db = MyPath.GetRealPath(DEXConfig.ReadString("pack_db"));
             bool rarity = DEXConfig.ReadBoolean("mse_auto_rarity", false);
             int c = cards.Length;
-            //不分开，或者卡片数小于单个存档的最大值
+            //Do not split when card count fits one save file
             if (mseHelper.MaxNum == 0 || c < mseHelper.MaxNum)
             {
                 SaveMSE(1, file, cards, pack_db, rarity, isUpdate);
@@ -326,13 +326,13 @@ namespace DataEditorX.Core
             else
             {
                 int nums = c / mseHelper.MaxNum;
-                if (nums * mseHelper.MaxNum < c)//计算需要分多少个存档
+                if (nums * mseHelper.MaxNum < c)//Calculate how many save files are needed
                 {
                     nums++;
                 }
 
                 List<Card> clist = new();
-                for (int i = 0; i < nums; i++)//分别生成存档
+                for (int i = 0; i < nums; i++)//Generate each save file
                 {
                     clist.Clear();
                     for (int j = 0; j < mseHelper.MaxNum; j++)
@@ -354,7 +354,7 @@ namespace DataEditorX.Core
         {
             string setFile = file + ".txt";
             Dictionary<Card, string> images = mseHelper.WriteSet(setFile, cards, pack_db, rarity);
-            if (isUpdate)//仅更新文字
+            if (isUpdate)//Update text only
             {
                 return;
             }
@@ -374,7 +374,7 @@ namespace DataEditorX.Core
 
                 i++;
                 worker.ReportProgress(i / count, string.Format("{0}/{1}-{2}", i, count, num));
-                //TODO 先裁剪图片
+                //TODO: crop images first
                 zips.CreateEntryFromFile(img, Path.GetFileName(img));
             }
             zips.Dispose();
@@ -382,7 +382,7 @@ namespace DataEditorX.Core
         }
         public Card[] ReadMSE(string mseset, bool repalceOld)
         {
-            //解压所有文件
+            //Extract all files
             using (ZipStorer zips = ZipStorer.Open(mseset, FileAccess.Read))
             {
                 zips.EncodeUTF8 = true;
@@ -401,7 +401,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 导出数据
+        #region Export data
         public void ExportData(string path, string zipname, string _cdbfile, string modulescript)
         {
             int i = 0;
@@ -414,11 +414,11 @@ namespace DataEditorX.Core
             int count = cards.Length;
             YgoPath ygopath = new(path);
             string name = Path.GetFileNameWithoutExtension(zipname);
-            //数据库
+            //Database
             string cdbfile = zipname + ".cdb";
-            //说明
+            //Readme
             string readme = MyPath.Combine(path, name + ".txt");
-            //新卡ydk
+            //New-card YDK
             string deckydk = ygopath.GetYdk(name);
             //module scripts
             string extra_script = "";
@@ -471,7 +471,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 运行
+        #region Run
         public void Run()
         {
             isCancel = false;

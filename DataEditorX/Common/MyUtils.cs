@@ -1,10 +1,10 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2015-5-24
- * 时间: 10:55
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2015-5-24
+ * Time: 10:55
  * 
- * 要改变这种模板请点击 工具|选项|代码编写|编辑标准头文件
+ * Legacy SharpDevelop template note.
  */
 using System.Diagnostics;
 using System.Text;
@@ -17,7 +17,7 @@ namespace DataEditorX.Common
     public class MyUtils
     {
         /// <summary>
-        /// 计算文件的MD5校验
+        /// Calculate file MD5
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>

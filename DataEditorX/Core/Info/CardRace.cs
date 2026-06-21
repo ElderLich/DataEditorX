@@ -1,68 +1,68 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 2014-10-13
- * 时间: 9:44
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: 2014-10-13
+ * Time: 9:44
  * 
  */
 
 namespace DataEditorX.Core.Info
 {
     /// <summary>
-    /// 卡片种族
+    /// Card races
     /// </summary>
     public enum CardRace : long
     {
         RACE_NONE = 0,
-        ///<summary>战士</summary>
+        ///<summary>Warrior</summary>
         RACE_WARRIOR = 0x1,
-        ///<summary>魔法师</summary>
+        ///<summary>Spellcaster</summary>
         RACE_SPELLCASTER = 0x2,
-        ///<summary>天使</summary>
+        ///<summary>Fairy</summary>
         RACE_FAIRY = 0x4,
-        ///<summary>恶魔</summary>
+        ///<summary>Fiend</summary>
         RACE_FIEND = 0x8,
-        ///<summary>不死</summary>
+        ///<summary>Zombie</summary>
         RACE_ZOMBIE = 0x10,
-        ///<summary>机械</summary>
+        ///<summary>Machine</summary>
         RACE_MACHINE = 0x20,
-        ///<summary>水</summary>
+        ///<summary>Water</summary>
         RACE_AQUA = 0x40,
-        ///<summary>炎</summary>
+        ///<summary>Fire</summary>
         RACE_PYRO = 0x80,
-        ///<summary>岩石</summary>
+        ///<summary>Rock</summary>
         RACE_ROCK = 0x100,
-        ///<summary>鸟兽</summary>
+        ///<summary>Winged Beast</summary>
         RACE_WINDBEAST = 0x200,
-        ///<summary>植物</summary>
+        ///<summary>Plant</summary>
         RACE_PLANT = 0x400,
-        ///<summary>昆虫</summary>
+        ///<summary>Insect</summary>
         RACE_INSECT = 0x800,
-        ///<summary>雷</summary>
+        ///<summary>Thunder</summary>
         RACE_THUNDER = 0x1000,
-        ///<summary>龙</summary>
+        ///<summary>Dragon</summary>
         RACE_DRAGON = 0x2000,
-        ///<summary>兽</summary>
+        ///<summary>Beast</summary>
         RACE_BEAST = 0x4000,
-        ///<summary>兽战士</summary>
+        ///<summary>Beast-Warrior</summary>
         RACE_BEASTWARRIOR = 0x8000,
-        ///<summary>恐龙</summary>
+        ///<summary>Dinosaur</summary>
         RACE_DINOSAUR = 0x10000,
-        ///<summary>鱼</summary>
+        ///<summary>Fish</summary>
         RACE_FISH = 0x20000,
-        ///<summary>海龙</summary>
+        ///<summary>Sea Serpent</summary>
         RACE_SEASERPENT = 0x40000,
-        ///<summary>爬虫</summary>
+        ///<summary>Reptile</summary>
         RACE_REPTILE = 0x80000,
-        ///<summary>念动力</summary>
+        ///<summary>Psychic</summary>
         RACE_PSYCHO = 0x100000,
-        ///<summary>幻神兽</summary>
+        ///<summary>Divine-Beast</summary>
         RACE_DEVINE = 0x200000,
-        ///<summary>创造神</summary>
+        ///<summary>Creator God</summary>
         RACE_CREATORGOD = 0x400000,
-        ///<summary>幻龙</summary>
+        ///<summary>Wyrm</summary>
         RACE_WYRM = 0x800000,
-        ///<summary>电子界</summary>
+        ///<summary>Cyberse</summary>
         RACE_CYBERSE = 0x1000000,
         RACE_ILLUSION = 0x2000000,
         RACE_CYBORG = 0x4000000,

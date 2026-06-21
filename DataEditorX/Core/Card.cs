@@ -1,6 +1,6 @@
-﻿/*
+/*
  * CreateDate :2014-02-07
- * desc :卡片类
+ * desc: card model
  * ModiftyDate :2014-02-12
  */
 using DataEditorX.Core.Info;
@@ -14,12 +14,12 @@ namespace DataEditorX.Core
         public const int STR_MAX = 0x10;
         public const int SETCODE_MAX = 4;
 
-        #region 构造
+        #region Constructors
         /// <summary>
-        /// 卡片
+        /// Card
         /// </summary>
-        /// <param name="cardCode">密码</param>
-        /// <param name="cardName">名字</param>
+        /// <param name="cardCode">Card ID</param>
+        /// <param name="cardName">Name</param>
         public Card(uint cardCode)
         {
             id = cardCode;
@@ -45,38 +45,38 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 成员
-        /// <summary>卡片密码</summary>
+        #region Fields
+        /// <summary>Card ID</summary>
         public uint id;
-        /// <summary>卡片规则</summary>
+        /// <summary>Card rule</summary>
         public int ot;
-        /// <summary>卡片同名卡</summary>
+        /// <summary>Card alias</summary>
         public uint alias;
-        /// <summary>卡片系列号</summary>
+        /// <summary>Card setcode</summary>
         public long setcode;
-        /// <summary>卡片种类</summary>
+        /// <summary>Card type</summary>
         public long type;
-        /// <summary>攻击力</summary>
+        /// <summary>Attack</summary>
         public int atk;
-        /// <summary>防御力</summary>
+        /// <summary>Defense</summary>
         public int def;
-        /// <summary>卡片等级</summary>
+        /// <summary>Card level</summary>
         public long level;
-        /// <summary>卡片种族</summary>
+        /// <summary>Card races</summary>
         public long race;
-        /// <summary>卡片属性</summary>
+        /// <summary>Card attributes</summary>
         public int attribute;
-        /// <summary>效果种类</summary>
+        /// <summary>Effect category</summary>
         public long category;
         /// <summary>Omega-exclusive parameters</summary>
         public long[] omega;
         public string script;
-        /// <summary>卡片名称</summary>
+        /// <summary>Card name</summary>
         public string name;
-        /// <summary>描述文本</summary>
+        /// <summary>Description text</summary>
         public string desc;
         string[] str;
-        /// <summary>脚本文件文字</summary>
+        /// <summary>Script text entries</summary>
         public string[] Str
         {
             get
@@ -148,12 +148,12 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 比较、哈希值、操作符
+        #region Comparison, hash code, and operators
         /// <summary>
-        /// 比较
+        /// Compare
         /// </summary>
-        /// <param name="obj">对象</param>
-        /// <returns>结果</returns>
+        /// <param name="obj">Object</param>
+        /// <returns>Result</returns>
         public override bool Equals(object obj)
         {
             if (obj is Card)
@@ -166,7 +166,7 @@ namespace DataEditorX.Core
             }
         }
         /// <summary>
-        /// 比较卡片，除脚本提示文本
+        /// Compare cards excluding script hint text
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
@@ -237,10 +237,10 @@ namespace DataEditorX.Core
             return equalBool;
         }
         /// <summary>
-        /// 比较卡片是否一致？
+        /// Compare whether cards match
         /// </summary>
-        /// <param name="other">比较的卡片</param>
-        /// <returns>结果</returns>
+        /// <param name="other">Card to compare</param>
+        /// <returns>Result</returns>
         public bool Equals(Card other)
         {
             bool equalBool = EqualsData(other);
@@ -268,7 +268,7 @@ namespace DataEditorX.Core
 
         }
         /// <summary>
-        /// 得到哈希值
+        /// Get hash code
         /// </summary>
         public override int GetHashCode()
         {
@@ -277,14 +277,14 @@ namespace DataEditorX.Core
             return hashCode;//member.GetHashCode();
         }
         /// <summary>
-        /// 比较卡片是否相等
+        /// Compare card equality
         /// </summary>
         public static bool operator ==(Card left, Card right)
         {
             return left.Equals(right);
         }
         /// <summary>
-        /// 是否是某类型
+        /// Check whether the card has a type
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -298,7 +298,7 @@ namespace DataEditorX.Core
             return false;
         }
         /// <summary>
-        /// 是否是某系列
+        /// Check whether the card has a setcode
         /// </summary>
         /// <param name="sc"></param>
         /// <returns></returns>
@@ -319,7 +319,7 @@ namespace DataEditorX.Core
             return false;
         }
         /// <summary>
-        /// 卡片是否不相等
+        /// Compare card inequality
         /// </summary>
         public static bool operator !=(Card left, Card right)
         {
@@ -327,16 +327,16 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 卡片文字信息
+        #region Card text info
         /// <summary>
-        /// 密码字符串
+        /// Card ID string
         /// </summary>
         public string IdString
         {
             get { return id.ToString("00000000"); }
         }
         /// <summary>
-        /// 字符串化
+        /// Format as string
         /// </summary>
         public override string ToString()
         {

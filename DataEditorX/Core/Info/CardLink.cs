@@ -1,10 +1,10 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Administrator
- * 日期: 2017/5/11
- * 时间: 16:14
+/*
+ * Created with SharpDevelop.
+ * User: Administrator
+ * Date: 2017/5/11
+ * Time: 16:14
  * 
- * 要改变这种模板请点击 工具|选项|代码编写|编辑标准头文件
+ * Legacy SharpDevelop template note.
  */
 
 namespace DataEditorX.Core.Info

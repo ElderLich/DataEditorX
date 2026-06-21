@@ -1,8 +1,8 @@
-﻿/*
- * 由SharpDevelop创建。
- * 用户： Acer
- * 日期: 5月18 星期日
- * 时间: 17:01
+/*
+ * Created with SharpDevelop.
+ * User: Acer
+ * Date: May 18, Sunday
+ * Time: 17:01
  * 
  */
 using Microsoft.Data.Sqlite;
@@ -11,11 +11,11 @@ using System.Text;
 namespace DataEditorX.Core
 {
     /// <summary>
-    /// SQLite 操作
+    /// SQLite helper methods.
     /// </summary>
     public static class DataBase
     {
-        #region 默认
+        #region Defaults
         static readonly string _defaultSQL;
         static readonly string _defaultTableSQL;
         static readonly string _defaultOTableSQL;
@@ -57,11 +57,11 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 创建数据库
+        #region Database creation
         /// <summary>
-        /// 创建数据库
+        /// Creates a new card database.
         /// </summary>
-        /// <param name="Db">新数据库路径</param>
+        /// <param name="Db">Destination database path.</param>
         public static bool Create(string Db)
         {
             if (File.Exists(Db))
@@ -96,13 +96,13 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 执行sql语句
+        #region SQL execution
         /// <summary>
-        /// 执行sql语句
+        /// Executes one or more SQL statements in a single transaction.
         /// </summary>
-        /// <param name="DB">数据库</param>
-        /// <param name="SQLs">sql语句</param>
-        /// <returns>返回影响行数</returns>
+        /// <param name="DB">Database path.</param>
+        /// <param name="SQLs">SQL statements to execute.</param>
+        /// <returns>Total affected rows, or -1 when the transaction fails.</returns>
         public static int Command(string DB, params string[] SQLs)
         {
             int result = 0;
@@ -123,7 +123,7 @@ namespace DataEditorX.Core
                     }
                     catch
                     {
-                        trans.Rollback();//出错，回滚
+                        trans.Rollback();
                         result = -1;
                     }
                     if (result != -1) trans.Commit();
@@ -135,7 +135,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 根据SQL读取
+        #region SQL reads
         static Card ReadCard(SqliteDataReader reader, bool reNewLine)
         {
             Card c = new(0)
@@ -190,7 +190,7 @@ namespace DataEditorX.Core
         {
             StringBuilder sr = new(text);
             _ = sr.Replace("\r\n", "\n");
-            _ = sr.Replace("\n", Environment.NewLine);//换为当前系统的换行符
+            _ = sr.Replace("\n", Environment.NewLine);
             text = sr.ToString();
             _ = sr.Remove(0, sr.Length);
             return text;
@@ -206,20 +206,22 @@ namespace DataEditorX.Core
             return Read(DB, reNewLine, idlist.ToArray());
         }
         /// <summary>
-        /// 根据密码集合，读取数据
+        /// Reads cards by SQL, card IDs, or a name fragment.
         /// </summary>
-        /// <param name="DB">数据库</param>
-        /// <param name="reNewLine">调整换行符</param>
-        /// <param name="SQLs">SQL/密码语句集合集合</param>
+        /// <param name="DB">Database path.</param>
+        /// <param name="reNewLine">Normalize line endings for the current OS.</param>
+        /// <param name="SQLs">SQL statements, card IDs, or name fragments.</param>
         public static Card[] Read(string DB, bool reNewLine, params string[] SQLs)
         {
             List<Card> list = new();
-            List<long> idlist = new();
+            HashSet<long> idlist = new();
             if (File.Exists(DB) && SQLs != null)
             {
+                using SqliteConnection con = new(@"Data Source=" + DB);
+                con.Open();
                 foreach (string str in SQLs)
                 {
-                    _ = int.TryParse(str, out int tmp);
+                    _ = long.TryParse(str, out long tmp);
                     string SQLstr = _defaultSQL;
                     if (!string.IsNullOrEmpty(str))
                     {
@@ -232,23 +234,20 @@ namespace DataEditorX.Core
                         else
                             SQLstr += " and texts.name like '%" + str + "%'";
                     }
-                    using SqliteConnection con = new(@"Data Source=" + DB);
-                    con.Open();
                     using SqliteCommand cmd = con.CreateCommand();
                     cmd.CommandText = SQLstr;
                     using SqliteDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
                         Card c = ReadCard(reader, reNewLine);
-                        if (idlist.IndexOf(c.id) < 0)
-                        {//不存在，则添加
-                            idlist.Add(c.id);
+                        if (idlist.Add(c.id))
+                        {
                             list.Add(c);
                         }
                     }
-                    con.Close();
-                    SqliteConnection.ClearAllPools();
                 }
+                con.Close();
+                SqliteConnection.ClearAllPools();
             }
             if (list.Count == 0)
             {
@@ -259,14 +258,14 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 复制数据库
+        #region Copy database
         /// <summary>
-        /// 复制数据库
+        /// Copy database
         /// </summary>
-        /// <param name="DB">复制到的数据库</param>
-        /// <param name="cards">卡片集合</param>
-        /// <param name="ignore">是否忽略存在</param>
-        /// <returns>更新数x2</returns>
+        /// <param name="DB">Destination database</param>
+        /// <param name="cards">Card collection</param>
+        /// <param name="ignore">Whether to keep existing records</param>
+        /// <returns>Updated row count x2</returns>
         public static int CopyDB(string DB, bool ignore, params Card[] cards)
         {
             int result = 0;
@@ -289,7 +288,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 删除记录
+        #region Delete records
         public static int DeleteDB(string DB, params Card[] cards)
         {
             int result = 0;
@@ -312,7 +311,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 压缩数据库
+        #region Compact database
         public static void Compression(string db)
         {
             if (File.Exists(db))
@@ -328,8 +327,8 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region SQL语句
-        #region 查询
+        #region SQL builders
+        #region Query builders
         static string ToInt(long l)
         {
             unchecked
@@ -561,13 +560,13 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 插入
+        #region Insert SQL builders
         /// <summary>
-        /// 转换为插入语句
+        /// Build insert SQL
         /// </summary>
-        /// <param name="c">卡片数据</param>
+        /// <param name="c">Card data</param>
         /// <param name="ignore"></param>
-        /// <returns>SQL语句</returns>
+        /// <returns>SQL statement.</returns>
         public static string OmegaGetInsertSQL(Card c, bool ignore, bool hex = false)
         {
             StringBuilder st = new();
@@ -695,11 +694,11 @@ namespace DataEditorX.Core
             return sql;
         }
         /// <summary>
-        /// 转换为插入语句
+        /// Build insert SQL
         /// </summary>
-        /// <param name="c">卡片数据</param>
+        /// <param name="c">Card data</param>
         /// <param name="ignore"></param>
-        /// <returns>SQL语句</returns>
+        /// <returns>SQL statement.</returns>
         public static string GetInsertSQL(Card c, bool ignore, bool hex = false)
         {
             StringBuilder st = new();
@@ -764,12 +763,12 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 更新
+        #region Update SQL builders
         /// <summary>
-        /// 转换为更新语句
+        /// Build update SQL
         /// </summary>
-        /// <param name="c">卡片数据</param>
-        /// <returns>SQL语句</returns>
+        /// <param name="c">Card data</param>
+        /// <returns>SQL statement.</returns>
         public static string OmegaGetUpdateSQL(Card c)
         {
             StringBuilder st = new();
@@ -825,10 +824,10 @@ namespace DataEditorX.Core
             return st.ToString();
         }
         /// <summary>
-        /// 转换为更新语句
+        /// Build update SQL
         /// </summary>
-        /// <param name="c">卡片数据</param>
-        /// <returns>SQL语句</returns>
+        /// <param name="c">Card data</param>
+        /// <returns>SQL statement.</returns>
         public static string GetUpdateSQL(Card c)
         {
             StringBuilder st = new();
@@ -861,12 +860,12 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region 删除
+        #region Delete
         /// <summary>
-        /// 转换删除语句
+        /// Build delete SQL
         /// </summary>
-        /// <param name="c">卡片密码</param>
-        /// <returns>SQL语句</returns>
+        /// <param name="c">Card ID</param>
+        /// <returns>SQL statement.</returns>
         public static string GetDeleteSQL(Card c)
         {
             string id = c.id.ToString();

@@ -2,7 +2,7 @@
 namespace DataEditorX.Common
 {
     /// <summary>
-    /// 区域
+    /// Rectangle area.
     /// </summary>
     public class Area
     {
@@ -14,19 +14,19 @@ namespace DataEditorX.Common
             height = 0;
         }
         /// <summary>
-        /// 左
+        /// Left position.
         /// </summary>
         public int left;
         /// <summary>
-        /// 顶
+        /// Top position.
         /// </summary>
         public int top;
         /// <summary>
-        /// 宽
+        /// Width.
         /// </summary>
         public int width;
         /// <summary>
-        /// 高
+        /// Height.
         /// </summary>
         public int height;
     }
