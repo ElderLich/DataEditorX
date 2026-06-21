@@ -7081,15 +7081,17 @@ Parameters:
   seq: int
 Source: Utilities/utility.lua:718
 
-●void Auxiliary.nbcon(int tp, Effect re)
-TODO document.
+●bool Auxiliary.nbcon(int tp, Effect re)
+Condition helper for effects that negate an activation and banish the activating card. It requires tp to be able to banish, and the activating card must either no longer be related to its effect or be able to be banished.
 Parameters:
   tp: int
   re: Effect
+Returns:
+  bool - true if the activation can be negated and the card can be banished if needed.
 Source: Utilities/utility.lua:1464
 
 ●void Auxiliary.nbtg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+Target helper for effects that negate an activation and banish the activating card. It sets negate operation info, adds banish info when the activating card is still related, and marks CATEGORY_GRAVE_ACTION for effects activated in the Graveyard.
 Parameters:
   e: Effect
   tp: int
@@ -7102,11 +7104,13 @@ Parameters:
   chk: bool
 Source: Utilities/utility.lua:1469
 
-●void Auxiliary.ndcon(int tp, Effect re)
-TODO document.
+●bool Auxiliary.ndcon(int tp, Effect re)
+Condition helper for effects that negate an activation and return the activating card to the Deck. It accepts Spell/Trap activations, unrelated cards, or related cards that can be returned to the Deck.
 Parameters:
   tp: int
   re: Effect
+Returns:
+  bool - true if the activation can be negated and the card can be returned to the Deck if needed.
 Source: Utilities/utility.lua:1482
 
 ●void Auxiliary.NecroValleyFilter(function f)
@@ -7120,36 +7124,46 @@ Parameters:
   f: function
 Source: Utilities/utility.lua:920
 
-●void Auxiliary.NecroValleyNegateCheck(any v)
-TODO document.
+●bool Auxiliary.NecroValleyNegateCheck(Card|Group v)
+Checks whether v, a Card or Group, contains a card affected by Necrovalley. If the current Chain is disablable and a matching card is found, it negates the current effect and returns true.
 Parameters:
-  v: any
+  v: Card|Group
+Returns:
+  bool - true if the current effect was negated by the Necrovalley check.
 Source: Utilities/utility.lua:926
 
-●void Auxiliary.NegateAnyFilter(Card c)
-TODO document.
+●bool Auxiliary.NegateAnyFilter(Card c)
+Filter for effects that negate a face-up card. Trap Monsters only need to be face-up, Spell/Trap Cards must be face-up and not already disabled, and monsters use Auxiliary.NegateMonsterFilter.
 Parameters:
   c: Card
+Returns:
+  bool - true if c is a valid card to have its effects negated.
 Source: Utilities/utility.lua:752
 
-●void Auxiliary.NegateEffectMonsterFilter(Card c)
-TODO document.
+●bool Auxiliary.NegateEffectMonsterFilter(Card c)
+Filter for effects that negate an Effect Monster, such as Effect Veiler: c must be face-up, not already disabled, and currently an Effect Monster.
 Parameters:
   c: Card
+Returns:
+  bool - true if c is a valid Effect Monster to have its effects negated.
 Source: Utilities/utility.lua:748
 
-●void Auxiliary.NegateMonsterFilter(Card c)
-TODO document.
+●bool Auxiliary.NegateMonsterFilter(Card c)
+Filter for effects that negate a face-up monster, such as Infinite Impermanence: c must be face-up, not already disabled, and be or originally be an Effect Monster.
 Parameters:
   c: Card
+Returns:
+  bool - true if c is a valid face-up monster to have its effects negated.
 Source: Utilities/utility.lua:744
 
-●void Auxiliary.NegateSummonCondition()
-TODO document.
+●bool Auxiliary.NegateSummonCondition()
+Returns true when no Chain is ready, for effects that negate a Summon.
+Returns:
+  bool - true when no Chain is ready.
 Source: Utilities/utility.lua:1831
 
-●void Auxiliary.NeosReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.NeosReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Condition for the mandatory Elemental HERO Neos Fusion End Phase return effect; true while the handler is not affected by Neo Space's effect code 42015635.
 Parameters:
   e: Effect
   tp: int
@@ -7159,10 +7173,12 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the forced Neos return effect should apply.
 Source: Utilities/utility.lua:242
 
-●void Auxiliary.NeosReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.NeosReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+Condition for the optional Elemental HERO Neos Fusion End Phase return effect; true while the handler is affected by Neo Space's effect code 42015635.
 Parameters:
   e: Effect
   tp: int
@@ -7172,18 +7188,24 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the optional Neos return effect should apply.
 Source: Utilities/utility.lua:252
 
-●void Auxiliary.NeosReturnTargetForced(any set_category)
-TODO document.
+●function Auxiliary.NeosReturnTargetForced([function|nil set_category])
+Returns the mandatory End Phase return target function for Elemental HERO Neos Fusions. It always allows targeting, sets to-Deck operation info, and calls set_category when provided.
 Parameters:
-  set_category: any
+  set_category: function|nil optional
+Returns:
+  function - Target function for the mandatory return effect.
 Source: Utilities/utility.lua:245
 
-●void Auxiliary.NeosReturnTargetOptional(any set_category)
-TODO document.
+●function Auxiliary.NeosReturnTargetOptional([function|nil set_category])
+Returns the optional End Phase return target function for Elemental HERO Neos Fusions. It requires the handler to be able to return to the Extra Deck, sets to-Deck operation info, and calls set_category when provided.
 Parameters:
-  set_category: any
+  set_category: function|nil optional
+Returns:
+  function - Target function for the optional return effect.
 Source: Utilities/utility.lua:255
 
 ●void Auxiliary.Next(Group g)
@@ -7202,14 +7224,16 @@ Parameters:
   g: Group
 Source: Utilities/utility.lua:82
 
-●void Auxiliary.NOT(function f)
-TODO document.
+●function Auxiliary.NOT(function f)
+Returns a predicate that negates f's result.
 Parameters:
   f: function
+Returns:
+  function - A predicate that returns not f(...).
 Source: Utilities/utility.lua:119
 
 ●void Auxiliary.NULL()
-TODO document.
+Empty helper function that intentionally does nothing.
 Source: Utilities/utility.lua:89
 
 ●void Auxiliary.nzatk(Card c)
@@ -7230,10 +7254,12 @@ Parameters:
   c: Card
 Source: Utilities/utility.lua:844
 
-●void Auxiliary.OR(... any)
-TODO document.
+●function Auxiliary.OR(... function)
+Returns a composed predicate that calls each function with the same arguments and stops at the first truthy result.
 Parameters:
-  ...: any
+  ...: function
+Returns:
+  function - A composed predicate.
 Source: Utilities/utility.lua:108
 
 ●bool Auxiliary.OrcustratedBabelFilter(Card c)
@@ -7252,24 +7278,28 @@ Returns:
   bool
 Source: Utilities/utility.lua:2037
 
-●void Auxiliary.PlaceCardsOnDeckBottom(int p, Group g, any reason)
-TODO document.
+●int Auxiliary.PlaceCardsOnDeckBottom(int p, Group g, [int reason])
+Sends g to the top of the Deck by reason, lets p order cards that reached either Deck, moves them to the bottom, and returns the number of operated cards.
 Parameters:
   p: int
   g: Group
-  reason: any
+  reason: int optional - Defaults to REASON_EFFECT.
+Returns:
+  int - The number of operated cards.
 Source: Utilities/utility.lua:1617
 
-●void Auxiliary.PlaceCardsOnDeckTop(int p, Group g, any reason)
-TODO document.
+●int Auxiliary.PlaceCardsOnDeckTop(int p, Group g, [int reason])
+Sends g to the top of the Deck by reason, lets p order cards that reached either Deck when needed, and returns the number of operated cards.
 Parameters:
   p: int
   g: Group
-  reason: any
+  reason: int optional - Defaults to REASON_EFFECT.
+Returns:
+  int - The number of operated cards.
 Source: Utilities/utility.lua:1601
 
 ●void Auxiliary.PuzzleOp(Effect e, int tp)
-TODO document.
+Puzzle-mode End Phase operation that sets player 0's LP to 0.
 Parameters:
   e: Effect
   tp: int
@@ -7298,34 +7328,36 @@ Parameters:
   te: Effect
 Source: Utilities/utility.lua:892
 
-●void Auxiliary.RegisterMergedDelayedEvent(Card c, int code, int event, Group g)
-TODO document.
+●void Auxiliary.RegisterMergedDelayedEvent(Card c, int code, int event, [Group|nil g])
+Registers global listeners that merge multiple occurrences of event into one EVENT_CUSTOM+code event. The merged event is raised immediately outside a Chain, or at Chain End while in a Chain.
 Parameters:
   c: Card
   code: int
   event: int
-  g: Group
+  g: Group|nil optional - Optional storage group; a kept-alive group is created when omitted.
 Source: Utilities/utility.lua:1647
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, int code, any events)
-TODO document.
+●int Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, int code, int|table events)
+Registers single-card merged delayed event listeners for one event or a table of events, returning the generated custom event code. The helper clears stored cards when the owner moves to a public state and installs the shared Chain End raiser when needed.
 Parameters:
   c: Card
   code: int
-  events: any
+  events: int|table
+Returns:
+  int - The generated custom event code.
 Source: Utilities/utility.lua:1684
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, int event, Effect event_code_single)
-TODO document.
+●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, int event, int event_code_single)
+Internal helper that registers one event listener and its Chain End companion for Auxiliary.RegisterMergedDelayedEvent_ToSingleCard.
 Parameters:
   c: Card
   g: Group
   event: int
-  event_code_single: Effect
+  event_code_single: int
 Source: Utilities/utility.lua:1729
 
 ●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_RaiseEvent(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+Global Chain End helper for single-card merged delayed events. It raises each pending generated custom event once, then clears its stored group.
 Parameters:
   e: Effect
   tp: int
@@ -7346,18 +7378,20 @@ Returns:
   bool
 Source: Utilities/utility.lua:1838
 
-●void Auxiliary.SelectCardFromFieldFirst(int tp, function f, int player, any s, any o, any min, any max, any ex, ... any)
-TODO document.
+●Group Auxiliary.SelectCardFromFieldFirst(int tp, function f, int player, int s, int o, int min, int max, any ex, ... any)
+Selection helper that first offers matching on-field cards with HINTMSG_FIELD_FIRST. If that selection is canceled, it restores the previous hint and falls back to Duel.SelectMatchingCard.
 Parameters:
   tp: int
   f: function
   player: int
-  s: any
-  o: any
-  min: any
-  max: any
+  s: int
+  o: int
+  min: int
+  max: int
   ex: any
   ...: any
+Returns:
+  Group - The selected cards.
 Source: Utilities/utility.lua:1379
 
 ●int Auxiliary.SelectFromOptions(int tp, ... table)
@@ -7383,33 +7417,39 @@ Returns:
   Group
 Source: Utilities/utility.lua:1421
 
-●void Auxiliary.SelectTargetFromFieldFirst(int tp, function f, int player, any s, any o, any min, any max, any ex, ... any)
-TODO document.
+●Group Auxiliary.SelectTargetFromFieldFirst(int tp, function f, int player, int s, int o, int min, int max, any ex, ... any)
+Target-selection helper that first offers matching on-field effect targets with HINTMSG_FIELD_FIRST. If accepted, it sets those cards as targets; otherwise it restores the previous hint and falls back to Duel.SelectTarget.
 Parameters:
   tp: int
   f: function
   player: int
-  s: any
-  o: any
-  min: any
-  max: any
+  s: int
+  o: int
+  min: int
+  max: int
   ex: any
   ...: any
+Returns:
+  Group - The selected target cards.
 Source: Utilities/utility.lua:1395
 
-●void Auxiliary.SelfEquipFilter(Card c, int id)
-TODO document.
+●bool Auxiliary.SelfEquipFilter(Card c, int id)
+Returns true if c has a flag with id, used by Auxiliary.IsSelfEquip to identify cards equipped by their own effect.
 Parameters:
   c: Card
   id: int
+Returns:
+  bool - true if c has the flag id.
 Source: Utilities/utility.lua:1956
 
-●void Auxiliary.SequenceToGlobal(int p, int loc, int seq)
-TODO document.
+●int Auxiliary.SequenceToGlobal(int p, int loc, int seq)
+Converts a player's local Monster Zone or Spell & Trap Zone sequence into a global zone bit. Invalid players, locations, or sequences return 0.
 Parameters:
   p: int
   loc: int
   seq: int
+Returns:
+  int - The global zone bit, or 0 for invalid input.
 Source: Utilities/utility.lua:1487
 
 ●void Auxiliary.SetUnionState(Card c)

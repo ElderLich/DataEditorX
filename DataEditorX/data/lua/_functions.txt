@@ -7033,15 +7033,17 @@ Parameters:
   seq: int
 Source: Utilities/utility.lua:718
 
-●void Auxiliary.nbcon(int tp, Effect re)
-TODO document.
+●bool Auxiliary.nbcon(int tp, Effect re)
+「把发动无效并除外」类效果的条件辅助函数；要求tp可以除外，且发动的卡不再与其效果关联，或仍关联但可以被除外。
 Parameters:
   tp: int
   re: Effect
+Returns:
+  bool - true if the activation can be negated and the card can be banished if needed.
 Source: Utilities/utility.lua:1464
 
 ●void Auxiliary.nbtg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-TODO document.
+「把发动无效并除外」类效果的目标辅助函数；登记无效信息，发动的卡仍与效果关联时登记除外信息，并在效果从墓地发动时标记CATEGORY_GRAVE_ACTION。
 Parameters:
   e: Effect
   tp: int
@@ -7054,11 +7056,13 @@ Parameters:
   chk: bool
 Source: Utilities/utility.lua:1469
 
-●void Auxiliary.ndcon(int tp, Effect re)
-TODO document.
+●bool Auxiliary.ndcon(int tp, Effect re)
+「把发动无效并回到卡组」类效果的条件辅助函数；魔法/陷阱的发动、已不与效果关联的卡，或仍关联且可以回到卡组的卡均满足。
 Parameters:
   tp: int
   re: Effect
+Returns:
+  bool - true if the activation can be negated and the card can be returned to the Deck if needed.
 Source: Utilities/utility.lua:1482
 
 ●void Auxiliary.NecroValleyFilter(function f)
@@ -7067,36 +7071,46 @@ Parameters:
   f: function
 Source: Utilities/utility.lua:920
 
-●void Auxiliary.NecroValleyNegateCheck(any v)
-TODO document.
+●bool Auxiliary.NecroValleyNegateCheck(Card|Group v)
+检查v这个Card或Group中是否包含受「王家长眠之谷」影响的卡。若当前连锁可被无效且找到匹配卡，则无效当前效果并返回true。
 Parameters:
-  v: any
+  v: Card|Group
+Returns:
+  bool - true if the current effect was negated by the Necrovalley check.
 Source: Utilities/utility.lua:926
 
-●void Auxiliary.NegateAnyFilter(Card c)
-TODO document.
+●bool Auxiliary.NegateAnyFilter(Card c)
+用于无效表侧卡效果的筛选。陷阱怪兽只需表侧表示，魔法/陷阱卡需表侧表示且尚未被无效，怪兽则使用Auxiliary.NegateMonsterFilter。
 Parameters:
   c: Card
+Returns:
+  bool - true if c is a valid card to have its effects negated.
 Source: Utilities/utility.lua:752
 
-●void Auxiliary.NegateEffectMonsterFilter(Card c)
-TODO document.
+●bool Auxiliary.NegateEffectMonsterFilter(Card c)
+用于无效效果怪兽效果的筛选，例如「效果遮蒙者」；c必须表侧表示、尚未被无效，且当前为效果怪兽。
 Parameters:
   c: Card
+Returns:
+  bool - true if c is a valid Effect Monster to have its effects negated.
 Source: Utilities/utility.lua:748
 
-●void Auxiliary.NegateMonsterFilter(Card c)
-TODO document.
+●bool Auxiliary.NegateMonsterFilter(Card c)
+用于无效表侧怪兽效果的筛选，例如「无限泡影」；c必须表侧表示、尚未被无效，且当前或原本为效果怪兽。
 Parameters:
   c: Card
+Returns:
+  bool - true if c is a valid face-up monster to have its effects negated.
 Source: Utilities/utility.lua:744
 
-●void Auxiliary.NegateSummonCondition()
-TODO document.
+●bool Auxiliary.NegateSummonCondition()
+没有待处理连锁时返回true，用于无效召唤的效果。
+Returns:
+  bool - true when no Chain is ready.
 Source: Utilities/utility.lua:1831
 
-●void Auxiliary.NeosReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.NeosReturnConditionForced(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+「元素英雄 新宇侠」融合怪兽结束阶段强制返回效果的条件；处理对象未受编号42015635（「新宇宙」）效果影响时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -7106,10 +7120,12 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the forced Neos return effect should apply.
 Source: Utilities/utility.lua:242
 
-●void Auxiliary.NeosReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.NeosReturnConditionOptional(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
+「元素英雄 新宇侠」融合怪兽结束阶段可选返回效果的条件；处理对象受编号42015635（「新宇宙」）效果影响时返回true。
 Parameters:
   e: Effect
   tp: int
@@ -7119,18 +7135,24 @@ Parameters:
   re: Effect
   r: any
   rp: int
+Returns:
+  bool - true if the optional Neos return effect should apply.
 Source: Utilities/utility.lua:252
 
-●void Auxiliary.NeosReturnTargetForced(any set_category)
-TODO document.
+●function Auxiliary.NeosReturnTargetForced([function|nil set_category])
+返回「元素英雄 新宇侠」融合怪兽强制结束阶段返回效果的目标函数；始终允许处理，登记回到卡组信息，并在提供set_category时调用它。
 Parameters:
-  set_category: any
+  set_category: function|nil optional
+Returns:
+  function - Target function for the mandatory return effect.
 Source: Utilities/utility.lua:245
 
-●void Auxiliary.NeosReturnTargetOptional(any set_category)
-TODO document.
+●function Auxiliary.NeosReturnTargetOptional([function|nil set_category])
+返回「元素英雄 新宇侠」融合怪兽可选结束阶段返回效果的目标函数；要求处理对象可以回到额外卡组，登记回到卡组信息，并在提供set_category时调用它。
 Parameters:
-  set_category: any
+  set_category: function|nil optional
+Returns:
+  function - Target function for the optional return effect.
 Source: Utilities/utility.lua:255
 
 ●void Auxiliary.Next(Group g)
@@ -7139,14 +7161,16 @@ Parameters:
   g: Group
 Source: Utilities/utility.lua:82
 
-●void Auxiliary.NOT(function f)
-TODO document.
+●function Auxiliary.NOT(function f)
+返回将f结果取反的谓词函数。
 Parameters:
   f: function
+Returns:
+  function - A predicate that returns not f(...).
 Source: Utilities/utility.lua:119
 
 ●void Auxiliary.NULL()
-TODO document.
+空辅助函数；有意不执行任何处理。
 Source: Utilities/utility.lua:89
 
 ●void Auxiliary.nzatk(Card c)
@@ -7161,10 +7185,12 @@ Parameters:
   c: Card
 Source: Utilities/utility.lua:844
 
-●void Auxiliary.OR(... any)
-TODO document.
+●function Auxiliary.OR(... function)
+返回组合条件函数；调用时会用相同参数依次执行传入的函数，并在第一个真值处停止。
 Parameters:
-  ...: any
+  ...: function
+Returns:
+  function - A composed predicate.
 Source: Utilities/utility.lua:108
 
 ●bool Auxiliary.OrcustratedBabelFilter(Card c)
@@ -7183,24 +7209,28 @@ Returns:
   bool
 Source: Utilities/utility.lua:2037
 
-●void Auxiliary.PlaceCardsOnDeckBottom(int p, Group g, any reason)
-TODO document.
+●int Auxiliary.PlaceCardsOnDeckBottom(int p, Group g, [int reason])
+以reason把g送到卡组最上方；让p为进入双方卡组的卡排序后，再移动到卡组最下方，并返回实际处理的卡数量。
 Parameters:
   p: int
   g: Group
-  reason: any
+  reason: int optional - Defaults to REASON_EFFECT.
+Returns:
+  int - The number of operated cards.
 Source: Utilities/utility.lua:1617
 
-●void Auxiliary.PlaceCardsOnDeckTop(int p, Group g, any reason)
-TODO document.
+●int Auxiliary.PlaceCardsOnDeckTop(int p, Group g, [int reason])
+以reason把g送到卡组最上方；需要时让p为进入双方卡组的卡排序，并返回实际处理的卡数量。
 Parameters:
   p: int
   g: Group
-  reason: any
+  reason: int optional - Defaults to REASON_EFFECT.
+Returns:
+  int - The number of operated cards.
 Source: Utilities/utility.lua:1601
 
 ●void Auxiliary.PuzzleOp(Effect e, int tp)
-TODO document.
+残局模式的结束阶段操作；把玩家0的LP变为0。
 Parameters:
   e: Effect
   tp: int
@@ -7213,34 +7243,36 @@ Parameters:
   te: Effect
 Source: Utilities/utility.lua:892
 
-●void Auxiliary.RegisterMergedDelayedEvent(Card c, int code, int event, Group g)
-TODO document.
+●void Auxiliary.RegisterMergedDelayedEvent(Card c, int code, int event, [Group|nil g])
+登记全局监听，把同一连锁内多次发生的event合并成1次EVENT_CUSTOM+code事件。不在连锁中则立即触发，在连锁中则于连锁结束触发。
 Parameters:
   c: Card
   code: int
   event: int
-  g: Group
+  g: Group|nil optional - Optional storage group; a kept-alive group is created when omitted.
 Source: Utilities/utility.lua:1647
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, int code, any events)
-TODO document.
+●int Auxiliary.RegisterMergedDelayedEvent_ToSingleCard(Card c, int code, int|table events)
+为单张卡登记1个事件或事件表的合并延迟监听，并返回生成的自定义事件编号。持有者移动到公开状态时会清空保存的卡，并在需要时安装共通的连锁结束触发器。
 Parameters:
   c: Card
   code: int
-  events: any
+  events: int|table
+Returns:
+  int - The generated custom event code.
 Source: Utilities/utility.lua:1684
 
-●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, int event, Effect event_code_single)
-TODO document.
+●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_AddOperation(Card c, Group g, int event, int event_code_single)
+Auxiliary.RegisterMergedDelayedEvent_ToSingleCard使用的内部辅助函数；登记1个事件监听及其连锁结束配套监听。
 Parameters:
   c: Card
   g: Group
   event: int
-  event_code_single: Effect
+  event_code_single: int
 Source: Utilities/utility.lua:1729
 
 ●void Auxiliary.RegisterMergedDelayedEvent_ToSingleCard_RaiseEvent(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+单卡合并延迟事件使用的全局连锁结束辅助函数；对每个待处理的生成自定义事件触发1次，然后清空对应Group。
 Parameters:
   e: Effect
   tp: int
@@ -7261,18 +7293,20 @@ Returns:
   bool
 Source: Utilities/utility.lua:1838
 
-●void Auxiliary.SelectCardFromFieldFirst(int tp, function f, int player, any s, any o, any min, any max, any ex, ... any)
-TODO document.
+●Group Auxiliary.SelectCardFromFieldFirst(int tp, function f, int player, int s, int o, int min, int max, any ex, ... any)
+选择辅助函数；先用HINTMSG_FIELD_FIRST提示玩家选择满足条件的场上卡。若取消该选择，则恢复之前的提示并回退到Duel.SelectMatchingCard。
 Parameters:
   tp: int
   f: function
   player: int
-  s: any
-  o: any
-  min: any
-  max: any
+  s: int
+  o: int
+  min: int
+  max: int
   ex: any
   ...: any
+Returns:
+  Group - The selected cards.
 Source: Utilities/utility.lua:1379
 
 ●int Auxiliary.SelectFromOptions(int tp, ... table)
@@ -7298,33 +7332,39 @@ Returns:
   Group
 Source: Utilities/utility.lua:1421
 
-●void Auxiliary.SelectTargetFromFieldFirst(int tp, function f, int player, any s, any o, any min, any max, any ex, ... any)
-TODO document.
+●Group Auxiliary.SelectTargetFromFieldFirst(int tp, function f, int player, int s, int o, int min, int max, any ex, ... any)
+取对象选择辅助函数；先用HINTMSG_FIELD_FIRST提示玩家选择满足条件的场上效果对象。若接受则登记为对象；否则恢复之前的提示并回退到Duel.SelectTarget。
 Parameters:
   tp: int
   f: function
   player: int
-  s: any
-  o: any
-  min: any
-  max: any
+  s: int
+  o: int
+  min: int
+  max: int
   ex: any
   ...: any
+Returns:
+  Group - The selected target cards.
 Source: Utilities/utility.lua:1395
 
-●void Auxiliary.SelfEquipFilter(Card c, int id)
-TODO document.
+●bool Auxiliary.SelfEquipFilter(Card c, int id)
+c持有id标记时返回true；Auxiliary.IsSelfEquip用它判断由自身效果装备的卡。
 Parameters:
   c: Card
   id: int
+Returns:
+  bool - true if c has the flag id.
 Source: Utilities/utility.lua:1956
 
-●void Auxiliary.SequenceToGlobal(int p, int loc, int seq)
-TODO document.
+●int Auxiliary.SequenceToGlobal(int p, int loc, int seq)
+把玩家本地的怪兽区域或魔法与陷阱区域序号转换为全局区域位。玩家、位置或序号无效时返回0。
 Parameters:
   p: int
   loc: int
   seq: int
+Returns:
+  int - The global zone bit, or 0 for invalid input.
 Source: Utilities/utility.lua:1487
 
 ●void Auxiliary.SetUnionState(Card c)
