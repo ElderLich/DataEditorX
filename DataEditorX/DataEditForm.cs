@@ -1208,6 +1208,11 @@ namespace DataEditorX
         void Lb_scripttextSelectedIndexChanged(object sender, EventArgs e)
         {
             tb_edittext.Text = Getscripttext();
+            if (lb_scripttext.SelectedIndex >= 0)
+            {
+                tb_edittext.Focus();
+                tb_edittext.SelectAll();
+            }
         }
 
         //Script text
@@ -2076,15 +2081,9 @@ namespace DataEditorX
         }
         private void AddArchetypeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MainForm mf;
-            try
-            {
-                mf = DockPanel.Parent as MainForm;
-            }
-            catch
-            {
-                return;
-            }
+            MainForm mf = GetMainForm();
+            if (mf == null) return;
+
             DataConfig datacfg = mf.GetDataConfig();
             Dictionary<long, string> d = datacfg.dicSetnames;
             Dictionary<long, string> knownSetnames = ArchetypeStringsService.BuildKnownSetnames(d, datapath);
@@ -2121,6 +2120,63 @@ namespace DataEditorX
                 tb_setcode1.Text = setcode.ToString("x");
             }
         }
+
+        private void AddCounterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainForm mf = GetMainForm();
+            if (mf == null) return;
+
+            Dictionary<long, string> knownCounters = ArchetypeStringsService.BuildKnownCounters(datapath);
+            AddArchetypeForm form = new(
+                knownCounters,
+                "Add Counter",
+                "Counter ID:",
+                "Counter Name:",
+                "Enter a valid hexadecimal counter ID, for example 76 or 0x76.",
+                "Enter a counter name.");
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                long counterId = form.code;
+                string counterName = form.name;
+                try
+                {
+                    CounterWriteResult result = ArchetypeStringsService.AddCounter(counterId, counterName, knownCounters);
+                    string message = $"Saved {ArchetypeStringsService.FormatHexId(counterId)} {counterName} to:\n{result.CustomStringsFile}";
+                    if (result.SyncedToMdPro3)
+                    {
+                        message += $"\n\nSynced to:\n{result.MdPro3StringsFile}";
+                    }
+                    else
+                    {
+                        message += "\n\nMDPro3 Directory is not configured, so the entry was not synced.";
+                    }
+
+                    MyMsg.Show(message);
+                }
+                catch (Exception ex)
+                {
+                    MyMsg.Error(ex.Message);
+                    return;
+                }
+
+                mf.GetCodeConfig().AddStringHint(ArchetypeStringsService.FormatHexId(counterId), counterName);
+                mf.GetCodeConfig().InitAutoMenus();
+            }
+        }
+
+        private MainForm GetMainForm()
+        {
+            try
+            {
+                return DockPanel.Parent as MainForm;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private void Pl_categoryScroll(object sender, MouseEventArgs e)
         {
             int d = e.Delta / 6;

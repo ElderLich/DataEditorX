@@ -56,6 +56,7 @@ namespace DataEditorX
             menuitem_autocheckupdate = new ToolStripMenuItem();
             menuitem_github = new ToolStripMenuItem();
             menuitem_addarchetype = new ToolStripMenuItem();
+            menuitem_addcounter = new ToolStripMenuItem();
             cb_cardattribute = new ComboBox();
             tb_cardname = new TextBox();
             cb_cardrule = new ComboBox();
@@ -129,7 +130,7 @@ namespace DataEditorX
             // 
             // mainMenu
             // 
-            mainMenu.Items.AddRange(new ToolStripItem[] { menu_data, menuitem_help, menuitem_addarchetype });
+            mainMenu.Items.AddRange(new ToolStripItem[] { menu_data, menuitem_help, menuitem_addarchetype, menuitem_addcounter });
             mainMenu.Location = new Point(0, 0);
             mainMenu.Name = "mainMenu";
             mainMenu.Size = new Size(991, 24);
@@ -269,6 +270,13 @@ namespace DataEditorX
             menuitem_addarchetype.Size = new Size(98, 20);
             menuitem_addarchetype.Text = "Add Arche&type";
             menuitem_addarchetype.Click += AddArchetypeToolStripMenuItem_Click;
+            //
+            // menuitem_addcounter
+            //
+            menuitem_addcounter.Name = "menuitem_addcounter";
+            menuitem_addcounter.Size = new Size(91, 20);
+            menuitem_addcounter.Text = "Add &Counter";
+            menuitem_addcounter.Click += AddCounterToolStripMenuItem_Click;
             // 
             // cb_cardattribute
             // 
@@ -407,13 +415,15 @@ namespace DataEditorX
             // tb_edittext
             // 
             tb_edittext.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            tb_edittext.BorderStyle = BorderStyle.FixedSingle;
             tb_edittext.HideSelection = false;
-            tb_edittext.Location = new Point(348, 513);
+            tb_edittext.Location = new Point(348, 494);
             tb_edittext.MaxLength = 2000;
             tb_edittext.Multiline = true;
             tb_edittext.Name = "tb_edittext";
+            tb_edittext.PlaceholderText = "Select a string above, then edit it here";
             tb_edittext.ScrollBars = ScrollBars.Vertical;
-            tb_edittext.Size = new Size(301, 40);
+            tb_edittext.Size = new Size(301, 59);
             tb_edittext.TabIndex = 4;
             tb_edittext.WordWrap = false;
             tb_edittext.TextChanged += Tb_edittextTextChanged;
@@ -1007,7 +1017,7 @@ namespace DataEditorX
             // lb_scripttext
             // 
             lb_scripttext.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            lb_scripttext.BorderStyle = BorderStyle.None;
+            lb_scripttext.BorderStyle = BorderStyle.FixedSingle;
             lb_scripttext.Font = new Font("SimSun", 9F, FontStyle.Regular, GraphicsUnit.Point);
             lb_scripttext.FormattingEnabled = true;
             lb_scripttext.IntegralHeight = false;
@@ -1015,7 +1025,7 @@ namespace DataEditorX
             lb_scripttext.Location = new Point(348, 432);
             lb_scripttext.Name = "lb_scripttext";
             lb_scripttext.ScrollAlwaysVisible = true;
-            lb_scripttext.Size = new Size(301, 86);
+            lb_scripttext.Size = new Size(301, 58);
             lb_scripttext.TabIndex = 6;
             lb_scripttext.SelectedIndexChanged += Lb_scripttextSelectedIndexChanged;
             // 
@@ -1171,5 +1181,6 @@ namespace DataEditorX
         private System.Windows.Forms.Label lb_support;
         private System.Windows.Forms.Label lb_name;
         private ToolStripMenuItem menuitem_addarchetype;
+        private ToolStripMenuItem menuitem_addcounter;
     }
 }

@@ -78,6 +78,14 @@ namespace DataEditorX.Config
             }
         }
 
+        public void AddStringHint(string key, string text)
+        {
+            if (!string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(text))
+            {
+                AddToolIipDic(key.Trim(), text.Trim());
+            }
+        }
+
         #endregion
 
         #region function
