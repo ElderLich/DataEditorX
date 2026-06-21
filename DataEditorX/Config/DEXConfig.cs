@@ -101,9 +101,9 @@ namespace DataEditorX.Config
         /// </summary>
         public const string TAG_THEME_CUSTOM_PALETTE = "theme_custom_palette";
         /// <summary>
-        /// add require automatically
+        /// Default script name
         /// </summary>
-        public const string TAG_ADD_REQUIRE = "add_require";
+        public const string TAG_DEFAULT_SCRIPT_NAME = "default_script_name";
         /// <summary>
         /// Check system language
         /// </summary>

@@ -68,7 +68,7 @@ DataEditForm.mainMenu.menuitem_mseconfig	Set MSE Config File
 DataEditForm.mainMenu.menu_data	Data(&D)
 DataEditForm.mainMenu.menuitem_operacardsfile	Rename both Script and Image
 DataEditForm.mainMenu.menuitem_openfileinthis	Open Lua with CodeEditor
-DataEditForm.mainMenu.menuitem_addrequire	Auto Add Requires
+DataEditForm.mainMenu.menuitem_default_script	Default Script Name
 DataEditForm.mainMenu.menuitem_findluafunc	Find Lua Functions from C++ Code
 DataEditForm.mainMenu.menuitem_readydk	Read Cards from YDK File(&Y)
 DataEditForm.mainMenu.menuitem_readlist	Read from Deck List

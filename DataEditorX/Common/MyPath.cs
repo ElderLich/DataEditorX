@@ -80,27 +80,20 @@ namespace System.IO
         /// Validate directory
         /// </summary>
         /// <param name="dir">Directory</param>
-        /// <param name="defalut">Fallback directory when invalid</param>
+        /// <param name="fallbackPath">Fallback directory when invalid</param>
         /// <returns></returns>
-        public static string CheckDir(string dir, string defalut)
+        public static string CheckDir(string dir, string fallbackPath)
         {
-            DirectoryInfo fo;
             try
             {
-                fo = new DirectoryInfo(GetRealPath(dir));
+                DirectoryInfo info = Directory.CreateDirectory(GetRealPath(dir));
+                return info.FullName;
             }
             catch
             {
-                //Path is invalid
-                fo = new DirectoryInfo(defalut);
+                DirectoryInfo fallbackInfo = Directory.CreateDirectory(fallbackPath);
+                return fallbackInfo.FullName;
             }
-            if (!fo.Exists)
-            {
-                fo.Create();
-            }
-
-            dir = fo.FullName;
-            return dir;
         }
         /// <summary>
         /// Get file name from tag

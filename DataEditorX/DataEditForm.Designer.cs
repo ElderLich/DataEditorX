@@ -49,7 +49,7 @@ namespace DataEditorX
             menu_data = new ToolStripMenuItem();
             menuitem_operacardsfile = new ToolStripMenuItem();
             menuitem_openfileinthis = new ToolStripMenuItem();
-            menuitem_addrequire = new ToolStripMenuItem();
+            menuitem_default_script = new ToolStripMenuItem();
             tsep2 = new ToolStripSeparator();
             menuitem_readydk = new ToolStripMenuItem();
             menuitem_readlist = new ToolStripMenuItem();
@@ -222,7 +222,7 @@ namespace DataEditorX
             // 
             // menu_data
             // 
-            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_addrequire, tsep2, menuitem_readydk, menuitem_readlist, menuitem_readimages, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_export_select_sql, menuitem_export_all_sql, menuitem_findluafunc, menuitem_exportdata, tsep5, menuitem_cutimages, menuitem_convertimage, tsep1, menuitem_cancelTask, menuitem_autoreturn, menuitem_replace });
+            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_default_script, tsep2, menuitem_readydk, menuitem_readlist, menuitem_readimages, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_export_select_sql, menuitem_export_all_sql, menuitem_findluafunc, menuitem_exportdata, tsep5, menuitem_cutimages, menuitem_convertimage, tsep1, menuitem_cancelTask, menuitem_autoreturn, menuitem_replace });
             menu_data.Name = "menu_data";
             menu_data.Size = new Size(57, 20);
             menu_data.Text = "Data(&T)";
@@ -241,12 +241,12 @@ namespace DataEditorX
             menuitem_openfileinthis.Text = "Open File in This";
             menuitem_openfileinthis.Click += Menuitem_openfileinthis_Click;
             // 
-            // menuitem_addrequire
+            // menuitem_default_script
             // 
-            menuitem_addrequire.Name = "menuitem_addrequire";
-            menuitem_addrequire.Size = new Size(222, 22);
-            menuitem_addrequire.Text = "Add REQUIRE Automatically";
-            menuitem_addrequire.Click += Menuitem_addrequire_Click;
+            menuitem_default_script.Name = "menuitem_default_script";
+            menuitem_default_script.Size = new Size(222, 22);
+            menuitem_default_script.Text = "Default Script Name";
+            menuitem_default_script.Click += Menuitem_default_script_Click;
             // 
             // tsep2
             // 
@@ -1327,7 +1327,7 @@ namespace DataEditorX
         private System.Windows.Forms.TextBox tb_link;
         private System.Windows.Forms.Panel pl_bottom;
         private System.Windows.Forms.Panel pl_main;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_addrequire;
+        private System.Windows.Forms.ToolStripMenuItem menuitem_default_script;
         private System.Windows.Forms.SplitContainer splitContainer;
         private DFlowLayoutPanel pl_markers;
         private System.Windows.Forms.Label lb_flags;

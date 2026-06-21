@@ -20,20 +20,20 @@ namespace DataEditorX
 {
     public partial class DataEditForm : DockContent, IDataForm
     {
-        private string addrequire_str;
+        private string defaultScriptName;
 
         [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
-        public string Addrequire
+        public string DefaultScriptName
         {
             get
             {
-                if (!string.IsNullOrEmpty(addrequire_str))
+                if (!string.IsNullOrEmpty(defaultScriptName))
                 {
-                    return addrequire_str;
+                    return defaultScriptName;
                 }
                 else
                 {
-                    string cdbName = Path.GetFileNameWithoutExtension(nowCdbFile);
+                    string cdbName = Path.GetFileNameWithoutExtension(nowCdbFile) ?? "";
                     if (cdbName.Length > 0 && File.Exists(GetPath().GetModuleScript(cdbName)))
                     {
                         return cdbName;
@@ -43,7 +43,7 @@ namespace DataEditorX
             }
             set
             {
-                addrequire_str = value;
+                defaultScriptName = value?.Trim() ?? "";
             }
         }
 
@@ -226,9 +226,8 @@ namespace DataEditorX
             menuitem_openfileinthis.Checked = DEXConfig.ReadBoolean(DEXConfig.TAG_OPEN_IN_THIS);
             //Load auto-update setting
             menuitem_autocheckupdate.Checked = DEXConfig.ReadBoolean(DEXConfig.TAG_AUTO_CHECK_UPDATE);
-            //add require automatically
-            Addrequire = DEXConfig.ReadString(DEXConfig.TAG_ADD_REQUIRE);
-            menuitem_addrequire.Checked = Addrequire.Length > 0;
+            //Default script opened when no card ID is selected
+            DefaultScriptName = DEXConfig.ReadString(DEXConfig.TAG_DEFAULT_SCRIPT_NAME);
             if (nowCdbFile != null && File.Exists(nowCdbFile))
             {
                 _ = Open(nowCdbFile);
@@ -1021,7 +1020,7 @@ namespace DataEditorX
         {
             if (cardedit != null)
             {
-                _ = cardedit.OpenScript(menuitem_openfileinthis.Checked, Addrequire);
+                _ = cardedit.OpenScript(menuitem_openfileinthis.Checked, DefaultScriptName);
             }
         }
         //Delete
@@ -1081,10 +1080,12 @@ namespace DataEditorX
                     tmpCodes.Clear();//Clear temporary results
                     Search(c, false);
                 }
+                e.SuppressKeyPress = true;
             }
-            if (e.KeyCode == Keys.R && e.Control)
+            else if (e.KeyCode == Keys.R && e.Control)
             {
                 Btn_resetClick(null, null);
+                e.SuppressKeyPress = true;
             }
         }
         //Card description edit
@@ -1784,7 +1785,7 @@ namespace DataEditorX
                                ygopath.gamepath,
                                dlg.FileName,
                                GetOpenFile(),
-                               Addrequire);
+                               DefaultScriptName);
                 Run(LanguageHelper.GetMsg(LMSG.ExportData));
             }
 
@@ -2069,12 +2070,14 @@ namespace DataEditorX
             menuitem_autocheckupdate.Checked = !menuitem_autocheckupdate.Checked;
             XMLReader.Save(DEXConfig.TAG_AUTO_CHECK_UPDATE, menuitem_autocheckupdate.Checked.ToString().ToLower());
         }
-        //add require automatically
-        private void Menuitem_addrequire_Click(object sender, EventArgs e)
+        //Set the default script opened when no card ID is selected
+        private void Menuitem_default_script_Click(object sender, EventArgs e)
         {
-            Addrequire = Microsoft.VisualBasic.Interaction.InputBox("Module script?\n\nPress \"Cancel\" to remove module script.", "", Addrequire);
-            menuitem_addrequire.Checked = Addrequire.Length > 0;
-            XMLReader.Save(DEXConfig.TAG_ADD_REQUIRE, Addrequire);
+            DefaultScriptName = Microsoft.VisualBasic.Interaction.InputBox(
+                "Set default script name (without extension).\n\nPress \"Cancel\" to remove the default script.",
+                "",
+                DefaultScriptName);
+            XMLReader.Save(DEXConfig.TAG_DEFAULT_SCRIPT_NAME, DefaultScriptName);
         }
         #endregion
 

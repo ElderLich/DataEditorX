@@ -72,6 +72,11 @@ namespace DataEditorX.Config
         }
         public string GetModuleScript(string modulescript)
         {
+            modulescript = (modulescript ?? "").Trim();
+            if (modulescript.EndsWith(".lua", StringComparison.OrdinalIgnoreCase))
+            {
+                return MyPath.Combine(luapath, modulescript);
+            }
             return MyPath.Combine(luapath, modulescript + ".lua");
         }
 

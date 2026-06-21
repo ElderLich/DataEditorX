@@ -284,7 +284,7 @@ namespace DataEditorX.Core
 
         #region Open script
         //Open script
-        public bool OpenScript(bool openinthis, string addrequire)
+        public bool OpenScript(bool openinthis, string defaultScriptName)
         {
             if (!dataform.CheckOpen())
             {
@@ -308,9 +308,9 @@ namespace DataEditorX.Core
                     }
                 }
             }
-            else if (addrequire.Length > 0)
+            else if (!string.IsNullOrWhiteSpace(defaultScriptName))
             {
-                lua = dataform.GetPath().GetModuleScript(addrequire);
+                lua = dataform.GetPath().GetModuleScript(defaultScriptName);
             }
             else
             {
@@ -335,13 +335,18 @@ namespace DataEditorX.Core
                     using FileStream fs = new(lua,
                         FileMode.OpenOrCreate, FileAccess.Write);
                     StreamWriter sw = new(fs, new UTF8Encoding(false));
-                    sw.WriteLine("--" + c.name);
-                    sw.WriteLine("local s,id,o=GetID()");
-                    if (!string.IsNullOrEmpty(addrequire))
-                        sw.WriteLine("Duel.LoadScript(\"" + addrequire + ".lua\")"); // DIY script
-                    sw.WriteLine("function s.initial_effect(c)");
-                    sw.WriteLine("\t");
-                    sw.WriteLine("end");
+                    if (c.id > 0)
+                    {
+                        sw.WriteLine("--" + c.name);
+                        sw.WriteLine("local s,id,o=GetID()");
+                        sw.WriteLine("function s.initial_effect(c)");
+                        sw.WriteLine("\t");
+                        sw.WriteLine("end");
+                    }
+                    else
+                    {
+                        sw.WriteLine("--" + Path.GetFileNameWithoutExtension(lua));
+                    }
                     sw.Close();
                     fs.Close();
                 }
