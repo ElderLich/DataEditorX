@@ -19,6 +19,9 @@ ARTIFACTS = ROOT / "artifacts"
 PUBLISH = ARTIFACTS / "publish"
 DEFAULT_REPO = "ElderLich/DataEditorX"
 DEFAULT_TAG = "MDPro3"
+DEFAULT_FRAMEWORK = "net9.0-windows7.0"
+NUGET_ORG = "https://api.nuget.org/v3/index.json"
+VS_OFFLINE_PACKAGES = Path(r"C:\Program Files (x86)\Microsoft SDKs\NuGetPackages")
 
 
 def run(args: list[str], *, cwd: Path = ROOT, check: bool = True) -> subprocess.CompletedProcess:
@@ -36,10 +39,33 @@ def assembly_version(version: str) -> str:
 
 
 def update_text_file(path: Path, replacements: list[tuple[str, str]]) -> None:
-    text = path.read_text(encoding="utf-8-sig")
+    raw = path.read_bytes()
+    has_bom = raw.startswith(b"\xef\xbb\xbf")
+    original = raw.decode("utf-8-sig")
+    text = original
     for pattern, replacement in replacements:
         text = re.sub(pattern, replacement, text)
-    path.write_text(text, encoding="utf-8")
+    if text == original:
+        return
+    path.write_text(text, encoding="utf-8-sig" if has_bom else "utf-8")
+
+
+def default_sources() -> list[str]:
+    sources = [NUGET_ORG]
+    if VS_OFFLINE_PACKAGES.exists():
+        sources.append(str(VS_OFFLINE_PACKAGES))
+    return sources
+
+
+def source_args(sources: list[str]) -> list[str]:
+    args = []
+    for source in sources:
+        args.extend(["--source", source])
+    return args
+
+
+def normalize_newlines(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def update_version_files(version: str, repo: str, tag: str) -> None:
@@ -55,17 +81,18 @@ def update_version_files(version: str, repo: str, tag: str) -> None:
     )
 
     base = f"https://github.com/{repo}/releases/download/{tag}"
-    UPDATE_INFO.write_text(
-        "\n".join(
-            [
-                f"[DataEditorX]{version}[DataEditorX]",
-                f"[URL]{base}/DataEditorX_win32.zip [URL]",
-                f"[URL]{base}/DataEditorX_win64.zip [URL]",
-                "",
-            ]
-        ),
-        encoding="utf-8-sig",
+    update_info = "\n".join(
+        [
+            f"[DataEditorX]{version}[DataEditorX]",
+            f"[URL]{base}/DataEditorX_win32.zip [URL]",
+            f"[URL]{base}/DataEditorX_win64.zip [URL]",
+            "",
+        ]
     )
+    raw = UPDATE_INFO.read_bytes() if UPDATE_INFO.exists() else b""
+    if normalize_newlines(raw.decode("utf-8-sig")) != update_info:
+        encoding = "utf-8-sig" if not raw or raw.startswith(b"\xef\xbb\xbf") else "utf-8"
+        UPDATE_INFO.write_text(update_info, encoding=encoding)
 
 
 def zip_dir(source: Path, destination: Path) -> None:
@@ -77,7 +104,7 @@ def zip_dir(source: Path, destination: Path) -> None:
                 zf.write(file, file.relative_to(source))
 
 
-def publish(runtime: str, output: Path, version: str, self_contained: bool) -> None:
+def publish(runtime: str, output: Path, version: str, framework: str, self_contained: bool, sources: list[str]) -> None:
     if output.exists():
         shutil.rmtree(output)
     asm = assembly_version(version)
@@ -86,8 +113,11 @@ def publish(runtime: str, output: Path, version: str, self_contained: bool) -> N
             "dotnet",
             "publish",
             str(PROJECT),
+            *source_args(sources),
             "-c",
             "Release",
+            "-f",
+            framework,
             "-r",
             runtime,
             "--self-contained",
@@ -118,12 +148,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--upload", action="store_true", help="Upload zips to the GitHub release using the gh CLI.")
     parser.add_argument("--skip-build", action="store_true", help="Only update version metadata and upload existing zips.")
     parser.add_argument("--self-contained", action="store_true", help="Publish self-contained builds instead of framework-dependent builds.")
+    parser.add_argument("--framework", default=DEFAULT_FRAMEWORK, help=f"Target framework to publish. Default: {DEFAULT_FRAMEWORK}.")
+    parser.add_argument("--source", action="append", help=f"NuGet source for restore. Can be repeated. Default: {NUGET_ORG}.")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     version = args.version.lstrip("v")
+    sources = args.source or default_sources()
     update_version_files(version, args.repo, args.tag)
 
     win32_publish = PUBLISH / "win32"
@@ -133,8 +166,8 @@ def main() -> int:
 
     ARTIFACTS.mkdir(exist_ok=True)
     if not args.skip_build:
-        publish("win-x86", win32_publish, version, args.self_contained)
-        publish("win-x64", win64_publish, version, args.self_contained)
+        publish("win-x86", win32_publish, version, args.framework, args.self_contained, sources)
+        publish("win-x64", win64_publish, version, args.framework, args.self_contained, sources)
         zip_dir(win32_publish, win32_zip)
         zip_dir(win64_publish, win64_zip)
 
