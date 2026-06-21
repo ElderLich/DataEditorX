@@ -713,14 +713,14 @@ namespace DataEditorX
             tb_pleft.Text = ((c.level >> 24) & 0xff).ToString();
             tb_pright.Text = ((c.level >> 16) & 0xff).ToString();
             // ATK/DEF
-            tb_atk.Text = (c.atk < 0) ? "?" : c.atk.ToString();
+            tb_atk.Text = c.atk == -1 ? "" : c.atk < 0 ? "?" : c.atk.ToString();
             if (c.IsType(Core.Info.CardType.TYPE_LINK))
             {
                 tb_def.Text = "0";
             }
             else
             {
-                tb_def.Text = (c.def < 0) ? "?" : c.def.ToString();
+                tb_def.Text = c.def == -1 ? "" : c.def < 0 ? "?" : c.def.ToString();
             }
 
             tb_cardcode.Text = c.id.ToString();
@@ -766,17 +766,18 @@ namespace DataEditorX
             c.level += temp << 24;
             _ = int.TryParse(tb_pright.Text, out temp);
             c.level += temp << 16;
-            if (tb_atk.Text == "?" || tb_atk.Text == "？")
-            {
-                c.atk = -2;
-            }
-            else if (tb_atk.Text == ".")
+            string atkText = tb_atk.Text.Trim();
+            if (string.IsNullOrEmpty(atkText) || atkText == ".")
             {
                 c.atk = -1;
             }
+            else if (atkText == "?" || atkText == "？")
+            {
+                c.atk = -2;
+            }
             else
             {
-                _ = int.TryParse(tb_atk.Text, out c.atk);
+                _ = int.TryParse(atkText, out c.atk);
             }
 
             if (c.IsType(Core.Info.CardType.TYPE_LINK))
@@ -785,17 +786,18 @@ namespace DataEditorX
             }
             else
             {
-                if (tb_def.Text == "?" || tb_def.Text == "？")
-                {
-                    c.def = -2;
-                }
-                else if (tb_def.Text == ".")
+                string defText = tb_def.Text.Trim();
+                if (string.IsNullOrEmpty(defText) || defText == ".")
                 {
                     c.def = -1;
                 }
+                else if (defText == "?" || defText == "？")
+                {
+                    c.def = -2;
+                }
                 else
                 {
-                    _ = int.TryParse(tb_def.Text, out c.def);
+                    _ = int.TryParse(defText, out c.def);
                 }
             }
             _ = uint.TryParse(tb_cardcode.Text, out c.id);

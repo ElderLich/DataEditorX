@@ -84,15 +84,28 @@ namespace DataEditorX.Core
         }
         public static bool CheckTable(string db)
         {
+            if (!File.Exists(db))
+            {
+                return false;
+            }
+
             try
             {
-                _ = db.EndsWith(".cdb", StringComparison.OrdinalIgnoreCase) ? Command(db, _defaultTableSQL) : Command(db, _defaultOTableSQL);
+                using SqliteConnection con = new(@"Data Source=" + db);
+                con.Open();
+                using SqliteCommand cmd = con.CreateCommand();
+                cmd.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('datas','texts')";
+                object count = cmd.ExecuteScalar();
+                return Convert.ToInt64(count) == 2;
             }
             catch
             {
                 return false;
             }
-            return true;
+            finally
+            {
+                SqliteConnection.ClearAllPools();
+            }
         }
         #endregion
 
@@ -336,6 +349,55 @@ namespace DataEditorX.Core
                 return ((int)l).ToString();
             }
         }
+        static int ToDatabaseStat(int value)
+        {
+            return value == -1 ? 0 : value;
+        }
+        static void AppendTypeCondition(StringBuilder sb, long type)
+        {
+            if (type <= 0)
+            {
+                return;
+            }
+
+            long normalSpell = (long)(Info.CardType.TYPE_NORMAL | Info.CardType.TYPE_SPELL);
+            long normalTrap = (long)(Info.CardType.TYPE_NORMAL | Info.CardType.TYPE_TRAP);
+            if (type == normalSpell)
+            {
+                _ = sb.Append(" and datas.type = " + ToInt((long)Info.CardType.TYPE_SPELL));
+            }
+            else if (type == normalTrap)
+            {
+                _ = sb.Append(" and datas.type = " + ToInt((long)Info.CardType.TYPE_TRAP));
+            }
+            else
+            {
+                _ = sb.Append(" and datas.type & " + ToInt(type) + " = " + ToInt(type));
+            }
+        }
+        static void AppendAtkCondition(StringBuilder sb, int atk)
+        {
+            if (atk != -1)
+            {
+                _ = sb.Append(" and datas.type & 1 = 1 and datas.atk = " + atk.ToString());
+            }
+        }
+        static void AppendDefCondition(StringBuilder sb, Card c)
+        {
+            if (c.IsType(Info.CardType.TYPE_LINK))
+            {
+                if (c.def > 0)
+                {
+                    _ = sb.Append(" and datas.def & " + c.def.ToString() + " = " + c.def.ToString());
+                }
+                return;
+            }
+
+            if (c.def != -1)
+            {
+                _ = sb.Append(" and datas.type & 1 = 1 and datas.def = " + c.def.ToString());
+            }
+        }
         public static string OmegaGetSelectSQL(Card c)
         {
             StringBuilder sb = new();
@@ -393,10 +455,7 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and datas.race = " + ToInt(c.race));
             }
 
-            if (c.type > 0)
-            {
-                _ = sb.Append(" and datas.type & " + ToInt(c.type) + " = " + ToInt(c.type));
-            }
+            AppendTypeCondition(sb, c.type);
 
             if (c.category > 0)
                 _ = sb.Append(" and datas.genre & " + ToInt(c.category) + " = " + ToInt(c.category));
@@ -409,30 +468,8 @@ namespace DataEditorX.Core
                     _ = sb.Append(" and datas.support & " + ToInt(c.omega[2]) + " = " + ToInt(c.omega[2]));
             }
 
-            if (c.atk == -1)
-            {
-                _ = sb.Append(" and datas.type & 1 = 1 and datas.atk = 0");
-            }
-            else if (c.atk < 0 || c.atk > 0)
-            {
-                _ = sb.Append(" and datas.atk = " + c.atk.ToString());
-            }
-
-            if (c.IsType(Info.CardType.TYPE_LINK))
-            {
-                _ = sb.Append(" and datas.def &" + c.def.ToString() + "=" + c.def.ToString());
-            }
-            else
-            {
-                if (c.def == -1)
-                {
-                    _ = sb.Append(" and datas.type & 1 = 1 and datas.def = 0");
-                }
-                else if (c.def < 0 || c.def > 0)
-                {
-                    _ = sb.Append(" and datas.def = " + c.def.ToString());
-                }
-            }
+            AppendAtkCondition(sb, c.atk);
+            AppendDefCondition(sb, c);
 
             if (c.id > 0 && c.alias > 0)
             {
@@ -507,40 +544,15 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and datas.race = " + ToInt(c.race));
             }
 
-            if (c.type > 0)
-            {
-                _ = sb.Append(" and datas.type & " + ToInt(c.type) + " = " + ToInt(c.type));
-            }
+            AppendTypeCondition(sb, c.type);
 
             if (c.category > 0)
             {
                 _ = sb.Append(" and datas.category & " + ToInt(c.category) + " = " + ToInt(c.category));
             }
 
-            if (c.atk == -1)
-            {
-                _ = sb.Append(" and datas.type & 1 = 1 and datas.atk = 0");
-            }
-            else if (c.atk < 0 || c.atk > 0)
-            {
-                _ = sb.Append(" and datas.atk = " + c.atk.ToString());
-            }
-
-            if (c.IsType(Info.CardType.TYPE_LINK))
-            {
-                _ = sb.Append(" and datas.def &" + c.def.ToString() + "=" + c.def.ToString());
-            }
-            else
-            {
-                if (c.def == -1)
-                {
-                    _ = sb.Append(" and datas.type & 1 = 1 and datas.def = 0");
-                }
-                else if (c.def < 0 || c.def > 0)
-                {
-                    _ = sb.Append(" and datas.def = " + c.def.ToString());
-                }
-            }
+            AppendAtkCondition(sb, c.atk);
+            AppendDefCondition(sb, c);
 
             if (c.id > 0 && c.alias > 0)
             {
@@ -608,8 +620,8 @@ namespace DataEditorX.Core
             _ = st.Append(',');
             if (hex) _ = st.Append("0x" + c.type.ToString("x")); else _ = st.Append(c.type);
             _ = st.Append(',');
-            _ = st.Append(c.atk); _ = st.Append(',');
-            _ = st.Append(c.def); _ = st.Append(',');
+            _ = st.Append(ToDatabaseStat(c.atk)); _ = st.Append(',');
+            _ = st.Append(ToDatabaseStat(c.def)); _ = st.Append(',');
             if (hex)
             {
                 _ = st.Append("0x" + c.level.ToString("x")); _ = st.Append(',');
@@ -724,8 +736,8 @@ namespace DataEditorX.Core
                 _ = st.Append(c.setcode); _ = st.Append(',');
                 _ = st.Append(c.type); _ = st.Append(',');
             }
-            _ = st.Append(c.atk); ; _ = st.Append(',');
-            _ = st.Append(c.def); _ = st.Append(',');
+            _ = st.Append(ToDatabaseStat(c.atk)); ; _ = st.Append(',');
+            _ = st.Append(ToDatabaseStat(c.def)); _ = st.Append(',');
             if (hex)
             {
                 _ = st.Append("0x" + c.level.ToString("x")); _ = st.Append(',');
@@ -788,8 +800,8 @@ namespace DataEditorX.Core
                 } else _ = st.Append("null");
             } else _ = st.Append(c.setcode);
             _ = st.Append(",type="); _ = st.Append(c.type);
-            _ = st.Append(",atk="); _ = st.Append(c.atk);
-            _ = st.Append(",def="); _ = st.Append(c.def);
+            _ = st.Append(",atk="); _ = st.Append(ToDatabaseStat(c.atk));
+            _ = st.Append(",def="); _ = st.Append(ToDatabaseStat(c.def));
             _ = st.Append(",level="); _ = st.Append(c.level);
             _ = st.Append(",race="); _ = st.Append(c.race);
             _ = st.Append(",attribute="); _ = st.Append(c.attribute);
@@ -835,8 +847,8 @@ namespace DataEditorX.Core
             _ = st.Append(",alias="); _ = st.Append(c.alias);
             _ = st.Append(",setcode="); _ = st.Append(c.setcode);
             _ = st.Append(",type="); _ = st.Append(c.type);
-            _ = st.Append(",atk="); _ = st.Append(c.atk);
-            _ = st.Append(",def="); _ = st.Append(c.def);
+            _ = st.Append(",atk="); _ = st.Append(ToDatabaseStat(c.atk));
+            _ = st.Append(",def="); _ = st.Append(ToDatabaseStat(c.def));
             _ = st.Append(",level="); _ = st.Append(c.level);
             _ = st.Append(",race="); _ = st.Append(c.race);
             _ = st.Append(",attribute="); _ = st.Append(c.attribute);

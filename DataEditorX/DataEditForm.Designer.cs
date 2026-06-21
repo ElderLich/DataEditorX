@@ -685,7 +685,7 @@ namespace DataEditorX
             tb_atk.Name = "tb_atk";
             tb_atk.Size = new Size(40, 21);
             tb_atk.TabIndex = 117;
-            tb_atk.Text = "0";
+            tb_atk.Text = "";
             tb_atk.TextAlign = HorizontalAlignment.Center;
             // 
             // tb_def
@@ -695,7 +695,7 @@ namespace DataEditorX
             tb_def.Name = "tb_def";
             tb_def.Size = new Size(40, 21);
             tb_def.TabIndex = 118;
-            tb_def.Text = "0";
+            tb_def.Text = "";
             tb_def.TextAlign = HorizontalAlignment.Center;
             // 
             // tb_cardcode

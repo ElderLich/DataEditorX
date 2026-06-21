@@ -13,6 +13,7 @@ namespace DataEditorX.Core
     {
         public const int STR_MAX = 0x10;
         public const int SETCODE_MAX = 4;
+        public static Card Empty => new(0);
 
         #region Constructors
         /// <summary>
@@ -28,8 +29,8 @@ namespace DataEditorX.Core
             alias = 0;
             setcode = 0;
             type = 0;
-            atk = 0;
-            def = 0;
+            atk = -1;
+            def = -1;
             level = 0;
             race = 0;
             attribute = 0;
