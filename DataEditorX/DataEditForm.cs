@@ -2213,14 +2213,7 @@ namespace DataEditorX
 
         private static int GetMouseWheelScrollAmount(Control panel)
         {
-            int wheelLines = SystemInformation.MouseWheelScrollLines;
-            if (wheelLines == -1)
-            {
-                return Math.Max(1, panel.ClientSize.Height);
-            }
-
-            int lineHeight = Math.Max(1, panel.Font.Height + 4);
-            return Math.Max(1, wheelLines) * lineHeight;
+            return Math.Max(4, panel.Font.Height / 2);
         }
 
         private static void SetVerticalScroll(ScrollableControl panel, int value)
