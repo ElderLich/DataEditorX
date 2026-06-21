@@ -181,45 +181,7 @@ namespace DataEditorX.Core
         }
         #endregion
 
-        #region Read database input from files
-        /// <summary>
-        /// Read a YDK file as a card ID array
-        /// </summary>
-        /// <param name="file">YDK file</param>
-        /// <returns>Card ID array</returns>
-        public static string[] ReadYDK(string ydkfile)
-        {
-            string str;
-            List<string> IDs = new();
-            if (File.Exists(ydkfile))
-            {
-                using FileStream f = new(ydkfile, FileMode.Open, FileAccess.Read);
-                StreamReader sr = new(f, Encoding.Default);
-                str = sr.ReadLine();
-                while (str != null)
-                {
-                    if (int.TryParse(str.Trim(), out _) && str.Length > 0)
-                    {
-                        if (IDs.IndexOf(str) < 0)
-                        {
-                            IDs.Add(str);
-                        }
-                    }
-                    str = sr.ReadLine();
-                }
-                sr.Close();
-                f.Close();
-            }
-            if (IDs.Count == 0)
-            {
-                return null;
-            }
-
-            return IDs.ToArray();
-        }
-        #endregion
-
-        #region Images
+        #region Script helpers
         public static string[] ReadScript(string path)
         {
             List<string> list = new();

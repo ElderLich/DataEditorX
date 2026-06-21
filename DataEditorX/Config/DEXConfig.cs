@@ -12,7 +12,6 @@ namespace DataEditorX.Config
         #region Constants
         public const string TAG_SAVE_LAGN = "-savelanguage";
         public const string TAG_SAVE_LAGN2 = "-sl";
-        public const string TAG_AUTO_LEN = "autolength";
         /// <summary>
         /// Window message for opening files
         /// </summary>

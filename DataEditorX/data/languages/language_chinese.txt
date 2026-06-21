@@ -79,8 +79,6 @@ DataEditForm.mainMenu.menuitem_operacardsfile	同步操作卡片图片和脚本
 DataEditForm.mainMenu.menuitem_openfileinthis	用CodeEditor打开脚本
 DataEditForm.mainMenu.menuitem_default_script	默认脚本名称
 DataEditForm.mainMenu.menuitem_findluafunc	从C++源码查找Lua函数
-DataEditForm.mainMenu.menuitem_readydk	从卡组文件读取卡片(&Y)
-DataEditForm.mainMenu.menuitem_readlist	从卡组列表读取
 DataEditForm.mainMenu.menuitem_readscripts	从脚本文件夹读取卡片
 DataEditForm.mainMenu.menuitem_compdb	压缩数据库
 DataEditForm.mainMenu.menuitem_exportdata	导出数据库和图片脚本为zip
@@ -92,8 +90,6 @@ DataEditForm.mainMenu.menuitem_tools	工具
 DataEditForm.mainMenu.menuitem_checkupdate	检查更新
 DataEditForm.mainMenu.menuitem_autocheckupdate	自动检查更新
 DataEditForm.mainMenu.menuitem_github	源码
-DataEditForm.mainMenu.menuitem_autoreturn	(特殊功能)中文自动换行
-DataEditForm.mainMenu.menuitem_replace	(特殊功能)批量替换文本
 #
 MainForm.mainMenu.menuitem_file	文件(&F)
 MainForm.mainMenu.menuitem_open	打开
@@ -137,7 +133,6 @@ MainForm.mainMenu.menuitem_closeall	关闭所有
 0x12	文件不存在！
 0x13	没有选择数据库！
 0x14	选择数据库文件
-0x15	选择ydk文件
 0x17	下载成功！
 0x18	下载失败！
 0x19	没有选中脚本文本！
@@ -149,7 +144,6 @@ MainForm.mainMenu.menuitem_closeall	关闭所有
 0x1f	版本：
 0x20	作者：
 0x21	数据库文件(*.cdb)|*.cdb|脚本文件(*.lua)|*.lua|所有文件(*.*)|*.*
-0x22	卡组文件(*.ydk)|*.ydk|所有文件(*.*)|*.*
 0x23	系列号输入出错！
 0x24	选择卡片图像
 0x25	jpg图像(*.jpg)|*.jpg|bmp图像(*.bmp)|*.bmp|png图像(*.png)|*.png|所有文件(*.*)|*.*

@@ -67,8 +67,6 @@ DataEditForm.mainMenu.menuitem_operacardsfile	Rename both Script and Image
 DataEditForm.mainMenu.menuitem_openfileinthis	Open Lua with CodeEditor
 DataEditForm.mainMenu.menuitem_default_script	Default Script Name
 DataEditForm.mainMenu.menuitem_findluafunc	Find Lua Functions from C++ Code
-DataEditForm.mainMenu.menuitem_readydk	Read Cards from YDK File(&Y)
-DataEditForm.mainMenu.menuitem_readlist	Read from Deck List
 DataEditForm.mainMenu.menuitem_readscripts	Read from Scripts Path
 DataEditForm.mainMenu.menuitem_compdb	Compress Database
 DataEditForm.mainMenu.menuitem_exportdata	Export Data as ZIP File
@@ -123,7 +121,6 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x12	File not found!
 0x13	No database selected!
 0x14	Select database file
-0x15	Select ydk file
 0x17	Download successfully!
 0x18	Downloading failed!
 0x19	No selected script text!
@@ -135,7 +132,6 @@ MainForm.mainMenu.menuitem_closeall	Close All
 0x1f	Version:
 0x20	Author :
 0x21	Databases(*.db)|*.db|Databases(*.cdb)|*.cdb|Databases(*.bytes)|*.bytes|Scripts(*.lua)|*.lua|all files(*.*)|*.*
-0x22	ydk file(*.ydk)|*.ydk|all files(*.*)|*.*
 0x23	Invalid SetCode!
 0x24	Select Image File
 0x25	jpg(*.jpg)|*.jpg|bmp(*.bmp)|*.bmp|png(*.png)|*.png|all files(*.*)|*.*

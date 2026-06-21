@@ -41,8 +41,6 @@ namespace DataEditorX
             menuitem_openfileinthis = new ToolStripMenuItem();
             menuitem_default_script = new ToolStripMenuItem();
             tsep2 = new ToolStripSeparator();
-            menuitem_readydk = new ToolStripMenuItem();
-            menuitem_readlist = new ToolStripMenuItem();
             menuitem_readscripts = new ToolStripMenuItem();
             tsep6 = new ToolStripSeparator();
             menuitem_compdb = new ToolStripMenuItem();
@@ -50,8 +48,6 @@ namespace DataEditorX
             menuitem_exportdata = new ToolStripMenuItem();
             tsep1 = new ToolStripSeparator();
             menuitem_cancelTask = new ToolStripMenuItem();
-            menuitem_autoreturn = new ToolStripMenuItem();
-            menuitem_replace = new ToolStripMenuItem();
             menuitem_help = new ToolStripMenuItem();
             menuitem_about = new ToolStripMenuItem();
             menuitem_language = new ToolStripMenuItem();
@@ -142,7 +138,7 @@ namespace DataEditorX
             // 
             // menu_data
             // 
-            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_default_script, tsep2, menuitem_readydk, menuitem_readlist, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_exportdata, tsep1, menuitem_cancelTask, menuitem_autoreturn, menuitem_replace });
+            menu_data.DropDownItems.AddRange(new ToolStripItem[] { menuitem_operacardsfile, menuitem_openfileinthis, menuitem_default_script, tsep2, menuitem_readscripts, tsep6, menuitem_compdb, menuitem_exportdata, tsep1, menuitem_cancelTask });
             menu_data.Name = "menu_data";
             menu_data.Size = new Size(57, 20);
             menu_data.Text = "Data(&T)";
@@ -172,20 +168,6 @@ namespace DataEditorX
             // 
             tsep2.Name = "tsep2";
             tsep2.Size = new Size(219, 6);
-            // 
-            // menuitem_readydk
-            // 
-            menuitem_readydk.Name = "menuitem_readydk";
-            menuitem_readydk.Size = new Size(222, 22);
-            menuitem_readydk.Text = "Read Cards from YDK File(&Y)";
-            menuitem_readydk.Click += Menuitem_readydkClick;
-            // 
-            // menuitem_readlist
-            // 
-            menuitem_readlist.Name = "menuitem_readlist";
-            menuitem_readlist.Size = new Size(222, 22);
-            menuitem_readlist.Text = "Read from Deck List";
-            menuitem_readlist.Click += Menuitem_readlistClick;
             // 
             // menuitem_readscripts
             // 
@@ -231,20 +213,6 @@ namespace DataEditorX
             menuitem_cancelTask.Size = new Size(222, 22);
             menuitem_cancelTask.Text = "Cancel Task";
             menuitem_cancelTask.Click += Menuitem_cancelTaskClick;
-            // 
-            // menuitem_autoreturn
-            // 
-            menuitem_autoreturn.Name = "menuitem_autoreturn";
-            menuitem_autoreturn.Size = new Size(222, 22);
-            menuitem_autoreturn.Text = "*Auto return";
-            menuitem_autoreturn.Click += Menuitem_autoreturnClick;
-            // 
-            // menuitem_replace
-            // 
-            menuitem_replace.Name = "menuitem_replace";
-            menuitem_replace.Size = new Size(222, 22);
-            menuitem_replace.Text = "*Auto replace";
-            menuitem_replace.Click += Menuitem_replaceClick;
             // 
             // menuitem_help
             // 
@@ -1181,8 +1149,6 @@ namespace DataEditorX
         private System.Windows.Forms.ToolStripMenuItem menuitem_about;
         private System.Windows.Forms.ToolStripMenuItem menuitem_help;
         private System.Windows.Forms.ToolStripMenuItem menuitem_readscripts;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_readydk;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_readlist;
         private System.Windows.Forms.MenuStrip mainMenu;
         private System.Windows.Forms.ToolStripMenuItem menuitem_findluafunc;
         private System.Windows.Forms.ToolStripSeparator tsep6;
@@ -1193,8 +1159,6 @@ namespace DataEditorX
 		private System.Windows.Forms.ToolStripMenuItem menuitem_autocheckupdate;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_language;
 		private System.Windows.Forms.ToolStripMenuItem menuitem_tools;
-		private System.Windows.Forms.ToolStripMenuItem menuitem_autoreturn;
-        private System.Windows.Forms.ToolStripMenuItem menuitem_replace;
         private System.Windows.Forms.Label lb_markers;
         private System.Windows.Forms.TextBox tb_link;
         private System.Windows.Forms.Panel pl_bottom;
