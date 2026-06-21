@@ -4,7 +4,7 @@
     <Nullable>annotations</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RepositoryUrl>https://github.com/Lyris12/DataEditorX</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ElderLich/DataEditorX</RepositoryUrl>
     <Title>
     </Title>
     <Version>4.0.4.3</Version>
