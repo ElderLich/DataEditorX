@@ -2882,12 +2882,12 @@ Parameters:
   get_info: bool optional
 Returns:
   bool
-  Group - 可能为空
-  int - 可能为空
-  int - 可能为空
-  Effect - 可能为空
-  int - 可能为空
-  int - 可能为空
+  Group - may be nil
+  int - may be nil
+  int - may be nil
+  Effect - may be nil
+  int - may be nil
+  int - may be nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4894
 
 ●bool Duel.CheckLocation(int player, int location, int seq)
@@ -2915,7 +2915,7 @@ Checks whether the card group satisfies mandatory material requirements.
 Parameters:
   player: int
   cards: Group|Card
-  ecode: int - EFFECT_MUST_BE_FMATERIAL等
+  ecode: int - for example, EFFECT_MUST_BE_FMATERIAL
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4988
@@ -3456,8 +3456,8 @@ Parameters:
   player: int
   location: int optional - default: LOCATION_HAND + LOCATION_MZONE
 Returns:
-  Group - material_all 包含受EFFECT_EXTRA_FUSION_MATERIAL影响的卡
-  Group - material_base 只取那些区域的卡
+  Group - material_all includes cards affected by EFFECT_EXTRA_FUSION_MATERIAL
+  Group - material_base contains only cards from the requested locations
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5000
 
 ●int Duel.GetLastSelectHint(int player)
@@ -3563,7 +3563,7 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4970
 Returns the group of cards that must be used as material.
 Parameters:
   player: int
-  ecode: int - EFFECT_MUST_BE_FMATERIAL等
+  ecode: int - for example, EFFECT_MUST_BE_FMATERIAL
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4987
@@ -3606,10 +3606,10 @@ Parameters:
   category: int
 Returns:
   bool
-  Group - 可能为空
-  int - 可能为空
-  int - 可能为空
-  int - 可能为空
+  Group - may be nil
+  int - may be nil
+  int - may be nil
+  int - may be nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5009
 
 ●int Duel.GetOverlayCount(int player, int s, int o)
@@ -4410,7 +4410,7 @@ Let the player player from the g to select a group [must contain gc] fusion fusi
 Parameters:
   player: int
   c: Card
-  g: Group|nil optional - 不能为空
+  g: Group|nil optional - cannot be nil when selecting materials
   gc: Card|nil optional
   chkf: int optional - default: PLAYER_NONE
   not_material: bool optional - default: false
@@ -5716,7 +5716,7 @@ btok indicates whether the confirm selection button is available, cancelable ind
 minc and maxc are client-side text buffer prompts indicating the need to select minc-maxc cards, but this only affects visual display and does not enforce the selection count
 Parameters:
   cg: Group
-  sg: Group|nil optional - 已选的卡，可以从中取消选择
+  sg: Group|nil optional - already selected cards that can be unselected
   player: int
   btok: bool - default: false
   cancelable: bool - default: false
@@ -7527,8 +7527,8 @@ Parameters:
 Source: Utilities/utility.lua:79
 
 ●void Auxiliary.sumreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-Used by Yosenju Yamamisaki (39853199) and some other cards (49249907, 93368494), though the purpose of this function is unclear (★意★义★不★明★)
-Card 54109233, while not using this function, uses a similar implementation, also with unclear purpose (★意★义★不★明★), equivalent to
+Used by Yosenju Yamamisaki (39853199) and some other cards (49249907, 93368494), though the purpose of this function is unclear.
+Card 54109233, while not using this function, uses a similar implementation with an unclear purpose, equivalent to
 function aux.sumreg(e, tp, eg, ep, ev, re, r, rp)
   local tc=eg:GetFirst()
   local code=e:GetLabel()

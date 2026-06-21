@@ -702,7 +702,7 @@ namespace DataEditorX
             Font? f = null;
             try
             {
-                f = JsonConvert.DeserializeObject<Font>(fontJson) ?? new Font("微软雅黑", 10);
+                f = JsonConvert.DeserializeObject<Font>(fontJson) ?? new Font("Microsoft YaHei", 10);
             }
             catch { }
             if (f == null) return;
