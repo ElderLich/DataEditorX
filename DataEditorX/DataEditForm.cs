@@ -425,6 +425,7 @@ namespace DataEditorX
             }
             fpanel.ResumeLayout(false);
             fpanel.PerformLayout();
+            fpanel.AutoScrollPosition = Point.Empty;
         }
 
         //Initialize ComboBox
@@ -2185,15 +2186,49 @@ namespace DataEditorX
 
         private void Pl_categoryScroll(object sender, MouseEventArgs e)
         {
-            int d = e.Delta / 6;
-            int c = pl_category.VerticalScroll.Value;
-            pl_category.VerticalScroll.Value = Math.Max(0, c + d);
+            ScrollCheckPanel(pl_category, e);
         }
+
         private void Pl_flagsScroll(object sender, MouseEventArgs e)
         {
-            int d = e.Delta / 6;
-            int c = pl_flags.VerticalScroll.Value;
-            pl_flags.VerticalScroll.Value = Math.Max(0, c + d);
+            ScrollCheckPanel(pl_flags, e);
+        }
+
+        private static void ScrollCheckPanel(FlowLayoutPanel panel, MouseEventArgs e)
+        {
+            if (e.Delta == 0 || !panel.VerticalScroll.Visible)
+            {
+                return;
+            }
+
+            int scrollAmount = GetMouseWheelScrollAmount(panel);
+            int target = panel.VerticalScroll.Value - Math.Sign(e.Delta) * scrollAmount;
+            SetVerticalScroll(panel, target);
+
+            if (e is HandledMouseEventArgs handled)
+            {
+                handled.Handled = true;
+            }
+        }
+
+        private static int GetMouseWheelScrollAmount(Control panel)
+        {
+            int wheelLines = SystemInformation.MouseWheelScrollLines;
+            if (wheelLines == -1)
+            {
+                return Math.Max(1, panel.ClientSize.Height);
+            }
+
+            int lineHeight = Math.Max(1, panel.Font.Height + 4);
+            return Math.Max(1, wheelLines) * lineHeight;
+        }
+
+        private static void SetVerticalScroll(ScrollableControl panel, int value)
+        {
+            VScrollProperties scroll = panel.VerticalScroll;
+            int max = Math.Max(scroll.Minimum, scroll.Maximum - scroll.LargeChange + 1);
+            int target = Math.Min(Math.Max(value, scroll.Minimum), max);
+            panel.AutoScrollPosition = new Point(Math.Abs(panel.AutoScrollPosition.X), target);
         }
 
         public void ApplyTheme()
