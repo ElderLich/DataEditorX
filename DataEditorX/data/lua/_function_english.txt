@@ -537,10 +537,10 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3538
 ●int Card.GetFlagEffect(Card c, int code)
 Returns how many flag effects with code are registered on c.
 Parameters:
-  c: Card
-  code: int
+  c: Card - Card whose single-card flag effects are counted.
+  code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
 Returns:
-  int
+  int - Number of matching flag effects on c.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3553
 
 ●int|nil,...? Card.GetFlagEffectLabel(Card c, int code)
@@ -2416,15 +2416,15 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3548
 Registers a special single-card flag effect on c and returns the created Effect.
 Flag effects are script markers: their code is kept separate from regular effect codes, they cannot be disabled, and count=0 is treated as 1.
 Parameters:
-  c: Card
-  code: int
-  reset_flag: int
-  property: int
-  reset_count: int
-  label: int optional
-  desc: int optional
+  c: Card - Card that receives the marker.
+  code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
+  reset_flag: int - RESET_* mask controlling when the marker expires.
+  property: int - Effect property flags stored on the created marker; EFFECT_FLAG_CANNOT_DISABLE is always added.
+  reset_count: int - Reset counter for the created marker; 0 is treated as 1.
+  label: int optional - Optional integer payload stored on the marker.
+  desc: int optional - Optional client description id for marker hints.
 Returns:
-  Effect
+  Effect - The created flag effect.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3552
 
 ●void Card.ReleaseEffectRelation(Card c, Effect e)
@@ -2490,8 +2490,8 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3550
 ●void Card.ResetFlagEffect(Card c, int code)
 Resets all flag effects on c with code.
 Parameters:
-  c: Card
-  code: int
+  c: Card - Card whose matching flag effects are reset.
+  code: int - Flag-effect code to clear.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3554
 
 ●void Card.ResetNegateEffect(Card c, [int code1], [... any])
@@ -2528,11 +2528,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3632
 ●bool Card.SetFlagEffectLabel(Card c, int code, int label)
 Sets the first matching flag effect label for code on c to label and returns whether a flag effect was found.
 Parameters:
-  c: Card
-  code: int
-  label: int
+  c: Card - Card whose matching flag effect is updated.
+  code: int - Flag-effect code to find.
+  label: int - New integer label stored on the first matching flag effect.
 Returns:
-  bool
+  bool - True if a matching flag effect was updated; false if none exists.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3555
 
 ●void Card.SetHint(Card c, int type, int value)
@@ -3413,13 +3413,13 @@ Returns:
   Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4949
 
-●int Duel.GetFlagEffect(int player, int code)
+●int|nil Duel.GetFlagEffect(int player, int code)
 Returns how many player flag effects with code are registered on player.
 Parameters:
-  player: int
-  code: int
+  player: int - Player whose flag effects are counted.
+  code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
 Returns:
-  int
+  int|nil - Number of matching player flag effects, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4854
 
 ●int|nil,int... Duel.GetFlagEffectLabel(int player, int code)
@@ -3429,7 +3429,7 @@ Parameters:
   player: int - Player whose player flag effects are inspected.
   code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
 Returns:
-  int|nil - First matching label, or nil if no matching flag effect exists.
+  int|nil - First matching label, or nil if player is invalid or no matching flag effect exists.
   int... - Additional matching labels; a matching effect with no label contributes 0.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4857
 
@@ -4256,18 +4256,18 @@ Parameters:
   player: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4852
 
-●Effect Duel.RegisterFlagEffect(int player, int code, int reset_flag, int property, int reset_count, [int label])
+●Effect|nil Duel.RegisterFlagEffect(int player, int code, int reset_flag, int property, int reset_count, [int label])
 Registers a player/global flag effect on player and returns the created Effect.
 The flag effect is player-targeted, field-only, cannot be disabled, and count=0 is treated as 1.
 Parameters:
-  player: int
-  code: int
-  reset_flag: int
-  property: int
-  reset_count: int - default: 1
-  label: int optional
+  player: int - Player that receives the marker; invalid players make the core return no values.
+  code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
+  reset_flag: int - RESET_* mask controlling when the marker expires.
+  property: int - Effect property flags stored on the created marker; player-target, field-only, and cannot-disable flags are always added.
+  reset_count: int - Reset counter for the created marker; 0 is treated as 1.
+  label: int optional - Optional integer payload stored on the marker.
 Returns:
-  Effect
+  Effect|nil - The created flag effect, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4853
 
 ●int Duel.Release(Card|Group targets, int reason, [int reason_player])
@@ -4330,8 +4330,8 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5018
 ●void Duel.ResetFlagEffect(int player, int code)
 Resets all player flag effects with code for player.
 Parameters:
-  player: int
-  code: int
+  player: int - Player whose matching flag effects are reset.
+  code: int - Flag-effect code to clear.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4855
 
 ●bool|nil Duel.ReturnToField(Card c, [int pos], [int zone])
@@ -4645,9 +4645,9 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5042
 ●bool|nil Duel.SetFlagEffectLabel(int player, int code, int label)
 Sets the first matching player flag effect's label to label and returns whether one was found.
 Parameters:
-  player: int
-  code: int
-  label: int
+  player: int - Player whose matching flag effect is updated.
+  code: int - Flag-effect code to find.
+  label: int - New integer label stored on the first matching player flag effect.
 Returns:
   bool|nil - True if a matching flag effect was updated; false if none exists; nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4856
