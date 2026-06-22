@@ -1281,12 +1281,12 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3593
 
-●bool Card.IsAbleToHand(Card c)
-检查c是否可以送去手卡
-注：仅当卡片或者玩家受到“不能加入手卡”的效果的影响时（如雷王）此函数才返回false
-##以下几个函数类似
+●bool Card.IsAbleToHand(Card c, [int player])
+判断c能否由player送去或返回手牌。
+player省略时使用当前原因玩家。
 Parameters:
   c: Card
+  player: int optional - default: reason player
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3584
@@ -1313,10 +1313,12 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3588
 
-●bool Card.IsAbleToRemoveAsCost(Card c)
-检查c是否可以作为cost除外
+●bool Card.IsAbleToRemoveAsCost(Card c, [int pos])
+判断c能否由当前原因玩家作为cost除外。
+pos指定除外时的表示形式，省略时为POS_FACEUP。
 Parameters:
   c: Card
+  pos: int optional - default: POS_FACEUP
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3594
@@ -2343,13 +2345,16 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3501
 
-●bool Card.IsSynchroSummonable(Card c, [Card|nil tuner], [Group mg])
+●bool Card.IsSynchroSummonable(Card c, [Card|nil tuner], [Group mg], [int min], [int max])
 判断c能否使用tuner以及可用素材组mg进行同调召唤。
 tuner为nil时，相当于检查c通常的特殊召唤手续。
+min和max限制该手续使用的非调整同调素材数量。
 Parameters:
   c: Card
   tuner: Card|nil optional
   mg: Group optional
+  min: int optional - default: 0
+  max: int optional - default: 0
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3576
@@ -3694,10 +3699,12 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4998
 
-●Group Duel.GetSynchroMaterial(int player)
-获取玩家可以作为同调素材的卡片组
+●Group Duel.GetSynchroMaterial(int player, [bool facedown])
+返回player可作为同调素材使用的卡组。
+怪兽区域中里侧表示的卡只有在facedown为true时才包含。
 Parameters:
   player: int
+  facedown: bool optional - default: false
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4992
@@ -5879,7 +5886,7 @@ Parameters:
   g: Group
   f: function
   ...: any
-Source: Define/def.lua:3861
+Source: Define/def.lua:3883
 
 ========== Auxiliary ==========
 ●void Auxiliary.AddBanishRedirect(Card c, [function condition])

@@ -1268,11 +1268,12 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3593
 
-●bool Card.IsAbleToHand(Card c)
+●bool Card.IsAbleToHand(Card c, [int player])
 Checks whether c can be returned or added to the hand by the current reason player.
 An optional player argument can be passed when a specific player is performing the action.
 Parameters:
   c: Card
+  player: int optional - default: reason player
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3584
@@ -1298,10 +1299,12 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3588
 
-●bool Card.IsAbleToRemoveAsCost(Card c)
-Checks whether c can be banished as a cost.
+●bool Card.IsAbleToRemoveAsCost(Card c, [int pos])
+Checks whether c can be banished as a cost by the current reason player.
+pos controls the banished position and defaults to POS_FACEUP.
 Parameters:
   c: Card
+  pos: int optional - default: POS_FACEUP
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3594
@@ -2326,13 +2329,16 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3501
 
-●bool Card.IsSynchroSummonable(Card c, [Card|nil tuner], [Group mg])
+●bool Card.IsSynchroSummonable(Card c, [Card|nil tuner], [Group mg], [int min], [int max])
 Checks whether c can be Synchro Summoned with tuner and the available material group mg.
 If tuner is nil, this behaves like the regular Special Summon procedure check for c.
+min and max restrict the number of non-Tuner Synchro Materials used by the procedure.
 Parameters:
   c: Card
   tuner: Card|nil optional
   mg: Group optional
+  min: int optional - default: 0
+  max: int optional - default: 0
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3576
@@ -3650,10 +3656,12 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4998
 
-●Group Duel.GetSynchroMaterial(int player)
+●Group Duel.GetSynchroMaterial(int player, [bool facedown])
 Gets the group of cards player can use as Synchro Material.
+Face-down cards in the Monster Zone are omitted unless facedown is true.
 Parameters:
   player: int
+  facedown: bool optional - default: false
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4992
@@ -5820,7 +5828,7 @@ Parameters:
   g: Group
   f: function
   ...: any
-Source: Define/def.lua:3861
+Source: Define/def.lua:3883
 
 ========== Auxiliary ==========
 ●void Auxiliary.AddBanishRedirect(Card c, [function condition])
