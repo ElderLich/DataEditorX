@@ -2826,14 +2826,9 @@ Parameters:
   f: function
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4928
 
-●int Duel.ChangePosition(Card|Group targets, int au, [int ad], [int du], [int dd], [bool noflip], [bool setavailable])
-改变targets的表示形式返回实际操作的数量，若只有2个参数，则不管什么表示形式，都变成 第二个参数 代表的形式
-表侧攻击表示 = au
-里侧攻击表示 = ad
-表侧守备表示 = du
-里侧守备表示 = dd
-如果noflip=true则不触发反转效果（但会触发反转时的诱发效果）
-如果setavailable=true则对象之后变成里侧也发动反转效果
+●int Duel.ChangePosition(Card|Group targets, int au, [int ad], [int du], [int dd], [bool noflip])
+变更targets的表示形式，并返回实际变更表示形式的卡的数量。
+au、ad、du、dd分别对应当前表侧攻击、里侧攻击、表侧守备、里侧守备的目标表示形式；省略时使用au。MDPro3核心不读取旧文档中的第7个setavailable参数。
 Parameters:
   targets: Card|Group
   au: int
@@ -2841,7 +2836,6 @@ Parameters:
   du: int optional - default: au
   dd: int optional - default: au
   noflip: bool optional - default: false
-  setavailable: bool optional - default: false
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4880
@@ -3300,9 +3294,9 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5039
 
-●bool Duel.GetControl(Card|Group targets, int player, [int reset_phase], [int reset_count], [int zone])
-让玩家 player [直到 reset_count 次 reset_phase 时][在区域 zone]
-得到 targets 的控制权，返回值表示是否成功
+●int Duel.GetControl(Card|Group targets, int player, [int reset_phase], [int reset_count], [int zone])
+把targets的控制权转移给player，并返回实际变更控制权的卡的数量。
+临时获得控制权时传入reset_phase和reset_count，例如PHASE_END, 1；只想指定可用区域时传入0, 0, zone。
 Parameters:
   targets: Card|Group
   player: int
@@ -3310,7 +3304,7 @@ Parameters:
   reset_count: int optional - default: 0
   zone: int optional - default: 0xff
 Returns:
-  bool
+  int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4906
 
 ●int Duel.GetCounter(int player, int s, int o, int countertype)
@@ -4809,10 +4803,10 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4873
 
-●nil|int Duel.SpecialSummonComplete()
-此函数在确定复数个Duel.SpecialSummonStep调用完毕之后调用，用于触发事件
+●int Duel.SpecialSummonComplete()
+完成由Duel.SpecialSummonStep开始的特殊召唤处理，触发召唤相关事件，并返回完成的特殊召唤数量。
 Returns:
-  nil|int
+  int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4875
 
 ●void Duel.SpecialSummonRule(int player, Card c, [int sumtype])

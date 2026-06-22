@@ -2817,12 +2817,9 @@ Parameters:
   f: function
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4928
 
-●int Duel.ChangePosition(Card|Group targets, int au, [int ad], [int du], [int dd], [bool noflip], [bool setavailable])
-Changing the representation of targets returns the number of actual operations
-The attack on the watch side becomes au, the attack on the inside indicates ad,
-The side of the garage that becomes du, inside the garrison said to become dd
-If noflip = true, the reverse effect will not be triggered (but the effect of inversion will be triggered)
-If setavailable = true then the object will become the back side also launched reversal effect
+●int Duel.ChangePosition(Card|Group targets, int au, [int ad], [int du], [int dd], [bool noflip])
+Changes the battle position of targets and returns the number of cards whose position actually changed.
+The position arguments map by current position: au for face-up Attack Position, ad for face-down Attack Position, du for face-up Defense Position, and dd for face-down Defense Position. Omitted values use au.
 Parameters:
   targets: Card|Group
   au: int
@@ -2830,7 +2827,6 @@ Parameters:
   du: int optional - default: au
   dd: int optional - default: au
   noflip: bool optional - default: false
-  setavailable: bool optional - default: false
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4880
@@ -3089,9 +3085,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4901
 
 ●int Duel.Destroy(Card|Group targets, int reason, [int dest], [int reason_player])
-Destroy targets dest by reason reason, the return value is actually destroyed by the number
-If the reason contains REASON_RULE, the break event will not check whether the card is immune,
-Does not trigger the generation of breaking effect and ignore the "can not destroy"
+Destroys targets for reason and returns the number of cards actually destroyed.
+dest defaults to LOCATION_GRAVE. reason_player defaults to the current Chain's reason player. Use REASON_EFFECT for normal card effects and reserve REASON_RULE for rule/procedure cleanup.
 Parameters:
   targets: Card|Group
   reason: int
@@ -3157,9 +3152,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4845
 
 ●bool Duel.Equip(int player, Card c1, Card c2, [bool up], [bool is_step])
-The player as a player c1 equipment card equipment to the c2, the return value that is successful
-Up = false to retain the card before the representation
-Is_step = true is the decomposition of the equipment process, the need to cooperate with Duel.EquipComplete use
+Equips c1 to c2 for player and returns true if the equip succeeds.
+up defaults to true and makes the Equip Card face-up. When is_step is true, call Duel.EquipComplete after all step equips have been created.
 Parameters:
   player: int
   c1: Card
@@ -3171,7 +3165,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4904
 
 ●void Duel.EquipComplete()
-In the call Duel.Equip, if is_step parameter is true, you need to call this function when the trigger point
+Completes a batch of step equips created with Duel.Equip(..., true) by enabling the equipped cards and raising the equip events.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4905
 
 ●int,... Duel.GetActivityCount(int player, int activity_type, ... any)
@@ -3288,8 +3282,9 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5039
 
-●bool Duel.GetControl(Card|Group targets, int player, [int reset_phase], [int reset_count], [int zone])
-Let players get control of the player, the return value indicates success
+●int Duel.GetControl(Card|Group targets, int player, [int reset_phase], [int reset_count], [int zone])
+Moves control of targets to player and returns the number of cards whose control actually changed.
+Use reset_phase and reset_count for temporary control, such as PHASE_END, 1. To pass only a zone mask, use 0, 0, zone.
 Parameters:
   targets: Card|Group
   player: int
@@ -3297,7 +3292,7 @@ Parameters:
   reset_count: int optional - default: 0
   zone: int optional - default: 0xff
 Returns:
-  bool
+  int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4906
 
 ●int Duel.GetCounter(int player, int s, int o, int countertype)
@@ -4129,8 +4124,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4884
 
 ●bool Duel.MoveToField(Card c, int move_player, int target_player, int dest, int pos, bool enable, [int zone])
-Let the player move_player to move the c target_player field, the return value that is successful
-Dest can only be LOCATION_MZONE or LOCATION_SZONE, pos represents an optional representation, and enable indicates whether or not the effect of c is applied immediately
+Moves c onto target_player's field and returns true if the move succeeds.
+dest is normally LOCATION_MZONE or LOCATION_SZONE. LOCATION_FZONE and LOCATION_PZONE are accepted and converted to the matching Spell & Trap Zone handling by the core.
 Parameters:
   c: Card
   move_player: int
@@ -4193,7 +4188,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4932
 
 ●void Duel.Overlay(Card c, Card|Group ocard, [bool adjust])
-The ocard as a stack of cards stacked c
+Overlays ocard under c as Xyz Material.
+By default the field is adjusted after the overlay. Pass adjust=false only when a larger procedure will adjust afterward.
 Parameters:
   c: Card
   ocard: Card|Group
@@ -4277,8 +4273,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4853
 
 ●int Duel.Release(Card|Group targets, int reason, [int reason_player])
-The reason for the liberation of targets to return the value of the actual liberation of the number of targets
-If the reason contains REASON_COST, it will not check whether the card is not affected by the effect
+Tributes/Releases targets for reason and returns the number of cards actually released.
+Use REASON_COST when paying a cost and REASON_EFFECT or REASON_SPSUMMON when the release is part of an effect or Summon procedure.
 Parameters:
   targets: Card|Group
   reason: int
@@ -4294,8 +4290,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4999
 
 ●int Duel.Remove(Card|Group targets, int pos, int reason, [int reason_player])
-In the case of reason, except for the pos form, the return value is the actual number being manipulated
-If the reason contains REASON_TEMPORARY, then the exception is considered temporary, you can return to the field by Duel.ReturnToField
+Banishes targets in position pos for reason and returns the number of cards actually banished.
+If reason includes REASON_TEMPORARY, the banish is treated as temporary and the card can later be returned with Duel.ReturnToField.
 Parameters:
   targets: Card|Group
   pos: int
@@ -4606,8 +4602,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4860
 
 ●int Duel.SendtoHand(Card|Group targets, [int|nil player], int reason, [int reason_player])
-The reason to target the player sent to the player's hand, the return value is the actual number of operations
-If player is nil, the card's holder's hand is returned
+Sends targets to a hand for reason and returns the number of cards actually moved.
+Pass nil for player to use the normal return destination. Pass a specific player only when the effect says the cards go to that player's hand.
 Parameters:
   targets: Card|Group
   player: int|nil optional
@@ -4773,10 +4769,10 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4873
 
-●nil|int Duel.SpecialSummonComplete()
-This function is called after determining that a number of calls to Duel.SpecialSummonStep are completed, for triggering an event
+●int Duel.SpecialSummonComplete()
+Completes a batch of successful Duel.SpecialSummonStep calls, raises the Summon events, and returns the number of completed Summons.
 Returns:
-  nil|int
+  int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4875
 
 ●void Duel.SpecialSummonRule(int player, Card c, [int sumtype])
@@ -4788,10 +4784,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4866
 
 ●bool Duel.SpecialSummonStep(Card c, int sumtype, int sumplayer, int target_player, bool nocheck, bool nolimit, int pos, [int zone])
-This function is Duel.SpecialSummon decomposition process, only a special summon a card c
-This function is used for an effect while simultaneously calling multiple cards with different parameters
-This function must be used with Duel.SpecialSummonComplete
-The return value indicates whether or not the special call succeeded
+Special Summons one card as part of a multi-step Summon procedure and returns true if that step succeeds.
+Every successful step batch must finish with Duel.SpecialSummonComplete.
 Parameters:
   c: Card
   sumtype: int
