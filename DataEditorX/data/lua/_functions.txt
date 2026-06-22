@@ -195,12 +195,12 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3522
 检查c在check_player场上是否满足当前唯一性规则，可以与已存在的卡共存。
 check_location默认LOCATION_ONFIELD，并会被限制为场上位置；测试即将移动的卡时，可用icard指定一张忽略的卡。
 Parameters:
-  c: Card
-  check_player: int
-  check_location: int optional - default: LOCATION_ONFIELD
-  icard: Card|nil optional
+  c: Card - Card being tested against unique-on-field restrictions.
+  check_player: int - Player whose field is checked for a uniqueness conflict.
+  check_location: int optional - On-field location mask to check; default: LOCATION_ONFIELD. The core masks this value to LOCATION_ONFIELD.
+  icard: Card|nil optional - Optional card ignored during the check, useful when testing a pending replacement or move.
 Returns:
-  bool
+  bool - True if c can coexist under the unique-on-field rules for the requested player and location.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3658
 
 ●void Card.ClearEffectRelation(Card c)
@@ -247,10 +247,10 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3557
 给c登记单卡的指示物许可效果，使其可以在指定范围放置countertype类型的指示物。
 省略location时，怪兽默认LOCATION_MZONE，非怪兽默认LOCATION_SZONE + LOCATION_FZONE。提供condition时会作为该许可效果的条件回调保存。
 Parameters:
-  c: Card
-  countertype: int
-  location: int optional
-  condition: function optional
+  c: Card - Card receiving the counter permit effect.
+  countertype: int - Counter type that c is allowed to hold.
+  location: int optional - Single-effect range for the permit. Omitted defaults to LOCATION_MZONE for monsters, otherwise LOCATION_SZONE + LOCATION_FZONE.
+  condition: function optional - Optional condition callback stored on the permit effect; ignored unless this argument is a function.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3631
 
 ●void Card.EnableDualState(Card c)
@@ -522,11 +522,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3519
 
 ●int Card.GetFieldID(Card c)
 返回c当前的field ID，即核心在c移动到当前位置时分配的时间标识。
-数值越小表示越早进入当前位置。此值不同于Card.GetRealFieldID，后者用于战斗状态等真实位置检查。
+数值越小表示越早进入当前位置。核心会在卡获得新的场上身份时更新该值，例如进入场上或变更控制者。此值不同于Card.GetRealFieldID，后者用于战斗状态等真实位置检查。
 Parameters:
-  c: Card
+  c: Card - Card whose current field ID is returned.
 Returns:
-  int
+  int - Current field ID assigned by the core for c's current field identity.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3477
 
 ●Card|nil Card.GetFirstCardTarget(Card c)
@@ -550,8 +550,8 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3553
 返回c上编号为code的每个标记效果的第1个Label值。
 没有匹配的标记效果时返回nil；匹配的标记效果没有Label时，该位置返回0。
 Parameters:
-  c: Card
-  code: int
+  c: Card - Card whose single-card flag effects are inspected.
+  code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
 Returns:
   int|nil - First label value, or nil if no matching flag effect exists.
   ...? - Additional integer label values from additional matching flag effects.
@@ -700,9 +700,9 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3466
 ●Group Card.GetMaterial(Card c)
 返回c当前记录的素材卡Group。
 Parameters:
-  c: Card
+  c: Card - Card whose stored material list is being read.
 Returns:
-  Group - Cards currently stored as c's material cards.
+  Group - New Group containing c's stored material cards; the Group is empty if no material cards are stored.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3515
 
 ●int Card.GetMaterialCount(Card c)
@@ -1374,20 +1374,20 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3598
 检查c是否为怪兽或当前被当作怪兽，并且当前攻击力是否大于等于atk。
 不同于Card.IsAttackBelow，此核心在比较前不会额外检查攻击力未知的情况。
 Parameters:
-  c: Card
-  atk: int
+  c: Card - Card whose current ATK is checked.
+  atk: int - Minimum ATK value accepted by the check.
 Returns:
-  bool
+  bool - True if c is a monster or treated as one and its current ATK is at least atk.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3619
 
 ●bool Card.IsAttackBelow(Card c, int atk)
 检查c是否为怪兽或被当作怪兽，并且当前攻击力已确定且小于等于atk。
 攻击力未知的卡返回false，因为核心要求当前攻击力至少为0。
 Parameters:
-  c: Card
-  atk: int
+  c: Card - Card whose current ATK is checked.
+  atk: int - Maximum ATK value accepted by the check.
 Returns:
-  bool
+  bool - True if c is a monster or treated as one, has known ATK, and that ATK is at most atk.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3618
 
 ●bool Card.IsAttackPos(Card c)
@@ -1570,9 +1570,9 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3636
 检查c能否被当前原因玩家变成里侧表示。
 连接怪兽、衍生物、已经里侧表示的卡，以及受到EFFECT_CANNOT_TURN_SET影响的卡或玩家会返回false。
 Parameters:
-  c: Card
+  c: Card - Card checked for whether it can be turned face-down.
 Returns:
-  bool
+  bool - True if c can be turned face-down by the current reason player.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3634
 
 ●bool Card.IsChainAttackable(Card c, [int ac], [bool monsteronly])
@@ -2319,12 +2319,12 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3572
 
 ●bool Card.IsSummonLocation(Card c, int loc)
-检查c记录的召唤位置是否包含loc。
+检查c记录的召唤位置是否包含loc。该函数读取召唤信息，不检查c的当前位置。
 Parameters:
-  c: Card
-  loc: int
+  c: Card - Card whose recorded Summon location is checked.
+  loc: int - Location mask to test against the stored Summon location, such as LOCATION_EXTRA or LOCATION_GRAVE.
 Returns:
-  bool
+  bool - True if any bit in loc is present in c's recorded Summon location.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3502
 
 ●bool Card.IsSummonPlayer(Card c, int player)
@@ -2707,11 +2707,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4886
 
 ●void Duel.AddCustomActivityCounter(int counter_id, int activity_type, function f)
 为指定ACTIVITY_*类型登记编号为counter_id的自定义行动计数器。
-召唤和攻击类计数器会以Card调用f，f返回false时计数增加。ACTIVITY_CHAIN会以effect, player, chain_id调用f，同样在返回false时计数。
+召唤和攻击类计数器会以Card调用f，f返回false时计数增加。ACTIVITY_CHAIN会以effect, player, chain_id调用f，同样在返回false时计数。在此核心中，ACTIVITY_BATTLE_PHASE和未知行动类型不会登记自定义计数器。
 Parameters:
-  counter_id: int
-  activity_type: int
-  f: function
+  counter_id: int - Script-chosen identifier used later with Duel.GetCustomActivityCount.
+  activity_type: int - ACTIVITY_* constant selecting which activity map receives the counter.
+  f: function - Filter callback. Returning false marks that activity as counted for the acting player.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5068
 
 ●void Duel.AdjustAll()
@@ -3309,9 +3309,9 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4947
 返回当前适用于player的第1个EFFECT_CHAIN_MATERIAL效果；没有时返回nil。
 融合类脚本通常读取该效果的Target和Operation回调，用于处理连锁素材替代流程。
 Parameters:
-  player: int
+  player: int - Player checked for an applying EFFECT_CHAIN_MATERIAL effect.
 Returns:
-  Effect|nil
+  Effect|nil - First applying EFFECT_CHAIN_MATERIAL effect; no Lua value is pushed if player is invalid or no such effect exists, which behaves as nil in normal assignment.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4889
 
 ●int... Duel.GetCoinResult()
@@ -3360,20 +3360,21 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4954
 返回counter_id和指定ACTIVITY_*类型下，player对应的自定义计数。
 计数每回合重置。在此核心中，多数以卡为对象的自定义计数器只记录该玩家是否至少进行过1次被计数行动；连锁计数器会随连锁建立和取消而增减。
 Parameters:
-  counter_id: int
-  player: int
-  activity_type: int
+  counter_id: int - Identifier previously registered with Duel.AddCustomActivityCounter.
+  player: int - Player whose count is read; use 0 or 1.
+  activity_type: int - ACTIVITY_* constant selecting which custom activity map is read.
 Returns:
-  int
+  int - Stored count for that player, counter ID, and activity type, or 0 if no matching custom counter exists.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5069
 
 ●Group Duel.GetDecktopGroup(int player, int count)
 返回玩家player卡组最上方最多count张卡组成的Group。
+若count大于剩余卡组数量，只包含实际存在的卡。该读取函数本身不会确认或公开这些卡。
 Parameters:
-  player: int
-  count: int
+  player: int - Player whose Deck is read.
+  count: int - Maximum number of cards to include from the top of the Deck.
 Returns:
-  Group
+  Group - New Group containing the top Deck cards, or an empty Group if no cards are available.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4967
 
 ●int,int,int,int,int Duel.GetDiceResult()
@@ -3465,21 +3466,21 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4854
 
 ●int|nil,int... Duel.GetFlagEffectLabel(int player, int code)
 返回player身上code对应标志效果保存的Label值。
-没有对应标志效果时核心返回nil；存在多个对应标志效果时，会按每个效果返回一个Label值。
+没有对应标志效果时核心返回nil；存在多个对应标志效果时，会按每个效果返回一个Label值。匹配的标志效果没有Label时，该位置返回0。
 Parameters:
-  player: int
-  code: int
+  player: int - Player whose player flag effects are inspected.
+  code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
 Returns:
   int|nil - First matching label, or nil if no matching flag effect exists.
-  int... - Additional matching labels.
+  int... - Additional matching labels; a matching effect with no label contributes 0.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4857
 
 ●Group,Group Duel.GetFusionMaterial(int player, [int location])
 返回player的两个Group：当前可用的全部融合素材候选，以及来自指定位置的基础素材池。
 location默认LOCATION_HAND + LOCATION_MZONE。魔法与陷阱区域或墓地中受EFFECT_EXTRA_FUSION_MATERIAL影响的卡只加入第1个返回Group；第2个Group只包含location指定位置的卡。
 Parameters:
-  player: int
-  location: int optional - default: LOCATION_HAND + LOCATION_MZONE
+  player: int - Player whose Fusion Material pool is collected.
+  location: int optional - Location mask for the base pool; default: LOCATION_HAND + LOCATION_MZONE.
 Returns:
   Group - All currently usable Fusion Material candidates, including extra Fusion Material effects.
   Group - Base material pool from the requested locations only.
@@ -4215,8 +4216,8 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4930
 对当前连锁中由c发动且仍与c保持关联的连锁，给c登记临时的EFFECT_DISABLE_CHAIN效果。
 该无效效果以RESET_CHAIN、RESET_EVENT和传入的reset标志重置；若没有可处理的早前连锁，或c不受当前处理效果影响，核心不做处理。
 Parameters:
-  c: Card
-  reset_flag: int
+  c: Card - Card whose related earlier Chain Links should receive EFFECT_DISABLE_CHAIN.
+  reset_flag: int - Additional reset mask ORed with RESET_CHAIN and RESET_EVENT on each generated disable effect.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4931
 
 ●void Duel.NegateSummon(Card|Group targets)
@@ -5057,9 +5058,9 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:631
 ●int Effect.GetFieldID(Effect e)
 返回效果e的内部field ID。
 Parameters:
-  e: Effect
+  e: Effect - Effect whose internal field ID is returned.
 Returns:
-  int
+  int - Internal effect ID stored in e.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:611
 
 ●Card Effect.GetHandler(Effect e)
@@ -5214,11 +5215,11 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:651
 检查效果e是否包含指定的效果Property标志。
 prop1检查第1个Property字段，可选的prop2检查第2个Property字段；某个字段传0时该字段视为通过。
 Parameters:
-  e: Effect
-  prop1: int
-  prop2: int optional
+  e: Effect - Effect whose property words are checked.
+  prop1: int - Mask checked against the first property word. Use 0 to ignore this word.
+  prop2: int optional - Mask checked against the second property word. Omitted or 0 means this word passes.
 Returns:
-  bool
+  bool - True when every nonzero requested property mask is present on e.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:650
 
 ●bool Effect.IsHasRange(Effect e, int range)
