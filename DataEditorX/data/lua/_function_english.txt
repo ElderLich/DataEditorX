@@ -1480,17 +1480,17 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3641
 Checks whether c can be Special Summoned by effect e using sumtype, sumplayer, sumpos, target player, and optional zone.
 If nocheck is true, c's Summoning condition is skipped. If nolimit is true, c's revive limit or proper-Summon limit is skipped.
 Parameters:
-  c: Card
-  e: Effect
-  sumtype: int
-  sumplayer: int
-  nocheck: bool
-  nolimit: bool
-  sumpos: int optional - default: POS_FACEUP
-  toplayer: int optional - default: sumplayer
-  zone: int optional - default: 0xff
+  c: Card - Card being checked.
+  e: Effect - Effect that would perform the Special Summon.
+  sumtype: int - Summon type value recorded for the Special Summon.
+  sumplayer: int - Player treated as performing the Special Summon.
+  nocheck: bool - If true, skips c's Summoning-condition check.
+  nolimit: bool - If true, skips c's revive-limit or proper-Summon limit check.
+  sumpos: int optional - Summon position mask checked by the core; default: POS_FACEUP.
+  toplayer: int optional - Player whose field c would be Summoned to; default: sumplayer.
+  zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
 Returns:
-  bool
+  bool - True if c can be Special Summoned with the supplied parameters.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3582
 
 ●bool Card.IsCanBeSynchroMaterial(Card c, [Card scard], [Card tuner])
@@ -2202,10 +2202,10 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3563
 Checks whether c is still related to effect e.
 When an effect enters the Chain, its handler and cards selected with Duel.SetTargetCard or Duel.SelectTarget are related to that effect. That relation is normally lost once the card leaves its expected place.
 Parameters:
-  c: Card
-  e: Effect
+  c: Card - Card whose relation is checked.
+  e: Effect - Effect relation to test against.
 Returns:
-  bool
+  bool - True if c still has relation to e.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3562
 
 ●bool Card.IsReleasable(Card c, [int reason])
@@ -3520,14 +3520,14 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4846
 Returns a Group containing cards from the specified locations that satisfy filter f and are not excluded by ex.
 s is player's own location mask and o is the opponent's location mask from that player's viewpoint. Extra arguments after ex are passed to f.
 Parameters:
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  ex: Card|Group|nil optional
-  ...: any
+  f: function|nil optional - Filter callback; nil accepts cards that pass location and exclusion checks.
+  player: int - Reference player for the s and o location masks.
+  s: int - Location mask on player's side.
+  o: int - Location mask on the opponent's side from player's viewpoint.
+  ex: Card|Group|nil optional - Card or Group excluded from the result; nil excludes nothing.
+  ...: any - Extra values forwarded to f after the candidate Card.
 Returns:
-  Group
+  Group - New Group containing every matching card.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4969
 
 ●int Duel.GetMatchingGroupCount([function|nil f], int player, int s, int o, [Card|Group|nil ex], ... any)
@@ -4410,21 +4410,21 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4989
 
-●Group Duel.SelectMatchingCard(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
+●Group|nil Duel.SelectMatchingCard(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
 Lets sel_player choose min to max cards from the specified locations that satisfy filter f and are not excluded by ex.
 s is player's own location mask and o is the opponent's location mask from that player's viewpoint. Extra arguments after ex are passed to f.
 Parameters:
-  sel_player: int
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  min: int
-  max: int
-  ex: Card|Group|nil optional
-  ...: any
+  sel_player: int - Player who makes the selection; invalid players make the core return no values.
+  f: function|nil optional - Filter callback; nil accepts cards that pass location and exclusion checks.
+  player: int - Reference player for the s and o location masks.
+  s: int - Location mask on player's side.
+  o: int - Location mask on the opponent's side from player's viewpoint.
+  min: int - Minimum number of cards to select.
+  max: int - Maximum number of cards to select.
+  ex: Card|Group|nil optional - Card or Group excluded from selectable cards; nil excludes nothing.
+  ...: any - Extra values forwarded to f after the candidate Card.
 Returns:
-  Group
+  Group|nil - New Group containing the selected cards, or nil if sel_player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4973
 
 ●int Duel.SelectOption(int player, int desc1, ... any)
@@ -4593,11 +4593,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4863
 ●int Duel.SendtoGrave(Card|Group targets, int reason, [int reason_player])
 Sends targets to the Graveyard for reason, optionally treating reason_player as the player that moved them, and returns the number actually moved.
 Parameters:
-  targets: Card|Group
-  reason: int
-  reason_player: int optional
+  targets: Card|Group - Card or Group to send to the Graveyard.
+  reason: int - REASON_* flags recorded for the move.
+  reason_player: int optional - Player recorded as the reason player; defaults to the core's current reason player.
 Returns:
-  int
+  int - Number of cards actually sent to the Graveyard.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4860
 
 ●int Duel.SendtoHand(Card|Group targets, [int|nil player], int reason, [int reason_player])
@@ -4665,17 +4665,17 @@ Parameters:
   lp: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4847
 
-●void Duel.SetOperationInfo(int chainc, int category, [Card|Group|nil|0 targets], int count, int target_player, int target_param)
+●void Duel.SetOperationInfo(int chainc, int category, Card|Group|nil targets, int count, int player, int param)
 Records operation information for category on chainc.
 Use concrete targets and count when the affected cards are known. For unresolved non-targeting movement effects, pass nil targets with the expected count, target player, and target location.
 This information is used by response checks such as Stardust Dragon-style effects.
 Parameters:
-  chainc: int
-  category: int
-  targets: Card|Group|nil|0 optional
-  count: int
-  target_player: int
-  target_param: int
+  chainc: int - Chain index/count passed to the core chain lookup; scripts commonly use 0 for the current Chain Link.
+  category: int - CATEGORY_* operation category to record.
+  targets: Card|Group|nil - Known affected cards. Card or Group values are cloned into a read-only Group; nil records only count, player, and param.
+  count: int - Expected number of affected cards.
+  player: int - Target player stored in the operation info.
+  param: int - Category-specific value, commonly a destination location, amount, or other operation parameter.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5008
 
 ●void Duel.SetSelectedCard(Card|Group targets)
@@ -4757,16 +4757,16 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4893
 Special Summons targets to target_player's field in position pos and returns the number of cards successfully Summoned.
 sumplayer is the player performing the Summon and sumtype records the Summon type. nocheck skips Summoning-condition checks; nolimit skips revive-limit checks.
 Parameters:
-  targets: Card|Group
-  sumtype: int
-  sumplayer: int
-  target_player: int
-  nocheck: bool
-  nolimit: bool
-  pos: int
-  zone: int optional - default: 0xff
+  targets: Card|Group - Card or Group to Special Summon.
+  sumtype: int - Summon type value recorded for the Summon.
+  sumplayer: int - Player treated as performing the Special Summon.
+  target_player: int - Player whose field receives the Summoned cards.
+  nocheck: bool - If true, skips Summoning-condition checks.
+  nolimit: bool - If true, skips revive-limit checks.
+  pos: int - POS_* position mask for the Summon.
+  zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
 Returns:
-  int
+  int - Number of cards successfully Special Summoned.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4873
 
 ●int Duel.SpecialSummonComplete()
@@ -5232,9 +5232,9 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:657
 Sets how many times e can be used before its count limit is spent.
 If count is 0, the core treats it as 1. Effects that share a nonzero code share the same usage count. EFFECT_COUNT_CODE_CHAIN is stored together with EFFECT_COUNT_CODE_SINGLE.
 Parameters:
-  e: Effect
-  count: int
-  code: int optional
+  e: Effect - Effect whose count limit is set.
+  count: int - Maximum uses before the count is spent; 0 is normalized to 1 by the core.
+  code: int optional - Shared count-limit code. Effects with the same nonzero code share usage.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:617
 
 ●void Effect.SetDescription(Effect e, int desc)
@@ -5485,12 +5485,12 @@ Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:931
 Returns a new Group containing cards from g that satisfy filter f and are not excluded by ex.
 Extra arguments after ex are passed to f after the card argument.
 Parameters:
-  g: Group
-  f: function
-  ex: Card|Group|nil optional
-  ...: any
+  g: Group - Group to filter; it is not modified.
+  f: function - Filter callback called for each candidate card.
+  ex: Card|Group|nil optional - Card or Group excluded before filtering; nil excludes nothing.
+  ...: any - Extra values forwarded to f after the candidate Card.
 Returns:
-  Group
+  Group - New Group containing cards that passed f.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:912
 
 ●int Group.FilterCount(Group g, function f, [Card|Group|nil ex], ... any)
@@ -5678,16 +5678,16 @@ Returns:
   Card
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:933
 
-●Group Group.Select(Group g, int player, int min, int max, [Card|Group|nil ex])
+●Group|nil Group.Select(Group g, int player, int min, int max, [Card|Group|nil ex])
 Lets player choose min to max cards from g, optionally excluding ex, and returns the selected Group.
 Parameters:
-  g: Group
-  player: int
-  min: int
-  max: int
-  ex: Card|Group|nil optional
+  g: Group - Selectable card pool.
+  player: int - Player who makes the selection; invalid players make the core return no values.
+  min: int - Minimum number of cards to select.
+  max: int - Maximum number of cards to select.
+  ex: Card|Group|nil optional - Card or Group excluded from selectable cards; nil excludes nothing.
 Returns:
-  Group
+  Group|nil - New Group containing selected cards, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:915
 
 ●Card|nil Group.SelectUnselect(Group cg, [Group|nil sg], int player, [bool finishable], [bool cancelable], [int min], [int max])

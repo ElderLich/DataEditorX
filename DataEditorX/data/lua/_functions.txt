@@ -1491,19 +1491,20 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3641
 
 ●bool Card.IsCanBeSpecialSummoned(Card c, Effect e, int sumtype, int sumplayer, bool nocheck, bool nolimit, [int sumpos], [int toplayer], [int zone])
-检查c是否可以用效果e和给定的召唤参数进行特殊召唤。
+检查c能否通过效果e，以给定的召唤类型、召唤玩家、表示形式、目标玩家和可选区域进行特殊召唤。
+nocheck为true时跳过召唤条件检查；nolimit为true时跳过苏生限制或正规召唤限制检查。
 Parameters:
-  c: Card
-  e: Effect
-  sumtype: int
-  sumplayer: int
-  nocheck: bool
-  nolimit: bool
-  sumpos: int optional - default: POS_FACEUP
-  toplayer: int optional - default: sumplayer
-  zone: int optional - default: 0xff
+  c: Card - Card being checked.
+  e: Effect - Effect that would perform the Special Summon.
+  sumtype: int - Summon type value recorded for the Special Summon.
+  sumplayer: int - Player treated as performing the Special Summon.
+  nocheck: bool - If true, skips c's Summoning-condition check.
+  nolimit: bool - If true, skips c's revive-limit or proper-Summon limit check.
+  sumpos: int optional - Summon position mask checked by the core; default: POS_FACEUP.
+  toplayer: int optional - Player whose field c would be Summoned to; default: sumplayer.
+  zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
 Returns:
-  bool
+  bool - True if c can be Special Summoned with the supplied parameters.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3582
 
 ●bool Card.IsCanBeSynchroMaterial(Card c, [Card scard], [Card tuner])
@@ -2217,11 +2218,12 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3563
 
 ●bool Card.IsRelateToEffect(Card c, Effect e)
 检查c是否仍与效果e保持联系。
+效果进入连锁时，其处理卡以及通过Duel.SetTargetCard或Duel.SelectTarget选中的卡会与该效果建立联系；卡离开预期位置后通常会失去该联系。
 Parameters:
-  c: Card
-  e: Effect
+  c: Card - Card whose relation is checked.
+  e: Effect - Effect relation to test against.
 Returns:
-  bool
+  bool - True if c still has relation to e.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3562
 
 ●bool Card.IsReleasable(Card c, [int reason])
@@ -3558,16 +3560,17 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4846
 
 ●Group Duel.GetMatchingGroup([function|nil f], int player, int s, int o, [Card|Group|nil ex], ... any)
-返回以player来看指定位置中满足f且不等于ex的卡组成的Group。
+返回指定位置中满足筛选函数f且不在ex中的卡组成的Group。
+s是player视角下己方位置掩码，o是对方位置掩码；ex之后的额外参数会传给f。
 Parameters:
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  ex: Card|Group|nil optional
-  ...: any
+  f: function|nil optional - Filter callback; nil accepts cards that pass location and exclusion checks.
+  player: int - Reference player for the s and o location masks.
+  s: int - Location mask on player's side.
+  o: int - Location mask on the opponent's side from player's viewpoint.
+  ex: Card|Group|nil optional - Card or Group excluded from the result; nil excludes nothing.
+  ...: any - Extra values forwarded to f after the candidate Card.
 Returns:
-  Group
+  Group - New Group containing every matching card.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4969
 
 ●int Duel.GetMatchingGroupCount([function|nil f], int player, int s, int o, [Card|Group|nil ex], ... any)
@@ -4452,20 +4455,21 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4989
 
-●Group Duel.SelectMatchingCard(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
-过滤函数；让玩家sel_player从指定位置选择min到max张满足f且不等于ex的卡。
+●Group|nil Duel.SelectMatchingCard(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
+让sel_player从指定位置中选择min到max张满足筛选函数f且不在ex中的卡。
+s是player视角下己方位置掩码，o是对方位置掩码；ex之后的额外参数会传给f。
 Parameters:
-  sel_player: int
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  min: int
-  max: int
-  ex: Card|Group|nil optional
-  ...: any
+  sel_player: int - Player who makes the selection; invalid players make the core return no values.
+  f: function|nil optional - Filter callback; nil accepts cards that pass location and exclusion checks.
+  player: int - Reference player for the s and o location masks.
+  s: int - Location mask on player's side.
+  o: int - Location mask on the opponent's side from player's viewpoint.
+  min: int - Minimum number of cards to select.
+  max: int - Maximum number of cards to select.
+  ex: Card|Group|nil optional - Card or Group excluded from selectable cards; nil excludes nothing.
+  ...: any - Extra values forwarded to f after the candidate Card.
 Returns:
-  Group
+  Group|nil - New Group containing the selected cards, or nil if sel_player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4973
 
 ●int Duel.SelectOption(int player, int desc1, ... any)
@@ -4636,14 +4640,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4863
 
 ●int Duel.SendtoGrave(Card|Group targets, int reason, [int reason_player])
-以reason原因把targets送去墓地，返回值是实际被操作的数量
-如果设置reason_player，则视为被玩家reason_player移动
+因reason将targets送去墓地，可选指定reason_player作为执行该移动的玩家，并返回实际移动的数量。
 Parameters:
-  targets: Card|Group
-  reason: int
-  reason_player: int optional
+  targets: Card|Group - Card or Group to send to the Graveyard.
+  reason: int - REASON_* flags recorded for the move.
+  reason_player: int optional - Player recorded as the reason player; defaults to the core's current reason player.
 Returns:
-  int
+  int - Number of cards actually sent to the Graveyard.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4860
 
 ●int Duel.SendtoHand(Card|Group targets, [int|nil player], int reason, [int reason_player])
@@ -4712,28 +4715,17 @@ Parameters:
   lp: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4847
 
-●void Duel.SetOperationInfo(int chainc, int category, [Card|Group|nil|0 targets], int count, int target_player, int target_param)
-操作信息：效果处理中确定要处理的分类
-比如潜行狙击手需要设置CATEGORY_DICE，但是不能设置CATEGORY_DESTROY，因为不确定
-对于破坏效果，targets需要设置成发动时可能成为连锁的影响对象的卡，
-并设置count为发动时确定的要处理的卡的数量
-比如黑洞发动时，targets需要设定为场上的所有怪兽，count设置成场上的怪的数量
-对于需要移动卡片位置的CATEGORY_SPECIAL_SUMMON,CATEGORY_TOHAND,CATEGORY_TODECK等分类，
-如果要处理的卡是确定的（比如取对象），则设置targets为这些卡，count为数量，
-如果要处理的卡是不确定的（效果处理时才能确定，一般是不取对象的效果），
-则设置targets为nil，count为预计要处理的卡的数量，
-target_player为预计要处理的卡的持有者（不确定就为0）
-target_param为预计要处理的卡的位置
-例如增援：SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-操作信息用于很多效果的发动的检测，例如星尘龙，王家长眠之谷等
-设置连锁chainc的category分类的操作信息， chainc=0 则是表示当前连锁
+●void Duel.SetOperationInfo(int chainc, int category, Card|Group|nil targets, int count, int player, int param)
+为chainc对应的连锁记录category的操作信息。
+已知受影响卡时传入具体targets和count；未确定对象的非取对象移动效果，可传nil targets并填写预计数量、目标玩家和目标位置。
+这些信息会被类似星尘龙的响应检查使用。
 Parameters:
-  chainc: int
-  category: int
-  targets: Card|Group|nil|0 optional
-  count: int
-  target_player: int
-  target_param: int
+  chainc: int - Chain index/count passed to the core chain lookup; scripts commonly use 0 for the current Chain Link.
+  category: int - CATEGORY_* operation category to record.
+  targets: Card|Group|nil - Known affected cards. Card or Group values are cloned into a read-only Group; nil records only count, player, and param.
+  count: int - Expected number of affected cards.
+  player: int - Target player stored in the operation info.
+  param: int - Category-specific value, commonly a destination location, amount, or other operation parameter.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5008
 
 ●void Duel.SetSelectedCard(Card|Group targets)
@@ -4815,18 +4807,19 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4893
 
 ●int Duel.SpecialSummon(Card|Group targets, int sumtype, int sumplayer, int target_player, bool nocheck, bool nolimit, int pos, [int zone])
-把targets特殊召唤到target_player场上，并返回成功特殊召唤的数量。
+以pos表示形式把targets特殊召唤到target_player场上，并返回成功特殊召唤的数量。
+sumplayer是执行召唤的玩家，sumtype记录召唤类型；nocheck跳过召唤条件检查，nolimit跳过苏生限制检查。
 Parameters:
-  targets: Card|Group
-  sumtype: int
-  sumplayer: int
-  target_player: int
-  nocheck: bool
-  nolimit: bool
-  pos: int
-  zone: int optional - default: 0xff
+  targets: Card|Group - Card or Group to Special Summon.
+  sumtype: int - Summon type value recorded for the Summon.
+  sumplayer: int - Player treated as performing the Special Summon.
+  target_player: int - Player whose field receives the Summoned cards.
+  nocheck: bool - If true, skips Summoning-condition checks.
+  nolimit: bool - If true, skips revive-limit checks.
+  pos: int - POS_* position mask for the Summon.
+  zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
 Returns:
-  int
+  int - Number of cards successfully Special Summoned.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4873
 
 ●int Duel.SpecialSummonComplete()
@@ -5291,11 +5284,12 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:657
 
 ●void Effect.SetCountLimit(Effect e, int count, [int code])
-设置效果e的使用次数限制count，以及可选的共享次数代码code。
+设置效果e在次数限制耗尽前可以使用的次数。
+count为0时核心按1处理。共享同一个非0 code的效果共用使用次数；EFFECT_COUNT_CODE_CHAIN会与EFFECT_COUNT_CODE_SINGLE一起保存。
 Parameters:
-  e: Effect
-  count: int
-  code: int optional
+  e: Effect - Effect whose count limit is set.
+  count: int - Maximum uses before the count is spent; 0 is normalized to 1 by the core.
+  code: int optional - Shared count-limit code. Effects with the same nonzero code share usage.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:617
 
 ●void Effect.SetDescription(Effect e, int desc)
@@ -5539,14 +5533,15 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:931
 
 ●Group Group.Filter(Group g, function f, [Card|Group|nil ex], ... any)
-从g中筛选满足f且不等于ex的卡，并返回新的Group。
+返回由g中满足筛选函数f且不在ex中的卡组成的新Group。
+ex之后的额外参数会在Card参数之后传给f。
 Parameters:
-  g: Group
-  f: function
-  ex: Card|Group|nil optional
-  ...: any
+  g: Group - Group to filter; it is not modified.
+  f: function - Filter callback called for each candidate card.
+  ex: Card|Group|nil optional - Card or Group excluded before filtering; nil excludes nothing.
+  ...: any - Extra values forwarded to f after the candidate Card.
 Returns:
-  Group
+  Group - New Group containing cards that passed f.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:912
 
 ●int Group.FilterCount(Group g, function f, [Card|Group|nil ex], ... any)
@@ -5735,16 +5730,16 @@ Returns:
   Card
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:933
 
-●Group Group.Select(Group g, int player, int min, int max, [Card|Group|nil ex])
-让玩家player从g中选择min到max张卡。
+●Group|nil Group.Select(Group g, int player, int min, int max, [Card|Group|nil ex])
+让player从g中选择min到max张卡，可选排除ex，并返回选中的Group。
 Parameters:
-  g: Group
-  player: int
-  min: int
-  max: int
-  ex: Card|Group|nil optional
+  g: Group - Selectable card pool.
+  player: int - Player who makes the selection; invalid players make the core return no values.
+  min: int - Minimum number of cards to select.
+  max: int - Maximum number of cards to select.
+  ex: Card|Group|nil optional - Card or Group excluded from selectable cards; nil excludes nothing.
 Returns:
-  Group
+  Group|nil - New Group containing selected cards, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:915
 
 ●Card|nil Group.SelectUnselect(Group cg, [Group|nil sg], int player, [bool finishable], [bool cancelable], [int min], [int max])
