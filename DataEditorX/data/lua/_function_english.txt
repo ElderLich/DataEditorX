@@ -145,7 +145,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3545
 
 ●bool Card.CheckEquipTarget(Card c1, Card c2)
-Check whether c2 is the correct equipment object for c1
+Checks whether c2 is a valid Equip target for c1.
+The core requires c1 to be affected by an EFFECT_EQUIP_LIMIT that accepts c2, and it also enforces old and modern Union count limits.
 Parameters:
   c1: Card
   c2: Card
@@ -233,7 +234,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3566
 
 ●void Card.CreateEffectRelation(Card c, Effect e)
-For the card c and the effect of e to establish contact
+Creates a relation between c and effect e.
+If e is the triggering effect of a current Chain Link, the relation is tied to that Chain Link; otherwise the core stores a direct effect relation.
 Parameters:
   c: Card
   e: Effect
@@ -421,13 +423,11 @@ Returns:
   int|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3386
 
-●Group Card.GetColumnGroup(Card c, [int left], [int right])
-Return the group of cards in the same column as card c, excluding c, the last two parameters include all cards in the left columns and right columns from c
-For example, if c is in the middle zone, c:GetColumnGroup(2,2) is equivalent to retrieving all cards on the field except the Field Spell
+●Group Card.GetColumnGroup(Card c)
+Returns a Group containing cards in the same column as c.
+This MDPro3/YGOPro binding only takes c. It uses c's current on-field column, including related Monster Zones, Spell & Trap Zones, and Extra Monster Zone column relationships; if c is not on the field, the returned Group is empty.
 Parameters:
   c: Card
-  left: int optional - default: 0
-  right: int optional - default: 0
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3427
@@ -630,7 +630,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3405
 
 ●int Card.GetLink(Card c)
-Return the Link Marker count of card c
+Returns c's Link Rating, or 0 if c is not a Link Monster.
 Parameters:
   c: Card
 Returns:
@@ -764,13 +764,14 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3387
 
-●int,int Card.GetOriginalCodeRule(Card c)
-Returns the codename on the c rule (used as a card rule on this card)
+●int,int|nil Card.GetOriginalCodeRule(Card c)
+Returns c's rule-original card code.
+Double-code cards return two codes: the printed original code and the second rule code. Other cards return only the duel code used by the core.
 Parameters:
   c: Card
 Returns:
-  int
-  int
+  int - Primary rule-original code.
+  int|nil - Second rule code, when present.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3388
 
 ●int Card.GetOriginalLeftScale(Card c)
@@ -959,7 +960,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3464
 
 ●int Card.GetPreviousRaceOnField(Card c)
-Returns the race before the c position changes
+Returns the Race value recorded for c's previous on-field state.
 Parameters:
   c: Card
 Returns:
@@ -1041,12 +1042,12 @@ Returns:
   Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3460
 
-●Effect Card.GetReasonEffect(Card c)
-Returns the effect that causes the position of c to change
+●Effect|nil Card.GetReasonEffect(Card c)
+Returns c's current reason effect, or nil when no reason effect is recorded.
 Parameters:
   c: Card
 Returns:
-  Effect
+  Effect|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3462
 
 ●int Card.GetReasonPlayer(Card c)
@@ -1184,7 +1185,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3513
 
 ●int Card.GetTurnID(Card c)
-Return c The round to the current position
+Returns c's stored turn ID.
+The core updates this value when the card is added to a location, so scripts commonly compare it with Duel.GetTurnCount() for same-turn timing checks.
 Parameters:
   c: Card
 Returns:
@@ -1357,7 +1359,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3490
 
 ●bool Card.IsAttackable(Card c)
-Check whether c can attack
+Checks whether c currently satisfies the core's basic attack-capable conditions.
+The card must be face-up Attack Position, or face-up Defense Position with EFFECT_DEFENSE_ATTACK, and it must not be forbidden, unable to attack, attack-disabled, or under a skipped Battle Phase. This does not check attack-announcement costs.
 Parameters:
   c: Card
 Returns:
@@ -1625,7 +1628,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3491
 
 ●bool Card.IsDefenseAbove(Card c, int def)
-Check c is defensive def above
+Checks whether c has current DEF greater than or equal to def.
+Link Monsters and cards that are not monsters or currently treated as monsters return false.
 Parameters:
   c: Card
   def: int
@@ -1669,7 +1673,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3535
 
 ●bool Card.IsDisabled(Card c)
-Check whether c is in an invalid state
+Checks whether c currently has STATUS_DISABLED.
 Parameters:
   c: Card
 Returns:
@@ -1898,11 +1902,12 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3617
 
 ●bool Card.IsLinkAttribute(Card c, int attribute, [int player])
-Check if card c, when used as Link Material [for a Link Summon by player], has Attribute attribute
+Checks whether c's Attribute while used as Link Material contains attribute.
+player defaults to the current reason player. The core uses c:GetLinkAttribute(player), so Link Material Attribute-changing effects are included.
 Parameters:
   c: Card
   attribute: int
-  player: int optional
+  player: int optional - default: current reason player
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3496
@@ -2044,11 +2049,14 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3609
 
-●bool Card.IsOriginalCodeRule(Card c, int code)
-Check if card c is treated as code under the rules
+●bool Card.IsOriginalCodeRule(Card c, int code1, [int code2], [... int])
+Checks whether c's rule-original card code matches any supplied code.
+Nil code arguments are skipped. For double-code cards, the core checks both rule-original codes; otherwise it checks the card's duel code.
 Parameters:
   c: Card
-  code: int
+  code1: int
+  code2: int optional
+  ...: int optional
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3479
@@ -2577,12 +2585,12 @@ Parameters:
   spsummon_code: int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3661
 
-●void Card.SetStatus(Card c, int state, bool enable)
-Set or cancel the status code for c
-Do not use this function unless you clearly understand the meaning of each status code
+●void Card.SetStatus(Card c, int status, bool enable)
+Sets or clears status on c.
+This is an internal-status helper. The binding does nothing while c is copying another card's effect.
 Parameters:
   c: Card
-  state: int
+  status: int
   enable: bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3509
 
@@ -2718,14 +2726,14 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4963
 
 ●int Duel.AnnounceAttribute(int player, int count, int available)
-Let the player player declare count attributes from the optional attribute
-Available is the combined value of all optional attributes
+Lets player declare count Attributes from the available Attribute bitmask and returns the selected Attribute bitmask.
+available should be a bitwise combination of ATTRIBUTE_* constants.
 Parameters:
   player: int
   count: int
   available: int
 Returns:
-  int
+  int - Selected Attribute bitmask.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5030
 
 ●int Duel.AnnounceCard(int player, [... int])
@@ -3172,7 +3180,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4900
 
 ●void Duel.EnableGlobalFlag(int global_flag)
-Set the global flag global_flag
+Enables the supplied core global_flag bit for the Duel and returns no Lua value.
 Parameters:
   global_flag: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4845
@@ -3235,13 +3243,14 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5070
 
-●Card,Card Duel.GetBattleMonster(int player)
-Return the monster controlled by player currently in battle; returns nil if there is no battle or no target
+●Card|nil,Card|nil Duel.GetBattleMonster(int player)
+Returns the monster controlled by player that is currently in battle, followed by the monster controlled by the opponent that is currently in battle.
+Each return can be nil if there is no attacker or attack target for that controller.
 Parameters:
   player: int
 Returns:
-  Card
-  Card
+  Card|nil - Monster controlled by player.
+  Card|nil - Monster controlled by the opponent.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4959
 
 ●Group,int,int,Effect,int,int Duel.GetChainEvent(int chainc)
@@ -4038,7 +4047,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5050
 
 ●bool Duel.IsPlayerCanSpecialSummonCount(int player, int count)
-Check whether the player player special call count times
+Checks whether player can perform count Special Summons under the current remaining Special Summon-count limits.
+The core checks EFFECT_LEFT_SPSUMMON_COUNT effects and the player's Special Summon counter.
 Parameters:
   player: int
   count: int
@@ -4188,7 +4198,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4931
 
 ●void Duel.NegateSummon(Card|Group targets)
-So that the call is being summoned · reverse call special summoned targets invalid
+Negates a current Normal Summon, Flip Summon, or Special Summon for targets.
+targets may be a Card or Group. Normal and Flip Summon negation require a single card; Special Summon negation can process a group and only negates cards whose Summon is negatable by the current reason effect. The core raises the matching *_SUMMON_NEGATED event and returns no Lua value.
 Parameters:
   targets: Card|Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4932
@@ -4307,8 +4318,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4859
 
 ●bool Duel.RemoveCounter(int player, int s, int o, int countertype, int count, int reason)
-Causes the player player to remove count objects of the countertype type present on the farm for reason reasons. The return value indicates success
-S represents the position of the player's own removable pointer, o represents the position of the opponent's removable pointer for the player
+Lets player remove count counters of countertype from the selected field locations for reason and returns whether removal succeeded.
+s marks locations on player's own field and o marks locations on the opponent's field, from player's perspective. The core can offer applicable counter-removal replacement effects before removing counters.
 Parameters:
   player: int
   s: int
@@ -4365,18 +4376,17 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5038
 
-●int Duel.SelectDisableField(int player, int count, int s, int o, int filter)
-Let the player player select the specified position to meet the marker condition filter count of the available space, and return to select the location of the marker
-Commonly used to select areas can not use or move the monster grid
-0: 16) + (l [i] == LOCATION_MZONE? 0: 8)) ## flag|= 1 << (seq [i] + (p [i] == player?
+●int Duel.SelectDisableField(int player, int count, int location1, int location2, int filter)
+Lets player select count available field zones from the requested own-side and opponent-side locations, then returns the selected zone bitmask.
+location1 applies to player's field and location2 applies to the opponent's field. The core clamps count to the available number of zones and returns no value if no zone can be selected.
 Parameters:
   player: int
   count: int
-  s: int
-  o: int
+  location1: int
+  location2: int
   filter: int
 Returns:
-  int
+  int - Selected zone bitmask.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5028
 
 ●bool Duel.SelectEffectYesNo(int player, Card c, [int desc])
@@ -4742,17 +4752,19 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4918
 
 ●void Duel.SkipPhase(int player, int phase, int reset_flag, int reset_count, [int value])
-Skip player phase phase player, and in a specific stage after reset, reset parameters and the same effect
+Applies a temporary field effect that makes player skip phase.
+The phase must be one of PHASE_DRAW, PHASE_STANDBY, PHASE_MAIN1, PHASE_BATTLE, PHASE_MAIN2, or PHASE_END. reset_count values of 0 or less are treated as 1, and value is stored on the generated skip effect.
 Parameters:
   player: int
   phase: int
   reset_flag: int
   reset_count: int
-  value: int optional
+  value: int optional - default: 0
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4955
 
 ●void Duel.SortDecktop(int sort_player, int target_player, int count)
-Let the player sort_player on the player target_player card group at the top count card sort
+Lets sort_player reorder the top count cards of target_player's Main Deck.
+Both players must be valid and count must be at least 1. If count is larger than the remaining Deck size, the processor only sorts the available top cards.
 Parameters:
   sort_player: int
   target_player: int
@@ -4864,24 +4876,27 @@ Parameters:
   maxc: int optional - default: 0
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4867
 
-●... Duel.TossCoin(int player, int count)
-Let the player player cast count (<= 5) coins, the return value for the count results, 0 or 1.
+●int,...? Duel.TossCoin(int player, int count)
+Tosses count coins for player and returns one integer result per toss.
+Results are 0 or 1. Normal script use passes a positive count up to MAX_COIN_COUNT; the binding rejects 0 and values below -1, and clamps large positive counts to the core maximum.
 Parameters:
   player: int
   count: int
 Returns:
-  ...
+  int - First coin result, 0 or 1.
+  ...? - Additional coin results.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5036
 
-●... Duel.TossDice(int player, int count1, [int count2])
-Let the player to cast count1 dice[, 1-player to vote count2 dice] (count1 + count2 <= 5)
-The return value is count1 + count2 results, 1-6
+●int,...? Duel.TossDice(int player, int count1, [int count2])
+Tosses count1 dice for player and, when count2 is supplied, count2 dice for the opponent.
+Valid dice results are integers from 1 to 6. Normal script use should keep count1 + count2 at 5 or less; the core rejects count1 <= 0 and count2 < 0.
 Parameters:
   player: int
   count1: int
-  count2: int optional
+  count2: int optional - default: 0
 Returns:
-  ...
+  int - First die result.
+  ...? - Additional die results.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5037
 
 ●void Duel.Win(int player, int win_reason)
@@ -5275,11 +5290,12 @@ Parameters:
   op_func: nil|function
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:629
 
-●void Effect.SetOwnerPlayer(Effect e, [int player])
-Set the OwnerPlayer property to player
+●void Effect.SetOwnerPlayer(Effect e, int player)
+Sets e's owner player to player.
+Only player values 0 and 1 are accepted; any other value leaves the effect unchanged.
 Parameters:
   e: Effect
-  player: int optional - default: 0
+  player: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:630
 
 ●void Effect.SetProperty(Effect e, int prop1, [int prop2])
@@ -5572,17 +5588,16 @@ Returns:
   Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:909
 
-●Group,int Group.GetMaxGroup(Group g, function f, ... any)
-F is the function that returns an interger value, and the card with the largest value of f is selected from g
-The second return value is the maximum value, starting with the third parameter as an additional parameter
-To use the second return value Note Check g is not empty
+●Group|nil,int|nil Group.GetMaxGroup(Group g, function f, [... any])
+Calls f for each card in g, forwards any extra arguments, and returns a Group containing every card tied for the maximum value.
+The second return is the maximum integer value. If g is empty, this binding returns no Lua values.
 Parameters:
   g: Group
   f: function
-  ...: any
+  ...: any optional
 Returns:
-  Group
-  int
+  Group|nil - Cards tied for maximum value.
+  int|nil - Maximum value.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:925
 
 ●Group,int Group.GetMinGroup(Group g, function f, ... any)
@@ -6121,12 +6136,8 @@ Parameters:
 Source: Utilities/utility.lua:806
 
 ●void Auxiliary.chainreg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-Used by Dark Armed Dragon (81059524), equivalent to
-function aux.chainreg(e, tp, eg, ep, ev, re, r, rp)
-  if e:GetHandler():GetFlagEffect(1)==0 then
-    e:GetHandler():RegisterFlagEffect(1, RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN, 0, 1)
-  end
-end
+Registers FLAG_ID_CHAINING on e's handler if that flag is not already present.
+The flag resets by the standard event reset, except turn Set reset, and also at the end of the Chain.
 Parameters:
   e: Effect
   tp: int
@@ -6768,14 +6779,13 @@ Returns:
   bool
 Source: Utilities/utility.lua:1969
 
-●void Auxiliary.imval1(Effect e, Card c)
-Simplified method for the filter function preventing a card from being targeted for attacks, used in effect registration for SetValue
-function aux.imval1(e, c)
-  return not c:IsImmuneToEffect(e)
-end
+●bool Auxiliary.imval1(Effect e, Card c)
+Default value helper for EFFECT_CANNOT_BE_BATTLE_TARGET; it returns true when c is not immune to e.
 Parameters:
   e: Effect
   c: Card
+Returns:
+  bool
 Source: Utilities/utility.lua:820
 
 ●bool Auxiliary.indoval(Effect e, Effect re, int rp)
@@ -7880,11 +7890,13 @@ Returns:
   int - Bitwise NOT of a.
 Source: Utilities/utility.lua:30
 
-●void bit.bor(any a, any b)
-A or b
+●int bit.bor(int a, int b)
+Returns the bitwise OR of a and b.
 Parameters:
-  a: any
-  b: any
+  a: int
+  b: int
+Returns:
+  int
 Source: Utilities/utility.lua:18
 
 ●void bit.bxor(any a, any b)
