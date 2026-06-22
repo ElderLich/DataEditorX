@@ -213,14 +213,14 @@ Parameters:
   c: Card
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3569
 
-●int Card.CopyEffect(Card c, int code, int reset_flag, [int reset_count])
-为c添加卡号是code的卡的可复制的效果，并且添加额外的reset条件
-返回值是表示复制效果的代号id
+●int Card.CopyEffect(Card c, int code, int reset, [int count])
+把卡号code的initial_effect复制到c上，并返回生成的复制id；code对应通常怪兽时返回-1。
+reset为0时默认RESETS_STANDARD。count默认1；带阶段重置但未指定自己/对方回合时，会规范为双方回合。若c是非效果怪兽，核心还会以同样重置条件追加TYPE_EFFECT。
 Parameters:
   c: Card
   code: int
-  reset_flag: int
-  reset_count: int optional - default: 1
+  reset: int
+  count: int optional - default: 1
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3566
@@ -378,7 +378,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3533
 
 ●int Card.GetBattlePosition(Card c)
-返回c在本次战斗发生之前的表示形式
+返回c的临时战斗表示形式快照。
 Parameters:
   c: Card
 Returns:
@@ -469,7 +469,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3630
 
 ●int Card.GetCurrentScale(Card c)
-返回c的当前灵摆刻度。如果在左灵摆区域则返回左刻度，在右灵摆区域或是不在灵摆区域则返回右刻度
+返回c当前使用的灵摆刻度。
+在灵摆区域时，会按c所在区域序号返回当前左/右刻度；不在灵摆区域时，返回c记载的左刻度数值。
 Parameters:
   c: Card
 Returns:
@@ -610,7 +611,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3475
 
 ●int Card.GetLeftScale(Card c)
-返回c的左灵摆刻度
+返回c当前的左灵摆刻度数值。
 Parameters:
   c: Card
 Returns:
@@ -696,7 +697,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3404
 
 ●int Card.GetLocation(Card c)
-返回c当前的所在位置
+返回c当前所在位置；c当前被当作不在场上时返回0。
 Parameters:
   c: Card
 Returns:
@@ -712,7 +713,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3515
 
 ●int Card.GetMaterialCount(Card c)
-返回c出场使用的素材数量
+返回当前记录为c素材的卡数量。
 Parameters:
   c: Card
 Returns:
@@ -883,7 +884,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3452
 
 ●int Card.GetPreviousAttributeOnField(Card c)
-返回c位置变化之前在场上的属性
+返回c之前场上状态记录的属性数值。
 Parameters:
   c: Card
 Returns:
@@ -891,12 +892,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3450
 
 ●int,int|nil Card.GetPreviousCodeOnField(Card c)
-返回c位置变化之前在场上的卡号
+返回c之前场上状态记录的卡号。
+若之前状态有第二卡号，则第二卡号作为第2个返回值返回。
 Parameters:
   c: Card
 Returns:
   int
-  int|nil
+  int|nil - Second previous code, when present.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3446
 
 ●int Card.GetPreviousControler(Card c)
@@ -1121,7 +1123,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3472
 
 ●int Card.GetSummonType(Card c)
-返回c的召唤/特殊召唤的方式
+返回c记录的召唤类型位，并按默认召唤类型字段进行掩码。
 Parameters:
   c: Card
 Returns:
@@ -1819,7 +1821,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3483
 
 ●bool Card.IsHasCardTarget(Card c1, Card c2)
-检查c2是否取c1为永续对象
+检查c1当前是否把c2作为持续取对象卡。
 Parameters:
   c1: Card
   c2: Card
@@ -1906,7 +1908,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3489
 
 ●bool Card.IsLinkAbove(Card c, int link)
-检查c是否连接标记数量是link以上
+检查c是否具有非0连接值，且连接值大于等于link。
 Parameters:
   c: Card
   link: int
@@ -2161,7 +2163,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3488
 
 ●bool Card.IsRankAbove(Card c, int rank)
-检查c是否是阶级rank以上
+检查c是否具有非0阶级，且阶级大于等于rank。
 Parameters:
   c: Card
   rank: int
@@ -2312,7 +2314,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3579
 
 ●bool Card.IsSummonableCard(Card c)
-检查c是否是可通常召唤的卡
+检查c的卡片数据是否属于按卡种可以通常召唤或盖放的怪兽。
+非怪兽、额外卡组怪兽、仪式怪兽、特殊召唤怪兽和衍生物会返回false。该函数不检查当前费用、召唤次数、位置或玩家限制。
 Parameters:
   c: Card
 Returns:
@@ -2407,7 +2410,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3577
 
 ●bool Card.IsXyzType(Card c, int type)
-检查c用作XYZ素材时是否属于类型type（与IsType的区别在于对于魔陷区的怪兽卡，用其原本类型作判断）
+检查c作为超量素材使用时的类型是否包含type。
 Parameters:
   c: Card
   type: int
@@ -2457,14 +2460,17 @@ Parameters:
   c2: Card
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3558
 
-●void Card.RemoveCounter(Card c, int player, int countertype, int count, int reason)
-让玩家player以原因reason移除c上的count个countertype类型的指示物， countertype=0 则清除c的所有指示物
+●bool|nil Card.RemoveCounter(Card c, int player, int countertype, int count, int reason)
+由player因reason从c上取除count个countertype类型的指示物。
+countertype为0时，核心会清除c上的全部指示物且不返回Lua值。否则会让处理器取除指定指示物，并返回是否成功。
 Parameters:
   c: Card
   player: int
   countertype: int
   count: int
   reason: int
+Returns:
+  bool|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3629
 
 ●int Card.RemoveOverlayCard(Card c, int player, int min, int max, int reason)
@@ -2767,15 +2773,18 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5035
 
-●int Duel.AnnounceLevel(int player, [int|nil min], [int|nil max], [... int])
-让玩家宣言一个[min-max]等级并返回
+●int|nil,int|nil Duel.AnnounceLevel(int player, [int min], [int max], [int excluded_level1], [... int])
+让player宣言等级，并返回宣言的等级以及从0开始的选项索引。
+min和max默认1与12；min大于max时会交换。额外的等级参数会从选项中排除；没有剩余等级时，该绑定不返回值。
 Parameters:
   player: int
-  min: int|nil optional - default: 1
-  max: int|nil optional - default: 12
+  min: int optional - default: 1
+  max: int optional - default: 12
+  excluded_level1: int optional
   ...: int optional
 Returns:
-  int
+  int|nil - Declared Level.
+  int|nil - Zero-based option index.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5031
 
 ●int,int Duel.AnnounceNumber(int player, int number1, [int number2], [... int])
@@ -2792,8 +2801,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5034
 
 ●int Duel.AnnounceRace(int player, int count, int available)
-让玩家player从可选的种族中宣言count个种族
-available是所有可选种族的组合值，可以自行组合
+让player从available中宣言count个种族，并返回所选RACE_*位掩码。
 Parameters:
   player: int
   count: int
@@ -2803,8 +2811,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5029
 
 ●int Duel.AnnounceType(int player)
-让玩家player宣言一个卡片类型（怪兽·魔法·陷阱）
-别想着直接宣言 复合类型（永续魔法 等）
+让player从核心内置的怪兽/魔法/陷阱类型选项中选择，并返回从0开始的选项索引。
+返回值是所选选项索引，不是TYPE_*位掩码。
 Parameters:
   player: int
 Returns:
@@ -2815,12 +2823,12 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5033
 中断当前效果，使之后的效果处理视为不同时处理，此函数会造成错时点
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4927
 
-●void Duel.CalculateDamage(Card c1, Card c2, [bool new_attack])
-令c1与c2进行战斗伤害计算（c1 攻击 c2）
-若 new_attack=true 则视为 攻击的卡进行过攻击宣言（？）
+●void Duel.CalculateDamage(Card attacker, Card|nil attack_target, [bool new_attack])
+开始attacker与attack_target之间的伤害计算；attack_target为nil时表示直接攻击。
+new_attack为可选参数，会传给伤害步骤处理器。attacker和attack_target是同一张卡时，该绑定不开始伤害计算且不返回值。
 Parameters:
-  c1: Card
-  c2: Card
+  attacker: Card
+  attack_target: Card|nil
   new_attack: bool optional - default: false
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4921
 
@@ -2839,10 +2847,11 @@ Parameters:
   ignore_count: bool optional - default: false
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4919
 
-●bool Duel.ChangeAttackTarget([Card|nil c])
-将攻击对象变为c，c为nil表示直接攻击，返回值表示是否成功转移攻击对象
+●bool Duel.ChangeAttackTarget(Card|nil target)
+把当前攻击对象改为target；target为nil时改为直接攻击。返回是否成功变更。
+当前攻击怪兽必须存在、可以攻击，且攻击未被取消。卡片对象必须是当前合法攻击对象之一；直接攻击要求攻击怪兽未被禁止直接攻击。
 Parameters:
-  c: Card|nil optional
+  target: Card|nil
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4920
@@ -2878,7 +2887,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4880
 
 ●void Duel.ChangeTargetCard(int chainc, Group g)
-把连锁chainc的对象换成g
+把chainc连锁环记录的取对象卡组替换为g。
 Parameters:
   chainc: int
   g: Group
@@ -2960,7 +2969,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4988
 
 ●bool Duel.CheckPhaseActivity()
-检查玩家在当前阶段是否有操作（是否处于阶段开始时，如七皇之剑）
+返回当前阶段是否已经记录过行动。
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5067
@@ -3253,7 +3262,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4958
 
 ●int Duel.GetBattleDamage(int player)
-返回玩家player在本次战斗中受到的伤害
+返回当前为player记录的战斗伤害。
 Parameters:
   player: int
 Returns:
@@ -3532,7 +3541,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4941
 
 ●int Duel.GetLinkedZone(int player)
-返回以玩家player来看的所有连接区域
+返回从player视角看当前被连接标记指向的区域位掩码。
 Parameters:
   player: int
 Returns:
@@ -3741,15 +3750,15 @@ Returns:
   int - zone
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4937
 
-●int Duel.GetTargetCount([function|nil f], int player, int s, int o, [Card|Group|nil ex], ... any)
-基本同Duel.GetMatchingGroupCount ，不同之处在于需要追加判定卡片是否能成为当前正在处理的效果的对象
+●int Duel.GetTargetCount(function|nil filter, int player, int location1, int location2, Card|Group|nil exception, [... any])
+统计给定场上位置中匹配filter且可作为效果对象的卡数量；提供exception时将其排除。
 Parameters:
-  f: function|nil optional
+  filter: function|nil
   player: int
-  s: int
-  o: int
-  ex: Card|Group|nil optional
-  ...: any
+  location1: int
+  location2: int
+  exception: Card|Group|nil
+  ...: any optional
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4984
@@ -3844,7 +3853,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4953
 
 ●bool Duel.IsCanAddCounter(int player, [int countertype], [int count], [Card c])
-检查玩家player能否向卡片c添加count个countertype类型的指示物，如果 player 不是 0或者1，则返回false
+只提供player时，检查player是否未被禁止放置指示物。
+提供countertype、count和c时，检查player能否在c上放置该数量的countertype指示物。
 Parameters:
   player: int
   countertype: int optional
@@ -3970,7 +3980,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5043
 
 ●bool Duel.IsPlayerCanAdditionalSummon(int player)
-检查玩家player是否有通常召唤外的召唤次数。
+当player在core.extra_summon中没有待处理的额外通常召唤标记时返回true。
 Parameters:
   player: int
 Returns:
@@ -4073,8 +4083,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5056
 
 ●bool Duel.IsPlayerCanSpecialSummon(int player, [int sumtype], [int sumpos], [int target_player], [Card c])
-检查玩家player能否特殊召唤[c到target_player场上，以sumtype召唤方式，sumpos表示形式]
-如果需要可选参数，则必须全部使用
+只提供player时，检查player是否允许进行特殊召唤，且仍有可用的特殊召唤次数。
+提供可选的卡片相关参数时，使用当前原因效果检查player能否以sumtype和sumpos把c特殊召唤到target_player场上。
 Parameters:
   player: int
   sumtype: int optional
@@ -4125,9 +4135,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5049
 
 ●bool Duel.IsPlayerCanSummon(int player, [int sumtype], [Card c])
-检查玩家player是否可以通常召唤[c，以sumtype方式]
-如果需要可选参数，则必须全部使用
-仅当玩家收到“不能上级召唤”等效果的影响时返回false
+只提供player时，检查player是否未被无目标的EFFECT_CANNOT_SUMMON禁止通常召唤。
+提供sumtype和c时，检查player对c以该sumtype通常召唤时受到的EFFECT_CANNOT_SUMMON限制。该绑定不检查召唤次数、费用、解放可用性或区域可用性。
 Parameters:
   player: int
   sumtype: int optional
@@ -4387,7 +4396,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5018
 
 ●void Duel.ResetFlagEffect(int player, int code)
-手动reset玩家player的 code 标识效果
+重置player持有的code对应全部玩家标志效果。
 Parameters:
   player: int
   code: int
@@ -4495,12 +4504,12 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5024
 
-●int Duel.SelectPosition(int player, Card c, int pos)
-让玩家player选择c的表示形式并返回
+●int Duel.SelectPosition(int player, Card c, int positions)
+让player为c从允许的表示形式中选择一个，并返回所选POS_*数值。
 Parameters:
   player: int
   c: Card
-  pos: int
+  positions: int
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5026
@@ -4642,12 +4651,11 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4862
 
-●int Duel.SendtoExtraP(Card|Group targets, [int|nil player], int reason)
-以reason原因把灵摆卡targets表侧表示送去玩家player的额外卡组，返回值是实际被操作的数量
-如果player是nil则返回卡的持有者的额外卡组
+●int Duel.SendtoExtraP(Card|Group targets, int player, int reason)
+因reason把卡以表侧送去player方额外卡组，并返回实际移动的卡数量。
 Parameters:
   targets: Card|Group
-  player: int|nil optional
+  player: int
   reason: int
 Returns:
   int
@@ -5055,12 +5063,12 @@ Returns:
   function
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:641
 
-●function Effect.GetCost(Effect e)
-返回cost属性
+●function|nil Effect.GetCost(Effect e)
+返回e的费用函数；未设置费用函数时返回nil。
 Parameters:
   e: Effect
 Returns:
-  function
+  function|nil
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:643
 
 ●int Effect.GetDescription(Effect e)
@@ -5136,12 +5144,12 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:648
 
 ●int,int Effect.GetProperty(Effect e)
-返回Property属性
+返回e的两个属性标志字段flag1和flag2。
 Parameters:
   e: Effect
 Returns:
-  int
-  int
+  int - flag1.
+  int - flag2.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:634
 
 ●int Effect.GetRange(Effect e)
@@ -5654,17 +5662,16 @@ Returns:
   int|nil - Maximum value.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:925
 
-●Group,int Group.GetMinGroup(Group g, function f, ... any)
-f为返回一个interger值的函数，从g中筛选出具有最小的f的值的卡
-第2个返回值为这个最小值，从第3个参数开始为额外参数
-要使用第2个返回值注意检查g非空
+●Group|nil,int|nil Group.GetMinGroup(Group g, function f, [... any])
+对g中的每张卡调用f，转发额外参数，并返回所有最小值并列卡组成的Group。
+第二个返回值是最小整数值。g为空时，该绑定不返回Lua值。
 Parameters:
   g: Group
   f: function
-  ...: any
+  ...: any optional
 Returns:
-  Group
-  int
+  Group|nil - Cards tied for the minimum value.
+  int|nil - Minimum value.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:924
 
 ●Card|nil Group.GetNext(Group g)
@@ -6263,17 +6270,20 @@ Parameters:
   g: Group
 Source: Utilities/utility.lua:1142
 
-●void Auxiliary.damcon1(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-TODO document.
+●bool Auxiliary.damcon1(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+用于判断玩家tp是否会受到效果伤害的条件辅助函数。
+它检查操作信息中对tp造成的伤害，或被反转成伤害的对tp恢复，并会考虑EFFECT_REVERSE_DAMAGE、EFFECT_REVERSE_RECOVER和EFFECT_NO_EFFECT_DAMAGE。
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
+Returns:
+  bool
 Source: Utilities/utility.lua:879
 
 ●void Auxiliary.DimensionalFissureTarget(Effect e, Card c)
@@ -6511,7 +6521,8 @@ Parameters:
 Source: Utilities/utility.lua:167
 
 ●void Auxiliary.EnableUnionAttribute(Card c, function filter)
-add effect to modern union monsters
+为c登记标准现代同盟怪兽组件。
+该辅助函数会添加装备卡破坏代替、使用filter的EFFECT_UNION_LIMIT、从怪兽区域把c装备给合法怪兽的起动效果，以及从魔法与陷阱区域特殊召唤c的起动效果。
 Parameters:
   c: Card
   filter: function
@@ -7390,7 +7401,8 @@ Returns:
 Source: Utilities/utility.lua:1487
 
 ●void Auxiliary.SetUnionState(Card c)
-TODO document.
+在c成为装备卡后，为其适用已装备的同盟状态。
+若c具有EFFECT_UNION_LIMIT效果，则登记对应的EFFECT_EQUIP_LIMIT和EFFECT_UNION_STATUS重置效果。旧式同盟卡还会获得EFFECT_OLDUNION_STATUS。
 Parameters:
   c: Card
 Source: Utilities/utility.lua:312
@@ -9228,13 +9240,15 @@ Parameters:
   rp: int
 Source: Utilities/procedure.lua:2114
 
-●void Auxiliary.ritlimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.ritlimit(Effect e, Effect se, int sp, int st)
+特殊召唤条件辅助函数：仅当召唤类型包含SUMMON_TYPE_RITUAL时返回true。
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool
 Source: Utilities/procedure.lua:2293
 
 ●bool Auxiliary.RitualCheck(Group g, int tp, Card c, int lv, string greater_or_equal)
@@ -9649,11 +9663,13 @@ Parameters:
   e: Effect
 Source: Utilities/procedure.lua:443
 
-●void Auxiliary.Tuner(function f, ... any)
-TODO document.
+●function Auxiliary.Tuner(function|nil f, [... any])
+返回一个素材筛选函数：接受对syncard来说是调整，且在提供f时满足f(target, ...)的卡。
 Parameters:
-  f: function
-  ...: any
+  f: function|nil
+  ...: any optional
+Returns:
+  function
 Source: Utilities/procedure.lua:42
 
 ●bool Auxiliary.Xyz2XMaterialEffectFilter(Card c, Card xyzc, int lv, function|nil f, int tp, bool|nil checked)
