@@ -5219,8 +5219,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:610
 
 ●void Effect.SetAbsoluteRange(Effect e, int playerid, int s_range, int o_range)
-设置target range属性并设置 EFFECT_FLAG_ABSOLUTE_TARGET 标志
-playerid != 0 s_range和o_range反转
+以绝对玩家视角设置效果e的Target Range属性。playerid为1时，s_range和o_range会在核心中交换保存。
 Parameters:
   e: Effect
   playerid: int
@@ -5229,7 +5228,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:616
 
 ●void Effect.SetCategory(Effect e, int cate)
-设置效果e的Category属性。
+设置效果e的Category属性，用于声明效果可能包含的操作类别。
 Parameters:
   e: Effect
   cate: int

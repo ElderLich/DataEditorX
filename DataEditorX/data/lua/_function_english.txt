@@ -5176,8 +5176,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:610
 
 ●void Effect.SetAbsoluteRange(Effect e, int playerid, int s_range, int o_range)
-Set the target range property and set the EFFECT_FLAG_ABSOLUTE_RANGE flag
-Playerid! = 0 s_range and o_range invert
+Sets e's target range from an absolute player viewpoint and marks the effect with EFFECT_FLAG_ABSOLUTE_TARGET.
+If playerid is 1, the supplied ranges are swapped internally so the stored ranges still line up with player 0/player 1 absolute handling.
 Parameters:
   e: Effect
   playerid: int
@@ -5187,6 +5187,7 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:616
 
 ●void Effect.SetCategory(Effect e, int cate)
 Sets e's operation category flags, such as CATEGORY_DESTROY, CATEGORY_TOHAND, or CATEGORY_SPECIAL_SUMMON.
+Categories describe what the effect may do; known operation details should still be recorded with Duel.SetOperationInfo in the Target callback.
 Parameters:
   e: Effect
   cate: int
@@ -5208,6 +5209,7 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:625
 
 ●void Effect.SetCost(Effect e, function cost_func)
 Sets e's cost callback. For activated effects, the callback checks whether the cost can be paid and then pays it.
+Cost callbacks should only test legality when chk is 0; irreversible payment belongs in the nonzero chk branch.
 Parameters:
   e: Effect
   cost_func: function
@@ -5222,7 +5224,7 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:657
 
 ●void Effect.SetCountLimit(Effect e, int count, [int code])
 Sets how many times e can be used before its count limit is spent.
-Effects that share a nonzero code share the same usage count. Special code flags such as EFFECT_COUNT_CODE_OATH, EFFECT_COUNT_CODE_DUEL, EFFECT_COUNT_CODE_SINGLE, and EFFECT_COUNT_CODE_CHAIN change how that count is scoped.
+If count is 0, the core treats it as 1. Effects that share a nonzero code share the same usage count. EFFECT_COUNT_CODE_CHAIN is stored together with EFFECT_COUNT_CODE_SINGLE.
 Parameters:
   e: Effect
   count: int
@@ -5274,6 +5276,7 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:630
 
 ●void Effect.SetProperty(Effect e, int prop1, [int prop2])
 Sets e's property flags. prop1 holds the normal effect property flags; prop2 is used for the second property word when needed.
+Internal flags are preserved when prop1 is replaced.
 Parameters:
   e: Effect
   prop1: int
@@ -5289,7 +5292,7 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:614
 
 ●void Effect.SetReset(Effect e, int reset_flag, [int reset_count])
 Sets when e resets and how many reset checks it can survive.
-When a phase reset is used without an explicit turn side, the core applies both RESET_SELF_TURN and RESET_OPPO_TURN.
+If reset_count is 0 or omitted, the core stores 1. When a phase reset is used without an explicit turn side, the core applies both RESET_SELF_TURN and RESET_OPPO_TURN.
 Parameters:
   e: Effect
   reset_flag: int
@@ -5304,8 +5307,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:626
 
 ●void Effect.SetTargetRange(Effect e, int s_range, int o_range)
-Sets e's target range fields.
-For most field effects, s_range is the affected locations on the handler's controller's side and o_range is the affected locations on the opponent's side. With EFFECT_FLAG_ABSOLUTE_RANGE, they mean player 0 and player 1 instead. With EFFECT_FLAG_SPSUM_PARAM, they store Special Summon destination player and position.
+Sets e's target range fields and clears EFFECT_FLAG_ABSOLUTE_TARGET.
+For most field effects, s_range is the affected locations on the handler's controller's side and o_range is the affected locations on the opponent's side. With EFFECT_FLAG_SPSUM_PARAM, they store Special Summon destination player and position.
 Parameters:
   e: Effect
   s_range: int
