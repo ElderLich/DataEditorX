@@ -153,7 +153,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3521
 
 ●bool Card.CheckFusionMaterial(Card c, [Group|nil g], [Card|nil gc], [int chkf], [bool not_material])
-Check if g contains a set of fusion material that c needs [must contain gc]
+Checks whether c's Fusion Material requirements can be satisfied by g, optionally requiring gc to be included.
+chkf is forwarded to the Fusion Material condition check, and not_material is used by procedures that check material availability without treating the cards as actual materials yet.
 Parameters:
   c: Card
   g: Group|nil optional
@@ -194,7 +195,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3522
 
 ●bool Card.CheckUniqueOnField(Card c, int check_player, [int check_location], [Card|nil icard])
-Check the uniqueness of c in the check_player field
+Checks whether c can coexist on check_player's field under the current unique-on-field rules.
+check_location defaults to LOCATION_ONFIELD and is masked to on-field locations. icard can be supplied as an ignored card when testing a pending move.
 Parameters:
   c: Card
   check_player: int
@@ -211,7 +213,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3561
 
 ●void Card.CompleteProcedure(Card c)
-So that c to complete the formal call procedures
+Marks c as having completed its proper Summon procedure.
 Parameters:
   c: Card
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3569
@@ -244,8 +246,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3557
 
 ●void Card.EnableCounterPermit(Card c, int countertype, [int location], [function condition])
-Allow c [to be placed in the location location] that can be placed "can be placed on the counter countertype
-The default value of location depends on the type of c, and the monster needs to specify whether it can place a pointer in a monster or pendulum area
+Registers a single-card counter permit effect allowing c to receive counters of countertype in the chosen range.
+If location is omitted, monsters default to LOCATION_MZONE and non-monsters default to LOCATION_SZONE + LOCATION_FZONE. An optional condition callback is stored on the permit effect.
 Parameters:
   c: Card
   countertype: int
@@ -260,7 +262,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3511
 
 ●void Card.EnableReviveLimit(Card c)
-Add a limit to the cs for c
+Marks c as needing to be properly Summoned before it can be Special Summoned from public locations.
 Parameters:
   c: Card
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3568
@@ -275,7 +277,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3544
 
 ●int Card.GetAttack(Card c)
-Return the current attack power of c, the return value is a negative that is "?"
+Returns c's current ATK, with unknown or negative ATK reported as 0.
 Parameters:
   c: Card
 Returns:
@@ -344,7 +346,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3435
 
 ●int Card.GetBaseAttack(Card c)
-Return the original attack power of c
+Returns c's current base ATK, with unknown or negative ATK reported as 0.
 Parameters:
   c: Card
 Returns:
@@ -384,12 +386,12 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3465
 
-●Card Card.GetBattleTarget(Card c)
-Returns the card that fought with c
+●Card|nil Card.GetBattleTarget(Card c)
+Returns the monster currently battling c, or nil if c is not the current attacker or attack target.
 Parameters:
   c: Card
 Returns:
-  Card
+  Card|nil - The monster battling c, or nil.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3653
 
 ●Group Card.GetCardTarget(Card c)
@@ -409,7 +411,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3539
 
 ●int,int|nil Card.GetCode(Card c)
-Returns the current codename for c (possibly because the effect changes)
+Returns c's current card code and, when present, its secondary code.
 Parameters:
   c: Card
 Returns:
@@ -451,7 +453,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3429
 
 ●int Card.GetControler(Card c)
-Returns the current controller of c
+Returns c's current controller.
 Parameters:
   c: Card
 Returns:
@@ -517,18 +519,17 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3517
 
-●Card Card.GetEquipTarget(Card c)
-Returns the current artefact object
+●Card|nil Card.GetEquipTarget(Card c)
+Returns the card that c is currently equipped to, or nil if c has no equip target.
 Parameters:
   c: Card
 Returns:
-  Card
+  Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3519
 
 ●int Card.GetFieldID(Card c)
-Returns the time stamp of the transition to the current position
-This value is unique, the smaller the c is the earlier appear in that position
-Opening the card from the inside will also change this value
+Returns c's current field ID, the core timestamp assigned when c moved to its current place.
+Smaller values are older. This differs from Card.GetRealFieldID, which tracks the real field ID used by battle-state checks.
 Parameters:
   c: Card
 Returns:
@@ -544,7 +545,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3538
 
 ●int Card.GetFlagEffect(Card c, int code)
-The type of returned c is the number of identifying effects of the code
+Returns how many flag effects with code are registered on c.
 Parameters:
   c: Card
   code: int
@@ -552,14 +553,15 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3553
 
-●int,...? Card.GetFlagEffectLabel(Card c, int code)
-The type of c is the label that identifies the effect of code, and returns nil if it does not
+●int|nil,...? Card.GetFlagEffectLabel(Card c, int code)
+Returns the first label value from each flag effect with the given code on c.
+If c has no matching flag effect, the core returns nil. Matching flag effects with no label return 0 for that slot.
 Parameters:
   c: Card
   code: int
 Returns:
-  int
-  ...? - integer
+  int|nil - First label value, or nil if no matching flag effect exists.
+  ...? - Additional integer label values from additional matching flag effects.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3556
 
 ●int Card.GetFusionAttribute(Card c, [int player])
@@ -617,7 +619,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3413
 
 ●int Card.GetLevel(Card c)
-Returns the current level of c
+Returns c's current Level.
 Parameters:
   c: Card
 Returns:
@@ -702,11 +704,11 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3466
 
 ●Group Card.GetMaterial(Card c)
-Returns the material used for the appearance of c
+Returns a Group containing the cards currently stored as c's material cards.
 Parameters:
   c: Card
 Returns:
-  Group
+  Group - Cards currently stored as c's material cards.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3515
 
 ●int Card.GetMaterialCount(Card c)
@@ -840,7 +842,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3526
 
 ●int Card.GetOwner(Card c)
-Returns the holder of c
+Returns c's original owner player.
 Parameters:
   c: Card
 Returns:
@@ -1185,7 +1187,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3476
 
 ●int Card.GetType(Card c)
-Returns the current type of c
+Returns c's current type mask, including temporary type changes applied to the card.
 Parameters:
   c: Card
 Returns:
@@ -1243,8 +1245,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3592
 
 ●bool Card.IsAbleToExtra(Card c)
-Check if c can send extra cards
-This function returns false for non-fusion, cohomology, and overdrive cards
+Checks whether c can be returned to the Extra Deck by the current reason player.
 Parameters:
   c: Card
 Returns:
@@ -1276,8 +1277,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3593
 
 ●bool Card.IsAbleToHand(Card c)
-Check whether c can hand
-Note: This function returns false only if the card or player is affected by the effect of being unable to join the hand (such as Ray King)
+Checks whether c can be returned or added to the hand by the current reason player.
+An optional player argument can be passed when a specific player is performing the action.
 Parameters:
   c: Card
 Returns:
@@ -1294,7 +1295,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3589
 
 ●bool Card.IsAbleToRemove(Card c, [int player], [int pos], [int reason])
-Check whether c can be player except player
+Checks whether c can be banished by player in position pos for reason.
+player defaults to the current reason player, pos defaults to POS_FACEUP, and reason defaults to REASON_EFFECT.
 Parameters:
   c: Card
   player: int optional
@@ -1367,7 +1369,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3619
 
 ●bool Card.IsAttackBelow(Card c, int atk)
-Check whether c is attack power atk below (at least 0)
+Checks whether c is a monster, or treated as one, whose current ATK is known and less than or equal to atk.
+Cards with unknown ATK return false because the core requires the current ATK to be at least 0.
 Parameters:
   c: Card
   atk: int
@@ -1384,7 +1387,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3602
 
 ●bool Card.IsAttribute(Card c, int attribute)
-Check whether c belongs to attribute attribute
+Checks whether c currently has at least one Attribute flag from attribute.
 Parameters:
   c: Card
   attribute: int
@@ -1426,7 +1429,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3647
 
 ●bool Card.IsCanBeEffectTarget(Card c, [Effect e])
-Check whether c can be the object of effect e
+Checks whether c can be targeted by e, or by the current reason effect when e is omitted.
 Parameters:
   c: Card
   e: Effect optional
@@ -1547,7 +1550,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3636
 
 ●bool Card.IsCanTurnSet(Card c)
-Check whether c can turn into the inside of that
+Checks whether c can be turned face-down by the current reason player.
+The core returns false for Link Monsters, Tokens, already face-down cards, and cards or players affected by EFFECT_CANNOT_TURN_SET.
 Parameters:
   c: Card
 Returns:
@@ -1577,7 +1581,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3480
 
 ●bool Card.IsControler(Card c, int controler)
-Check whether the current control of c is a controler
+Checks whether c's current controller is controler.
 Parameters:
   c: Card
   controler: int
@@ -1702,7 +1706,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3426
 
 ●bool Card.IsFacedown(Card c)
-Check whether c is the backside representation
+Checks whether c is in face-down position.
 Parameters:
   c: Card
 Returns:
@@ -1726,7 +1730,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3601
 
 ●bool Card.IsForbidden(Card c)
-Check whether c is in the declaration prohibition state
+Checks whether c currently has STATUS_FORBIDDEN.
 Parameters:
   c: Card
 Returns:
@@ -1754,7 +1758,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3391
 
 ●bool Card.IsFusionSetCard(Card c, ... int)
-Check the c as a fusion material can be used as a name setname card
+Checks whether c can be treated as belonging to any supplied set code while used as Fusion Material.
+nil set-code arguments are ignored.
 Parameters:
   c: Card
   ...: int
@@ -1797,15 +1802,16 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3623
 
-●Effect,...? Card.IsHasEffect(Card c, int code, [int player])
-Check if c is affected by the effect type
+●Effect|nil,... Effect Card.IsHasEffect(Card c, int code, [int player])
+Returns the effects currently affecting c with effect code code, or nil if none match.
+When player is supplied, only effects whose count limit can still be used by that player are returned. Multiple matching effects are returned as multiple Lua return values.
 Parameters:
   c: Card
   code: int
   player: int optional
 Returns:
-  Effect
-  ...? - Effect
+  Effect|nil
+  ... Effect - Additional matching effects, if any.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3549
 
 ●bool Card.IsHasLevel(Card c)
@@ -1817,7 +1823,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3622
 
 ●bool Card.IsImmuneToEffect(Card c, Effect e)
-Check whether c immune effect e (that is not affected by the impact of e)
+Checks whether c is unaffected by effect e.
 Parameters:
   c: Card
   e: Effect
@@ -1826,7 +1832,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3646
 
 ●bool Card.IsLevel(Card c, int level1, [int level2], [... int])
-Check if card c is Level level1 [, or level2...]
+Checks whether c's current Level equals any supplied level value.
+nil level arguments are ignored.
 Parameters:
   c: Card
   level1: int
@@ -1837,7 +1844,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3487
 
 ●bool Card.IsLevelAbove(Card c, int level)
-Check whether c is above level level
+Checks whether c has a Level greater than 0 and greater than or equal to level.
 Parameters:
   c: Card
   level: int
@@ -1846,7 +1853,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3613
 
 ●bool Card.IsLevelBelow(Card c, int level)
-Check whether c is below the level level (at least 1)
+Checks whether c has a Level greater than 0 and less than or equal to level.
 Parameters:
   c: Card
   level: int
@@ -1980,8 +1987,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3610
 
 ●bool Card.IsMSetable(Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
-Check whether c can be normally called set, ignore_count = true does not check the number of calls limit
-E ~ = nil then check whether c can be the effect of e is usually called set, min that at least the number of sacrifices needed (used to distinguish between compromise summoned set and superior summoned set)
+Checks whether c can be Normal Set in a Monster Zone for the current reason player.
+ignore_count skips the Normal Summon/Set count check. e checks Set legality for that effect, min is the minimum number of releases required, and zone restricts usable Monster Zones.
 Parameters:
   c: Card
   ignore_count: bool
@@ -2012,8 +2019,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3505
 
 ●bool Card.IsOnField(Card c)
-Check if c is present
-Note: This function returns false when the monster summons, reverses the call, and when the summon is successful
+Checks whether c is currently on the field and is not being treated as off the field.
 Parameters:
   c: Card
 Returns:
@@ -2048,7 +2054,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3394
 
 ●bool Card.IsPosition(Card c, int pos)
-Check whether c is the representation pos
+Checks whether c's current battle position includes pos.
 Parameters:
   c: Card
   pos: int
@@ -2057,7 +2063,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3605
 
 ●bool Card.IsPreviousControler(Card c, int player)
-Check if card c's previous controller was player
+Checks whether c's previous controller was player.
 Parameters:
   c: Card
   player: int
@@ -2066,7 +2072,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3608
 
 ●bool Card.IsPreviousLocation(Card c, int location)
-Check if the location before c is location
+Checks whether c's previous location included location.
 Parameters:
   c: Card
   location: int
@@ -2075,7 +2081,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3611
 
 ●bool Card.IsPreviousPosition(Card c, int pos)
-Check whether the c position before the change is represented by pos
+Checks whether c's previous position included pos.
 Parameters:
   c: Card
   pos: int
@@ -2093,7 +2099,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3395
 
 ●bool Card.IsPublic(Card c)
-Check if c is open
+Checks whether c is currently public to both players, represented by face-up position in this core.
 Parameters:
   c: Card
 Returns:
@@ -2101,7 +2107,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3624
 
 ●bool Card.IsRace(Card c, int race)
-Check if c is race race
+Checks whether c currently has at least one Race flag from race.
 Parameters:
   c: Card
   race: int
@@ -2139,7 +2145,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3614
 
 ●bool Card.IsReason(Card c, int reason)
-Check if c contains the reason
+Checks whether c's current reason flags include reason.
 Parameters:
   c: Card
   reason: int
@@ -2148,8 +2154,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3499
 
 ●bool Card.IsRelateToBattle(Card c)
-Check whether c is associated with this battle
-Note: This effect is usually used for damage calculation before the end of the injury phase, used to check whether the fighting off the card too
+Checks whether c is still related to the current battle, usually during the Damage Step or shortly after damage calculation.
 Parameters:
   c: Card
 Returns:
@@ -2248,7 +2253,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3581
 
 ●bool Card.IsStatus(Card c, int status)
-Check whether c contains a status code
+Checks whether c currently has at least one status flag from status.
 Parameters:
   c: Card
   status: int
@@ -2278,7 +2283,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3572
 
 ●bool Card.IsSummonLocation(Card c, int loc)
-Check if card c's Normal Summon or Special Summon location is loc
+Checks whether c's recorded Summon location contains loc.
 Parameters:
   c: Card
   loc: int
@@ -2287,7 +2292,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3502
 
 ●bool Card.IsSummonPlayer(Card c, int player)
-Check if the player who Normal Summoned or Special Summoned card c is player
+Checks whether player was the player who Summoned c.
 Parameters:
   c: Card
   player: int
@@ -2296,7 +2301,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3503
 
 ●bool Card.IsSummonType(Card c, int sumtype)
-Check if card c's summon type is sumtype
+Checks whether c's recorded Summon type includes every flag in sumtype.
 Parameters:
   c: Card
   sumtype: int
@@ -2305,8 +2310,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3501
 
 ●bool Card.IsSynchroSummonable(Card c, [Card|nil tuner], [Group mg])
-Check whether tuner can be used as an adjustment, the field card [or mg] for the coherent material on the c cohomology summon procedures
-If the tuner is nil, this function has the same effect as Card.IsSpecialSummonable
+Checks whether c can be Synchro Summoned with tuner and the available material group mg.
+If tuner is nil, this behaves like the regular Special Summon procedure check for c.
 Parameters:
   c: Card
   tuner: Card|nil optional
@@ -2386,11 +2391,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3548
 
 ●Effect Card.RegisterFlagEffect(Card c, int code, int reset_flag, int property, int reset_count, [int label], [int desc])
-For the registration of a logo with the results
-Note: The effect of the registration to the card is not used for the system,
-Even if the code and the built-in effect code coincidence will not affect,
-And the type is always EFFECT_TYPE_SINGLE, reset method, property, and the general effect of the same,
-And will not be invalidated, immune effect from the card
+Registers a special single-card flag effect on c and returns the created Effect.
+Flag effects are script markers: their code is kept separate from regular effect codes, they cannot be disabled, and count=0 is treated as 1.
 Parameters:
   c: Card
   code: int
@@ -2528,7 +2530,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3655
 
 ●void Card.SetMaterial(Card c, [Group|nil g])
-The g of all the cards as the c material (superior summon, special summon)
+Sets g as c's material group for a Summon, or clears c's materials when g is nil.
 Parameters:
   c: Card
   g: Group|nil optional
@@ -2673,14 +2675,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4886
 
 ●void Duel.AddCustomActivityCounter(int counter_id, int activity_type, function f)
-Set the action type to activity_type, code counter_id counter, placed in the initial_effect function
-F for the filter function, the card type parameters, the return value of false cards for the following types of operations, the counter increased by 1 (at present up to 1)
-The activity_type is of the following type
-ACTIVITY_SUMMON call (not including the usual call set)
-ACTIVITY_NORMALSUMMON usually called (including the usual call set)
-ACTIVITY_SPSUMMON Special call
-ACTIVITY_FLIPSUMMON Reverse call
-ACTIVITY_CHAIN ​​Activates the effect
+Registers a custom activity counter with id counter_id for the selected ACTIVITY_* type.
+For Summon and attack counters, f is called with a Card and the counter increases when f returns false. For ACTIVITY_CHAIN, f is called with effect, player, chain_id and also counts false results.
 Parameters:
   counter_id: int
   activity_type: int
@@ -2769,7 +2765,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5033
 
 ●void Duel.BreakEffect()
-Interrupt the current effect, so that after the effect of treatment as not treated simultaneously, this function will cause the wrong time
+Separates the current resolving effect into a later timing window, then raises EVENT_BREAK_EFFECT.
+Use this when card text says to do one action, then do another action afterward, so later triggers do not see both actions as simultaneous.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4927
 
 ●void Duel.CalculateDamage(Card c1, Card c2, [bool new_attack])
@@ -2920,8 +2917,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5067
 
 ●bool Duel.CheckReleaseGroup(int player, [function|nil f], int count, [Card|Group|nil ex], ... any)
-Check if the player has at least count of cards that meet the filter condition f and are not equal to ex (non-superior summons)
-The fifth parameter starts as an extra parameter
+Checks whether player can release at least count cards matching f, excluding ex.
+Extra arguments after ex are passed to f after the Card argument. This helper uses REASON_COST.
 Parameters:
   player: int
   f: function|nil optional
@@ -2933,7 +2930,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4976
 
 ●bool Duel.CheckReleaseGroupEx(int player, [function|nil f], int count, int reason, bool use_hand, [Card|Group|nil ex], ... any)
-Check whether there are at least count cards that can satisfy the filter condition f and are not equal to ex. (For non-superior summoning)
+Checks whether player can release at least count cards matching f, excluding ex, with an explicit reason and optional hand releases.
+Extra arguments after ex are passed to f after the Card argument.
 Parameters:
   player: int
   f: function|nil optional
@@ -3041,7 +3039,8 @@ The current processing of the chain of all the objects cleared
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5005
 
 ●void Duel.ConfirmCards(int player, Card|Group targets, [bool skip_panel])
-Identify targets for the player
+Reveals a Card or Group to player and waits for the client confirmation.
+If skip_panel is true, the client skips the extra confirmation panel when possible.
 Parameters:
   player: int
   targets: Card|Group
@@ -3062,19 +3061,19 @@ Parameters:
   count: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4891
 
-●Card Duel.CreateToken(int player, int code)
-Creates a new Token with the passed in parameter value and returns
+●Card|false Duel.CreateToken(int player, int code)
+Creates a Token card with card code code for player and returns it.
+The returned Token is not placed on the field automatically; scripts normally pass it to Duel.SpecialSummon or another operation afterwards.
 Parameters:
   player: int
   code: int
 Returns:
-  Card
+  Card|false
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4872
 
 ●int Duel.Damage(int player, int value, int reason, [bool is_step])
-To the reason reason to give players the player caused value damage, the actual value of the damage received
-The return value is 0 if the damage becomes an effect such as a reply.
-Is_step to true is the damage / recovery LP process decomposition, need to call Duel.RDComplete() trigger point
+Deals value effect damage to player for reason and returns the damage actually applied.
+If damage is changed into LP recovery or prevented, the return value reflects the final applied damage. With is_step=true, finish the damage/recovery batch with Duel.RDComplete.
 Parameters:
   player: int
   value: int
@@ -3120,8 +3119,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4910
 
 ●int Duel.DiscardHand(int player, [function|nil f], int min, int max, int reason, [Card|Group|nil ex], ... any)
-Filter function allows the player to select and discard the player to meet the screening conditions f soldiers is not equal to ex min-max Zhang card
-The seventh argument starts as an extra parameter
+Lets player choose and discard min to max matching cards from their hand for reason, then returns the number discarded.
+Cards in ex are excluded. Extra arguments after ex are passed to filter f.
 Parameters:
   player: int
   f: function|nil optional
@@ -3135,8 +3134,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4911
 
 ●int Duel.Draw(int player, int count, int reason)
-Let the player play the count card with the reason, and return the number of cards actually drawn
-If the reason contains REASON_RULE the draw is not affected by the "can not draw" effect
+Makes player draw up to count cards for reason and returns the number actually drawn.
+When reason includes REASON_RULE, effects that prevent drawing are ignored.
 Parameters:
   player: int
   count: int
@@ -3187,13 +3186,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5066
 
 ●Card Duel.GetAttacker()
-Return the card for this combat attack
+Returns the monster that is currently attacking, or nil if there is no current attacker.
 Returns:
   Card
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4957
 
 ●Card Duel.GetAttackTarget()
-Return to the battle was attacked card, if the return nil said that a direct attack
+Returns the monster currently being attacked, or nil for a direct attack.
 Returns:
   Card
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4958
@@ -3238,25 +3237,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4948
 
 ●... Duel.GetChainInfo(int chainc, ... any)
-Returns the chainc information, if chainc = 0, returns the chain of information currently being processed
-This function returns the corresponding number of return values ​​in sequence according to the number of arguments passed in. The arguments can be:
-CHAININFO_CHAIN_COUNT The serial number of the chain
-CHAININFO_TRIGGERING_EFFECT The effect of the chain
-CHAININFO_TRIGGERING_PLAYER
-CHAININFO_TRIGGERING_CONTROLER The player to which the chained position belongs
-CHAININFO_TRIGGERING_LOCATION The location where the chain occurred
-CHAININFO_TRIGGERING_SEQUENCE The number of the position where the chain occurred
-CHAININFO_TARGET_CARDS Chain of object cards
-CHAININFO_TARGET_PLAYER The target player for the chain
-CHAININFO_TARGET_PARAM The object parameters of the chain
-CHAININFO_DISABLE_REASON The chain is invalid for the effect of the effect
-CHAININFO_DISABLE_PLAYER The chain is invalid for the reason the player
-CHAININFO_CHAIN_ID The unique identifier for the chain
-CHAININFO_TYPE Type of Chain Card (Monster, Magic, Trap)
-CHAININFO_EXTTYPE The specific type of chain card (for example, monster, continuous magic, counterattack trap)
-For example:
-Duel.GetChainInfo(0, CHAININFO_TRIGGERING_LOCATION, CHAININFO_TARGET_CARDS)
-This will return the location and object card where the current chain occurred
+Returns information fields from chainc in the same order as the requested CHAININFO_* constants.
+Use chainc=0 for the currently resolving Chain. Unknown requested fields return nil, and no values are returned if the Chain does not exist.
 Parameters:
   chainc: int
   ...: any
@@ -3265,7 +3247,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4947
 
 ●Effect|nil Duel.GetChainMaterial(int player)
-Returns the effect of the chained material that is played by the player. This function is only used to blend the effect of a class card
+Returns the first EFFECT_CHAIN_MATERIAL effect currently applying to player, or nil if none applies.
+Fusion-style scripts use the returned effect's target and operation callbacks to handle Chain Material alternatives.
 Parameters:
   player: int
 Returns:
@@ -3314,19 +3297,14 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4945
 
 ●int Duel.GetCurrentPhase()
-Returns the current stage
+Returns the current phase constant.
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4954
 
 ●int Duel.GetCustomActivityCount(int counter_id, int player, int activity_type)
-Counter number counter_id count, the number of players to return to the following (currently up to 1)
-The activity_type is of the following type
-ACTIVITY_SUMMON call (not including the usual call set)
-ACTIVITY_NORMALSUMMON usually called (including the usual call set)
-ACTIVITY_SPSUMMON Special call
-ACTIVITY_FLIPSUMMON Reverse call
-ACTIVITY_CHAIN ​​Activates the effect
+Returns player 0's or player 1's count for the custom counter_id and ACTIVITY_* type.
+Counts are reset each turn. In this core, most card-based custom counters only record whether that player has performed a counted activity at least once, while Chain counters can increase and decrease with Chain creation and cancellation.
 Parameters:
   counter_id: int
   player: int
@@ -3336,7 +3314,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5069
 
 ●Group Duel.GetDecktopGroup(int player, int count)
-Returns the count card at the top of the player's deck
+Returns a Group containing up to count cards from the top of player's Deck.
 Parameters:
   player: int
   count: int
@@ -3382,7 +3360,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4943
 
 ●Group Duel.GetFieldGroup(int player, int s, int o)
-Returns the card at the specified location
+Returns the cards in the specified locations from player's viewpoint; s is player's side and o is the opponent's side.
 Parameters:
   player: int
   s: int
@@ -3392,7 +3370,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4965
 
 ●int Duel.GetFieldGroupCount(int player, int s, int o)
-Returns the number of cards in the specified location
+Returns the number of cards in the specified locations from player's viewpoint.
 Parameters:
   player: int
   s: int
@@ -3423,7 +3401,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4949
 
 ●int Duel.GetFlagEffect(int player, int code)
-Returns the number of specific marker effects for the player's player
+Returns how many player flag effects with code are registered on player.
 Parameters:
   player: int
   code: int
@@ -3442,14 +3420,14 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4857
 
 ●Group,Group Duel.GetFusionMaterial(int player, [int location])
-Return the group of cards available to player for Fusion Summon materials
-Includes monsters in hand, on the field, and cards affected by EFFECT_EXTRA_FUSION_MATERIAL
+Returns two Groups for player: all currently usable Fusion Material candidates, then the base material pool from the requested locations.
+location defaults to LOCATION_HAND + LOCATION_MZONE. Extra Fusion Material effects in the Spell & Trap Zone or GY are added to the first returned Group, while the second Group contains only cards from location.
 Parameters:
   player: int
   location: int optional - default: LOCATION_HAND + LOCATION_MZONE
 Returns:
-  Group - material_all includes cards affected by EFFECT_EXTRA_FUSION_MATERIAL
-  Group - material_base contains only cards from the requested locations
+  Group - All currently usable Fusion Material candidates, including extra Fusion Material effects.
+  Group - Base material pool from the requested locations only.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5000
 
 ●int Duel.GetLastSelectHint(int player)
@@ -3504,20 +3482,22 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4935
 
-●int Duel.GetLocationCountFromEx(int player, [int reason_player], [Group|Card|nil targets], [Card|int sc], [int zone])
-Return the number of available slots on player's field [after targets leave due to reason_player] for Special Summoning card sc from the Extra Deck in zone
+●int,int Duel.GetLocationCountFromEx(int player, [int reason_player], [Group|Card|nil targets], [Card|int|nil sc], [int zone])
+Returns the usable Monster Zone count for Special Summoning from the Extra Deck, followed by the usable zone mask.
+reason_player defaults to the current reason player. targets are treated as leaving the field before the count is checked.
 Parameters:
   player: int
-  reason_player: int optional - default: player
+  reason_player: int optional
   targets: Group|Card|nil optional
-  sc: Card|int optional
-  zone: int optional - default: 0xff
+  sc: Card|int|nil optional
+  zone: int optional
 Returns:
-  int
+  int - Number of usable Monster Zones.
+  int - Usable zone mask.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4938
 
 ●int Duel.GetLP(int player)
-Returns the current LP of the player's player
+Returns player's current LP.
 Parameters:
   player: int
 Returns:
@@ -3539,7 +3519,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4969
 
 ●int Duel.GetMatchingGroupCount([function|nil f], int player, int s, int o, [Card|Group|nil ex], ... any)
-Filter function to return to the specified location to meet the filter condition f and not equal to the number of ex card
+Counts cards in the specified locations that satisfy filter f and are not excluded by ex.
+Extra arguments after ex are passed to f after the card argument.
 Parameters:
   f: function|nil optional
   player: int
@@ -3561,7 +3542,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4987
 
 ●int,int Duel.GetMZoneCount(int player, [Group|Card targets], [int use_player], [int reason], [int zone])
-Return the number of available [zone slots] in the Monster Zone on player's field [after targets leave]
+Returns the number of usable Monster Zones for player after targets leave, plus the usable zone mask.
+use_player, reason, and zone are used by effects that restrict where monsters can be placed.
 Parameters:
   player: int
   targets: Group|Card optional
@@ -3574,10 +3556,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4936
 
 ●Group Duel.GetOperatedGroup()
-This function returns a card set that was actually manipulated before a card operation
-Duel.Destroy, Duel.Remove, Duel.SendtoGrave,
-Duel.SendtoHand, Duel.SendtoDeck, Duel.SendtoExtraP, Duel.Release,
-Duel.ChangePosition, Duel.SpecialSummon, Duel.DiscardDeck
+Returns the group of cards actually processed by the most recent card operation.
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4864
@@ -3728,7 +3707,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4980
 
 ●int Duel.GetTurnCount([int player])
-Returns the current number of turns
+Returns the current turn count.
+With no player argument, this returns the duel-wide turn number; with player 0 or 1, it returns that player's personal turn count.
 Parameters:
   player: int optional
 Returns:
@@ -3736,7 +3716,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4850
 
 ●int Duel.GetTurnPlayer()
-Returns the current round of players
+Returns the current turn player.
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4849
@@ -3768,7 +3748,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5019
 
 ●void Duel.HintSelection(Group g)
-Manually displays the animated effect of the selected object for g and records that the card is selected as the object
+Displays the selection animation for g and records those cards as selected for client feedback.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5021
@@ -3817,7 +3797,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4878
 
 ●bool Duel.IsChainDisablable(int chainc)
-Check chainC effect can be invalid
+Checks whether chainc's effect can be negated.
+While a Chain is resolving, this asks the core whether that Chain link can currently be disabled; outside Chain resolution it returns true.
 Parameters:
   chainc: int
 Returns:
@@ -3833,7 +3814,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5063
 
 ●bool Duel.IsChainNegatable(int chainc)
-Check the chain chainc launch can be invalid
+Compatibility check for whether chainc's activation can be negated.
+In this MDPro3 core binding, the function currently returns true for any chain count.
 Parameters:
   chainc: int
 Returns:
@@ -3909,7 +3891,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4951
 
 ●Effect|nil,... Duel.IsPlayerAffectedByEffect(int player, int code)
-Check if the player is affected by the effect of the code type, and return the effect if there is one
+Returns an effect affecting player with code, or nil if no matching effect exists. Some effects may return additional values.
 Parameters:
   player: int
   code: int
@@ -4041,9 +4023,9 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5053
 
-●bool Duel.IsPlayerCanSpecialSummonMonster(int player, int code, [int|nil setcode], [int|nil type], [int|nil atk], [int|nil def], [int|nil level], [int|nil race], [int|nil attribute], [int pos], [int target_player], [int sumtype], [int zone])
-Check player player can be pos to the form of special summon the parameters of the monster to the target_player field
-This function is usually used to determine whether it is possible to trick token and trap monsters
+●bool Duel.IsPlayerCanSpecialSummonMonster(int player, int code, [int|nil setcode], [int|nil type], [int|nil atk], [int|nil def], [int|nil level], [int|nil race], [int|nil attribute], [int pos], [int target_player], [int sumtype])
+Checks whether player can Special Summon a virtual monster with the supplied card data.
+Optional arguments override the loaded card data, then pos, target_player, and sumtype describe how and where the monster would be Summoned. This MDPro3 binding does not read a zone argument.
 Parameters:
   player: int
   code: int
@@ -4054,12 +4036,11 @@ Parameters:
   level: int|nil optional
   race: int|nil optional
   attribute: int|nil optional
-  pos: int optional - default: POS_FACEUP
-  target_player: int optional - default: player
-  sumtype: int optional - default: 0
-  zone: int optional
+  pos: int optional
+  target_player: int optional
+  sumtype: int optional
 Returns:
-  bool
+  bool - true if the virtual monster can be Special Summoned.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5052
 
 ●bool Duel.IsPlayerCanSSet(int player, [Card scard])
@@ -4151,7 +4132,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4870
 
 ●bool Duel.NegateActivation(int chainc)
-So that the chain chainc launch invalid, the return value that is successful
+Attempts to negate the activation of chainc and returns true if it succeeds.
 Parameters:
   chainc: int
 Returns:
@@ -4166,7 +4147,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4960
 
 ●bool Duel.NegateEffect(int chainc, [bool forced])
-So that the chain chainc invalid effect, the return value that is successful
+Attempts to negate the effect of chainc and returns true if it succeeds. forced requests a forced disable.
 Parameters:
   chainc: int
   forced: bool optional
@@ -4174,11 +4155,12 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4930
 
-●void Duel.NegateRelatedChain(Card c, int reset)
-So that card c has launched the chain are invalid, reset event occurs reset
+●void Duel.NegateRelatedChain(Card c, int reset_flag)
+For each current Chain Link whose triggering effect is handled by c and still related to c, registers a temporary EFFECT_DISABLE_CHAIN effect on c.
+The generated disable effect resets with RESET_CHAIN, RESET_EVENT, and the supplied reset flags. The core does nothing if there is no earlier Chain Link to disable or if c is unaffected by the resolving effect.
 Parameters:
   c: Card
-  reset: int
+  reset_flag: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4931
 
 ●void Duel.NegateSummon(Card|Group targets)
@@ -4238,9 +4220,8 @@ Unspecified or unclear principle Do not use this function to avoid an infinite l
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4962
 
 ●int Duel.Recover(int player, int value, int reason, [bool is_step])
-To reason reason players to player value LP, return to the actual response value
-The return value is 0 if it is affected by an effect such as a return to harm.
-Is_step to true is the damage / recovery LP process decomposition, need to call Duel.RDComplete() trigger point
+Gives player LP for reason and returns the amount processed.
+Effects can reverse recovery into damage. With is_step=true, finish the damage/recovery batch with Duel.RDComplete.
 Parameters:
   player: int
   value: int
@@ -4251,16 +4232,15 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4902
 
 ●void Duel.RegisterEffect(Effect e, int player)
-Register the effect e as the player's effect to the global environment
+Registers e as a player/global effect for player.
 Parameters:
   e: Effect
   player: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4852
 
 ●Effect Duel.RegisterFlagEffect(int player, int code, int reset_flag, int property, int reset_count, [int label])
-For the player to register the global environment logo effect
-This effect always affects the player's (EFFECT_FLAG_PLAYER_TARGET) and will not be invalidated
-The rest is the same as Card.RegisterFlagEffect
+Registers a player/global flag effect on player and returns the created Effect.
+The flag effect is player-targeted, field-only, cannot be disabled, and count=0 is treated as 1.
 Parameters:
   player: int
   code: int
@@ -4375,7 +4355,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5028
 
 ●bool Duel.SelectEffectYesNo(int player, Card c, [int desc])
-Let players choose whether to launch the card player c effect
+Asks player whether to use c's effect with description id desc, defaulting to 95.
 Parameters:
   player: int
   c: Card
@@ -4398,12 +4378,13 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5027
 
-●Group Duel.SelectFusionMaterial(int player, Card c, [Group|nil g], [Card|nil gc], [int chkf], [bool not_material])
-Let the player player from the g to select a group [must contain gc] fusion fusion monster c material
+●Group Duel.SelectFusionMaterial(int player, Card c, Group g, [Card|nil gc], [int chkf], [bool not_material])
+Lets player select a valid Fusion Material group for Fusion Monster c from g and returns the selected Group.
+gc, when supplied, must be included. The returned Group also contains gc, matching the core selection behavior.
 Parameters:
   player: int
   c: Card
-  g: Group|nil optional - cannot be nil when selecting materials
+  g: Group
   gc: Card|nil optional
   chkf: int optional - default: PLAYER_NONE
   not_material: bool optional - default: false
@@ -4429,8 +4410,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4973
 
 ●int Duel.SelectOption(int player, int desc1, ... any)
-Let the player select the option, starting with the second argument, where each parameter represents an option
-Returns the serial number of the selected option (0-based)
+Shows player a list of description ids and returns the zero-based index of the selected option.
+The selected description id is also announced to the client.
 Parameters:
   player: int
   desc1: int
@@ -4450,7 +4431,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5026
 
 ●Group Duel.SelectReleaseGroup(int sel_player, [function|nil f], int min, int max, [Card|Group|nil ex], ... any)
-Filter function, allowing players to choose from the field min-max Zhang is not equal to ex to meet the conditions f can be liberated card (non-superior summon)
+Lets player select min to max releasable cards matching f, excluding ex, and returns the selected Group.
+Extra arguments after ex are passed to f after the Card argument.
 Parameters:
   sel_player: int
   f: function|nil optional
@@ -4482,8 +4464,8 @@ This function only has a check_action_permission operation, purpose unknown
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5025
 
 ●Group Duel.SelectSynchroMaterial(int player, Card c, [function|nil f1], [function|nil f2], int min, int max, [Card|nil smat], [Group|nil mg])
-Let the player player [from mg] select a set of clips that are required for the cohomology c [must contain smat (if there is mg ~ = nil this parameter is ignored)] The number of min-max clips that satisfy the condition
-F1 is to adjust the filter conditions to be met, f2 is outside the adjustment to meet the needs of the filter conditions
+Lets player select Synchro Materials for c and returns the selected Group.
+f1 filters the Tuner material, f2 filters non-Tuner materials, min and max restrict the non-Tuner count, smat forces a required material, and mg supplies an optional material pool.
 Parameters:
   player: int
   c: Card
@@ -4558,7 +4540,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5013
 
 ●bool Duel.SelectYesNo(int player, int desc)
-Let player player select Yes or No
+Asks player a yes/no prompt using description id desc and returns true for Yes.
 Parameters:
   player: int
   desc: int
@@ -4687,26 +4669,26 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5002
 
 ●void Duel.SetSynchroMaterial(Group g)
-Set g to be the cohomology material you want to use
+Stores g as the Synchro Material group for the current Summon procedure.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4991
 
 ●void Duel.SetTargetCard(Card|Group targets)
-Sets the currently chained objects to targets
-Note that here the object refers to the generalized object, including objects that do not take the effect that the object may have to deal with
+Stores targets as the target cards for the currently handled Chain.
+This records broad operation targets; it does not by itself check whether the cards are legal effect targets.
 Parameters:
   targets: Card|Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5004
 
 ●void Duel.SetTargetParam(int param)
-Sets the object parameters of the chain that is currently being processed into param
+Stores param as the target parameter for the currently handled Chain.
 Parameters:
   param: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5007
 
 ●void Duel.SetTargetPlayer(int player)
-Set the player that is currently handling the chained object to player
+Stores player as the target player for the currently handled Chain.
 Parameters:
   player: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5006
@@ -4847,7 +4829,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4885
 
 ●void Duel.SynchroSummon(int player, Card c, [Card|nil tuner], [Group|nil mg], [int minc], [int maxc])
-Let the player player to tuner as the adjustment [mg for the material] on the c cohomology summon procedures
+Performs a Synchro Summon of c for player, optionally requiring tuner and selecting materials from mg.
+minc and maxc can restrict the number of non-Tuner materials used by the procedure.
 Parameters:
   player: int
   c: Card
@@ -4906,7 +4889,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:660
 
 ●Effect Effect.Clone(Effect e)
-Create a new copy of effect e
+Creates and returns a new Effect object copied from e.
 Parameters:
   e: Effect
 Returns:
@@ -4954,7 +4937,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:637
 
 ●int Effect.GetCode(Effect e)
-Returns the code property
+Returns e's effect code.
 Parameters:
   e: Effect
 Returns:
@@ -4978,7 +4961,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:643
 
 ●int Effect.GetDescription(Effect e)
-Returns the description of the effect
+Returns e's description id.
 Parameters:
   e: Effect
 Returns:
@@ -4986,7 +4969,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:631
 
 ●int Effect.GetFieldID(Effect e)
-Gets the id of the effect e
+Returns e's internal field ID.
 Parameters:
   e: Effect
 Returns:
@@ -5002,7 +4985,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:640
 
 ●int Effect.GetHandlerPlayer(Effect e)
-Return to the current, usually Handle controller
+Returns the current controller of e's handler.
 Parameters:
   e: Effect
 Returns:
@@ -5010,7 +4993,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:649
 
 ●... Effect.GetLabel(Effect e)
-Returns the Label property
+Returns e's stored integer labels. If no label was set, returns 0.
 Parameters:
   e: Effect
 Returns:
@@ -5018,23 +5001,23 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:635
 
 ●Card|Group|Effect Effect.GetLabelObject(Effect e)
-Returns the LabelObject property
+Returns e's stored label object, or nil if none is stored or the object is no longer valid.
 Parameters:
   e: Effect
 Returns:
   Card|Group|Effect
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:636
 
-●function Effect.GetOperation(Effect e)
-Returns the operation attribute
+●function|nil Effect.GetOperation(Effect e)
+Returns e's operation callback, or nil if no operation callback is set.
 Parameters:
   e: Effect
 Returns:
-  function
+  function|nil
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:645
 
 ●Card Effect.GetOwner(Effect e)
-Returns the Owner property
+Returns the card that owns e.
 Parameters:
   e: Effect
 Returns:
@@ -5066,16 +5049,16 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:638
 
-●function Effect.GetTarget(Effect e)
-Returns the target attribute
+●function|nil Effect.GetTarget(Effect e)
+Returns e's target callback, or nil if no target callback is set.
 Parameters:
   e: Effect
 Returns:
-  function
+  function|nil
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:642
 
 ●int Effect.GetType(Effect e)
-Returns the Type property
+Returns e's effect type mask, such as EFFECT_TYPE_SINGLE, EFFECT_TYPE_FIELD, or EFFECT_TYPE_TRIGGER_O.
 Parameters:
   e: Effect
 Returns:
@@ -5083,7 +5066,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:633
 
 ●function|int Effect.GetValue(Effect e)
-Returns the value attribute
+Returns e's value field. For function-valued effects this is the stored callback; otherwise it is the stored integer value.
 Parameters:
   e: Effect
 Returns:
@@ -5116,7 +5099,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:655
 
 ●bool Effect.IsActiveType(Effect e, int type)
-Check if the effect type of e (monster, magic, trap) has a type
+Checks whether e's active card type contains at least one flag from type.
 Parameters:
   e: Effect
   type: int
@@ -5142,7 +5125,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:651
 
 ●bool Effect.IsHasProperty(Effect e, int prop1, [int prop2])
-Check if the effect contains the flags prop1 [and prop2]
+Checks whether e contains the requested effect property flags.
+prop1 is checked against the first property word and optional prop2 against the second property word. Passing 0 for a word makes that word pass.
 Parameters:
   e: Effect
   prop1: int
@@ -5161,7 +5145,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:653
 
 ●bool Effect.IsHasType(Effect e, int type)
-Check if the effect is of type type
+Checks whether e's effect type contains at least one flag from type.
 Parameters:
   e: Effect
   type: int
@@ -5170,7 +5154,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:652
 
 ●void Effect.Reset(Effect e)
-The effect of e reset, reset can not be used after this effect
+Removes e from its registered card or field effect list when e is still attached to a valid owner and handler.
 Parameters:
   e: Effect
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:610
@@ -5239,7 +5223,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:612
 
 ●void Effect.SetHintTiming(Effect e, int s_time, [int o_time])
-Set the prompt point
+Sets when the client should offer or highlight e for the handler's controller and, optionally, the opponent.
 Parameters:
   e: Effect
   s_time: int
@@ -5247,14 +5231,14 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:624
 
 ●void Effect.SetLabel(Effect e, ... int)
-Sets the Label property
+Stores one or more integer label values on e, replacing any previous labels.
 Parameters:
   e: Effect
   ...: int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:621
 
 ●void Effect.SetLabelObject(Effect e, Card|Group|Effect labelobject)
-Sets the LabelObject property
+Stores a Card, Group, Effect, or nil as e's label object.
 Parameters:
   e: Effect
   labelobject: Card|Group|Effect
@@ -5394,7 +5378,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:937
 
 ●void Group.AddCard(Group g, Card c)
-Increase g to g
+Adds c to g if g is mutable.
 Parameters:
   g: Group
   c: Card
@@ -5451,7 +5435,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:905
 
 ●Group Group.Clone(Group g)
-Create a new copy of card group g
+Creates and returns a new Group containing the same cards as g.
 Parameters:
   g: Group
 Returns:
@@ -5465,7 +5449,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:900
 
 ●void Group.DeleteGroup(Group g)
-Delete the card group g
+Releases a Group previously preserved with Group.KeepAlive so Lua can manage it normally again.
+Calling this on an ordinary Group has no effect.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:902
@@ -5492,7 +5477,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:912
 
 ●int Group.FilterCount(Group g, function f, [Card|Group|nil ex], ... any)
-Filter function, and Group.Filter is basically the same, the difference is that this function only returns the number of cards to meet the conditions
+Counts cards in g that satisfy f, excluding ex.
+Extra arguments after ex are passed to f after the Card argument.
 Parameters:
   g: Group
   f: function
@@ -5503,8 +5489,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:913
 
 ●Group Group.FilterSelect(Group g, int player, function f, int min, int max, [Card|Group|nil ex], ... any)
-Filter function, allowing players to choose from the g player min-max sheets meet the screening conditions f and not equal to the ex card
-Starting with the 7th argument is an additional parameter
+Lets player choose min to max cards from g that satisfy filter f, excluding ex, and returns the selected Group.
+Extra arguments after ex are passed to f after the Card argument.
 Parameters:
   g: Group
   player: int
@@ -5518,7 +5504,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:914
 
 ●Group Group.FromCards(... Card)
-Indefinite parameters, the incoming card into a combination of all cards and return
+Creates and returns a new Group containing the non-nil Card arguments.
 Parameters:
   ...: Card
 Returns:
@@ -5606,7 +5592,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:926
 
 ●bool Group.IsContains(Group g, Card c)
-Check g for card c
+Checks whether g contains card c.
 Parameters:
   g: Group
   c: Card
@@ -5628,14 +5614,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:919
 
 ●void Group.KeepAlive(Group g)
-Let the deck continue, set the deck to effect LabelObject needs to be set
+Prevents g from being automatically released by Lua until Group.DeleteGroup is called.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:901
 
 ●void Group.Merge(Group g1, Group g2)
-Combine all cards in g2 to g1
-Note: g2 itself does not change
+Adds every card from g2 into g1. g2 itself is not changed.
 Parameters:
   g1: Group
   g2: Group
@@ -6088,11 +6073,7 @@ Parameters:
 Source: Utilities/utility.lua:1807
 
 ●void Auxiliary.bfgcost(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp, bool chk)
-Simplified method for the filter condition of banishing this card, used in effect registration for cost
-function aux.bfgcost(e, tp, eg, ep, ev, re, r, rp, chk)
-  if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-  Duel.Remove(e:GetHandler(), POS_FACEUP, REASON_COST)
-end
+Shared cost function that checks whether the handler can be banished as cost, then banishes it face-up as REASON_COST.
 Parameters:
   e: Effect
   tp: int
@@ -6557,13 +6538,8 @@ Returns false.
 Source: Utilities/utility.lua:94
 
 ●void Auxiliary.FilterBoolFunction(function f, ... any)
-Filter cards satisfying a single filter condition f, returning a function with a bool return type; additional parameters start from the second parameter
-function Auxiliary.FilterBoolFunction(f,...)
-  local ext_params={...}
-  return function(target)
-    return f(target,table.unpack(ext_params))
-  end
-end
+Returns a filter function that calls f(target, ...) with the extra arguments captured now.
+Use this when another API expects a one-argument Card filter but the real filter needs fixed extra values.
 Parameters:
   f: function
   ...: any
@@ -7067,12 +7043,7 @@ Returns:
 Source: Utilities/utility.lua:1482
 
 ●void Auxiliary.NecroValleyFilter(function f)
-Return a new filter condition based on filter condition f: cards that satisfy f and are not affected by Necrovalley
-function Auxiliary.NecroValleyFilter(f)
-  return function(target,...)
-    return f(target,...) and not (target:IsHasEffect(EFFECT_NECRO_VALLEY) and Duel.IsChainDisablable(0))
-  end
-end
+Returns a wrapper filter that requires f(target, ...) and also rejects cards currently protected by Necrovalley while the Chain is disablable.
 Parameters:
   f: function
 Source: Utilities/utility.lua:920
@@ -7161,20 +7132,12 @@ Returns:
   function - Target function for the optional return effect.
 Source: Utilities/utility.lua:255
 
-●void Auxiliary.Next(Group g)
-Iterator for group g; the pointer starts at the first card and moves to the next card with each call, typically used when operating on cards in g
-For example:
-local g=Group.CreateGroup()
-for tc in aux.Next(g) do
-end
-Equivalent to:
-local g=Group.CreateGroup()
-local tc=g:GetFirst()
-while tc do
-  tc=g:GetNext()
-end
+●function Auxiliary.Next(Group g)
+Returns an iterator over g for generic for loops, using Group.GetFirst and Group.GetNext internally.
 Parameters:
   g: Group
+Returns:
+  function - Iterator function for generic for loops.
 Source: Utilities/utility.lua:82
 
 ●function Auxiliary.NOT(function f)
@@ -7540,17 +7503,14 @@ Returns:
   int - The local column index, or NULL_VALUE for invalid input.
 Source: Utilities/utility.lua:722
 
-●void Auxiliary.TargetBoolFunction(function f, ... any)
-Used in effect registration, returns a function with a bool return type; additional parameters start from the second parameter
-function Auxiliary.TargetBoolFunction(f,...)
-  local ext_params={...}
-  return function(effect,target)
-    return f(target,table.unpack(ext_params))
-  end
-end
+●function Auxiliary.TargetBoolFunction(function f, ... any)
+Returns an effect target callback that calls f(target, ...) with the extra arguments captured now.
+Use this when SetTarget or similar APIs expect a function with parameters (effect, target).
 Parameters:
   f: function
   ...: any
+Returns:
+  function - A target callback with parameters (effect, target).
 Source: Utilities/utility.lua:454
 
 ●void Auxiliary.TargetEqualFunction(function f, any value, ... any)
@@ -7568,10 +7528,8 @@ Parameters:
 Source: Utilities/utility.lua:448
 
 ●void Auxiliary.tgoval(Effect e, Effect re, int rp)
-Simplified method for the filter function preventing being targeted by opponent's card effects, used in effect registration for SetValue
-function aux.tgoval(e, re, rp)
-  return rp==e:GetHandlerPlayer()
-end
+Shared value function for EFFECT_CANNOT_BE_EFFECT_TARGET effects that protect against the opponent's effects.
+It returns true when the reason player rp is the opponent of e's handler player.
 Parameters:
   e: Effect
   re: Effect
@@ -7884,11 +7842,13 @@ Returns:
 Source: Utilities/utility.lua:1353
 
 ========== bit ==========
-●void bit.band(any a, any b)
-A and b with the bit
+●int bit.band(int a, int b)
+Returns the bitwise AND of a and b.
 Parameters:
-  a: any
-  b: any
+  a: int
+  b: int
+Returns:
+  int - Bitwise AND of a and b.
 Source: Utilities/utility.lua:15
 
 ●int bit.bnot(int a)
@@ -8169,8 +8129,8 @@ Parameters:
 Source: Utilities/procedure.lua:1342
 
 ●Effect Auxiliary.AddLinkProcedure(Card c, [function|nil f], int min, [int max], [function gf])
-Add a Link Summon procedure for c
-Use minc-maxc monsters satisfying filter condition f [and within the group satisfying filter condition gf] as Link Materials
+Registers the standard Link Summon procedure for c and returns the created Effect.
+f filters materials, min/max constrain the material count, and gf optionally checks the selected material group.
 Parameters:
   c: Card
   f: function|nil optional
@@ -8364,9 +8324,8 @@ Parameters:
 Source: Utilities/procedure.lua:135
 
 ●void Auxiliary.AddSynchroProcedure(Card c, [function|nil f1], [function|nil f2], int minc, [int maxc])
-Add a cohomology call to c
-F1 to adjust the filter to meet the conditions, f2 to adjust to meet other than the filter conditions (usually aux.NonTuner)
-Adjust monsters other than ct at least
+Registers the standard Synchro Summon procedure for c.
+f1 filters the Tuner material, f2 filters non-Tuner materials, and minc/maxc set the number of non-Tuner materials required.
 Parameters:
   c: Card
   f1: function|nil optional
@@ -8375,21 +8334,18 @@ Parameters:
   maxc: int optional
 Source: Utilities/procedure.lua:60
 
-●void Auxiliary.AddSynchroProcedure2(Card c, any f1, any f2)
-Add a cohomology call to c
-F1 to adjust the filter to meet the conditions, f2 to adjust to meet other than the filter conditions (usually aux.NonTuner)
-Can only be adjusted with a monster outside
+●void Auxiliary.AddSynchroProcedure2(Card c, [function|nil f1], [function|nil f2])
+Backward-compatible helper for a Synchro Monster that uses exactly 1 Tuner and 1 non-Tuner material.
+It calls Auxiliary.AddSynchroProcedure(c, f1, f2, 1, 1).
 Parameters:
   c: Card
-  f1: any
-  f2: any
+  f1: function|nil optional
+  f2: function|nil optional
 Source: Utilities/procedure.lua:123
 
 ●void Auxiliary.AddXyzProcedure(Card c, [function|nil f], int lv, int ct, [function alterf], [string alterdesc], [int maxct], [function alterop])
-Add an excess summon for c
-With the conditions to meet the conditions for the f-level cv-maxct lv monster to be stacked
-The rest of the parameters are used to stack on a single monster (usually an excess of monsters)
-Alterf for this monster to meet the conditions, desc for the description, op for the stacked operation (hope Huanglong)
+Registers the standard Xyz Summon procedure for c.
+f filters materials, lv is the required Level, ct is the minimum material count, and maxct optionally caps the maximum. alterf/alterdesc/alterop define an alternate one-card Xyz Summon route.
 Parameters:
   c: Card
   f: function|nil optional
@@ -8511,12 +8467,12 @@ Parameters:
   c: Card
 Source: Utilities/procedure.lua:22
 
-●void Auxiliary.EnablePendulumAttribute(Card c, Group reg)
-Add Pendulum Monster attributes to c (Pendulum Summon, Pendulum Card activation)
-If active_effect=false, do not register the Pendulum Card's "card activation" effect
+●void Auxiliary.EnablePendulumAttribute(Card c, [bool|nil reg])
+Registers the Pendulum Summon procedure for Pendulum Monster c.
+Unless reg is false, it also registers the Pendulum Card activation effect from the hand.
 Parameters:
   c: Card
-  reg: Group
+  reg: bool|nil optional
 Source: Utilities/procedure.lua:1948
 
 ●void Auxiliary.EnableReviveLimitPendulumSummonable(Card c, int loc)
@@ -9188,8 +9144,8 @@ Parameters:
 Source: Utilities/procedure.lua:2283
 
 ●void Auxiliary.NonTuner(function f, ... any)
-Filter non-Tuner monsters satisfying a single filter condition f, returning a function with a bool return type; if only non-Tuner monsters are required, use aux.NonTuner(nil)
-Additional parameters start from the second parameter
+Returns a non-Tuner material filter that also applies f when f is supplied.
+Extra arguments are captured now and passed to f after the Card argument.
 Parameters:
   f: function
   ...: any
