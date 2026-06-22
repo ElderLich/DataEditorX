@@ -4,6 +4,7 @@
 EFFECT_IMMUNE_EFFECT					Target card is unaffected by effects
 EFFECT_DISABLE							Negates the target card's effects
 EFFECT_DISABLE_EFFECT					Negates the target effect
+EFFECT_DISABLE_CHAIN					Negates an effect while it is resolving in a Chain
 EFFECT_CANNOT_DISABLE					The target effect cannot be negated
 EFFECT_CANNOT_INACTIVATE				The target card's activation cannot be negated
 EFFECT_CANNOT_DISEFFECT					The target card's effect cannot be negated
@@ -20,6 +21,7 @@ EFFECT_MONSTER_SSET						The target card can be Set from hand to the Spell & Tra
 EFFECT_CANNOT_SUMMON					The target player cannot Normal Summon monsters. Use a separate effect to prevent Sets.
 EFFECT_CANNOT_FLIP_SUMMON				The target player cannot Flip Summon monsters
 EFFECT_CANNOT_SPECIAL_SUMMON			The target player cannot Special Summon monsters
+EFFECT_LIMIT_SPECIAL_SUMMON_POSITION	The target player cannot Special Summon monsters in specified battle positions
 EFFECT_CANNOT_MSET						The target player cannot Set monsters. Use EFFECT_CANNOT_TURN_SET for turn-to-face-down restrictions.
 EFFECT_CANNOT_SSET						The target player cannot Set Spell/Trap cards. Use EFFECT_CANNOT_TURN_SET for turn-to-face-down restrictions.
 EFFECT_CANNOT_DRAW						The target player cannot draw cards
@@ -40,8 +42,8 @@ EFFECT_CANNOT_DISABLE_FLIP_SUMMON		The target card's Flip Summon cannot be negat
 EFFECT_INDESTRUCTABLE					The target card cannot be destroyed
 EFFECT_INDESTRUCTABLE_EFFECT			The target card cannot be destroyed by card effects
 EFFECT_INDESTRUCTABLE_BATTLE			The target card cannot be destroyed by battle
-EFFECT_UNRELEASABLE_SUM					The target card cannot be Tributed for an Advanced Summon
-EFFECT_UNRELEASABLE_NONSUM				The target card cannot be Tributed except for an Advanced Summon
+EFFECT_UNRELEASABLE_SUM					The target card cannot be Tributed for a Tribute Summon
+EFFECT_UNRELEASABLE_NONSUM				The target card cannot be Tributed except for a Tribute Summon
 EFFECT_DESTROY_SUBSTITUTE				Provides a mandatory substitute action when the target card would be destroyed
 EFFECT_CANNOT_RELEASE					The target card cannot be Tributed
 EFFECT_INDESTRUCTABLE_COUNT				The target card cannot be destroyed up to a specified number of times per turn
@@ -78,10 +80,13 @@ EFFECT_EQUIP_LIMIT						The target card can only be equipped by the specified co
 EFFECT_DUAL_SUMMONABLE					The target card can be Normal Summoned again as a Gemini monster
 EFFECT_REVERSE_DAMAGE					Damage the target player would take becomes LP recovery instead
 EFFECT_REVERSE_RECOVER					LP recovery for the target player becomes damage instead
+EFFECT_DIVINE_LIGHT						Applies Divine Light-style damage handling to the target player
 EFFECT_CHANGE_DAMAGE					Damage the target player would take becomes a new value
+EFFECT_REPLACE_DAMAGE					Replaces damage with a custom action or value
 EFFECT_REFLECT_DAMAGE					Damage the target player would take is taken by the opponent instead
 EFFECT_CANNOT_ATTACK					The target card cannot attack
 EFFECT_CANNOT_ATTACK_ANNOUNCE			The target card cannot declare an attack
+EFFECT_ATTACK_DISABLED					Marks the attack as disabled after a successful attack-negation effect
 EFFECT_CANNOT_CHANGE_POS_E				The target card's battle position cannot be changed by card effects
 EFFECT_ACTIVATE_COST					The target player must pay the specified cost to activate cards
 EFFECT_SUMMON_COST						The target player must pay the specified cost to Summon cards
@@ -94,10 +99,12 @@ EFFECT_UPDATE_ATTACK					Increases or decreases the target card's ATK; positive 
 EFFECT_SET_ATTACK						Sets the target card's ATK with low priority; later higher-priority changes can overwrite it.
 EFFECT_SET_ATTACK_FINAL					Sets the target card's ATK with high priority; commonly used for "until the end of the turn" values.
 EFFECT_SET_BASE_ATTACK					Sets the target card's original ATK
+EFFECT_SET_BASE_ATTACK_FINAL			Temporarily changes the target card's original ATK with high priority
 EFFECT_UPDATE_DEFENSE					Increases or decreases the target card's DEF; positive values increase, negative values decrease.
 EFFECT_SET_DEFENSE						Sets the target card's DEF with low priority; later higher-priority changes can overwrite it.
 EFFECT_SET_DEFENSE_FINAL				Sets the target card's DEF with high priority; commonly used for "until the end of the turn" values.
 EFFECT_SET_BASE_DEFENSE					Sets the target card's original DEF
+EFFECT_SET_BASE_DEFENSE_FINAL			Temporarily changes the target card's original DEF with high priority
 EFFECT_REVERSE_UPDATE					Reverses ATK/DEF increases and decreases for the target player
 EFFECT_SWAP_AD							Swaps the target card's ATK and DEF
 EFFECT_SWAP_BASE_AD						Swaps the target card's original ATK and DEF
@@ -112,9 +119,12 @@ EFFECT_CHANGE_RACE						The target card is treated as the specified race
 EFFECT_ADD_ATTRIBUTE					The target card is also treated as the specified attribute
 EFFECT_REMOVE_ATTRIBUTE					The target card is no longer treated as the specified attribute
 EFFECT_CHANGE_ATTRIBUTE					The target card is treated as the specified attribute
+EFFECT_CHANGE_GRAVE_ATTRIBUTE			Changes the Attribute of matching cards in the Graveyard
+EFFECT_CHANGE_GRAVE_RACE				Changes the Race of matching cards in the Graveyard
+EFFECT_PRE_MONSTER						Allows temporary monster values added with Card.AddMonsterAttribute() to be read
 EFFECT_UPDATE_LEVEL						Increases or decreases the target card's Level; positive values increase, negative values decrease.
 EFFECT_CHANGE_LEVEL						Sets the target card's Level with low priority; later higher-priority changes can overwrite it.
-EFFECT_CHANGE_LEVEL_FINAL				Sets the target card's Level with high priority; commonly used for temporary changes.
+#EFFECT_CHANGE_LEVEL_FINAL				Legacy name; use EFFECT_CHANGE_LEVEL in current MDPro3 scripts.
 EFFECT_UPDATE_RANK						Increases or decreases the target card's Rank
 EFFECT_CHANGE_RANK						Sets the target card's Rank with low priority; later higher-priority changes can overwrite it.
 EFFECT_CHANGE_RANK_FINAL				Sets the target card's Rank with high priority
@@ -129,8 +139,8 @@ EFFECT_DOUBLE_TRIBUTE					The target card counts as 2 Tributes
 EFFECT_TRIPLE_TRIBUTE					The target card counts as 3 Tributes
 EFFECT_DECREASE_TRIBUTE					Reduces the number of Tributes required when the target player Summons matching monsters
 EFFECT_DECREASE_TRIBUTE_SET				Reduces the number of Tributes required when the target player Sets matching monsters
-EFFECT_TRIBUTE_LIMIT					Tributes for the target card's Advanced Summon must satisfy the specified condition
-EFFECT_ADD_EXTRA_TRIBUTE				The target player can Tribute specified cards instead of monsters for an Advanced Summon
+EFFECT_TRIBUTE_LIMIT					Tributes for the target card's Tribute Summon must satisfy the specified condition
+EFFECT_ADD_EXTRA_TRIBUTE				The target player can Tribute specified cards instead of monsters for a Tribute Summon
 EFFECT_EXTRA_RELEASE					The target player must Tribute specified cards instead of their own monsters when Tributing monsters
 EFFECT_EXTRA_RELEASE_SUM				The target player can Tribute specified cards instead of their own monsters when Tributing for a Summon
 EFFECT_EXTRA_RELEASE_NONSUM				The target player can Tribute specified cards instead of other cards when paying a Tribute cost for an effect
@@ -163,11 +173,12 @@ EFFECT_ALSO_BATTLE_DAMAGE				The opponent also takes battle damage you take from
 EFFECT_PIERCE							The target card inflicts piercing battle damage when attacking a Defense Position monster
 EFFECT_BATTLE_DAMAGE_TO_EFFECT			Battle damage dealt by the target card to the opponent is treated as effect damage
 EFFECT_CHANGE_BATTLE_DAMAGE				Battle damage involving the target card becomes a new value
-#EFFECT_TOSS_COIN_REPLACE				Re-toss a coin
-#EFFECT_TOSS_DICE_REPLACE				Re-roll a die
+EFFECT_CHANGE_INVOLVING_BATTLE_DAMAGE	Changes battle damage caused by the target card
+EFFECT_TOSS_COIN_REPLACE				Replaces a coin toss with another toss/action
+EFFECT_TOSS_DICE_REPLACE				Replaces a die roll with another roll/action
 EFFECT_FUSION_MATERIAL					Standard Fusion Material condition for the target card. Prefer aux helpers in most scripts.
 EFFECT_CHAIN_MATERIAL					When the target player Fusion Summons, allows Fusion Materials listed on the Fusion Monster to be chosen from hand, Deck, field, or Graveyard and banished as material
-EFFECT_SYNCHRO_MATERIAL					Standard Synchro Material condition for the target card
+#EFFECT_SYNCHRO_MATERIAL					Legacy name; use EFFECT_SYNCHRO_MATERIAL_CUSTOM or Synchro procedure helpers in current MDPro3 scripts.
 EFFECT_XYZ_MATERIAL						Standard Xyz Material condition for the target card
 EFFECT_FUSION_SUBSTITUTE				The target card can substitute for 1 specifically named Fusion Material
 EFFECT_CANNOT_BE_FUSION_MATERIAL		The target card cannot be used as Fusion Material
@@ -176,20 +187,28 @@ EFFECT_SYNCHRO_MATERIAL_CUSTOM			When the target card is used as Synchro Materia
 EFFECT_CANNOT_BE_XYZ_MATERIAL			The target card cannot be used as Xyz Material
 EFFECT_CANNOT_BE_LINK_MATERIAL			The target card cannot be used as Link Material
 EFFECT_SYNCHRO_LEVEL					The target card can be treated as another Level when used as Synchro Material
+EFFECT_SYNCHRO_LEVEL_EX					Allows monsters without Levels to be used as Synchro Material
 EFFECT_RITUAL_LEVEL						The target card can be treated as another Level when used as Ritual Material
+EFFECT_RITUAL_LEVEL_EX					Allows monsters without Levels to be used as Ritual Material
 EFFECT_XYZ_LEVEL						The target card can be treated as another Level when used as Xyz Material
 EFFECT_EXTRA_RITUAL_MATERIAL			The target card can be used as one monster for the required Level of a Ritual Summon, then performs an action
+EFFECT_OVERLAY_RITUAL_MATERIAL			Allows Xyz Materials to be used for a Ritual Summon
 EFFECT_NONTUNER							The target card can be treated as a non-Tuner
+EFFECT_TUNER							The target card can be treated as a Tuner for a Synchro Summon
+EFFECT_EXTRA_SYNCHRO_MATERIAL			The target card can be used as Synchro Material from the hand or opponent's field
 EFFECT_OVERLAY_REMOVE_REPLACE			The target player can perform an action instead of detaching Xyz Material
 EFFECT_SCRAP_CHIMERA					When the target card is used as Synchro Material, all other Synchro Materials must satisfy the specified condition
 EFFECT_TUNE_MAGICIAN_X					When the target card is used as Xyz Material, all other Xyz Materials must satisfy the specified condition
 EFFECT_TUNE_MAGICIAN_F					When the target card is used as Fusion Material, all other Fusion Materials must satisfy the specified condition
+EFFECT_XYZ_MIN_COUNT					The target card can only be used for an Xyz Summon with at least the specified number of materials
+EFFECT_DOUBLE_XMATERIAL					The target card counts as 2 materials for Xyz Summons that require 3 or more materials
 EFFECT_MATERIAL_CHECK					Performs a material check when the target card enters the field. Used for effects that care about material or Tribute conditions.
 EFFECT_DISABLE_FIELD					Makes up to a specified number of the target player's Monster Zones unusable
 EFFECT_USE_EXTRA_MZONE					While the target card is face-up on the field, specified Monster Zones become unusable; effectively used when a card occupies multiple zones.
 EFFECT_USE_EXTRA_SZONE					While the target card is face-up on the field, specified Spell & Trap Zones become unusable; effectively used when a card occupies multiple zones.
 EFFECT_MAX_MZONE						The target player can control at most 3 monsters
 EFFECT_MAX_SZONE						The target player can control at most 3 Spell/Trap cards
+EFFECT_KAISER_COLOSSEUM				Applies Kaiser Colosseum-style monster count restrictions
 EFFECT_MUST_USE_MZONE					The target player must use specified Monster Zones. Often used in reverse for linked Extra Monster Zone restrictions.
 EFFECT_HAND_LIMIT						Changes the target player's hand size limit
 EFFECT_DRAW_COUNT						Changes the number of cards the target player draws for the normal Draw Phase draw
@@ -227,6 +246,7 @@ EFFECT_PATRICIAN_OF_DARKNESS			While the target card is face-up, its controller 
 EFFECT_EXTRA_ATTACK_MONSTER				The target card can make additional attacks on opponent's monsters; the value is the extra count, not the final total.
 EFFECT_UNION_STATUS						The target card is in Union state. Prefer aux.SetUnionState(c).
 EFFECT_OLDUNION_STATUS					The target card has old shared Union behavior. Prefer aux.SetUnionState(c).
+EFFECT_UNION_LIMIT						Limits which monster this Union or equip-style effect can equip to
 EFFECT_ADD_FUSION_ATTRIBUTE				When the target card is used as Fusion Material, it can be treated as the specified Attribute
 EFFECT_REMOVE_FUSION_ATTRIBUTE			When the target card is used as Fusion Material, it cannot be treated as the specified Attribute
 EFFECT_CHANGE_FUSION_ATTRIBUTE			When the target card is used as Fusion Material, it must be treated as the specified Attribute
@@ -321,11 +341,11 @@ EFFECT_FLAG_ABSOLUTE_TARGET			This effect's target range does not change when co
 EFFECT_FLAG_IGNORE_IMMUNE			This effect ignores effect immunity
 EFFECT_FLAG_SET_AVAILABLE			This effect affects face-down cards on the field, or can activate while face-down
 EFFECT_FLAG_CANNOT_INACTIVATE		This card's activation cannot be negated
-EFFECT_FLAG_CANNOT_NEGATE			This effect's activation cannot be negated
+EFFECT_FLAG_CAN_FORBIDDEN			Allows an effect marked cannot be disabled to still be stopped by Prohibition-style effects
 EFFECT_FLAG_CANNOT_DISABLE			This effect cannot be negated
 EFFECT_FLAG_PLAYER_TARGET			This effect targets players
 EFFECT_FLAG_BOTH_SIDE				Both players can use this effect
-EFFECT_FLAG_COPY_INHERIT			If this effect is copied, the copy inherits its Reset property
+#EFFECT_FLAG_COPY_INHERIT			Legacy internal name; not exposed by current Lua constants.
 EFFECT_FLAG_DAMAGE_STEP				This effect can activate during the Damage Step
 EFFECT_FLAG_DAMAGE_CAL				This effect can activate during damage calculation
 EFFECT_FLAG_DELAY					This is an "if" trigger effect rather than a "when" trigger effect
@@ -340,8 +360,15 @@ EFFECT_FLAG_OWNER_RELATE			This effect expires when its owner becomes invalid
 EFFECT_FLAG_CLIENT_HINT				This effect displays a client hint when it is applied
 EFFECT_FLAG_CONTINUOUS_TARGET		This effect establishes a continuous target relationship with another card
 EFFECT_FLAG_LIMIT_ZONE				This Spell/Trap can only be activated in certain zones
+EFFECT_FLAG_ACTIVATE_CONDITION		Checks a Trigger Effect's condition when it is about to activate
 EFFECT_FLAG_IMMEDIATELY_APPLY		This effect applies when activated rather than during resolution; mostly used by continuous effects
+EFFECT_FLAG_COIN					Marks this effect as involving a coin toss
+EFFECT_FLAG_DICE					Marks this effect as involving a die roll
+EFFECT_FLAG_FUSION_SUMMON			Marks this effect as involving a Fusion Summon
+EFFECT_FLAG2_REPEAT_UPDATE			Recalculates repeated ATK/DEF updates after final stat calculation
 EFFECT_FLAG2_COF					This Normal Spell can be activated outside the Main Phase
+EFFECT_FLAG2_WICKED					Uses the Wicked Avatar/Dreadroot final ATK/DEF calculation timing
+EFFECT_FLAG2_OPTION					Uses the optional final ATK/DEF calculation lane
 !CATEGORY
 CATEGORY_DESTROY				Destruction effect
 CATEGORY_RELEASE				Tribute effect
