@@ -67,13 +67,14 @@
 #####################################################
 
 ========== Card ==========
-●bool Card.AddCounter(Card c, int countertype, int count, [int singly])
-为c放置count个countertype类型的指示物，singly为true表示逐个添加至上限为止
+●bool Card.AddCounter(Card c, int countertype, int count, [bool singly])
+尝试给c放置count个countertype类型的指示物，并返回核心是否接受该次放置。
+c必须受当前处理中的原因效果影响。放置指示物的玩家使用当前原因玩家。singly为true时，指示物上限检查允许只放置到剩余上限为止。
 Parameters:
   c: Card
   countertype: int
   count: int
-  singly: int optional - default: false
+  singly: bool optional - default: false
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3628
@@ -323,8 +324,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3530
 
 ●int Card.GetAttribute(Card c)
-返回c的当前属性
-注：对某些多属性怪兽如光与暗之龙，此函数的返回值可能是几个属性的组合值
+返回c当前的属性位掩码。
+被视为具有多个属性的卡可能返回多个ATTRIBUTE_*值的按位组合。
 Parameters:
   c: Card
 Returns:
@@ -807,7 +808,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3416
 
 ●int Card.GetOriginalType(Card c)
-返回c的卡片记载的类型
+返回c原本卡片数据中的种类位掩码，而不是当前被修改后的种类。
 Parameters:
   c: Card
 Returns:
@@ -823,7 +824,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3525
 
 ●Group Card.GetOverlayGroup(Card c)
-返回c当前叠放着的卡片组
+返回当前叠放在c下面作为超量素材的卡组成的Group。
 Parameters:
   c: Card
 Returns:
@@ -1027,13 +1028,12 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3459
 
-●Card Card.GetReasonCard(Card c)
-返回导致c的位置变化的卡
-此函数仅在某卡被战斗破坏时，因为上级召唤被解放，或者成为特殊召唤使用的素材时有效
+●Card|nil Card.GetReasonCard(Card c)
+返回c当前记录的原因卡；没有记录原因卡时返回nil。
 Parameters:
   c: Card
 Returns:
-  Card
+  Card|nil
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3460
 
 ●Effect Card.GetReasonEffect(Card c)
@@ -1045,7 +1045,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3462
 
 ●int Card.GetReasonPlayer(Card c)
-返回导致c的位置变化的玩家
+返回c当前记录的原因玩家，即c当前原因状态中的玩家。
 Parameters:
   c: Card
 Returns:
@@ -1351,7 +1351,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3482
 
 ●bool Card.IsAttack(Card c, int atk1, [int atk2], [... int])
-检查c的攻击力是否是 atk1[, 或者为 atk2...]，如果c不是怪兽卡，或者不在 LOCATION_MZONE 则都返回false
+检查c是否为怪兽或当前被当作怪兽，并且当前攻击力是否等于任意给定的atk值。
+nil的atk参数会被跳过。不是怪兽且未被当作怪兽的卡返回false。
 Parameters:
   c: Card
   atk1: int
@@ -1370,7 +1371,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3598
 
 ●bool Card.IsAttackAbove(Card c, int atk)
-检查c是否是攻击力atk以上
+检查c是否为怪兽或当前被当作怪兽，并且当前攻击力是否大于等于atk。
+不同于Card.IsAttackBelow，此核心在比较前不会额外检查攻击力未知的情况。
 Parameters:
   c: Card
   atk: int
@@ -1389,7 +1391,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3618
 
 ●bool Card.IsAttackPos(Card c)
-检查c是否是攻击表示
+检查c当前表示形式是否包含POS_ATTACK。
 Parameters:
   c: Card
 Returns:
@@ -1447,11 +1449,13 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3648
 
-●bool Card.IsCanBeFusionMaterial(Card c, [Card fc])
-检查c是否可以成为[融合怪兽fc的]融合素材
+●bool Card.IsCanBeFusionMaterial(Card c, [Card|nil fc], [int summon_type])
+检查c能否作为fc和summon_type的融合素材使用。
+fc可省略，summon_type默认SUMMON_TYPE_FUSION。该绑定没有ignore_mon参数，而是交给核心的融合素材合法性检查处理。
 Parameters:
   c: Card
-  fc: Card optional
+  fc: Card|nil optional
+  summon_type: int optional - default: SUMMON_TYPE_FUSION
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3639
@@ -1521,7 +1525,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3642
 
 ●bool Card.IsCanChangePosition(Card c)
-检查c是否可以用效果改变表示形式
+检查核心中供效果改变表示形式使用的能力判断。
+在此MDPro3/YGOPro核心中，该底层辅助函数对连接怪兽返回false，对其他卡返回true；它不会执行更完整的手动改变战斗表示形式检查。
 Parameters:
   c: Card
 Returns:
@@ -1538,10 +1543,11 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3637
 
 ●bool Card.IsCanOverlay(Card c, [int player])
-检查c是否可以作为XYZ素材
+检查c能否由player作为超量素材使用。
+player省略时使用当前原因玩家。核心会排除衍生物、处于非法状态的禁止使用卡，以及由对方控制且不能变更控制权的卡。
 Parameters:
   c: Card
-  player: int optional
+  player: int optional - default: current reason player
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3638
@@ -1931,20 +1937,22 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3418
 
 ●bool Card.IsLinkRace(Card c, int race, [int player])
-检查c[由player连接召唤时]用作连接素材时是否属于种族race
+检查c作为player的连接素材使用时的种族是否包含race。player省略时使用当前原因玩家。
 Parameters:
   c: Card
   race: int
-  player: int optional
+  player: int optional - default: current reason player
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3493
 
-●bool Card.IsLinkSetCard(Card c, ... int)
-检查c作为link素材时能否当作名字含有setname的卡
+●bool Card.IsLinkSetCard(Card c, int setcode1, [int setcode2], [... int])
+检查c作为连接素材使用时能否视为任意给定setcode的系列卡。nil的setcode参数会被跳过。
 Parameters:
   c: Card
-  ...: int
+  setcode1: int
+  setcode2: int optional
+  ...: int optional
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3397
@@ -1970,7 +1978,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3578
 
 ●bool Card.IsLinkType(Card c, int type)
-检查c用作连接素材时是否属于类型type（与IsType的区别在于对于魔陷区的怪兽卡，用其原本类型作判断）
+检查c作为连接素材使用时的种类是否包含type。
 Parameters:
   c: Card
   type: int
@@ -3063,7 +3071,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4892
 
 ●void Duel.ConfirmDecktop(int player, int count)
-确认玩家player卡组最上方count张卡
+向客户端公开player卡组最上方最多count张卡。
+count会被限制为剩余主卡组数量。函数会为公开等待而yield，不返回Lua值。
 Parameters:
   player: int
   count: int
@@ -3324,7 +3333,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4879
 
 ●int Duel.GetCurrentChain()
-返回当前的连锁个数（即正在处理的连锁序号）
+返回当前连锁中已记录的连锁环数量。
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4945
@@ -4128,7 +4137,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5073
 
 ●void Duel.MoveSequence(Card c, int seq)
-移动c的序号，通常用于在场上换格子或者在卡组中移动到最上方或者最下方
+若c受当前处理中的原因效果影响，将c在其当前控制者与当前位置内移动到序号seq。
+核心会对移动的卡引发EVENT_MOVE，且不返回Lua值。
 Parameters:
   c: Card
   seq: int
@@ -5089,8 +5099,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:639
 
 ●int Effect.GetOwnerPlayer(Effect e)
-返回OwnerPlayer属性（发动效果、建立效果的玩家）
-若無OwnerPlayer属性，则是Owner的控制者
+返回效果e记录的拥有者玩家。
 Parameters:
   e: Effect
 Returns:
@@ -5157,7 +5166,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:654
 
 ●bool Effect.IsActivated(Effect e)
-检查效果e是否是已发动的效果
+检查效果e是否具有EFFECT_TYPES_CHAIN_LINK中的类型位。
 Parameters:
   e: Effect
 Returns:
@@ -5501,7 +5510,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:903
 
 ●Group Group.CreateGroup()
-新建一个空的卡片组
+新建并返回一个空Group。
 Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:900
@@ -5640,7 +5649,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:908
 
 ●int Group.GetSum(Group g, function f, ... any)
-计算g中所有卡的取值的总和，f为为每张卡的取值函数，从第3个参数开始为额外参数
+对g中的每张卡调用f，转发额外参数，并返回各次整数结果的总和。
 Parameters:
   g: Group
   f: function
@@ -5685,8 +5694,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:929
 
 ●Group Group.RandomSelect(Group g, int player, int count)
-让玩家player从g中随机选择count张卡
-因为是随机选择，所以参数player基本无用，由系统随机选取
+返回一个新Group，包含从g中随机选出的count张卡。
+count会被限制为g的数量。player参数会写入随机选择消息，但不影响随机结果。
 Parameters:
   g: Group
   player: int
@@ -5733,20 +5742,19 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:915
 
-●Card|nil Group.SelectUnselect(Group cg, [Group|nil sg], int player, bool btok, bool cancelable, int minc, int maxc)
-让玩家 player 从 cg 中选择 1 张卡放入 sg ，并返回选的卡。
-btok 表示是否可以点击完成选择的按钮， cancelable 表示是否可以取消整个选择返回 nil，
-minc 和 maxc 是客户端的文字缓冲提示，表示需要选择 minc-maxc 张卡，但是这个只是影响视觉效果，并不代表必须要选择那个数量
+●Card|nil Group.SelectUnselect(Group cg, [Group|nil sg], int player, [bool finishable], [bool cancelable], [int min], [int max])
+让player从cg中选择1张卡加入当前选择，或从sg中选择1张卡移出当前选择，并返回被选择的那张卡。
+sg可以为nil。finishable控制当前数量下能否结束选择，cancelable允许取消；取消时返回nil。min和max默认均为1。
 Parameters:
   cg: Group
-  sg: Group|nil optional - already selected cards that can be unselected
+  sg: Group|nil optional
   player: int
-  btok: bool - default: false
-  cancelable: bool - default: false
-  minc: int
-  maxc: int
+  finishable: bool optional - default: false
+  cancelable: bool optional - default: false
+  min: int optional - default: 1
+  max: int optional - default: 1
 Returns:
-  Card|nil
+  Card|nil - Chosen card, or nil if the selection is canceled.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:916
 
 ●Group Group.SelectWithSumEqual(Group g, int player, function f, int sum, int min, int max, ... any)
@@ -6524,10 +6532,12 @@ Parameters:
   e: Effect
 Source: Utilities/utility.lua:802
 
-●void Auxiliary.ExceptThisCard(Effect e)
-TODO document.
+●Card|nil Auxiliary.ExceptThisCard(Effect e)
+当效果e的处理者仍与当前连锁保持关联时返回该卡；否则返回nil。
 Parameters:
   e: Effect
+Returns:
+  Card|nil - e's handler if it is still related to the current Chain; otherwise nil.
 Source: Utilities/utility.lua:1176
 
 ●void Auxiliary.ExtraDeckSummonCountLimitReset()
@@ -6778,11 +6788,14 @@ Returns:
   bool
 Source: Utilities/utility.lua:1981
 
-●void Auxiliary.IsCodeListed(Card c, int code)
-TODO document.
+●bool|nil Auxiliary.IsCodeListed(Card c, int code)
+检查code是否已通过Auxiliary.AddCodeList或相关辅助函数登记在c的card_code_list中。
+该Lua辅助函数在列名时返回true，否则返回nil，通常作为真假判断使用。
 Parameters:
   c: Card
   code: int
+Returns:
+  bool|nil - true if code is listed by c; nil otherwise.
 Source: Utilities/utility.lua:547
 
 ●bool Auxiliary.IsCodeOrListed(Card c, int code)
@@ -7275,14 +7288,14 @@ Returns:
   Group - The selected cards.
 Source: Utilities/utility.lua:1379
 
-●int Auxiliary.SelectFromOptions(int tp, ... table)
-Duel.SelectOption with option condition
-Return value starts from 1, different from Duel.SelectOption
+●any|nil Auxiliary.SelectFromOptions(int tp, ... table)
+按条件筛选选项表，用可用选项文本调用Duel.SelectOption，并返回所选表的自定义值或原始序号。
+每个选项为{condition, option[, value]}。没有条件成立时返回nil。默认返回的序号从1开始，不同于Duel.SelectOption从0开始。
 Parameters:
   tp: int
-  ...: table - {condition, option[, value]}
+  ...: table
 Returns:
-  int
+  any|nil - Selected option value or 1-based option index; nil if no option is available.
 Source: Utilities/utility.lua:152
 
 ●Group Auxiliary.SelectSameCount(int tp, Group g1, Group g2, [int min], [int max], [Card|Group except])
@@ -7980,7 +7993,7 @@ Parameters:
 Source: Utilities/procedure.lua:1253
 
 ●void Auxiliary.AddFusionProcFun2(Card c, function|table f1, function|table f2, bool insf)
-Fusion monster, condition + condition
+给c登记需要1个满足f1和1个满足f2的素材的融合召唤手续。
 Parameters:
   c: Card
   f1: function|table
@@ -8010,7 +8023,7 @@ Parameters:
 Source: Utilities/procedure.lua:1313
 
 ●void Auxiliary.AddFusionProcFunRep(Card c, function|table f, int cc, bool insf)
-Fusion monster, condition * n
+给c登记需要cc个满足同一素材筛选函数f的素材的融合召唤手续。
 Parameters:
   c: Card
   f: function|table
@@ -9016,12 +9029,15 @@ Returns:
   bool - true if the Summon matches Mask Change conditions.
 Source: Utilities/procedure.lua:2317
 
-●void Auxiliary.MustMaterialCheck(any v, int tp, int code)
-TODO document.
+●bool Auxiliary.MustMaterialCheck(Card|Group|nil v, int tp, int code)
+检查tp受到的code类型必须素材效果是否已经满足。
+v为nil时，只有Duel.GetMustMaterial(tp, code)为空才成功，但utility脚本中存在硬编码的超量和同调素材例外。v提供时，返回Duel.CheckMustMaterial(tp, v, code)的结果。
 Parameters:
-  v: any
+  v: Card|Group|nil
   tp: int
   code: int
+Returns:
+  bool
 Source: Utilities/procedure.lua:2274
 
 ●void Auxiliary.MustMaterialCounterFilter(Card c, Group g)
