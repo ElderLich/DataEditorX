@@ -169,7 +169,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3645
 
 ●bool Card.CheckRemoveOverlayCard(Card c, int player, int count, int reason)
-检查玩家player能否以reason为原因，至少移除c叠放的count张卡
+检查player能否为了reason从c上取除至少count个超量素材。
+即使c本身素材不足，可适用的EFFECT_OVERLAY_REMOVE_REPLACE替代效果也可能使该函数返回true。
 Parameters:
   c: Card
   player: int
@@ -459,7 +460,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3456
 
 ●int Card.GetCounter(Card c, int countertype)
-返回c上的countertype类型的指示物的数量， countertype=0 则返回c上所有类型的指示物数量之和
+返回c上的countertype类型指示物信息。
+countertype为0时，此核心返回c当前拥有的不同指示物类型数量，而不是全部指示物的总数。
 Parameters:
   c: Card
   countertype: int
@@ -476,7 +478,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3417
 
 ●int Card.GetDefense(Card c)
-返回c的当前守备力
+返回c当前的守备力。未知或负数守备力会被该绑定限制为0。
 Parameters:
   c: Card
 Returns:
@@ -751,7 +753,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3432
 
 ●int Card.GetOriginalCode(Card c)
-返回c的卡片记载的卡号
+返回c卡片数据中的原本卡号。
 Parameters:
   c: Card
 Returns:
@@ -776,7 +778,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3414
 
 ●int Card.GetOriginalLevel(Card c)
-返回c的卡片记载的等级
+返回c卡片数据中的原本等级；超量怪兽、连接怪兽以及带STATUS_NO_LEVEL的卡返回0。
 Parameters:
   c: Card
 Returns:
@@ -1004,7 +1006,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3439
 
 ●int Card.GetRank(Card c)
-返回c的当前阶级
+返回c当前的阶级。
+非超量卡返回0。超量怪兽不在怪兽区域时返回原本阶级；在怪兽区域时会应用阶级变更效果，结果最低为1。
 Parameters:
   c: Card
 Returns:
@@ -1142,7 +1145,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3402
 
 ●int Card.GetTextAttack(Card c)
-返回c的卡片记载的攻击力，返回值是负数表示是"?"
+返回c卡片数据中记录的攻击力。
+这是记载/数据库数值，不是当前攻击力。不同于Card.GetAttack，该绑定不会把未知攻击力限制为0；但带STATUS_NO_LEVEL的卡返回0。
 Parameters:
   c: Card
 Returns:
@@ -1220,8 +1224,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3403
 
 ●bool Card.IsAbleToChangeControler(Card c)
-检查c是否可以改变控制权
-注：仅当卡收到了“不能改变控制权”的效果的影响时，此函数返回false
+只检查c是否不受EFFECT_CANNOT_CHANGE_CONTROL影响。
 Parameters:
   c: Card
 Returns:
@@ -1606,8 +1609,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3607
 
 ●bool Card.IsControlerCanBeChanged(Card c, [bool ignore_mzone], [int zone])
-检查c的控制权是否可以改变。
-ignore_mzone=true 会忽视转移控制权后的玩家场上是否有空格位， zone 表示必须要使用的位置
+检查c的控制权当前能否转移给另一名玩家。
+c必须在怪兽区域，且不受EFFECT_CANNOT_CHANGE_CONTROL影响。ignore_mzone不为true时，对方还必须在zone指定范围内有可用的怪兽区域。
 Parameters:
   c: Card
   ignore_mzone: bool optional - default: false
@@ -1616,12 +1619,13 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3627
 
-●bool Card.IsDefense(Card c, int def, [int atk2], [... int])
-检查c的守备力是否是 def1[, 或者为 def2...]，如果c不是怪兽卡，或者不在 LOCATION_MZONE 则都返回false
+●bool Card.IsDefense(Card c, int def1, [int def2], [... int])
+检查c不是连接怪兽、是怪兽或当前被当作怪兽，并且当前守备力是否等于任意给定def值。
+nil的def参数会被跳过。不同于旧导入文本，该绑定不会明确要求c位于怪兽区域。
 Parameters:
   c: Card
-  def: int
-  atk2: int optional
+  def1: int
+  def2: int optional
   ...: int optional
 Returns:
   bool
@@ -1646,7 +1650,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3620
 
 ●bool Card.IsDefensePos(Card c)
-检查c是否是守备表示
+检查c当前表示形式是否包含POS_DEFENSE。
 Parameters:
   c: Card
 Returns:
@@ -1654,7 +1658,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3604
 
 ●bool Card.IsDestructable(Card c, [Effect e])
-检查c是否是可被[效果 e]破坏的
+检查c能否被破坏。
+不传e时，核心只排除超量素材以及已经在墓地或除外的卡。传入e时，会检查c是否受e影响，以及按当前原因玩家判断的效果破坏耐性。
 Parameters:
   c: Card
   e: Effect optional
@@ -1794,7 +1799,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3574
 
 ●bool Card.IsFusionType(Card c, int type)
-检查c用作融合素材时是否属于类型type（与IsType的区别在于对于魔陷区的怪兽卡，用其原本类型作判断）
+检查c作为融合素材使用时的种类是否包含type。
+原本为怪兽的卡位于魔法与陷阱区域，且正在素材检查时，核心使用卡片数据中的种类；其他情况使用c当前种类。
 Parameters:
   c: Card
   type: int
@@ -2126,7 +2132,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3492
 
 ●bool Card.IsRank(Card c, int rank1, [int rank2], [... int])
-检查c是否是阶级 rank1[, 或者为 rank2...]
+检查c:GetRank()是否等于任意给定rank值。
+nil的rank参数会被跳过。该绑定直接比较数值阶级，不会额外要求c必须是超量怪兽，因此非超量卡会按阶级0参与比较。
 Parameters:
   c: Card
   rank1: int
@@ -2203,7 +2210,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3562
 
 ●bool Card.IsReleasable(Card c, [int reason])
-检查c是否可以被以原因reason解放（非上级召唤用）
+检查c能否由当前原因玩家作为非召唤用途被解放。
+reason默认REASON_COST。正在召唤中的卡、超量素材、墓地或除外的卡、手牌中的魔法/陷阱卡、玩家不能解放的卡，以及受EFFECT_UNRELEASABLE_NONSUM影响的卡会返回false。
 Parameters:
   c: Card
   reason: int optional - default: REASON_COST
@@ -2444,7 +2452,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3629
 
 ●int Card.RemoveOverlayCard(Card c, int player, int min, int max, int reason)
-以reason为原因，让玩家player移除c叠放的min-max张卡，返回值表示移除的数量
+让player为了reason从c上取除min到max个超量素材，并返回实际取除数量。
+核心会在选择素材前提供可适用的EFFECT_OVERLAY_REMOVE_REPLACE替代效果。
 Parameters:
   c: Card
   player: int
@@ -2452,7 +2461,7 @@ Parameters:
   max: int
   reason: int
 Returns:
-  int
+  int - Number of Xyz Materials actually removed.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3528
 
 ●int Card.ReplaceEffect(Card c, int code, int reset_flag, [int reset_count])
@@ -2503,8 +2512,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3656
 
 ●void Card.SetCardTarget(Card c1, Card c2)
-把c2作为c1的永续对象
-c1和c2的联系会在c1或c2任意一卡离场或变成里侧表示时reset
+把c2登记为c1的持续卡片对象。
+该函数保存的是供Card.GetCardTarget等函数以及相关卡无效检查使用的卡片对象关系，不是Duel.SelectTarget登记的连锁对象列表。
 Parameters:
   c1: Card
   c2: Card
@@ -2902,12 +2911,12 @@ Returns:
   int - may be nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4894
 
-●bool Duel.CheckLocation(int player, int location, int seq)
-检查玩家player的场上位于location序号为seq的空格是否可用
+●bool Duel.CheckLocation(int player, int location, int sequence)
+检查player能否使用location中的sequence位置。
 Parameters:
   player: int
   location: int
-  seq: int
+  sequence: int
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4944
@@ -3876,9 +3885,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4956
 
 ●bool Duel.IsEnvironment(int code, [int player], [int loc])
-检查场地卡号是否是code [，来源玩家是否是 player][，生效区域是否在 loc 内]
-场地卡号指当前生效的场地卡的卡号，或者海神的巫女把场地变化效果的值
-来源玩家指当前生效的场地卡的控制者，或者海神的巫女等卡的控制者
+检查code当前是否被视为环境卡，或是否在请求的位置中存在匹配的表侧表示卡。
+player默认PLAYER_ALL，loc默认LOCATION_ONFIELD。核心会先检查场地区域；若没有表侧场地区域卡，也可以匹配最新的EFFECT_CHANGE_ENVIRONMENT效果。
 Parameters:
   code: int
   player: int optional - default: PLAYER_ALL
@@ -4181,8 +4189,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4929
 
 ●bool Duel.NegateAttack()
-无效此次攻击，返回值表示是否成功
-此次攻击已经被其他效果无效或导致攻击的卡不能攻击则返回false
+尝试无效当前攻击，并返回是否成功无效该次攻击。
+没有有效攻击怪兽、攻击怪兽离场或field ID变化、攻击怪兽不能攻击、伤害步骤状态不允许无效攻击，或攻击怪兽不受当前处理效果影响时，核心返回false。
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4960
@@ -4226,12 +4234,13 @@ Parameters:
   must_pay: bool optional - default: false
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4909
 
-●void Duel.RaiseEvent(Group|Card eg, int code, Effect re, int r, int rp, int ep, int ev)
-以eg,ep,ev,re,r,rp触发一个时点 code
+●void Duel.RaiseEvent(Card|Group eg, int code, Effect|nil re, int r, int rp, int ep, int ev)
+以给定效果、原因、原因玩家、事件玩家和事件值，对Card或Group引发事件code。
+核心在引发事件后处理即时事件并yield，不返回Lua值。
 Parameters:
-  eg: Group|Card
+  eg: Card|Group
   code: int
-  re: Effect
+  re: Effect|nil
   r: int
   rp: int
   ep: int
@@ -4358,15 +4367,15 @@ Parameters:
   code: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4855
 
-●bool Duel.ReturnToField(Card c, [int pos], [int zone])
-把c以表示形式pos返回到场上[的区域 zone]，pos默认值是离场前的表示形式，返回值表示是否成功
-c必须是以REASON_TEMPORARY原因离场，并且离场后没有离开过那个位置
+●bool|nil Duel.ReturnToField(Card c, [int pos], [int zone])
+把临时离场的卡返回到其之前的控制者和之前的位置。
+pos默认之前的表示形式，zone默认0xff。若c不是因REASON_TEMPORARY离场，该绑定不返回Lua值；否则会yield并返回移动是否成功。
 Parameters:
   c: Card
-  pos: int optional
+  pos: int optional - default: previous position
   zone: int optional - default: 0xff
 Returns:
-  bool
+  bool|nil - Success flag, or nil if c was not temporarily removed from the field.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4883
 
 ●void Duel.RevealSelectDeckSequence([bool enabled])
@@ -4648,10 +4657,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4861
 
 ●void Duel.SetChainLimit(function f)
-设定连锁条件，f的函数原型为 bool f(e,ep,tp)
-e表示要限制连锁的效果，ep表示要限制连锁的玩家，tp表示发动该效果的玩家
-在cost或者target处理中调用此函数可以限制可以连锁的效果的种类（如超融合）
-如果f返回false表示不能连锁，一旦设置连锁条件后发生了新的连锁那么连锁条件将会解除
+为当前连锁窗口登记临时连锁限制回调。
+该回调会与当前原因玩家一起保存，之后以f(e, chain_player, activating_player)调用；返回false时，该效果不能连锁。
 Parameters:
   f: function
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4887
@@ -5714,7 +5721,7 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:928
 
 ●void Group.RemoveCard(Group g, Card c)
-把c从g中移除
+从g中移除c。除非g为只读Group，否则会直接修改g；不返回Lua值。
 Parameters:
   g: Group
   c: Card
@@ -5784,8 +5791,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:923
 
 ●void Group.Sub(Group g1, Group g2)
-从g1中移除属于g2中的卡
-注：g2本身不会发生变化
+从g1中移除g2包含的每张卡。除非g1只读，否则会直接修改g1；g2不会改变。
 Parameters:
   g1: Group
   g2: Group
@@ -6526,10 +6532,12 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:914
 
-●void Auxiliary.exccon(Effect e)
-TODO document.
+●bool Auxiliary.exccon(Effect e)
+用于“送去墓地的当回合不能发动”类效果的条件辅助函数；处理者不是本回合送去墓地，或处理者因返回而记录原因时返回true。
 Parameters:
   e: Effect
+Returns:
+  bool
 Source: Utilities/utility.lua:802
 
 ●Card|nil Auxiliary.ExceptThisCard(Effect e)
@@ -6583,11 +6591,12 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:908
 
-●bool Auxiliary.GCheckAdditional(Group sg, [Card|nil c], Group g)
-Subgroup check function
+●bool Auxiliary.GCheckAdditional(Group sg, Card|nil c, Group g)
+Group.CheckSubGroup及相关选择辅助函数使用的全局额外子组检查钩子。
+默认实现返回true。召唤和选择手续会临时替换该函数以施加额外组限制，之后再恢复。
 Parameters:
   sg: Group
-  c: Card|nil optional
+  c: Card|nil
   g: Group
 Returns:
   bool
@@ -6762,12 +6771,14 @@ Parameters:
   c: Card
 Source: Utilities/utility.lua:820
 
-●void Auxiliary.indoval(Effect e, Effect re, int rp)
-TODO document.
+●bool Auxiliary.indoval(Effect e, Effect re, int rp)
+对方效果破坏耐性使用的Value辅助函数；当rp是效果e处理者玩家的对方时返回true。
 Parameters:
   e: Effect
   re: Effect
   rp: int
+Returns:
+  bool
 Source: Utilities/utility.lua:828
 
 ●void Auxiliary.indsval(Effect e, Effect re, int rp)
@@ -7903,7 +7914,8 @@ Returns:
 Source: Utilities/procedure.lua:1453
 
 ●void Auxiliary.AddFusionProcCode2(Card c, int code1, int code2, bool sub, bool insf)
-Fusion monster, name + name
+给c登记需要卡号为code1和code2的素材的融合召唤手续。
+该辅助函数会把sub和insf原样转交给Auxiliary.AddFusionProcMix。
 Parameters:
   c: Card
   code1: int
@@ -8848,13 +8860,15 @@ Returns:
   function - Target function for a configurable Fusion Summon effect.
 Source: Utilities/procedure.lua:1499
 
-●void Auxiliary.fuslimit(Effect e, Effect se, any sp, any st)
-TODO document.
+●bool Auxiliary.fuslimit(Effect e, Effect se, int sp, int st)
+特殊召唤条件辅助函数；当召唤类型st包含SUMMON_TYPE_FUSION时返回true。
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool
 Source: Utilities/procedure.lua:2289
 
 ●void Auxiliary.GetLinkCount(Card c)
