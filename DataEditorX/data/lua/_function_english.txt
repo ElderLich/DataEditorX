@@ -93,27 +93,19 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3650
 
 ●void Card.AssumeProperty(Card c, int assume_type, int assume_value)
-Use the value of assume_type c as assume_value (genome fighter)
-Assume_type is the following type
-ASSUME_CODE card number
-The ASSUME_TYPE type
-ASSUME_LEVEL class
-ASSUME_RANK class
-ASSUME_ATTRIBUTE property
-ASSUME_RACE race
-ASSUME_ATTACK Attack power
-ASSUME_DEFENSE Defense
+Temporarily assumes one property of c for core checks.
+assume_type is one of ASSUME_CODE, ASSUME_TYPE, ASSUME_LEVEL, ASSUME_RANK, ASSUME_ATTRIBUTE, ASSUME_RACE, ASSUME_ATTACK, or ASSUME_DEFENSE.
 Parameters:
   c: Card
   assume_type: int
   assume_value: int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3660
 
-●void Card.CancelCardTarget(Card c1, Card c2)
-Cancel c2 as a perpetual object of c1
+●void Card.CancelCardTarget(Card c, Card target)
+Removes target from c's persistent card-target relation list.
 Parameters:
-  c1: Card
-  c2: Card
+  c: Card
+  target: Card
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3541
 
 ●void Card.CancelToGrave(Card c, [bool cancel])
@@ -167,11 +159,11 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3644
 
-●bool Card.CheckFusionSubstitute(Card c, Card fc)
-Check whether the c can replace the material description card name of the fusion monster fc
+●bool Card.CheckFusionSubstitute(Card c, Card fcard)
+Checks whether c can substitute for a specifically named Fusion Material listed by Fusion Monster fcard.
 Parameters:
   c: Card
-  fc: Card
+  fcard: Card
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3645
@@ -290,12 +282,12 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3440
 
 ●Group,bool Card.GetAttackableTarget(Card c)
-Returns the attackable card set and whether it can attack directly
+Returns the Group of cards c can attack and a boolean indicating whether c can attack directly.
 Parameters:
   c: Card
 Returns:
-  Group
-  bool
+  Group - Attackable monsters.
+  bool - Whether c can attack directly.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3654
 
 ●int Card.GetAttackAnnouncedCount(Card c)
@@ -307,8 +299,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3534
 
 ●int Card.GetAttackedCount(Card c)
-Returns the number of times this round has been attacked
-Note: If this value is different from the return value of the previous function, then this card has been a direct attack this round
+Returns c's attack count for the current turn.
 Parameters:
   c: Card
 Returns:
@@ -340,11 +331,11 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3431
 
-●int Card.GetAttributeInGrave(Card c, [int reasonPlayer])
-Return the Attribute card c is treated as having in the Graveyard
+●int Card.GetAttributeInGrave(Card c, [int player])
+Returns the Attribute c is treated as having in the GY for player, defaulting to the current reason player.
 Parameters:
   c: Card
-  reasonPlayer: int optional
+  player: int optional - default: current reason player
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3435
@@ -604,7 +595,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3547
 
 ●int Card.GetLeaveFieldDest(Card c)
-Returns the destination of an effect (such as the universe) that was changed as a result of departure from c
+Returns the location c would be redirected to by leave-field effects for REASON_EFFECT.
 Parameters:
   c: Card
 Returns:
@@ -721,7 +712,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3516
 
 ●Group Card.GetMutualLinkedGroup(Card c)
-Return the group of cards mutually linked with card c
+Returns the Group of cards mutually linked with c.
 Parameters:
   c: Card
 Returns:
@@ -910,7 +901,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3457
 
 ●int Card.GetPreviousDefenseOnField(Card c)
-Returns the defensive power before the c position changes
+Returns the DEF value c had while it was previously on the field.
 Parameters:
   c: Card
 Returns:
@@ -926,7 +917,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3520
 
 ●int Card.GetPreviousLevelOnField(Card c)
-Returns the rank before the c position change
+Returns the Level value c had while it was previously on the field.
 Parameters:
   c: Card
 Returns:
@@ -934,7 +925,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3448
 
 ●int Card.GetPreviousLocation(Card c)
-Returns the position before the c position changes
+Returns c's previous location bitmask from before its last location change.
 Parameters:
   c: Card
 Returns:
@@ -1094,7 +1085,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3473
 
 ●int Card.GetSummonLocation(Card c)
-Returns the call position of c
+Returns the location c was Summoned from, decoded from its summon information.
 Parameters:
   c: Card
 Returns:
@@ -1454,11 +1445,11 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3639
 
-●bool Card.IsCanBeLinkMaterial(Card c, [Card|nil sc])
-Check if c can be used as Link Material [for Link Monster sc]; if sc is not specified, must pass nil
+●bool Card.IsCanBeLinkMaterial(Card c, [Card scard])
+Checks whether c can be used as Link Material, optionally for Link Monster scard.
 Parameters:
   c: Card
-  sc: Card|nil optional
+  scard: Card optional
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3643
@@ -1933,16 +1924,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3392
 
 ●bool Card.IsLinkMarker(Card c, int dir)
-Check if card c has a Link Marker in direction dir
-dir values are:
-LINK_MARKER_BOTTOM_LEFT =0x001 -- ↙
-LINK_MARKER_BOTTOM      =0x002 -- ↓
-LINK_MARKER_BOTTOM_RIGHT=0x004 -- ↘
-LINK_MARKER_LEFT        =0x008 -- ←
-LINK_MARKER_RIGHT       =0x020 -- →
-LINK_MARKER_TOP_LEFT    =0x040 -- ↖
-LINK_MARKER_TOP         =0x080 -- ↑
-LINK_MARKER_TOP_RIGHT   =0x100 -- ↗
+Checks whether c has Link Marker direction dir.
 Parameters:
   c: Card
   dir: int
@@ -2385,7 +2367,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3481
 
 ●bool Card.IsXyzLevel(Card c, Card xyzc, int lv)
-Check c for excess monster xyzc with the level of whether the excess is lv
+Checks whether c can provide Xyz Level lv for Xyz Monster xyzc.
 Parameters:
   c: Card
   xyzc: Card
@@ -2441,7 +2423,7 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3552
 
 ●void Card.ReleaseEffectRelation(Card c, Effect e)
-Manually release the link between c and effect e
+Releases c's relation to effect e.
 Parameters:
   c: Card
   e: Effect
@@ -2480,14 +2462,14 @@ Returns:
   int - Number of Xyz Materials actually removed.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3528
 
-●int Card.ReplaceEffect(Card c, int code, int reset_flag, [int reset_count])
-Replace the effect of c with the effect of the card whose card number is code, and add additional reset conditions
-The return value is the code id representing the replacement effect
+●int Card.ReplaceEffect(Card c, int code, int reset, [int count])
+Replaces c's effects with the effects of card code under the given reset flags and returns the replacement id.
+count defaults to 1; phase resets automatically include both players' turns when no turn side is specified.
 Parameters:
   c: Card
   code: int
-  reset_flag: int
-  reset_count: int optional - default: 1
+  reset: int
+  count: int optional - default: 1
 Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3567
@@ -2516,7 +2498,8 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3659
 
 ●void Card.ReverseInDeck(Card c)
-The setting c is indicated in the front of the deck
+Marks c face-up while it is in the Deck.
+If c is the current top card of the Main Deck, the core also sends the top-of-Deck update to the client.
 Parameters:
   c: Card
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3656
@@ -2834,7 +2817,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4920
 
 ●void Duel.ChangeBattleDamage(int player, int value, [bool check])
-The player player in this battle by the harm into value, check for false is the original combat damage to 0 also change the damage
+Changes player battle damage for the current battle to value.
+When check is true or omitted, existing 0 battle damage is left unchanged.
 Parameters:
   player: int
   value: int
@@ -3132,10 +3116,10 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4858
 
-●void Duel.DisableSelfDestroyCheck([bool enabled])
-Disable card self-destruction checks; no parameter or enabled=true disables the check, enabled=false enables the check
+●void Duel.DisableSelfDestroyCheck([bool disable])
+Sets whether the core's self-destruction check is disabled; omitting disable disables the check.
 Parameters:
-  enabled: bool optional - default: true
+  disable: bool optional - default: true
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4913
 
 ●void Duel.DisableShuffleCheck([bool disable])
@@ -3288,14 +3272,10 @@ Returns:
   Effect|nil
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4889
 
-●int,int,int,int,int Duel.GetCoinResult()
-Returns the result of the current coin
+●int... Duel.GetCoinResult()
+Returns the stored coin toss results for the current coin-toss event, one result per coin.
 Returns:
-  int
-  int
-  int
-  int
-  int
+  int... - One value per stored coin result.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5039
 
 ●int Duel.GetControl(Card|Group targets, int player, [int reset_phase], [int reset_count], [int zone])
@@ -3355,21 +3335,21 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4967
 
 ●int,int,int,int,int Duel.GetDiceResult()
-Returns the result of the current dice
+Returns the five stored dice-result slots for the current dice event.
 Returns:
-  int
-  int
-  int
-  int
-  int
+  int - First dice result.
+  int - Second dice result.
+  int - Third dice result.
+  int - Fourth dice result.
+  int - Fifth dice result.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5040
 
-●int Duel.GetDrawCount(int player)
-Returns the player's number of rules drawn per turn
+●int|nil Duel.GetDrawCount(int player)
+Returns player's current rule draw count for the Draw Phase.
 Parameters:
   player: int
 Returns:
-  int
+  int|nil - Draw count, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4851
 
 ●Group Duel.GetExtraTopGroup(int player, int count)
@@ -3442,14 +3422,15 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4854
 
-●int,...? Duel.GetFlagEffectLabel(int player, int code)
-Return the Label of the flag effect of type code for player; return nil if no such effect exists
+●int|nil,int... Duel.GetFlagEffectLabel(int player, int code)
+Returns the label values stored on player flag effects with code.
+If no matching flag effect exists, the core returns nil; if multiple matching flag effects exist, it returns one label value for each.
 Parameters:
   player: int
   code: int
 Returns:
-  int
-  ...? - integer
+  int|nil - First matching label, or nil if no matching flag effect exists.
+  int... - Additional matching labels.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4857
 
 ●Group,Group Duel.GetFusionMaterial(int player, [int location])
@@ -3625,14 +3606,14 @@ Returns:
   int|nil - Overlay count, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5016
 
-●Group Duel.GetOverlayGroup(int player, int s, int o)
-Returns all stacked cards at a specified location
+●Group|nil Duel.GetOverlayGroup(int player, int s, int o)
+Returns the Xyz Materials attached to cards in player-relative locations s and o.
 Parameters:
   player: int
   s: int
   o: int
 Returns:
-  Group
+  Group|nil - Overlay group, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5015
 
 ●int Duel.GetReadyChain()
@@ -3989,7 +3970,8 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5048
 
 ●bool Duel.IsPlayerCanRelease(int player, [Card c], [int reason])
-Check whether the player can liberate the player c
+Checks whether player can release cards at all, or whether player can release c for reason.
+When c is supplied and reason is omitted, the core uses REASON_COST.
 Parameters:
   player: int
   c: Card optional
@@ -4079,11 +4061,11 @@ Returns:
   bool - true if the virtual monster can be Special Summoned.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5052
 
-●bool Duel.IsPlayerCanSSet(int player, [Card scard])
-Check if player can Set [scard]
+●bool Duel.IsPlayerCanSSet(int player, [Card c])
+Checks whether player can Set Spell/Trap Cards at all, or whether player can Set c as a Spell/Trap Card.
 Parameters:
   player: int
-  scard: Card optional
+  c: Card optional
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5049
@@ -4655,26 +4637,28 @@ Parameters:
   ...: any
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5041
 
-●void Duel.SetDiceResult(int res, ... any)
-Forcibly modify the result of casting dice to res
-This function is used in the persistent EVENT_TOSS_DICE event
+●void Duel.SetDiceResult([int res1], [int res2], [int res3], [int res4], [int res5])
+Sets the five stored dice-result slots; missing or out-of-range values are stored as 1.
 Parameters:
-  res: int
-  ...: any
+  res1: int optional
+  res2: int optional
+  res3: int optional
+  res4: int optional
+  res5: int optional
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5042
 
-●bool Duel.SetFlagEffectLabel(int player, int code, int label)
-Return whether player has a flag effect of type code and set its Label property to label
+●bool|nil Duel.SetFlagEffectLabel(int player, int code, int label)
+Sets the first matching player flag effect's label to label and returns whether one was found.
 Parameters:
   player: int
   code: int
   label: int
 Returns:
-  bool
+  bool|nil - True if a matching flag effect was updated; false if none exists; nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4856
 
 ●void Duel.SetFusionMaterial(Group g)
-Set g to be the fusion material you want to use
+Replaces the core's current Fusion Material set with the cards in g.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4990
@@ -4987,12 +4971,12 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:632
 
-●function Effect.GetCondition(Effect e)
-Returns the condition property
+●function|nil Effect.GetCondition(Effect e)
+Returns e's condition callback, or nil when no condition is set.
 Parameters:
   e: Effect
 Returns:
-  function
+  function|nil
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:641
 
 ●function|nil Effect.GetCost(Effect e)
@@ -5123,12 +5107,12 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:608
 
 ●bool Effect.IsActivatable(Effect e, int player, [bool neglect_loc], [bool neglect_target])
-Check whether the effect can be launched by the player
+Checks whether e can currently be activated by player, with optional booleans to ignore location and target checks.
 Parameters:
   e: Effect
   player: int
-  neglect_loc: bool optional - default: false
-  neglect_target: bool optional - default: false
+  neglect_loc: bool optional
+  neglect_target: bool optional
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:654
@@ -5964,7 +5948,7 @@ Parameters:
 Source: Utilities/utility.lua:281
 
 ●bool Auxiliary.ArcanaCondition(Effect e)
-condition of Arcana Force monster effect from coin toss
+Arcana Force condition helper that checks whether the handler has a stored Arcana coin-result flag.
 Parameters:
   e: Effect
 Returns:
@@ -6256,21 +6240,19 @@ Parameters:
   g: Group
 Source: Utilities/utility.lua:1126
 
-●void Auxiliary.dogcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
-Check if e:GetHandler() was destroyed by the opponent and sent to the Graveyard from your field, used for SetCondition
-function Auxiliary.dogcon(e, tp, eg, ep, ev, re, r, rp)
-  local c=e:GetHandler()
-  return c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY) and rp==1-tp
-end
+●bool Auxiliary.dogcon(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+EVENT_TO_GRAVE condition helper that checks whether the handler was previously controlled by tp and destroyed by the opponent.
 Parameters:
   e: Effect
   tp: int
   eg: Group
   ep: int
-  ev: any
+  ev: int
   re: Effect
-  r: any
+  r: int
   rp: int
+Returns:
+  bool
 Source: Utilities/utility.lua:791
 
 ●void Auxiliary.dogfcon(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
@@ -6287,8 +6269,7 @@ Parameters:
 Source: Utilities/utility.lua:796
 
 ●bool Auxiliary.DragonXyzSpSummonType(Card c)
-The `nolimit` parameter for Special Summon effects of Dragon, Xyz monsters where Soul Drain Dragon is available
-(Soul Drain Dragon, Level 8/LIGHT/Dragon/4000/0)
+Returns true only for Soul Drain Dragon, used as a Special Summon procedure-type helper.
 Parameters:
   c: Card
 Returns:
@@ -6375,7 +6356,7 @@ Parameters:
 Source: Utilities/utility.lua:1057
 
 ●bool Auxiliary.DrytronSpSummonType(Card c)
-The `nolimit` parameter for Special Summon effects of Drytron cards
+Returns whether c is a Special Summon procedure monster, used by Drytron Special Summon helpers.
 Parameters:
   c: Card
 Returns:
@@ -6560,18 +6541,14 @@ Parameters:
   ...: any
 Source: Utilities/utility.lua:466
 
-●void Auxiliary.FilterEqualFunction(function f, any value, ... any)
-Filter cards satisfying a single filter condition f with value value, returning a function with a bool return type; additional parameters start from the third parameter
-function Auxiliary.FilterEqualFunction(f, value, ...)
-  local ext_params={...}
-  return function(target)
-    return f(target, table.unpack(ext_params))==value
-  end
-end
+●function Auxiliary.FilterEqualFunction(function f, any value, [... any])
+Returns a card filter that calls f on the card and extra arguments, then checks whether the result equals value.
 Parameters:
   f: function
   value: any
-  ...: any
+  ...: any optional
+Returns:
+  function
 Source: Utilities/utility.lua:460
 
 ●bool Auxiliary.gbspcon(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
@@ -6637,7 +6614,7 @@ Parameters:
 Source: Utilities/utility.lua:1528
 
 ●int Auxiliary.GetColumn(Card c, [int p])
-Return the column sequence number of card c from player's perspective, excluding the Field Zone; from left to right, columns are 0-4
+Returns c's column index from player p's viewpoint, or NULL_VALUE when c has no field column.
 Parameters:
   c: Card
   p: int optional - default: 0
@@ -6709,10 +6686,12 @@ Returns:
   int - Zone mask for zones linked by at least two Link Monsters.
 Source: Utilities/utility.lua:1181
 
-●void Auxiliary.GetValueType(any v)
-Return the Lua type of value
+●string Auxiliary.GetValueType(any v)
+Returns Lua's type string for ordinary values, or Card, Group, or Effect for those userdata objects.
 Parameters:
   v: any
+Returns:
+  string
 Source: Utilities/utility.lua:472
 
 ●int|nil Auxiliary.GetXyzNumber(any v)
@@ -6781,15 +6760,14 @@ Returns:
   bool
 Source: Utilities/utility.lua:828
 
-●void Auxiliary.indsval(Effect e, Effect re, int rp)
-Simplified method for the filter function preventing destruction by your own card effects, used in effect registration for SetValue
-function aux.indsval(e, re, rp)
-  return rp==e:GetHandlerPlayer()
-end
+●bool Auxiliary.indsval(Effect e, Effect re, int rp)
+Value helper for self-protection from effect destruction; it returns true when the reason player is the handler's player.
 Parameters:
   e: Effect
   re: Effect
   rp: int
+Returns:
+  bool
 Source: Utilities/utility.lua:824
 
 ●bool Auxiliary.IsCanBeQuickEffect(Card c, int tp, int code)
@@ -6875,7 +6853,7 @@ Returns:
 Source: Utilities/utility.lua:1854
 
 ●bool Auxiliary.IsSelfEquip(Card c, int id)
-Check if c has a equip card equipped by the effect of itself.
+Checks whether c has an equipped card carrying flag effect id, which marks equipment created by that card's own effect.
 Parameters:
   c: Card
   id: int
@@ -7208,7 +7186,7 @@ Returns:
 Source: Utilities/utility.lua:1962
 
 ●bool Auxiliary.PhantasmsSpSummonType(Card c)
-The `nolimit` parameter for Special Summon effects of Phantasms cards
+Returns whether c is a Special Summon procedure monster, used by Phantasm Special Summon helpers.
 Parameters:
   c: Card
 Returns:
@@ -7512,18 +7490,14 @@ Returns:
   function - A target callback with parameters (effect, target).
 Source: Utilities/utility.lua:454
 
-●void Auxiliary.TargetEqualFunction(function f, any value, ... any)
-Used in effect registration, returns a function with a bool return type; additional parameters start from the third parameter
-function Auxiliary.TargetEqualFunction(f, value, ...)
-  local ext_params={...}
-  return function(effect,target)
-    return f(target,table.unpack(ext_params))==value
-  end
-end
+●function Auxiliary.TargetEqualFunction(function f, any value, [... any])
+Returns an effect target-value function that calls f on the target card and extra arguments, then checks whether the result equals value.
 Parameters:
   f: function
   value: any
-  ...: any
+  ...: any optional
+Returns:
+  function
 Source: Utilities/utility.lua:448
 
 ●void Auxiliary.tgoval(Effect e, Effect re, int rp)
@@ -7535,15 +7509,14 @@ Parameters:
   rp: int
 Source: Utilities/utility.lua:836
 
-●void Auxiliary.tgsval(Effect e, Effect re, int rp)
-Simplified method for the filter function preventing being targeted by your own card effects, used in effect registration for SetValue
-function aux.tgsval(e, re, rp)
-  return rp==e:GetHandlerPlayer()
-end
+●bool Auxiliary.tgsval(Effect e, Effect re, int rp)
+Value helper for self-targeting protection; it returns true when the reason player is the handler's player.
 Parameters:
   e: Effect
   re: Effect
   rp: int
+Returns:
+  bool
 Source: Utilities/utility.lua:832
 
 ●bool Auxiliary.ThisCardInGraveAlreadyCheckReg(Effect e, int tp, Group eg, int ep, any ev, Effect re, any r, int rp)
@@ -7596,7 +7569,7 @@ Returns:
 Source: Utilities/utility.lua:874
 
 ●bool Auxiliary.TriamidSpSummonType(Card c)
-The `nolimit` parameter for Special Summon effects of Triamid cards
+Returns whether c is a Special Summon procedure monster, used by Triamid Special Summon helpers.
 Parameters:
   c: Card
 Returns:
@@ -7989,7 +7962,7 @@ Parameters:
 Source: Utilities/procedure.lua:1219
 
 ●void Auxiliary.AddFusionProcCode4(Card c, int code1, int code2, int code3, int code4, bool sub, bool insf)
-For the c designated card number for the code1, code2, code3, code4 monster for the fusion material
+Registers a fixed four-name Fusion procedure requiring code1, code2, code3, and code4 as materials.
 Parameters:
   c: Card
   code1: int
@@ -8087,9 +8060,7 @@ Parameters:
 Source: Utilities/procedure.lua:1283
 
 ●void Auxiliary.AddFusionProcFunRep2(Card c, function|table f, int minc, int maxc, bool insf)
-Add a Fusion Summon procedure for c
-Use minc-maxc monsters satisfying the same condition f as Fusion Materials
-Equivalent to aux.AddFusionProcMixRep(c, false, insf, f, minc, maxc)
+Registers a Fusion procedure requiring between minc and maxc materials that satisfy f.
 Parameters:
   c: Card
   f: function|table
@@ -8202,19 +8173,20 @@ Parameters:
   extra_target: any
 Source: Utilities/procedure.lua:1929
 
-●void Auxiliary.AddRitualProcEqualCode(Card c, any code1, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
-Add a Ritual Summon effect for c
-code is the card code of the Ritual Monster; the sum of the Ritual Levels of the materials must equal the original Level of the Ritual Monster
-Equivalent to: aux.AddRitualProcEqual(c, aux.FilterBoolFunction(Card.IsCode, code)), with fit_monster=code added
+●Effect Auxiliary.AddRitualProcEqualCode(Card c, int code1, [int summon_location], [function grave_filter], [function mat_filter], [bool pause], [function extra_operation], [function extra_target])
+Creates a Ritual Summon activation effect for Ritual Monster code1.
+The selected materials' Ritual Levels must exactly equal the Ritual Monster's original Level, and optional Graveyard material, material filter, and extra callbacks are forwarded to the shared Ritual procedure.
 Parameters:
   c: Card
-  code1: any
-  summon_location: any
-  grave_filter: any
-  mat_filter: any
-  pause: Effect
-  extra_operation: any
-  extra_target: any
+  code1: int
+  summon_location: int optional - default: LOCATION_HAND
+  grave_filter: function optional
+  mat_filter: function optional
+  pause: bool optional
+  extra_operation: function optional
+  extra_target: function optional
+Returns:
+  Effect - Created Ritual Summon activation effect.
 Source: Utilities/procedure.lua:1917
 
 ●void Auxiliary.AddRitualProcGreater(Card c, function filter, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
@@ -8475,12 +8447,12 @@ Parameters:
   reg: bool|nil optional
 Source: Utilities/procedure.lua:1948
 
-●void Auxiliary.EnableReviveLimitPendulumSummonable(Card c, int loc)
-If monster c is Pendulum Summoned from location, it can bypass revival restrictions
-NOTE: The original description includes a question mark (?), indicating potential uncertainty; translated as written (e.g., Odd-Eyes Revolution Dragon (16306932))
+●void Auxiliary.EnableReviveLimitPendulumSummonable(Card c, [int loc])
+Enables revive-limit handling for c while also allowing it to be Pendulum Summoned from loc.
+The helper stores loc on c's metatable and completes c's procedure when it is successfully Pendulum Summoned.
 Parameters:
   c: Card
-  loc: int
+  loc: int optional - default: 0xff
 Source: Utilities/procedure.lua:2097
 
 ●bool Auxiliary.FCheckMix(Card c, Group mg, Group sg, Card fc, bool sub, function fun1, [function|nil fun2], ... function)
@@ -9241,17 +9213,15 @@ Returns:
   bool - true if c's current location is Pendulum Summonable by its flag.
 Source: Utilities/procedure.lua:2111
 
-●void Auxiliary.penlimit(Effect e, Effect se, any sp, any st)
-Simplified method for the filter function preventing summoning (broadly) by methods other than Pendulum Summon, used in effect registration for SetValue
-se is the effect used to summon the card, sp is the summoning player, st is the summon type
-function aux.penlimit(e, se, sp, st)
-  return st&SUMMON_TYPE_PENDULUM==SUMMON_TYPE_PENDULUM
-end
+●bool Auxiliary.penlimit(Effect e, Effect se, int sp, int st)
+Special Summon condition helper that returns true only when st contains SUMMON_TYPE_PENDULUM.
 Parameters:
   e: Effect
   se: Effect
-  sp: any
-  st: any
+  sp: int
+  st: int
+Returns:
+  bool
 Source: Utilities/procedure.lua:2305
 
 ●void Auxiliary.PSSCompleteProcedure(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
