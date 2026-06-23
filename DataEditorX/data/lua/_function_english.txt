@@ -2910,14 +2910,15 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4944
 
-●bool Duel.CheckLPCost(int player, int cost, [bool must_pay])
-Checks whether player can pay the specified LP cost.
+●bool|nil Duel.CheckLPCost(int player, int cost, [bool must_pay])
+Checks whether player can pay the specified LP cost without paying it.
+Use this in a Cost callback's chk==0 branch. The core returns false for nonpositive costs, and the optional must_pay flag is passed to the LP-cost check.
 Parameters:
-  player: int
-  cost: int
-  must_pay: bool optional - default: false
+  player: int - Player checked for payment ability.
+  cost: int - LP amount to check; values of 0 or less return false.
+  must_pay: bool optional - Passed through to the core LP-cost check; scripts use true when the player must be able to pay that exact amount.
 Returns:
-  bool
+  bool|nil - True if the LP cost can be paid; false if it cannot or cost is nonpositive; nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4908
 
 ●bool Duel.CheckMustMaterial(int player, Group|Card cards, int ecode)
@@ -4198,10 +4199,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5014
 
 ●void Duel.PayLPCost(int player, int cost, [bool must_pay])
 Makes player pay the specified LP cost.
+Call this only in the real Cost branch after the chk==0 branch has used Duel.CheckLPCost or an equivalent legality check.
 Parameters:
-  player: int
-  cost: int
-  must_pay: bool optional - default: false
+  player: int - Player who pays the LP cost.
+  cost: int - LP amount to pay.
+  must_pay: bool optional - Passed through to the core LP-cost payment processor.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4909
 
 ●void Duel.RaiseEvent(Card|Group eg, int code, Effect|nil re, int r, int rp, int ep, int ev)
@@ -4701,14 +4703,16 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5004
 
 ●void Duel.SetTargetParam(int param)
 Stores param as the target parameter for the currently handled Chain.
+Operations commonly read it with Duel.GetChainInfo(0, CHAININFO_TARGET_PARAM), often together with CHAININFO_TARGET_PLAYER.
 Parameters:
-  param: int
+  param: int - Integer target parameter stored on the current Chain.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5007
 
 ●void Duel.SetTargetPlayer(int player)
 Stores player as the target player for the currently handled Chain.
+Operations commonly read it with Duel.GetChainInfo(0, CHAININFO_TARGET_PLAYER), often together with CHAININFO_TARGET_PARAM.
 Parameters:
-  player: int
+  player: int - Player value stored on the current Chain.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5006
 
 ●void Duel.ShuffleDeck(int player)
@@ -5220,8 +5224,8 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:625
 Sets e's cost callback. For activated effects, the callback checks whether the cost can be paid and then pays it.
 Cost callbacks should only test legality when chk is 0; irreversible payment belongs in the nonzero chk branch.
 Parameters:
-  e: Effect
-  cost_func: function
+  e: Effect - Effect whose cost callback is replaced.
+  cost_func: function - Callback usually shaped as cost_func(e,tp,eg,ep,ev,re,r,rp,chk).
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:627
 
 ●void Effect.SetCostCheck(Effect e, bool b)
@@ -5272,9 +5276,10 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:622
 
 ●void Effect.SetOperation(Effect e, nil|function op_func)
 Sets e's operation callback. Passing nil clears the operation.
+For activated effects, this callback resolves after the Chain reaches this Link, so it should re-check targets, locations, relation, and other state that may have changed since activation.
 Parameters:
-  e: Effect
-  op_func: nil|function
+  e: Effect - Effect whose operation callback is replaced or cleared.
+  op_func: nil|function - Operation callback, or nil to clear it.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:629
 
 ●void Effect.SetOwnerPlayer(Effect e, int player)

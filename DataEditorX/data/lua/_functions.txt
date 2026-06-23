@@ -2928,14 +2928,15 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4944
 
-●bool Duel.CheckLPCost(int player, int cost, [bool must_pay])
-检查玩家player是否能支付cost点lp，must_pay表示不能用代替支付的效果
+●bool|nil Duel.CheckLPCost(int player, int cost, [bool must_pay])
+检查player是否可以支付指定LP Cost，但不会实际支付。
+通常在Cost回调的chk==0分支使用。cost小于等于0时核心返回false；可选的must_pay标志会传给LP支付检查。
 Parameters:
-  player: int
-  cost: int
-  must_pay: bool optional - default: false
+  player: int - 要检查支付能力的玩家。
+  cost: int - 要检查的LP数值；0或更小的值会返回false。
+  must_pay: bool optional - 传给核心LP Cost检查；脚本在玩家必须能够支付该确切数值时传true。
 Returns:
-  bool
+  bool|nil - 可以支付时为true；不能支付或cost不为正数时为false；player无效时为nil。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4908
 
 ●bool Duel.CheckMustMaterial(int player, Group|Card cards, int ecode)
@@ -4222,11 +4223,12 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5014
 
 ●void Duel.PayLPCost(int player, int cost, [bool must_pay])
-让玩家player支付cost点lp，must_pay表示不能用代替支付的效果
+使player支付指定LP Cost。
+只应在实际Cost分支调用；chk==0分支应先使用Duel.CheckLPCost或等价检查确认可以支付。
 Parameters:
-  player: int
-  cost: int
-  must_pay: bool optional - default: false
+  player: int - 支付LP Cost的玩家。
+  cost: int - 要支付的LP数值。
+  must_pay: bool optional - 传给核心LP Cost支付处理器。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4909
 
 ●void Duel.RaiseEvent(Card|Group eg, int code, Effect|nil re, int r, int rp, int ep, int ev)
@@ -4733,15 +4735,17 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5004
 
 ●void Duel.SetTargetParam(int param)
-把当前正在处理的连锁的对象参数设置成param
+把param保存为当前处理连锁的对象参数。
+Operation回调通常用Duel.GetChainInfo(0, CHAININFO_TARGET_PARAM)读取它，并常与CHAININFO_TARGET_PLAYER一起使用。
 Parameters:
-  param: int
+  param: int - 保存到当前连锁上的整数对象参数。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5007
 
 ●void Duel.SetTargetPlayer(int player)
-把当前正在处理的连锁的对象玩家设置成player
+把player保存为当前处理连锁的对象玩家。
+Operation回调通常用Duel.GetChainInfo(0, CHAININFO_TARGET_PLAYER)读取它，并常与CHAININFO_TARGET_PARAM一起使用。
 Parameters:
-  player: int
+  player: int - 保存到当前连锁上的玩家值。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5006
 
 ●void Duel.ShuffleDeck(int player)
@@ -5256,10 +5260,11 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:625
 
 ●void Effect.SetCost(Effect e, function cost_func)
-设置效果e的Cost函数。
+设置e的Cost回调。对于发动型效果，该回调用于检查Cost能否支付，并在实际发动时支付Cost。
+chk为0时Cost回调只应检查合法性；不可逆的支付动作应放在chk非0的分支。
 Parameters:
-  e: Effect
-  cost_func: function
+  e: Effect - 要替换Cost回调的效果。
+  cost_func: function - 回调通常写作cost_func(e,tp,eg,ep,ev,re,r,rp,chk)。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:627
 
 ●void Effect.SetCostCheck(Effect e, bool b)
@@ -5309,10 +5314,11 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:622
 
 ●void Effect.SetOperation(Effect e, nil|function op_func)
-设置或清除效果e的Operation函数。
+设置e的Operation回调；传入nil会清除Operation。
+对于发动型效果，该回调会在连锁处理到此连锁环时结算，因此应重新检查对象、位置、关联以及发动后可能变化的状态。
 Parameters:
-  e: Effect
-  op_func: nil|function
+  e: Effect - 要替换或清除Operation回调的效果。
+  op_func: nil|function - Operation回调；传nil表示清除。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:629
 
 ●void Effect.SetOwnerPlayer(Effect e, int player)
