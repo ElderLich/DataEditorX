@@ -4903,11 +4903,12 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4868
 ========== Effect ==========
 ●bool Effect.CheckCountLimit(Effect e, int p)
 Checks whether e's count limit is still available for player p.
+Normal activation checks already use the core count-limit check; this helper is mainly for scripts that manually inspect another Effect object.
 Parameters:
-  e: Effect
-  p: int
+  e: Effect - Effect whose remaining count is checked.
+  p: int - Player whose local or shared count map is checked.
 Returns:
-  bool
+  bool - True if e has no exhausted count limit for p; false when the count is already spent.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:660
 
 ●Effect Effect.Clone(Effect e)
@@ -5230,11 +5231,12 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:657
 
 ●void Effect.SetCountLimit(Effect e, int count, [int code])
 Sets how many times e can be used before its count limit is spent.
-If count is 0, the core treats it as 1. Effects that share a nonzero code share the same usage count. EFFECT_COUNT_CODE_CHAIN is stored together with EFFECT_COUNT_CODE_SINGLE.
+If count is 0, the core treats it as 1. Effects that share a nonzero code share the same usage count for the checked player.
+EFFECT_COUNT_CODE_OATH uses oath-style rollback on negated activations and failed procedure attempts; EFFECT_COUNT_CODE_DUEL uses the duel-long count map; EFFECT_COUNT_CODE_SINGLE shares usage by handler instance; EFFECT_COUNT_CODE_CHAIN uses the chain count map.
 Parameters:
   e: Effect - Effect whose count limit is set.
   count: int - Maximum uses before the count is spent; 0 is normalized to 1 by the core.
-  code: int optional - Shared count-limit code. Effects with the same nonzero code share usage.
+  code: int optional - Shared count-limit code. Effects with the same nonzero code share usage for the checked player; combine a card id with EFFECT_COUNT_CODE_OATH, EFFECT_COUNT_CODE_DUEL, or EFFECT_COUNT_CODE_SINGLE when that special behavior is needed. Passing exactly EFFECT_COUNT_CODE_CHAIN stores it together with EFFECT_COUNT_CODE_SINGLE in this core.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:617
 
 ●void Effect.SetDescription(Effect e, int desc)
@@ -5341,10 +5343,10 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:628
 Manually consumes count uses of e's count limit for player p.
 count defaults to 1. If oath_only is true, the count is consumed only when e's count code includes EFFECT_COUNT_CODE_OATH; otherwise the binding decrements the count limit directly.
 Parameters:
-  e: Effect
-  p: int
-  count: int optional - default: 1
-  oath_only: bool optional - default: false
+  e: Effect - Effect whose count is manually consumed.
+  p: int - Player whose local or shared count is consumed.
+  count: int optional - Number of uses to consume; default: 1.
+  oath_only: bool optional - If true, consume only when e's count code includes EFFECT_COUNT_CODE_OATH; default: false.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:661
 
 ========== Group ==========

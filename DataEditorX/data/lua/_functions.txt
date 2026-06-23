@@ -4957,11 +4957,12 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4868
 ========== Effect ==========
 ●bool Effect.CheckCountLimit(Effect e, int p)
 检查效果e对玩家p是否仍有可用次数。
+通常的发动检查已经会执行核心次数限制检查；此函数主要用于脚本手动检查另一个Effect对象。
 Parameters:
-  e: Effect
-  p: int
+  e: Effect - 要检查剩余次数的效果。
+  p: int - 要检查本地或共享次数表的玩家。
 Returns:
-  bool
+  bool - 如果e对p没有耗尽次数限制则返回true；次数已经用尽时返回false。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:660
 
 ●Effect Effect.Clone(Effect e)
@@ -5282,11 +5283,12 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:657
 
 ●void Effect.SetCountLimit(Effect e, int count, [int code])
 设置效果e在次数限制耗尽前可以使用的次数。
-count为0时核心按1处理。共享同一个非0 code的效果共用使用次数；EFFECT_COUNT_CODE_CHAIN会与EFFECT_COUNT_CODE_SINGLE一起保存。
+count为0时核心按1处理。共享同一个非0 code的效果会对被检查的玩家共用使用次数。
+EFFECT_COUNT_CODE_OATH在发动被无效或手续失败时使用誓约式次数回退；EFFECT_COUNT_CODE_DUEL使用决斗内次数表；EFFECT_COUNT_CODE_SINGLE按处理者实例共享次数；EFFECT_COUNT_CODE_CHAIN使用连锁次数表。
 Parameters:
-  e: Effect - Effect whose count limit is set.
-  count: int - Maximum uses before the count is spent; 0 is normalized to 1 by the core.
-  code: int optional - Shared count-limit code. Effects with the same nonzero code share usage.
+  e: Effect - 要设置次数限制的效果。
+  count: int - 次数耗尽前的最大使用次数；核心会将0按1处理。
+  code: int optional - 共享次数限制代码。同一个非0代码的效果会对被检查的玩家共用使用次数；需要特殊行为时可将卡号与EFFECT_COUNT_CODE_OATH、EFFECT_COUNT_CODE_DUEL或EFFECT_COUNT_CODE_SINGLE组合。传入的代码正好是EFFECT_COUNT_CODE_CHAIN时，此核心会同时保存EFFECT_COUNT_CODE_SINGLE。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:617
 
 ●void Effect.SetDescription(Effect e, int desc)
@@ -5389,10 +5391,10 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:628
 手动消耗玩家p对效果e的count次次数限制。
 count默认1。oath_only为true时，只有e的次数代码包含EFFECT_COUNT_CODE_OATH才会消耗次数；否则该绑定会直接减少次数限制。
 Parameters:
-  e: Effect
-  p: int
-  count: int optional - default: 1
-  oath_only: bool optional - default: false
+  e: Effect - 要手动消耗次数的效果。
+  p: int - 要消耗本地或共享次数的玩家。
+  count: int optional - 要消耗的使用次数；默认值为1。
+  oath_only: bool optional - 若为true，则仅在e的次数代码包含EFFECT_COUNT_CODE_OATH时消耗次数；默认值为false。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:661
 
 ========== Group ==========
