@@ -3278,30 +3278,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4948
 
 ●... Duel.GetChainInfo(int chainc, ... any)
-返回连锁chainc的信息，如果chainc=0，则返回当前正在处理的连锁的信息
-此函数根据传入的参数个数按顺序返回相应数量的返回值参数可以是:
-CHAININFO_CHAIN_COUNT               连锁序号
-CHAININFO_TRIGGERING_EFFECT         连锁的效果
-CHAININFO_TRIGGERING_PLAYER         连锁的玩家
-CHAININFO_TRIGGERING_CONTROLER      连锁发生位置所属玩家
-CHAININFO_TRIGGERING_LOCATION       连锁发生位置
-CHAININFO_TRIGGERING_SEQUENCE       连锁发生的位置的序号
-CHAININFO_TARGET_CARDS              连锁的对象卡片组
-CHAININFO_TARGET_PLAYER             连锁的对象玩家
-CHAININFO_TARGET_PARAM              连锁的对象参数
-CHAININFO_DISABLE_REASON            连锁被无效的原因效果
-CHAININFO_DISABLE_PLAYER            连锁被无效的原因玩家
-CHAININFO_CHAIN_ID                  连锁的唯一标识
-CHAININFO_TYPE                      连锁卡片的类型（怪兽·魔法·陷阱）
-CHAININFO_EXTTYPE                   连锁卡片的具体类型（例如同调怪兽·永续魔法·反击陷阱）
-举例：
-Duel.GetChainInfo(0,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TARGET_CARDS)
-将会返回当前连锁发生的位置和对象卡
+按请求的CHAININFO_*常量顺序，返回chainc对应连锁的信息字段。
+chainc=0表示当前正在处理的连锁。未知字段返回nil；连锁不存在时不返回值。
 Parameters:
-  chainc: int
-  ...: any
+  chainc: int - Chain index/count to inspect; scripts commonly use 0 for the current Chain Link.
+  ...: any - One or more CHAININFO_* constants. Each requested field produces one return value.
 Returns:
-  ...
+  ... - Values corresponding to the requested CHAININFO_* constants. CHAININFO_TARGET_CARDS returns the Chain's target Group.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4947
 
 ●Effect|nil Duel.GetChainMaterial(int player)
@@ -3449,9 +3432,10 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4971
 
 ●Card|nil Duel.GetFirstTarget()
-返回当前连锁登记的对象卡。
+返回当前正在处理的连锁登记的第一张对象卡。
+若登记了多张对象卡，其余对象卡会按登记顺序作为额外返回值返回。
 Returns:
-  Card|nil
+  Card|nil - First recorded target card, followed by any additional target cards as extra Lua return values. No value is returned when the current Chain has no target cards.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4949
 
 ●int|nil Duel.GetFlagEffect(int player, int code)
@@ -3738,9 +3722,10 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4984
 
 ●Group Duel.GetTargetsRelateToChain()
-返回当前连锁所有有关联的对象卡
+返回当前正在处理的连锁中仍与该连锁有关联的全部对象卡。
+这是多对象操作常用的关联检查辅助函数；已经离开预期位置的对象不会包含在返回的Group中。
 Returns:
-  Group
+  Group - New Group containing the current Chain targets whose Chain relation is still valid; empty when none qualify.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4950
 
 ●int Duel.GetTributeCount(Card c, [Group mg], [bool ex])
@@ -3915,17 +3900,18 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4972
 
 ●bool Duel.IsExistingTarget([function|nil f], int player, int s, int o, int count, [Card|Group|nil ex], ... any)
-检查指定位置是否存在足够数量、满足f且可以成为当前效果对象的卡。
+检查指定位置中是否存在至少count张满足筛选函数f、未被ex排除、且可以成为当前处理效果对象的卡。
+当卡需要成为正式效果对象时，在Target回调中使用此函数。
 Parameters:
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  count: int
-  ex: Card|Group|nil optional
-  ...: any
+  f: function|nil optional - Filter called with each candidate card first, then any extra arguments after ex.
+  player: int - Viewpoint player for s and o.
+  s: int - Locations on player's side to search.
+  o: int - Locations on the opponent's side to search.
+  count: int - Minimum number of legal targets required.
+  ex: Card|Group|nil optional - Card or Group excluded from the search.
+  ...: any - Extra values passed to f after the candidate card.
 Returns:
-  bool
+  bool - True if at least count matching cards can be targeted by the current effect.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4985
 
 ●bool Duel.IsMainPhase()
@@ -4541,19 +4527,20 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4993
 
 ●Group Duel.SelectTarget(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
-选择满足条件的对象卡，并把选择结果登记为当前连锁的对象。
+让sel_player选择min到max张满足筛选函数f、未被ex排除、且可以成为当前处理效果对象的卡。
+选择的卡会登记为当前连锁的对象卡。对于非永续效果，核心还会建立供IsRelateToEffect等函数使用的连锁关联。
 Parameters:
-  sel_player: int
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  min: int
-  max: int
-  ex: Card|Group|nil optional
-  ...: any
+  sel_player: int - Player who makes the selection.
+  f: function|nil optional - Filter called with each candidate card first, then any extra arguments after ex.
+  player: int - Viewpoint player for s and o.
+  s: int - Locations on player's side to search.
+  o: int - Locations on the opponent's side to search.
+  min: int - Minimum number of cards to select.
+  max: int - Maximum number of cards to select.
+  ex: Card|Group|nil optional - Card or Group excluded from the selection.
+  ...: any - Extra values passed to f after the candidate card.
 Returns:
-  Group
+  Group - Group of cards selected by sel_player and registered as current Chain targets. If there is no current Chain or sel_player is invalid, the core returns no value.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4986
 
 ●Group Duel.SelectTribute(int player, Card c, int min, int max, [Group|nil mg], [int toplayer])
@@ -4738,10 +4725,11 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4991
 
 ●void Duel.SetTargetCard(Card|Group targets)
-把当前正在处理的连锁的对象设置成targets
-注，这里的对象指的的广义的对象，包括不取对象的效果可能要处理的对象
+把targets保存为当前处理连锁的对象卡。
+对于非永续效果，核心会为这些卡建立连锁关联；若效果带有EFFECT_FLAG_CARD_TARGET，还会发送成为对象的消息。
+此函数用于登记广义操作对象；它本身不会检查这些卡是否可以合法成为效果对象。
 Parameters:
-  targets: Card|Group
+  targets: Card|Group - Card or Group to record as current Chain target cards.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5004
 
 ●void Duel.SetTargetParam(int param)
@@ -5359,10 +5347,11 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:618
 
 ●void Effect.SetTarget(Effect e, function targ_func)
-设置效果e的Target函数。
+设置e的Target回调。对于发动型效果，该回调用于检查发动合法性，并登记对象或操作信息。
+Target回调通常在chk==0分支只回答是否合法；实际发动分支再用Duel.SelectTarget选择正式对象、用Duel.SetTargetCard登记广义对象，或用Duel.SetOperationInfo声明操作信息。
 Parameters:
-  e: Effect
-  targ_func: function
+  e: Effect - Effect whose target callback is replaced.
+  targ_func: function - Callback function stored on e.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:626
 
 ●void Effect.SetTargetRange(Effect e, int s_range, int o_range)

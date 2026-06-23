@@ -3256,10 +3256,10 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4948
 Returns information fields from chainc in the same order as the requested CHAININFO_* constants.
 Use chainc=0 for the currently resolving Chain. Unknown requested fields return nil, and no values are returned if the Chain does not exist.
 Parameters:
-  chainc: int
-  ...: any
+  chainc: int - Chain index/count to inspect; scripts commonly use 0 for the current Chain Link.
+  ...: any - One or more CHAININFO_* constants. Each requested field produces one return value.
 Returns:
-  ...
+  ... - Values corresponding to the requested CHAININFO_* constants. CHAININFO_TARGET_CARDS returns the Chain's target Group.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4947
 
 ●Effect|nil Duel.GetChainMaterial(int player)
@@ -3410,7 +3410,7 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4971
 Returns the first target card currently recorded for the resolving Chain.
 If multiple target cards were recorded, the remaining target cards are returned as additional values in recorded order.
 Returns:
-  Card|nil
+  Card|nil - First recorded target card, followed by any additional target cards as extra Lua return values. No value is returned when the current Chain has no target cards.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4949
 
 ●int|nil Duel.GetFlagEffect(int player, int code)
@@ -3695,9 +3695,10 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4984
 
 ●Group Duel.GetTargetsRelateToChain()
-Returns all target cards currently related to the Chain.
+Returns all target cards currently related to the resolving Chain.
+This is the relation-aware helper for multi-target operations; targets that left their expected place are omitted from the returned Group.
 Returns:
-  Group
+  Group - New Group containing the current Chain targets whose Chain relation is still valid; empty when none qualify.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4950
 
 ●int Duel.GetTributeCount(Card c, [Group mg], [bool ex])
@@ -3877,15 +3878,15 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4972
 Checks whether the specified locations contain at least count cards that satisfy filter f, are not excluded by ex, and can be targeted by the currently handled effect.
 Use this in Target callbacks when the card must become an official effect target.
 Parameters:
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  count: int
-  ex: Card|Group|nil optional
-  ...: any
+  f: function|nil optional - Filter called with each candidate card first, then any extra arguments after ex.
+  player: int - Viewpoint player for s and o.
+  s: int - Locations on player's side to search.
+  o: int - Locations on the opponent's side to search.
+  count: int - Minimum number of legal targets required.
+  ex: Card|Group|nil optional - Card or Group excluded from the search.
+  ...: any - Extra values passed to f after the candidate card.
 Returns:
-  bool
+  bool - True if at least count matching cards can be targeted by the current effect.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4985
 
 ●bool Duel.IsMainPhase()
@@ -4499,19 +4500,19 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4993
 
 ●Group Duel.SelectTarget(int sel_player, [function|nil f], int player, int s, int o, int min, int max, [Card|Group|nil ex], ... any)
 Lets sel_player choose min to max cards that satisfy filter f, are not excluded by ex, and can be targeted by the currently handled effect.
-The selected cards are also registered as the current Chain's target cards.
+The selected cards are registered as the current Chain's target cards. For non-continuous effects, the core also creates Chain relations used by IsRelateToEffect and related helpers.
 Parameters:
-  sel_player: int
-  f: function|nil optional
-  player: int
-  s: int
-  o: int
-  min: int
-  max: int
-  ex: Card|Group|nil optional
-  ...: any
+  sel_player: int - Player who makes the selection.
+  f: function|nil optional - Filter called with each candidate card first, then any extra arguments after ex.
+  player: int - Viewpoint player for s and o.
+  s: int - Locations on player's side to search.
+  o: int - Locations on the opponent's side to search.
+  min: int - Minimum number of cards to select.
+  max: int - Maximum number of cards to select.
+  ex: Card|Group|nil optional - Card or Group excluded from the selection.
+  ...: any - Extra values passed to f after the candidate card.
 Returns:
-  Group
+  Group - Group of cards selected by sel_player and registered as current Chain targets. If there is no current Chain or sel_player is invalid, the core returns no value.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4986
 
 ●Group Duel.SelectTribute(int player, Card c, int min, int max, [Group|nil mg], [int toplayer])
@@ -4692,9 +4693,10 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4991
 
 ●void Duel.SetTargetCard(Card|Group targets)
 Stores targets as the target cards for the currently handled Chain.
+For non-continuous effects, the core creates Chain relations for those cards and sends the become-target message when the effect has EFFECT_FLAG_CARD_TARGET.
 This records broad operation targets; it does not by itself check whether the cards are legal effect targets.
 Parameters:
-  targets: Card|Group
+  targets: Card|Group - Card or Group to record as current Chain target cards.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5004
 
 ●void Duel.SetTargetParam(int param)
@@ -5310,9 +5312,10 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:618
 
 ●void Effect.SetTarget(Effect e, function targ_func)
 Sets e's target callback. For activated effects, this callback performs activation legality checks and records target or operation information.
+Target callbacks normally use chk==0 only to answer legality, then use the real activation branch to select official targets with Duel.SelectTarget, record broad targets with Duel.SetTargetCard, or announce operation details with Duel.SetOperationInfo.
 Parameters:
-  e: Effect
-  targ_func: function
+  e: Effect - Effect whose target callback is replaced.
+  targ_func: function - Callback function stored on e.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:626
 
 ●void Effect.SetTargetRange(Effect e, int s_range, int o_range)
