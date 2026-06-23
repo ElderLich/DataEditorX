@@ -1068,13 +1068,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3409
 
 ●int Card.GetSequence(Card c)
-返回c在当前位置的序号
-在场上时，序号代表所在的格子，从左往右分别是0-4，场地魔法格的序号为5
-在其它地方时，序号表示的是第几张卡，最下面的卡的序号为0
+返回c在当前位置中的序号。
+在场上时，主要怪兽区域和魔法与陷阱区域从左到右使用0-4；场地区域使用5；灵摆区域使用6-7。
+在其他位置时，序号表示该卡在该位置中的顺序，从0开始。
 Parameters:
-  c: Card
+  c: Card - 要读取当前序号的卡。
 Returns:
-  int
+  int - c在当前位置中的序号。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3468
 
 ●... Card.GetSpecialSummonInfo(Card c, ... int)
@@ -3507,16 +3507,18 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4942
 
 ●int,int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
-返回玩家player场上location可用区域数量以及对应的可用区域mask。
+返回player场上location中可用区域数量以及对应的可用区域掩码。
+location通常为LOCATION_MZONE或LOCATION_SZONE。use_player、reason和zone用于会限制放置区域的效果，例如类似凯撒斗技场的限制。
+数量可能为负数；因此会把区域作为Cost腾出的脚本有时检查ft > -1，而不是ft > 0。
 Parameters:
-  player: int
-  location: int
-  use_player: int optional
-  reason: int optional
-  zone: int optional
+  player: int - 要检查其场上的玩家。
+  location: int - 要统计的位置，通常为LOCATION_MZONE或LOCATION_SZONE。
+  use_player: int optional - 视为要放置卡的玩家。省略时使用当前原因玩家。
+  reason: int optional - 放置原因，例如LOCATION_REASON_TOFIELD或LOCATION_REASON_CONTROL。省略时为LOCATION_REASON_TOFIELD。
+  zone: int optional - 限制统计范围的区域掩码。省略时为0xff。
 Returns:
-  int
-  int
+  int - 可用区域数量。核心注释说明该值可能为负数。
+  int - 可用区域掩码。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4935
 
 ●int,int Duel.GetLocationCountFromEx(int player, [int reason_player], [Group|Card|nil targets], [Card|int|nil sc], [int zone])
@@ -3579,18 +3581,18 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4987
 
-●int,int Duel.GetMZoneCount(int player, [Group|Card targets], [int use_player], [int reason], [int zone])
-返回玩家player场上[targets 离开后]可用的[区域 zone 里的]怪兽区数量
-##第三个第四个额外参数与凯撒斗技场等限制格子的效果有关
+●int,int Duel.GetMZoneCount(int player, [Card|Group|nil targets], [int use_player], [int reason], [int zone])
+返回targets离场后player可用的怪兽区域数量，并额外返回可用区域掩码。
+use_player、reason和zone用于会限制怪兽可放置区域的效果。
 Parameters:
-  player: int
-  targets: Group|Card optional
-  use_player: int optional
-  reason: int optional
-  zone: int optional - default: 0xff
+  player: int - 要检查其怪兽区域的玩家。
+  targets: Card|Group|nil optional - 在统计前视为将离场的Card或Group。
+  use_player: int optional - 视为要放置怪兽的玩家。省略时使用当前原因玩家。
+  reason: int optional - 放置原因。省略时为LOCATION_REASON_TOFIELD。
+  zone: int optional - 限制统计范围的怪兽区域掩码。省略时为0xff。
 Returns:
-  int
-  int - zone
+  int - 忽略targets后的可用怪兽区域数量。
+  int - 可用怪兽区域掩码。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4936
 
 ●Group Duel.GetOperatedGroup()
@@ -3695,18 +3697,18 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4992
 
-●int,int Duel.GetSZoneCount(int player, [Group|Card targets], [int use_player], [int reason], [int zone])
-返回玩家player场上[targets 离开后]可用的[区域 zone 里的]魔陷区数量（不含场地区域）
-##第三个第四个额外参数与凯撒斗技场等限制格子的效果有关
+●int,int Duel.GetSZoneCount(int player, [Card|Group|nil targets], [int use_player], [int reason], [int zone])
+返回targets离场后player可用的魔法与陷阱区域数量，并可用zone限制统计范围；不包含场地区域。
+额外的use_player和reason参数用于会限制区域的效果，例如凯撒斗技场。
 Parameters:
-  player: int
-  targets: Group|Card optional
-  use_player: int optional
-  reason: int optional
-  zone: int optional - default: 0xff
+  player: int - 要检查其魔法与陷阱区域的玩家。
+  targets: Card|Group|nil optional - 在统计前视为将离场的Card或Group。
+  use_player: int optional - 视为要放置卡的玩家。省略时使用当前原因玩家。
+  reason: int optional - 放置原因。省略时为LOCATION_REASON_TOFIELD。
+  zone: int optional - 限制统计范围的魔法与陷阱区域掩码。省略时为0xff。
 Returns:
-  int
-  int - zone
+  int - 忽略targets后的可用魔法与陷阱区域数量。
+  int - 可用魔法与陷阱区域掩码。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4937
 
 ●int Duel.GetTargetCount(function|nil filter, int player, int location1, int location2, Card|Group|nil exception, [... any])
@@ -4392,14 +4394,15 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5038
 ●int Duel.SelectDisableField(int player, int count, int location1, int location2, int filter)
 让player从请求的己方与对方位置中选择count个可用场地区域，并返回所选区域位掩码。
 location1应用于player场上，location2应用于对方场上。核心会把count限制为可用区域数量；没有可选区域时不返回值。
+返回掩码使用player视角位：己方怪兽区域为seq，己方魔法与陷阱区域为seq+8，对方怪兽区域为seq+16，对方魔法与陷阱区域为seq+24。
 Parameters:
-  player: int
-  count: int
-  location1: int
-  location2: int
-  filter: int
+  player: int - 选择区域的玩家；返回掩码也以该玩家视角表示。
+  count: int - 要选择的区域数量；必要时核心会把该值限制到可用区域数量。
+  location1: int - player场上可选择的位置，通常为LOCATION_MZONE和/或LOCATION_SZONE。
+  location2: int - 对方场上可选择的位置，通常为LOCATION_MZONE和/或LOCATION_SZONE。
+  filter: int - 以player视角表示的不可选择区域掩码。
 Returns:
-  int - Selected zone bitmask.
+  int - 所选区域掩码；没有可选区域时不返回值。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5028
 
 ●bool Duel.SelectEffectYesNo(int player, Card c, [int desc])
@@ -6655,11 +6658,12 @@ Source: Utilities/utility.lua:1528
 
 ●int Auxiliary.GetColumn(Card c, [int p])
 从玩家p视角返回c所在纵列编号；c没有场上纵列时返回NULL_VALUE。
+本地辅助函数把通常怪兽区域、魔法与陷阱区域映射为0-4列；额外怪兽区域序号5和6分别映射为1列和3列。
 Parameters:
-  c: Card
-  p: int optional - default: 0
+  c: Card - 要检查所在纵列的卡。
+  p: int optional - 视角玩家。省略时为0。
 Returns:
-  int
+  int - 从p视角看的纵列编号；若c没有场上纵列则为NULL_VALUE。
 Source: Utilities/utility.lua:702
 
 ●int,int Auxiliary.GetFieldIndex(Card c)
@@ -7387,12 +7391,13 @@ Source: Utilities/utility.lua:1956
 
 ●int Auxiliary.SequenceToGlobal(int p, int loc, int seq)
 把玩家本地的怪兽区域或魔法与陷阱区域序号转换为全局区域位。玩家、位置或序号无效时返回0。
+怪兽区域位按16*p+seq位移；魔法与陷阱区域位按16*p+seq+8位移。
 Parameters:
-  p: int
-  loc: int
-  seq: int
+  p: int - 要转换其本地区域序号的玩家。
+  loc: int - LOCATION_MZONE或LOCATION_SZONE。
+  seq: int - loc中的序号。怪兽区域可接受到6；魔法与陷阱区域可接受到4。
 Returns:
-  int - The global zone bit, or 0 for invalid input.
+  int - 全局区域位；输入无效时为0。
 Source: Utilities/utility.lua:1487
 
 ●void Auxiliary.SetUnionState(Card c)

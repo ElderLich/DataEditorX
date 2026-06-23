@@ -1068,9 +1068,9 @@ Returns c's sequence within its current location.
 For field zones, Main Monster Zones and Spell & Trap Zones use 0-4 from left to right, the Field Zone uses 5, and Pendulum Zones use 6-7.
 For other locations, sequence is the card's position in that location, starting from 0.
 Parameters:
-  c: Card
+  c: Card - Card whose current sequence is returned.
 Returns:
-  int
+  int - Sequence in c's current location.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3468
 
 ●... Card.GetSpecialSummonInfo(Card c, ... int)
@@ -3484,15 +3484,16 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4942
 ●int,int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
 Returns how many zones of location are available on player's field and the corresponding usable zone mask.
 location is normally LOCATION_MZONE or LOCATION_SZONE. use_player, reason, and zone are used by effects that restrict where cards can be placed, such as Kaiser Colosseum-style restrictions.
+The count can be negative, so scripts that free a zone as a cost sometimes check ft > -1 instead of ft > 0.
 Parameters:
-  player: int
-  location: int
-  use_player: int optional
-  reason: int optional
-  zone: int optional
+  player: int - Player whose field is checked.
+  location: int - Location to count, normally LOCATION_MZONE or LOCATION_SZONE.
+  use_player: int optional - Player treated as placing the card. Defaults to the current reason player.
+  reason: int optional - Placement reason such as LOCATION_REASON_TOFIELD or LOCATION_REASON_CONTROL. Defaults to LOCATION_REASON_TOFIELD.
+  zone: int optional - Zone mask to restrict the count. Defaults to 0xff.
 Returns:
-  int
-  int
+  int - Available zone count. The core comment notes this can be negative.
+  int - Usable zone mask.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4935
 
 ●int,int Duel.GetLocationCountFromEx(int player, [int reason_player], [Group|Card|nil targets], [Card|int|nil sc], [int zone])
@@ -3554,18 +3555,18 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4987
 
-●int,int Duel.GetMZoneCount(int player, [Group|Card targets], [int use_player], [int reason], [int zone])
+●int,int Duel.GetMZoneCount(int player, [Card|Group|nil targets], [int use_player], [int reason], [int zone])
 Returns the number of usable Monster Zones for player after targets leave, plus the usable zone mask.
 use_player, reason, and zone are used by effects that restrict where monsters can be placed.
 Parameters:
-  player: int
-  targets: Group|Card optional
-  use_player: int optional
-  reason: int optional
-  zone: int optional - default: 0xff
+  player: int - Player whose Monster Zones are checked.
+  targets: Card|Group|nil optional - Card or Group treated as leaving the field before the count is checked.
+  use_player: int optional - Player treated as placing the monster. Defaults to the current reason player.
+  reason: int optional - Placement reason. Defaults to LOCATION_REASON_TOFIELD.
+  zone: int optional - Monster Zone mask to restrict the count. Defaults to 0xff.
 Returns:
-  int
-  int - zone
+  int - Usable Monster Zone count after targets are ignored.
+  int - Usable Monster Zone mask.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4936
 
 ●Group Duel.GetOperatedGroup()
@@ -3668,18 +3669,18 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4992
 
-●int,int Duel.GetSZoneCount(int player, [Group|Card targets], [int use_player], [int reason], [int zone])
+●int,int Duel.GetSZoneCount(int player, [Card|Group|nil targets], [int use_player], [int reason], [int zone])
 Returns the number of available Spell & Trap Zones for player after targets leave, optionally restricted by zone. The Field Zone is not included.
 The additional use_player and reason parameters are used by effects that restrict zones, such as Kaiser Colosseum.
 Parameters:
-  player: int
-  targets: Group|Card optional
-  use_player: int optional
-  reason: int optional
-  zone: int optional - default: 0xff
+  player: int - Player whose Spell & Trap Zones are checked.
+  targets: Card|Group|nil optional - Card or Group treated as leaving the field before the count is checked.
+  use_player: int optional - Player treated as placing the card. Defaults to the current reason player.
+  reason: int optional - Placement reason. Defaults to LOCATION_REASON_TOFIELD.
+  zone: int optional - Spell & Trap Zone mask to restrict the count. Defaults to 0xff.
 Returns:
-  int
-  int - zone
+  int - Usable Spell & Trap Zone count after targets are ignored.
+  int - Usable Spell & Trap Zone mask.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4937
 
 ●int Duel.GetTargetCount(function|nil filter, int player, int location1, int location2, Card|Group|nil exception, [... any])
@@ -4365,14 +4366,15 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5038
 ●int Duel.SelectDisableField(int player, int count, int location1, int location2, int filter)
 Lets player select count available field zones from the requested own-side and opponent-side locations, then returns the selected zone bitmask.
 location1 applies to player's field and location2 applies to the opponent's field. The core clamps count to the available number of zones and returns no value if no zone can be selected.
+The returned mask uses player-relative bits: own Monster Zone seq, own Spell & Trap Zone seq+8, opponent Monster Zone seq+16, and opponent Spell & Trap Zone seq+24.
 Parameters:
-  player: int
-  count: int
-  location1: int
-  location2: int
-  filter: int
+  player: int - Player who selects zones and whose viewpoint defines the returned mask.
+  count: int - Number of zones to select. The core reduces this to the number of available zones if needed.
+  location1: int - Selectable locations on player's field, usually LOCATION_MZONE and/or LOCATION_SZONE.
+  location2: int - Selectable locations on the opponent's field, usually LOCATION_MZONE and/or LOCATION_SZONE.
+  filter: int - Player-relative mask of zones that cannot be selected.
 Returns:
-  int - Selected zone bitmask.
+  int - Selected zone bitmask, or no return value if no zone can be selected.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5028
 
 ●bool Duel.SelectEffectYesNo(int player, Card c, [int desc])
@@ -6619,11 +6621,12 @@ Source: Utilities/utility.lua:1528
 
 ●int Auxiliary.GetColumn(Card c, [int p])
 Returns c's column index from player p's viewpoint, or NULL_VALUE when c has no field column.
+The local helper maps ordinary Monster Zones and Spell & Trap Zones to columns 0-4; Extra Monster Zone sequences 5 and 6 map to columns 1 and 3.
 Parameters:
-  c: Card
-  p: int optional - default: 0
+  c: Card - Card whose field column is checked.
+  p: int optional - Viewpoint player. Defaults to 0.
 Returns:
-  int
+  int - Column index from p's viewpoint, or NULL_VALUE if c has no field column.
 Source: Utilities/utility.lua:702
 
 ●int,int Auxiliary.GetFieldIndex(Card c)
@@ -7351,10 +7354,11 @@ Source: Utilities/utility.lua:1956
 
 ●int Auxiliary.SequenceToGlobal(int p, int loc, int seq)
 Converts a player's local Monster Zone or Spell & Trap Zone sequence into a global zone bit. Invalid players, locations, or sequences return 0.
+Monster Zone bits are shifted by 16*p+seq; Spell & Trap Zone bits are shifted by 16*p+seq+8.
 Parameters:
-  p: int
-  loc: int
-  seq: int
+  p: int - Player whose local field sequence is converted.
+  loc: int - LOCATION_MZONE or LOCATION_SZONE.
+  seq: int - Sequence inside loc. Monster Zone sequences up to 6 are accepted; Spell & Trap Zone sequences up to 4 are accepted.
 Returns:
   int - The global zone bit, or 0 for invalid input.
 Source: Utilities/utility.lua:1487
