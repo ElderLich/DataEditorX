@@ -117,23 +117,24 @@ Parameters:
   cancel: bool optional - default: true
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3651
 
-●Effect,Group|nil,int|nil,int|nil,Effect|nil,int|nil,int|nil Card.CheckActivateEffect(Card c, bool neglect_con, bool neglect_cost, bool copy_info)
+●Effect|nil,Group|nil,int|nil,int|nil,Effect|nil,int|nil,int|nil Card.CheckActivateEffect(Card c, bool neglect_con, bool neglect_cost, bool copy_info)
 Checks whether c has an activation effect that can currently be activated.
 If neglect_con is true, condition checks are skipped. If neglect_cost is true, cost checks are skipped.
-When copy_info is true, the returned values include the triggering event information: eg, ep, ev, re, r, and rp.
+When copy_info is true and the matching activation is not a free-chain activation, the returned values include the triggering event information: eg, ep, ev, re, r, and rp.
+Returns no Lua values when no activation effect is currently usable, so local scripts usually compare the first result with nil.
 Parameters:
   c: Card
-  neglect_con: bool
-  neglect_cost: bool
-  copy_info: bool
+  neglect_con: bool - true to skip the activation effect's condition check.
+  neglect_cost: bool - true to skip the activation effect's cost check.
+  copy_info: bool - true to copy triggering-event information for non-free-chain activations.
 Returns:
-  Effect
-  Group|nil
-  int|nil
-  int|nil
-  Effect|nil
-  int|nil
-  int|nil
+  Effect|nil - The usable activation effect, or nil/no value if none is currently usable.
+  Group|nil - eg when copy_info returns event data.
+  int|nil - ep when copy_info returns event data.
+  int|nil - ev when copy_info returns event data.
+  Effect|nil - re when copy_info returns event data.
+  int|nil - r when copy_info returns event data.
+  int|nil - rp when copy_info returns event data.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3545
 
 ●bool Card.CheckEquipTarget(Card c1, Card c2)
@@ -210,8 +211,10 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3561
 
 ●void Card.CompleteProcedure(Card c)
 Marks c as having completed its proper Summon procedure.
+Use this after a resolving effect successfully performs a proper Summon for a revive-limit monster, such as an effect-driven Ritual, Fusion, Synchro, Xyz, Link, or Special Summon-only procedure.
+Do not call this for ordinary revive effects. Normal rule procedures registered with EFFECT_SPSUMMON_PROC are completed by the core after the procedure succeeds.
 Parameters:
-  c: Card
+  c: Card - Card whose proper Summon status is being completed.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3569
 
 ●int Card.CopyEffect(Card c, int code, int reset, [int count])
@@ -253,24 +256,29 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3631
 
 ●void Card.EnableDualState(Card c)
-Registers an EFFECT_DUAL_STATUS client-hint effect on c.
+Registers EFFECT_DUAL_STATUS on c so local Gemini/Dual checks treat it as having gained its effects.
+This does not perform a Normal Summon or spend a Normal Summon. Use it only for effects that explicitly make a Gemini Monster be treated as having been Normal Summoned again.
+The registered status effect includes the local client hint and resets with the normal card event reset.
 Parameters:
-  c: Card
+  c: Card - Gemini Monster that should immediately gain Dual State.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3511
 
 ●void Card.EnableReviveLimit(Card c)
-Marks c as needing to be properly Summoned before it can be Special Summoned from public locations.
+Marks c as needing to be properly Summoned before ordinary Special Summon effects can bring it back from public locations.
+The core registers an EFFECT_REVIVE_LIMIT effect on c. Pair this with the card's proper Summon procedure or with an effect that calls CompleteProcedure after a successful proper Summon.
+Local core handling clears the completed-procedure status when the card moves to the hand or Deck.
 Parameters:
-  c: Card
+  c: Card - Card that should require a proper Summon before ordinary revive effects can Special Summon it.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3568
 
-●Effect,...? Card.GetActivateEffect(Card c)
+●Effect|nil Card.GetActivateEffect(Card c)
 Returns c's activation effect, the effect with type EFFECT_TYPE_ACTIVATE. This is mainly used for Spell/Trap Cards.
+Returns nil when the card has no registered activation effect, so guard the result before calling Effect methods.
+Use the returned Effect to check whether a Field Spell or other Spell/Trap can be activated before moving or resolving it through another effect.
 Parameters:
   c: Card
 Returns:
-  Effect
-  ...? - Effect
+  Effect|nil - The activation effect registered on c, or nil if none is registered.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3544
 
 ●int Card.GetAttack(Card c)
@@ -603,10 +611,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3475
 
 ●int Card.GetLeftScale(Card c)
 Returns c's current left Pendulum Scale value.
+While c is in a Pendulum Zone, the core applies EFFECT_UPDATE_LSCALE and EFFECT_CHANGE_LSCALE modifiers. Outside a Pendulum Zone, it returns the card-data left scale.
 Parameters:
   c: Card
 Returns:
-  int
+  int - Current left Pendulum Scale value.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3413
 
 ●int Card.GetLevel(Card c)
@@ -645,10 +654,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3390
 
 ●Group Card.GetLinkedGroup(Card c)
 Returns the cards currently occupying zones linked by c.
+Use this when an effect cares about the actual cards in zones pointed to by c's Link Markers.
 Parameters:
   c: Card
 Returns:
-  Group
+  Group - Cards currently in c's linked zones.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3419
 
 ●int Card.GetLinkedGroupCount(Card c)
@@ -661,12 +671,13 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3420
 
 ●int Card.GetLinkedZone(Card c, [int player])
 Returns the linked-zone bitmask generated by c.
-By default the bitmask is from c's controller perspective. Passing the opponent as player swaps the self and opponent halves to that player's perspective.
+By default the bitmask is from c's controller perspective. Passing player converts the mask to that player's perspective.
+Use bit helpers such as bit.extract or bit.band when checking whether a specific sequence is pointed to.
 Parameters:
   c: Card
-  player: int optional - default: c's controller
+  player: int optional - Perspective player for the returned zone mask. Default: c's controller.
 Returns:
-  int
+  int - Linked-zone bitmask from the requested perspective.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3421
 
 ●int Card.GetLinkRace(Card c, [int player])
@@ -1048,10 +1059,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3461
 
 ●int Card.GetRightScale(Card c)
 Returns c's current right Pendulum Scale value.
+While c is in a Pendulum Zone, the core applies EFFECT_UPDATE_RSCALE and EFFECT_CHANGE_RSCALE modifiers. Outside a Pendulum Zone, it returns the card-data right scale.
 Parameters:
   c: Card
 Returns:
-  int
+  int - Current right Pendulum Scale value.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3415
 
 ●int Card.GetRitualLevel(Card c, Card rc)
@@ -1188,12 +1200,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3399
 
 ●int,int Card.GetUnionCount(Card c)
-Returns c's modern Union count and old Union count.
+Returns two values for c: the number of modern Union cards equipped to it, then the number of old Union cards equipped to it.
+The local core counts equipped cards with TYPE_UNION plus EFFECT_UNION_STATUS or EFFECT_OLDUNION_STATUS.
 Parameters:
-  c: Card
+  c: Card - Monster whose equipped Union cards should be counted.
 Returns:
-  int - Modern Union count.
-  int - Old Union count.
+  int - Number of equipped modern Union cards.
+  int - Number of equipped old Union cards.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3523
 
 ●int Card.GetXyzType(Card c)
@@ -1449,11 +1462,12 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3639
 
 ●bool Card.IsCanBeLinkMaterial(Card c, [Card scard])
 Checks whether c can be used as Link Material, optionally for Link Monster scard.
+Standard Link procedures call this before applying their own material filters.
 Parameters:
   c: Card
-  scard: Card optional
+  scard: Card optional - Link Monster that would use c as material.
 Returns:
-  bool
+  bool - true if c may currently be used as Link Material for scard or for a generic Link Material check.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3643
 
 ●bool Card.IsCanBePlacedOnField(Card c, [int toplayer], [int tolocation])
@@ -1468,7 +1482,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3583
 
 ●bool Card.IsCanBeRitualMaterial(Card c, [Card|nil sc])
-Checks whether c can be used as Ritual Material for sc; pass nil when no Ritual Monster is being checked.
+Checks whether c can be used as Ritual Material for sc.
+Ritual scripts usually call this after choosing the Ritual Monster, filtering Duel.GetRitualMaterial's result with Card.IsCanBeRitualMaterial so monster-specific material restrictions are respected.
+Pass nil for sc only when checking the generic material pool before a specific Ritual Monster is known.
 Parameters:
   c: Card
   sc: Card|nil optional
@@ -1478,14 +1494,15 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3641
 
 ●bool Card.IsCanBeSpecialSummoned(Card c, Effect e, int sumtype, int sumplayer, bool nocheck, bool nolimit, [int sumpos], [int toplayer], [int zone])
 Checks whether c can be Special Summoned by effect e using sumtype, sumplayer, sumpos, target player, and optional zone.
-If nocheck is true, c's Summoning condition is skipped. If nolimit is true, c's revive limit or proper-Summon limit is skipped.
+Use the same nocheck, nolimit, position, target player, and zone values that the later Duel.SpecialSummon call will use.
+If nocheck is true, c's Summoning condition is skipped. If nolimit is true, c's revive limit or proper-Summon limit is skipped. Leave both false unless the card text and local pattern justify bypassing those checks.
 Parameters:
   c: Card - Card being checked.
   e: Effect - Effect that would perform the Special Summon.
   sumtype: int - Summon type value recorded for the Special Summon.
   sumplayer: int - Player treated as performing the Special Summon.
-  nocheck: bool - If true, skips c's Summoning-condition check.
-  nolimit: bool - If true, skips c's revive-limit or proper-Summon limit check.
+  nocheck: bool - If true, skips c's Summoning-condition check, including EFFECT_SPSUMMON_CONDITION-style restrictions.
+  nolimit: bool - If true, skips c's revive-limit or proper-Summon completion check.
   sumpos: int optional - Summon position mask checked by the core; default: POS_FACEUP.
   toplayer: int optional - Player whose field c would be Summoned to; default: sumplayer.
   zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
@@ -1966,14 +1983,16 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3425
 ●bool Card.IsLinkSummonable(Card c, Group|nil materials, [Card|nil lcard], [int minc], [int maxc])
 Checks whether Link Monster c can be Link Summoned by the current reason player.
 Optional materials, lcard, minc, and maxc restrict the Link Material pool and material count used by the core check.
+Use this in effect target and operation branches before calling Duel.LinkSummon. minc and maxc default to 0 when omitted, leaving the registered procedure's own count rules in control.
+The core rejects this check during the Damage Step.
 Parameters:
-  c: Card
-  materials: Group|nil
-  lcard: Card|nil optional
-  minc: int optional - default: 0
-  maxc: int optional - default: 0
+  c: Card - Link Monster being tested.
+  materials: Group|nil - Optional temporary material pool. nil lets the registered procedure collect its normal pool.
+  lcard: Card|nil optional - Optional fixed material that the final selected group must include.
+  minc: int optional - Runtime minimum material-card count. default: 0
+  maxc: int optional - Runtime maximum material-card count. default: 0
 Returns:
-  bool
+  bool - true if c has a legal Link Summon under the supplied temporary limits.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3578
 
 ●bool Card.IsLinkType(Card c, int type)
@@ -2236,21 +2255,22 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3393
 
 ●bool Card.IsSpecialSummonable(Card c, [int sum_type])
-Checks whether c can be Special Summoned by player under sum_type, defaulting to 0 and using the current reason player.
+Checks whether c can currently be Special Summoned by the current reason player under sum_type, defaulting to 0.
+This is a broad core check. For effect resolution and activation filters, prefer Card.IsCanBeSpecialSummoned so the effect, target player, position, nocheck, nolimit, and zone match the later Duel.SpecialSummon call.
 Parameters:
-  c: Card
-  sum_type: int optional
+  c: Card - Card being checked.
+  sum_type: int optional - Summon type value to test; default: 0.
 Returns:
-  bool
+  bool - True if the core currently considers c Special Summonable under that summon type.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3575
 
 ●bool Card.IsSpecialSummonableCard(Card c)
 Checks whether c can be Special Summoned by a proper procedure.
-c must have an available Special Summon procedure.
+c must have an available Special Summon procedure. This is useful for cards that look for monsters in the GY that already satisfy their revive-limit requirements and still have a legal procedure-style Special Summon path.
 Parameters:
-  c: Card
+  c: Card - Card being checked.
 Returns:
-  bool
+  bool - True if c has an available proper Special Summon procedure in the current game state.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3573
 
 ●bool Card.IsSpecialSummonSetCard(Card c, ... int)
@@ -2273,11 +2293,12 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3581
 
 ●bool Card.IsStatus(Card c, int status)
 Checks whether c currently has at least one status flag from status.
+Common legality checks use this for temporary engine states such as STATUS_BATTLE_DESTROYED before allowing a Damage Step Quick Effect.
 Parameters:
-  c: Card
-  status: int
+  c: Card - Card whose current status flags are checked.
+  status: int - Status flag or combined status mask, such as STATUS_BATTLE_DESTROYED.
 Returns:
-  bool
+  bool - true if c has any flag included in status.
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3504
 
 ●bool Card.IsSummonable(Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
@@ -2383,11 +2404,13 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3412
 
 ●bool Card.IsXyzSummonable(Card c, [Group|nil materials], [int minc], [int maxc])
 Checks whether Xyz Monster c can be Xyz Summoned by the current reason player with an optional material group and min/max constraints.
+Use this in effect target and operation branches before calling Duel.XyzSummon. minc and maxc default to 0 when omitted, leaving the registered procedure's own count rules in control.
+The core rejects this check during the Damage Step.
 Parameters:
-  c: Card
-  materials: Group|nil optional
-  minc: int optional
-  maxc: int optional
+  c: Card - Xyz Monster being tested.
+  materials: Group|nil optional - Optional material pool or exact material group supplied by the effect.
+  minc: int optional - Optional minimum material count override. Defaults to 0.
+  maxc: int optional - Optional maximum material count override. Defaults to 0.
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3577
@@ -2415,10 +2438,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3548
 ●Effect Card.RegisterFlagEffect(Card c, int code, int reset_flag, int property, int reset_count, [int label], [int desc])
 Registers a special single-card flag effect on c and returns the created Effect.
 Flag effects are script markers: their code is kept separate from regular effect codes, they cannot be disabled, and count=0 is treated as 1.
+When reset_flag contains RESET_PHASE without RESET_SELF_TURN or RESET_OPPO_TURN, the core applies both turn sides. See the Reset Flags And Effect Duration learning guide for full patterns.
 Parameters:
   c: Card - Card that receives the marker.
   code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
-  reset_flag: int - RESET_* mask controlling when the marker expires.
+  reset_flag: int - RESET_* mask controlling when the marker expires; phase resets without an explicit turn side apply to both players' turns.
   property: int - Effect property flags stored on the created marker; EFFECT_FLAG_CANNOT_DISABLE is always added.
   reset_count: int - Reset counter for the created marker; 0 is treated as 1.
   label: int optional - Optional integer payload stored on the marker.
@@ -2902,12 +2926,13 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4894
 
 ●bool Duel.CheckLocation(int player, int location, int sequence)
 Checks whether player can use the given sequence in location.
+For Pendulum Zone checks, use LOCATION_PZONE with sequence 0 for the left Pendulum Zone or sequence 1 for the right Pendulum Zone.
 Parameters:
   player: int
-  location: int
-  sequence: int
+  location: int - Location constant to inspect, such as LOCATION_MZONE, LOCATION_SZONE, or LOCATION_PZONE.
+  sequence: int - Sequence inside that location.
 Returns:
-  bool
+  bool - true if that exact location sequence is usable.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4944
 
 ●bool|nil Duel.CheckLPCost(int player, int cost, [bool must_pay])
@@ -3001,11 +3026,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4994
 
 ●bool Duel.CheckTiming(int timing)
-Checks whether timing is present in either player's current hint timing mask.
+Returns whether the current core hint-timing masks contain timing for either player.
+This is a prompt-window helper, not a full activation legality check; no indexed local card script currently calls it directly.
+Use ordinary type/code/range, condition, cost, and target checks for real legality. See the Chain Timing And Activation Windows learning guide for full patterns.
 Parameters:
-  timing: int
+  timing: int - TIMING_* mask to test against the current core hint timing.
 Returns:
-  bool
+  bool - True if timing is present in either player's current hint timing mask.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4897
 
 ●bool Duel.CheckTribute(Card c, int min, [int max], [Group|nil mg], [int toplayer], [int zone])
@@ -3036,17 +3063,18 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4996
 
-●bool Duel.CheckXyzMaterial(Card c, [function|nil f], int lv, int min, int max, [Group|nil mg])
-Checks whether scard has a legal Xyz Material selection for Level lv, material count range, optional filter, and optional material group.
+●bool Duel.CheckXyzMaterial(Card scard, function|nil f, int lv, int minc, int maxc, [Group|nil materials])
+Checks whether scard has a legal Xyz Material selection for material Xyz Level lv, material count range, optional filter, and optional material group.
+This is the boolean check used by Xyz procedure targets. It does not select or move cards.
 Parameters:
-  c: Card
-  f: function|nil optional
-  lv: int
-  min: int
-  max: int
-  mg: Group|nil optional
+  scard: Card - Xyz Monster whose material procedure is checked.
+  f: function|nil - Optional per-material filter.
+  lv: int - Required material Xyz Level.
+  minc: int - Minimum material count.
+  maxc: int - Maximum material count.
+  materials: Group|nil optional - Optional candidate material group. When omitted, procedure code usually supplies the player's Monster Zone group.
 Returns:
-  bool
+  bool - true if a legal Xyz Material selection exists.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5012
 
 ●void Duel.ClearOperationInfo(int ct)
@@ -3455,10 +3483,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5020
 
 ●Group|nil Duel.GetLinkedGroup(int player, int s, int o)
 Returns a Group of cards in player-relative locations s and o that are linked.
+Use the Card.GetLinkedGroup method when checking one Link Monster; use this Duel helper for field-wide location-mask checks.
 Parameters:
-  player: int
-  s: int
-  o: int
+  player: int - Perspective player.
+  s: int - Location mask on player's side.
+  o: int - Location mask on the opponent's side from player's perspective.
 Returns:
   Group|nil - Linked cards, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4940
@@ -3475,10 +3504,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4941
 
 ●int Duel.GetLinkedZone(int player)
 Returns the zone bitmask currently pointed to by Link Markers from player's perspective.
+Use bit operations to test individual zones. For one Link Monster's markers, use Card.GetLinkedZone.
 Parameters:
-  player: int
+  player: int - Perspective player for the returned zone mask.
 Returns:
-  int
+  int - Linked-zone bitmask from player's perspective.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4942
 
 ●int,int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
@@ -3583,18 +3613,19 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5010
 
-●bool,Group,int,int,int Duel.GetOperationInfo(int chainc, int category)
+●bool,Group|nil,int|nil,int|nil,int|nil Duel.GetOperationInfo(int chainc, int category)
 Returns operation information recorded for category on chainc.
 The first return value is false when that category is not recorded. Otherwise, the remaining values correspond to Duel.SetOperationInfo: targets, count, target_player, and target_param.
+Use this in response checks that need to inspect what a Chain Link announced, such as whether it is expected to destroy cards or move cards from a location.
 Parameters:
-  chainc: int
-  category: int
+  chainc: int - Chain Link number to inspect. Use 0 for the current Chain Link.
+  category: int - CATEGORY_* flag whose operation info should be read.
 Returns:
-  bool
-  Group - may be nil
-  int - may be nil
-  int - may be nil
-  int - may be nil
+  bool - true if operation info for category exists; false if not.
+  Group|nil - Recorded target cards, or nil when only count/player/param were recorded.
+  int|nil - Recorded expected count.
+  int|nil - Recorded target player.
+  int|nil - Recorded category-specific parameter, often a location or amount.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5009
 
 ●int|nil Duel.GetOverlayCount(int player, int s, int o)
@@ -3644,7 +3675,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4975
 
 ●Group Duel.GetRitualMaterial(int player)
-Returns the cards player can use as Ritual Material, including cards in the hand/field that can be Tributed and cards such as Ritual Djinn monsters in the Graveyard.
+Returns the cards player can use as basic Ritual Material.
+The group includes cards in the hand or field that can be Tributed, plus Ritual-material exceptions such as suitable cards in the Graveyard.
+This is only the starting pool. After a Ritual Monster is chosen, filter the group with Card.IsCanBeRitualMaterial and then perform the exact or greater-or-equal material total check.
 Parameters:
   player: int
 Returns:
@@ -3652,7 +3685,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4997
 
 ●Group Duel.GetRitualMaterialEx(int player)
-Returns the group of cards player can use as Ritual Material, including monsters without a Level.
+Returns an extended Ritual Material pool, including monsters without a Level.
+Local Drytron-style scripts use this when the Ritual procedure compares something other than ordinary Levels, such as an ATK-based value.
+After collecting the group, still apply the script's own race, card text, and Ritual Monster material checks.
 Parameters:
   player: int
 Returns:
@@ -3788,14 +3823,14 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4953
 
 ●bool Duel.IsCanAddCounter(int player, [int countertype], [int count], [Card c])
 With only player, checks whether player is not forbidden from placing counters.
-With countertype, count, and c, checks whether player can place that many counters of countertype on c.
+With countertype, count, and c, checks player-wide counter placement restrictions for that card target. It does not replace Card.IsCanAddCounter; use the Card check when you need to confirm the card's permit, face-up state, location, and counter limit.
 Parameters:
-  player: int
-  countertype: int optional
-  count: int optional
-  c: Card optional
+  player: int - Player attempting to place counters.
+  countertype: int optional - Counter type to test when the card-target overload is used.
+  count: int optional - Number of counters to test when the card-target overload is used.
+  c: Card optional - Card target passed to player-level counter-placement restriction effects.
 Returns:
-  bool
+  bool - true when the player-level placement check passes; this does not by itself prove c can hold or receive the counters.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4876
 
 ●bool Duel.IsCanRemoveCounter(int player, int s, int o, int countertype, int count, int reason)
@@ -3832,10 +3867,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5063
 ●bool Duel.IsChainNegatable(int chainc)
 Compatibility check for whether chainc's activation can be negated.
 In this MDPro3 core binding, the function currently returns true for any chain count.
+Local scripts still call it in negation conditions so the script expresses the intended activation-legality check.
 Parameters:
-  chainc: int
+  chainc: int - Chain Link number to test, commonly the ev argument in an EVENT_CHAINING condition.
 Returns:
-  bool
+  bool - true when this binding considers that Chain Link's activation negatable.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5061
 
 ●bool Duel.IsChainSolving()
@@ -3846,8 +3882,9 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5060
 
 ●bool Duel.IsDamageCalculated()
 Returns whether damage calculation has been performed in the current battle/damage-step state.
+Use it with Duel.GetCurrentPhase in Damage Step conditions, especially for ATK/DEF-changing effects that stop being legal after damage calculation.
 Returns:
-  bool
+  bool - true after damage calculation has been performed in the current battle timing.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4956
 
 ●bool Duel.IsEnvironment(int code, [int player], [int loc])
@@ -4096,15 +4133,16 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4848
 
 ●void Duel.LinkSummon(int player, Card c, Group|nil materials, [Card|nil lcard], [int minc], [int maxc])
-Starts a rule Link Summon of c for player.
-materials, lcard, minc, and maxc become temporary Link Summon limits; the binding yields to the core and returns no Lua value.
+Performs a rule Link Summon for player and c using an optional material group, fixed material, and min/max constraints.
+Use this in effect operations after checking Card.IsLinkSummonable. The selected Link Monster's registered procedure still controls final material selection and sends materials to the GY.
+The core rejects this during the Damage Step, yields while the Summon is processed, and returns no Lua value.
 Parameters:
-  player: int
-  c: Card
-  materials: Group|nil
-  lcard: Card|nil optional
-  minc: int optional - default: 0
-  maxc: int optional - default: 0
+  player: int - Player performing the Link Summon.
+  c: Card - Link Monster to Link Summon.
+  materials: Group|nil - Optional temporary material pool. nil uses the Link Monster's normal procedure pool.
+  lcard: Card|nil optional - Optional fixed material that must be included in the selected group.
+  minc: int optional - Runtime minimum material-card count. default: 0
+  maxc: int optional - Runtime maximum material-card count. default: 0
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4869
 
 ●void Duel.MajesticCopy(Card c1, Card c2)
@@ -4123,19 +4161,20 @@ Parameters:
   seq: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4884
 
-●bool Duel.MoveToField(Card c, int move_player, int target_player, int dest, int pos, bool enable, [int zone])
+●bool Duel.MoveToField(Card c, int move_player, int target_player, int dest, int positions, bool enable, [int zone])
 Moves c onto target_player's field and returns true if the move succeeds.
 dest is normally LOCATION_MZONE or LOCATION_SZONE. LOCATION_FZONE and LOCATION_PZONE are accepted and converted to the matching Spell & Trap Zone handling by the core.
+For LOCATION_PZONE, the core requires a Pendulum Card, lets the player choose an open Pendulum Zone, and sends the card to the GY by rule if no matching Pendulum Zone is usable.
 Parameters:
-  c: Card
-  move_player: int
-  target_player: int
-  dest: int
-  pos: int
-  enable: bool
-  zone: int optional
+  c: Card - Card to move.
+  move_player: int - Player making the placement selection.
+  target_player: int - Player whose field receives the card.
+  dest: int - Destination location. LOCATION_PZONE is accepted for Pendulum Zone placement.
+  positions: int - Allowed position mask, commonly POS_FACEUP for Pendulum Zone placement.
+  enable: bool - Whether to enable the card's field effects after it moves. Local Pendulum placement scripts commonly pass true.
+  zone: int optional - Optional zone mask. For LOCATION_PZONE, low bit 0 allows the left Pendulum Zone and low bit 1 allows the right Pendulum Zone; omitted defaults to both.
 Returns:
-  bool
+  bool - true if the move succeeds; false if the move is invalid or no usable zone is available.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4882
 
 ●void Duel.MSet(int player, Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
@@ -4151,11 +4190,12 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4870
 
 ●bool Duel.NegateActivation(int chainc)
-Attempts to negate the activation of chainc and returns true if it succeeds.
+Attempts to negate the activation of a Chain Link and returns true only if the activation was successfully negated.
+Use it in a resolving negation operation after checking activation legality, commonly with Duel.IsChainNegatable. Gate follow-up actions such as destroy, banish, or send to the GY behind the boolean return.
 Parameters:
-  chainc: int
+  chainc: int - Chain Link number to negate, commonly ev in an EVENT_CHAINING operation.
 Returns:
-  bool
+  bool - true if the activation was negated; false if the Chain Link cannot be negated or the negation fails.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4929
 
 ●bool Duel.NegateAttack()
@@ -4166,12 +4206,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4960
 
 ●bool Duel.NegateEffect(int chainc, [bool forced])
-Attempts to negate the effect of chainc and returns true if it succeeds. forced requests a forced disable.
+Attempts to negate the effect of a Chain Link without necessarily negating its activation, and returns true if the effect was successfully negated.
+Use this for text such as "negate that effect". The optional forced argument requests a forced disable.
 Parameters:
-  chainc: int
-  forced: bool optional
+  chainc: int - Chain Link number whose effect should be negated.
+  forced: bool optional - Optional forced-disable request.
 Returns:
-  bool
+  bool - true if the Chain Link's effect was negated; false if it cannot be negated or the negation fails.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4930
 
 ●void Duel.NegateRelatedChain(Card c, int reset_flag)
@@ -4191,11 +4232,12 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4932
 
 ●void Duel.Overlay(Card c, Card|Group ocard, [bool adjust])
 Overlays ocard under c as Xyz Material.
+This moves a Card or Group under c; it does not by itself perform a proper Xyz Summon or mark the monster's procedure complete.
 By default the field is adjusted after the overlay. Pass adjust=false only when a larger procedure will adjust afterward.
 Parameters:
-  c: Card
-  ocard: Card|Group
-  adjust: bool optional - default: true
+  c: Card - Card that will receive the Xyz Materials.
+  ocard: Card|Group - Card or Group to overlay under c.
+  adjust: bool optional - Whether to adjust the field after overlaying. Defaults to true.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5014
 
 ●void Duel.PayLPCost(int player, int cost, [bool must_pay])
@@ -4263,10 +4305,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4852
 ●Effect|nil Duel.RegisterFlagEffect(int player, int code, int reset_flag, int property, int reset_count, [int label])
 Registers a player/global flag effect on player and returns the created Effect.
 The flag effect is player-targeted, field-only, cannot be disabled, and count=0 is treated as 1.
+When reset_flag contains RESET_PHASE without RESET_SELF_TURN or RESET_OPPO_TURN, the core applies both turn sides. See the Reset Flags And Effect Duration learning guide for full patterns.
 Parameters:
   player: int - Player that receives the marker; invalid players make the core return no values.
   code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
-  reset_flag: int - RESET_* mask controlling when the marker expires.
+  reset_flag: int - RESET_* mask controlling when the marker expires; phase resets without an explicit turn side apply to both players' turns.
   property: int - Effect property flags stored on the created marker; player-target, field-only, and cannot-disable flags are always added.
   reset_count: int - Reset counter for the created marker; 0 is treated as 1.
   label: int optional - Optional integer payload stored on the marker.
@@ -4286,7 +4329,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4881
 
 ●void Duel.ReleaseRitualMaterial(Group g)
-Tributes the Ritual Materials in g; materials such as Ritual Djinn monsters in the Graveyard are banished instead.
+Moves the selected Ritual Materials in g using Ritual-material rules.
+Standard hand or field materials are Tributed, while materials such as suitable Graveyard Ritual Materials are banished instead.
+Call Card.SetMaterial before this function, then Special Summon with SUMMON_TYPE_RITUAL and call Card.CompleteProcedure after the Summon succeeds. The function does not return a count.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4999
@@ -4548,18 +4593,19 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4995
 
-●Group Duel.SelectXyzMaterial(int player, Card c, [function|nil f], int lv, int min, int max, [Group|nil mg])
-Lets player select Xyz Materials for scard for Level lv and material count range, with optional filter and material group.
+●Group Duel.SelectXyzMaterial(int player, Card scard, function|nil f, int lv, int minc, int maxc, [Group|nil materials])
+Lets player select Xyz Materials for scard for material Xyz Level lv and material count range, with optional filter and material group.
+Use this only after a matching Duel.CheckXyzMaterial check has succeeded. It yields and returns the selected Group.
 Parameters:
-  player: int
-  c: Card
-  f: function|nil optional
-  lv: int
-  min: int
-  max: int
-  mg: Group|nil optional
+  player: int - Player choosing the Xyz Materials.
+  scard: Card - Xyz Monster whose materials are being selected.
+  f: function|nil - Optional per-material filter.
+  lv: int - Required material Xyz Level.
+  minc: int - Minimum material count.
+  maxc: int - Maximum material count.
+  materials: Group|nil optional - Optional candidate material group.
 Returns:
-  Group
+  Group - The selected Xyz Materials.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5013
 
 ●bool Duel.SelectYesNo(int player, int desc)
@@ -4659,6 +4705,8 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4856
 
 ●void Duel.SetFusionMaterial(Group g)
 Replaces the core's current Fusion Material set with the cards in g.
+Fusion Material procedure operations use this after selecting a legal group so the later Fusion Summon operation can read the selected materials.
+This function records the selection only; it does not move the materials or return a value.
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4990
@@ -4690,9 +4738,11 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5002
 
 ●void Duel.SetSynchroMaterial(Group g)
-Stores g as the Synchro Material group for the current Summon procedure.
+Stores g as the Synchro Material group for the current Synchro Material custom procedure.
+Local standard Synchro helpers usually keep their selected material group on the procedure effect instead; this function appears in custom material-provider scripts such as Flower Cardian Synchro helpers.
+This records the selected group for the core. It does not move those cards and returns no value.
 Parameters:
-  g: Group
+  g: Group - Selected Synchro Material group to store for the custom procedure.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4991
 
 ●void Duel.SetTargetCard(Card|Group targets)
@@ -4764,13 +4814,14 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4893
 ●int Duel.SpecialSummon(Card|Group targets, int sumtype, int sumplayer, int target_player, bool nocheck, bool nolimit, int pos, [int zone])
 Special Summons targets to target_player's field in position pos and returns the number of cards successfully Summoned.
 sumplayer is the player performing the Summon and sumtype records the Summon type. nocheck skips Summoning-condition checks; nolimit skips revive-limit checks.
+For revive-limit monsters, a successful Duel.SpecialSummon does not automatically mark the card as properly Summoned. Call Card.CompleteProcedure only when this resolving effect is intended to be that card's proper Summon method.
 Parameters:
   targets: Card|Group - Card or Group to Special Summon.
   sumtype: int - Summon type value recorded for the Summon.
   sumplayer: int - Player treated as performing the Special Summon.
   target_player: int - Player whose field receives the Summoned cards.
-  nocheck: bool - If true, skips Summoning-condition checks.
-  nolimit: bool - If true, skips revive-limit checks.
+  nocheck: bool - If true, skips Summoning-condition checks, including EFFECT_SPSUMMON_CONDITION-style restrictions.
+  nolimit: bool - If true, skips revive-limit and proper-Summon completion checks.
   pos: int - POS_* position mask for the Summon.
   zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
 Returns:
@@ -4785,10 +4836,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4875
 
 ●void Duel.SpecialSummonRule(int player, Card c, [int sumtype])
 Performs a rule Special Summon of c for player with optional summon type sumtype, unless the core is in effect damage step processing.
+Most ordinary card scripts register an EFFECT_SPSUMMON_PROC instead of calling this directly. Prefer the established procedure helpers unless a local script pattern specifically needs this core entry point.
 Parameters:
-  player: int
-  c: Card
-  sumtype: int optional - default: 0
+  player: int - Player performing the rule Special Summon.
+  c: Card - Card to Special Summon by rule.
+  sumtype: int optional - Summon type value recorded for the rule Summon; default: 0.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4866
 
 ●bool Duel.SpecialSummonStep(Card c, int sumtype, int sumplayer, int target_player, bool nocheck, bool nolimit, int pos, [int zone])
@@ -4858,14 +4910,15 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4885
 
 ●void Duel.SynchroSummon(int player, Card c, [Card|nil tuner], [Group|nil mg], [int minc], [int maxc])
 Performs a Synchro Summon of c for player, optionally requiring tuner and selecting materials from mg.
+Use this in an effect operation after checking Card.IsSynchroSummonable; the chosen Synchro Monster's registered procedure still controls material legality.
 minc and maxc can restrict the number of non-Tuner materials used by the procedure.
 Parameters:
-  player: int
-  c: Card
-  tuner: Card|nil optional
-  mg: Group|nil optional
-  minc: int optional - default: 0
-  maxc: int optional - default: 0
+  player: int - Player performing the Synchro Summon.
+  c: Card - Synchro Monster to Summon.
+  tuner: Card|nil optional - Optional required Tuner material.
+  mg: Group|nil optional - Optional material pool to select from.
+  minc: int optional - Optional minimum non-Tuner material count override; default: 0.
+  maxc: int optional - Optional maximum non-Tuner material count override; default: 0.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4867
 
 ●int,...? Duel.TossCoin(int player, int count)
@@ -4900,12 +4953,14 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4899
 
 ●void Duel.XyzSummon(int player, Card c, [Group|nil materials], [int minc], [int maxc])
 Performs a rule Xyz Summon for player and c using an optional material group and min/max constraints.
+Use this in effect operations after checking Card.IsXyzSummonable. The selected Xyz Monster's registered procedure still controls final material legality and overlaying.
+The core rejects this during the Damage Step, yields while the summon is processed, and returns no Lua value.
 Parameters:
-  player: int
-  c: Card
-  materials: Group|nil optional
-  minc: int optional
-  maxc: int optional
+  player: int - Player performing the Xyz Summon.
+  c: Card - Xyz Monster to Summon.
+  materials: Group|nil optional - Optional material group supplied by the effect.
+  minc: int optional - Optional minimum material count override. Defaults to 0.
+  maxc: int optional - Optional maximum material count override. Defaults to 0.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4868
 
 ========== Effect ==========
@@ -5256,10 +5311,12 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:612
 
 ●void Effect.SetHintTiming(Effect e, int s_time, [int o_time])
 Sets when the client should offer or highlight e for the handler's controller and, optionally, the opponent.
+If o_time is omitted, the local core copies s_time to the opponent-side mask; masks are interpreted relative to the handler's controller when prompts are checked.
+This controls prompting and display timing only; it does not replace activation legality checks in the effect's condition, cost, or target callbacks.
 Parameters:
   e: Effect
-  s_time: int
-  o_time: int optional - default: s_time
+  s_time: int - Hint timing mask for the handler's controller.
+  o_time: int optional - Hint timing mask for the opponent. Defaults to s_time.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:624
 
 ●void Effect.SetLabel(Effect e, ... int)
@@ -5295,10 +5352,11 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:630
 ●void Effect.SetProperty(Effect e, int prop1, [int prop2])
 Sets e's property flags. prop1 holds the normal effect property flags; prop2 is used for the second property word when needed.
 Internal flags are preserved when prop1 is replaced.
+Learner-facing flags include EFFECT_FLAG_CARD_TARGET for official targets, EFFECT_FLAG_DAMAGE_STEP and EFFECT_FLAG_DAMAGE_CAL for Damage Step timing, and EFFECT_FLAG_PLAYER_TARGET for effects that apply to players.
 Parameters:
-  e: Effect
-  prop1: int
-  prop2: int optional
+  e: Effect - Effect whose property flags are set.
+  prop1: int - Primary effect property bitmask.
+  prop2: int optional - Optional second property bitmask for flags stored in the second property word.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:620
 
 ●void Effect.SetRange(Effect e, int range)
@@ -5311,10 +5369,11 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:614
 ●void Effect.SetReset(Effect e, int reset_flag, [int reset_count])
 Sets when e resets and how many reset checks it can survive.
 If reset_count is 0 or omitted, the core stores 1. When a phase reset is used without an explicit turn side, the core applies both RESET_SELF_TURN and RESET_OPPO_TURN.
+For card-bound temporary effects, combine the card-identity reset, such as RESET_EVENT+RESETS_STANDARD, with the phase or lifetime reset from the card text. See the Reset Flags And Effect Duration learning guide for full patterns.
 Parameters:
-  e: Effect
-  reset_flag: int
-  reset_count: int optional
+  e: Effect - Effect whose reset mask is replaced.
+  reset_flag: int - RESET_* mask describing the events or phases that can reset e.
+  reset_count: int optional - Number of matching reset checks before e resets; omitted or 0 is treated as 1.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:618
 
 ●void Effect.SetTarget(Effect e, function targ_func)
@@ -5329,9 +5388,9 @@ Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:626
 Sets e's target range fields and clears EFFECT_FLAG_ABSOLUTE_TARGET.
 For most field effects, s_range is the affected locations on the handler's controller's side and o_range is the affected locations on the opponent's side. With EFFECT_FLAG_SPSUM_PARAM, they store Special Summon destination player and position.
 Parameters:
-  e: Effect
-  s_range: int
-  o_range: int
+  e: Effect - Effect whose target range fields are being set.
+  s_range: int - Usually the handler controller's affected locations. With EFFECT_FLAG_SPSUM_PARAM, this is the allowed Special Summon position.
+  o_range: int - Usually the opponent's affected locations. With EFFECT_FLAG_SPSUM_PARAM, this is the destination player value for the Special Summon.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:615
 
 ●void Effect.SetType(Effect e, int type)
@@ -5642,8 +5701,9 @@ Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:919
 
 ●void Group.KeepAlive(Group g)
 Prevents g from being automatically released by Lua until Group.DeleteGroup is called.
+Use this when a selected Group is stored on an Effect with SetLabelObject or otherwise needs to survive into a later callback. Pair it with Group.DeleteGroup when the delayed effect is done.
 Parameters:
-  g: Group
+  g: Group - Group to preserve until DeleteGroup is called.
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:901
 
 ●void Group.Merge(Group g1, Group g2)
@@ -5705,6 +5765,7 @@ Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:915
 ●Card|nil Group.SelectUnselect(Group cg, [Group|nil sg], int player, [bool finishable], [bool cancelable], [int min], [int max])
 Lets player choose one card from cg to add to the current selection or one card from sg to remove from it, then returns the card that was chosen.
 sg may be nil. finishable controls whether the selection can finish at its current size, cancelable allows cancellation, and cancellation returns nil. min and max default to 1.
+This is a building block for step-by-step material or procedure selections. For ordinary one-shot choices, Group.Select, Group.FilterSelect, or Duel.SelectMatchingCard is usually clearer.
 Parameters:
   cg: Group
   sg: Group|nil optional
@@ -6174,13 +6235,14 @@ Parameters:
 Source: Utilities/utility.lua:1314
 
 ●bool Auxiliary.CheckUnionEquip(Card uc, Card tc, [int exclude_modern_count])
-Checks Union equip count compatibility between Union Monster uc and target tc, optionally ignoring some modern Union count.
+Checks whether Union Monster uc can be equipped to target tc under the local modern/old Union count rules.
+Use exclude_modern_count when a replacement-style effect will remove an already equipped modern Union before equipping another one.
 Parameters:
-  uc: Card
-  tc: Card
-  exclude_modern_count: int optional
+  uc: Card - Union Monster that would become equipped.
+  tc: Card - Monster that would receive the Union card.
+  exclude_modern_count: int optional - Modern Union count to ignore while checking the target, commonly 1 when replacing the currently equipped Union.
 Returns:
-  bool
+  bool - true if the target can receive this Union card under the count compatibility rule.
 Source: Utilities/utility.lua:335
 
 ●table Auxiliary.CreateChecks(function f, table list)
@@ -6439,6 +6501,12 @@ Source: Utilities/utility.lua:433
 ●void Auxiliary.EnableExtraDeckSummonCountLimit()
 Initializes the shared Extra Deck Summon count table with one count for each player and registers a global Draw Phase Start reset. The helper only manages the counter; individual card scripts still check and decrement it.
 Source: Utilities/utility.lua:482
+
+●void Auxiliary.EnableMulcharmyGlobalCheck()
+Installs the shared Mulcharmy activation-count watcher once per Duel process.
+The watcher listens to EVENT_CHAINING and registers player flag 84192580 through the End Phase whenever that player activates a monster effect from set 0x1b2.
+Mulcharmy monster scripts call this from initial_effect, then check Duel.GetFlagEffect(tp,84192580)<=1 as part of their hand-activation condition.
+Source: Utilities/utility.lua:2041
 
 ●void Auxiliary.EnableNeosReturn(Card c, function operation, any set_category)
 Registers the shared Elemental HERO Neos Fusion End Phase return effects on c. It creates a mandatory return effect and an optional version used while c is affected by effect code 42015635, then returns both effects.
@@ -6990,6 +7058,21 @@ Parameters:
 Returns:
   function
 Source: Utilities/utility.lua:2028
+
+●void Auxiliary.MulcharmyGlobalCheck(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+Internal EVENT_CHAINING operation installed by Auxiliary.EnableMulcharmyGlobalCheck.
+When the triggering effect is a monster effect whose handler is in set 0x1b2, it registers player flag 84192580 on the activating player until the End Phase.
+Card scripts should call Auxiliary.EnableMulcharmyGlobalCheck instead of registering this operation directly.
+Parameters:
+  e: Effect - The global continuous effect that received EVENT_CHAINING.
+  tp: int - Controller of the global effect. This helper uses rp for the activating player.
+  eg: Group - Event group supplied by EVENT_CHAINING.
+  ep: int - Event player supplied by EVENT_CHAINING.
+  ev: int - Event value supplied by EVENT_CHAINING.
+  re: Effect - The effect being activated in the Chain.
+  r: int - Reason flags supplied by EVENT_CHAINING.
+  rp: int - Player who activated re; this player receives flag 84192580 when the Mulcharmy check matches.
+Source: Utilities/utility.lua:2050
 
 ●bool Auxiliary.mzctcheck(Group g, int tp)
 Returns true if tp would have an open Monster Zone after releasing g.
@@ -7796,6 +7879,7 @@ Source: Utilities/utility.lua:1338
 
 ●Group|nil Group.SelectSubGroup(Group g, int tp, function f, bool cancelable, [int min], [int max], ... any)
 Lets tp select a subgroup from g with size between min and max that satisfies f. It respects already selected cards and returns nil if no valid selection is completed.
+Use Group.CheckSubGroup for the legality check, then SelectSubGroup where the player actually chooses the cards. If the chosen Group is stored for a later callback, call KeepAlive and later DeleteGroup.
 Parameters:
   g: Group
   tp: int
@@ -7911,14 +7995,15 @@ Returns:
 Source: Utilities/procedure.lua:1687
 
 ●Effect Auxiliary.AddFusionEffectProc(Card c, function filter, int mat_location, [function|nil mat_filter], [function|nil mat_operation], [table|nil params])
-Convenience wrapper for Auxiliary.AddFusionEffectProcUltimate. It builds a params table from the common arguments and returns the created Fusion effect.
+Convenience wrapper for Auxiliary.AddFusionEffectProcUltimate.
+It builds a params table from the common Fusion Summon arguments: Extra Deck filter, material locations, material filter, material movement operation, and optional advanced params.
 Parameters:
   c: Card
-  filter: function
-  mat_location: int
-  mat_filter: function|nil optional
-  mat_operation: function|nil optional
-  params: table|nil optional
+  filter: function - Fusion Monster filter for the Extra Deck candidate.
+  mat_location: int - Base material locations, commonly LOCATION_HAND+LOCATION_MZONE.
+  mat_filter: function|nil optional - Optional candidate material filter.
+  mat_operation: function|nil optional - Optional operation that moves the selected material group.
+  params: table|nil optional - Optional advanced params forwarded to AddFusionEffectProcUltimate.
 Returns:
   Effect - The created Fusion effect.
 Source: Utilities/procedure.lua:1677
@@ -7926,6 +8011,7 @@ Source: Utilities/procedure.lua:1677
 ●Effect Auxiliary.AddFusionEffectProcUltimate(Card c, table params)
 Creates the configurable Fusion Summon activation effect described by params.
 Missing material locations, material filters, material operations, Special Summon nocheck, and category fields are filled with the MDPro3 defaults. Unless params.reg is false, the effect is registered to c as an activation effect.
+The generated effect checks Fusion Monsters in the Extra Deck, gathers and filters Fusion Materials, supports Chain Material fallback, selects materials, moves them with the configured operations, Special Summons with SUMMON_TYPE_FUSION, and completes the procedure.
 Parameters:
   c: Card
   params: table
@@ -8104,17 +8190,18 @@ Parameters:
   attr: int
 Source: Utilities/procedure.lua:1342
 
-●Effect Auxiliary.AddLinkProcedure(Card c, [function|nil f], int min, [int max], [function gf])
+●Effect Auxiliary.AddLinkProcedure(Card c, function|nil f, int min, [int max], [function|nil gf])
 Registers the standard Link Summon procedure for c and returns the created Effect.
-f filters materials, min/max constrain the material count, and gf optionally checks the selected material group.
+f filters each Link Material, min/max constrain the number of selected material cards, and gf optionally checks the selected group as a whole.
+The helper creates an Extra Deck EFFECT_SPSUMMON_PROC with SUMMON_TYPE_LINK, uses Auxiliary.GetLinkCount to match the Link Rating, records materials with Card.SetMaterial, and sends them to the GY with REASON_MATERIAL+REASON_LINK.
 Parameters:
-  c: Card
-  f: function|nil optional
-  min: int
-  max: int optional
-  gf: function optional
+  c: Card - Link Monster receiving the procedure.
+  f: function|nil - Optional per-material filter. nil means no extra filter beyond normal Link Material legality.
+  min: int - Minimum number of material cards that must be selected.
+  max: int optional - Maximum number of material cards. Defaults to c:GetLink() when omitted.
+  gf: function|nil optional - Optional whole-group validator called as gf(selected_group, link_monster, player).
 Returns:
-  Effect
+  Effect - The registered Special Summon procedure effect.
 Source: Utilities/procedure.lua:2128
 
 ●void Auxiliary.AddRitualProcEqual(Card c, function filter, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
@@ -8264,24 +8351,27 @@ Returns:
 Source: Utilities/procedure.lua:1909
 
 ●Effect Auxiliary.AddRitualProcUltimate(Card c, function filter, function level_function, string greater_or_equal, [int summon_location], [function|nil grave_filter], [function|nil mat_filter], [bool pause], [function|nil extra_operation], [function|nil extra_target])
-Creates the configurable Ritual Summon activation effect for c and returns it. The effect can be paused from registration, can use Graveyard materials, and can run extra target/operation callbacks.
+Creates the configurable Ritual Summon activation effect for c and returns it.
+The generated effect checks for a Ritual Monster, gathers Ritual Materials, validates an equal or greater-or-equal material total, releases Ritual Materials, Special Summons with SUMMON_TYPE_RITUAL, and completes the procedure.
+Use wrapper helpers for ordinary Ritual Spells, and call this directly when a script needs Graveyard material, a material filter, delayed registration, or extra target/operation callbacks.
 Parameters:
   c: Card
-  filter: function
-  level_function: function
-  greater_or_equal: string
-  summon_location: int optional
-  grave_filter: function|nil optional
-  mat_filter: function|nil optional
-  pause: bool optional
-  extra_operation: function|nil optional
-  extra_target: function|nil optional
+  filter: function - Ritual Monster filter. It receives the candidate Ritual Monster plus the helper's extra arguments and should return true for monsters this effect can Summon.
+  level_function: function - Function used to get the required value from the Ritual Monster, commonly Card.GetOriginalLevel or Card.GetLevel.
+  greater_or_equal: string - Use "Greater" for equal-or-higher material totals or "Equal" for exact totals.
+  summon_location: int optional - Location to search for the Ritual Monster. Defaults to LOCATION_HAND.
+  grave_filter: function|nil optional - Optional filter for extra Graveyard materials that the helper may merge into the material pool.
+  mat_filter: function|nil optional - Optional filter applied to candidate Ritual Materials before the material subgroup is selected.
+  pause: bool optional - If true, returns the effect without registering it to c.
+  extra_operation: function|nil optional - Optional callback run after the Ritual Summon operation. Local wrappers pass the Summoned monster and selected material group to this callback.
+  extra_target: function|nil optional - Optional callback run during the target branch for extra operation info or activation checks.
 Returns:
-  Effect - The created Ritual Summon activation effect.
+  Effect - The created Ritual Summon activation effect. If pause is false or nil, the helper also registers it to c.
 Source: Utilities/procedure.lua:1750
 
 ●void Auxiliary.AddSynchroMixProcedure(Card c, function|nil f1, function|nil f2, function|nil f3, function|nil f4, int minc, int maxc, [function gc])
 Registers a mixed Synchro Summon procedure requiring up to three fixed material filters plus f4 repeated between minc and maxc times.
+The helper creates an Extra Deck EFFECT_SPSUMMON_PROC with SUMMON_TYPE_SYNCHRO, checks the exact Synchro Level total, and handles mandatory material, hand Synchro, tuner-limit, and optional group-check rules.
 The maximum count is capped by c's Level after subtracting any required fixed materials.
 Parameters:
   c: Card
@@ -8297,12 +8387,13 @@ Source: Utilities/procedure.lua:135
 ●void Auxiliary.AddSynchroProcedure(Card c, [function|nil f1], [function|nil f2], int minc, [int maxc])
 Registers the standard Synchro Summon procedure for c.
 f1 filters the Tuner material, f2 filters non-Tuner materials, and minc/maxc set the number of non-Tuner materials required.
+The created procedure lives in the Extra Deck, checks materials through the core Synchro helpers, stores the selected group for the operation, and sends materials to the GY with REASON_MATERIAL+REASON_SYNCHRO.
 Parameters:
-  c: Card
-  f1: function|nil optional
-  f2: function|nil optional
-  minc: int
-  maxc: int optional
+  c: Card - Synchro Monster that receives the procedure.
+  f1: function|nil optional - Optional Tuner filter. nil accepts any legal Tuner.
+  f2: function|nil optional - Optional non-Tuner filter, commonly built with Auxiliary.NonTuner.
+  minc: int - Minimum number of non-Tuner materials.
+  maxc: int optional - Maximum number of non-Tuner materials. If omitted, the helper caps it by c's Level minus 1.
 Source: Utilities/procedure.lua:60
 
 ●void Auxiliary.AddSynchroProcedure2(Card c, [function|nil f1], [function|nil f2])
@@ -8314,32 +8405,35 @@ Parameters:
   f2: function|nil optional
 Source: Utilities/procedure.lua:123
 
-●void Auxiliary.AddXyzProcedure(Card c, [function|nil f], int lv, int ct, [function alterf], [string alterdesc], [int maxct], [function alterop])
+●void Auxiliary.AddXyzProcedure(Card c, function|nil f, int lv, int ct, [function|nil alterf], [int alterdesc], [int maxct], [function|nil alterop])
 Registers the standard Xyz Summon procedure for c.
-f filters materials, lv is the required Level, ct is the minimum material count, and maxct optionally caps the maximum. alterf/alterdesc/alterop define an alternate one-card Xyz Summon route.
+f filters materials, lv is the required material Xyz Level, ct is the minimum material count, and maxct optionally caps the maximum.
+The helper creates an Extra Deck EFFECT_SPSUMMON_PROC with SUMMON_TYPE_XYZ, checks and selects materials with the core Xyz helpers, records them with Card.SetMaterial, and overlays them with Duel.Overlay.
+alterf, alterdesc, and alterop define an optional one-card alternate Xyz Summon route.
 Parameters:
-  c: Card
-  f: function|nil optional
-  lv: int
-  ct: int
-  alterf: function optional
-  alterdesc: string optional
-  maxct: int optional
-  alterop: function optional
+  c: Card - Xyz Monster receiving the procedure.
+  f: function|nil - Optional per-material filter. nil means no extra material restriction beyond the normal Xyz checks.
+  lv: int - Required material Xyz Level.
+  ct: int - Minimum material count.
+  alterf: function|nil optional - Optional filter for a one-card alternate Xyz Summon route.
+  alterdesc: int optional - Prompt text id used when the alternate route can be chosen.
+  maxct: int optional - Maximum material count. Defaults to ct when omitted.
+  alterop: function|nil optional - Optional check/apply callback for the alternate route. The local helper calls it with chk==0 for legality and chk==1 after selection.
 Source: Utilities/procedure.lua:485
 
 ●void Auxiliary.AddXyzProcedureLevelFree(Card c, function|nil f, function|nil gf, int minc, int maxc, [function|nil alterf], [int alterdesc], [function|nil alterop])
 Registers a Level-free Xyz Summon procedure on c.
-This helper uses f, gf, minc, maxc, and optional alternate-summon settings, and returns no explicit value.
+f filters each candidate material, while gf can validate the selected group as a whole, such as requiring all materials to have the same Rank.
+The local helper still checks Card.IsCanBeXyzMaterial, zone availability, and EFFECT_XYZ_MIN_COUNT, but procedure.lua notes that EFFECT_DOUBLE_XMATERIAL is not supported in this path.
 Parameters:
-  c: Card
-  f: function|nil
-  gf: function|nil
-  minc: int
-  maxc: int
-  alterf: function|nil optional
-  alterdesc: int optional
-  alterop: function|nil optional
+  c: Card - Xyz Monster receiving the Level-free procedure.
+  f: function|nil - Optional per-material filter.
+  gf: function|nil - Optional whole-group validator called on the selected material group.
+  minc: int - Minimum material count.
+  maxc: int - Maximum material count.
+  alterf: function|nil optional - Optional filter for a one-card alternate Xyz Summon route.
+  alterdesc: int optional - Prompt text id used when the alternate route can be chosen.
+  alterop: function|nil optional - Optional check/apply callback for the alternate route.
 Source: Utilities/procedure.lua:700
 
 ●bool Auxiliary.AssaultModeLimit(Effect e, Effect se, int sp, int st)
@@ -8438,19 +8532,20 @@ Parameters:
 Source: Utilities/procedure.lua:22
 
 ●void Auxiliary.EnablePendulumAttribute(Card c, [bool|nil reg])
-Registers the Pendulum Summon procedure for Pendulum Monster c.
-Unless reg is false, it also registers the Pendulum Card activation effect from the hand.
+Registers the standard Pendulum Summon procedure for Pendulum Monster c.
+The procedure is a LOCATION_PZONE EFFECT_SPSUMMON_PROC_G with SUMMON_TYPE_PENDULUM, using Auxiliary.PendCondition and Auxiliary.PendOperation.
+Unless reg is false, the helper also registers the simple Pendulum Card activation effect from the hand.
 Parameters:
-  c: Card
-  reg: bool|nil optional
+  c: Card - Pendulum Monster receiving the shared Pendulum Summon procedure.
+  reg: bool|nil optional - When false, skip the default hand activation effect. nil or true registers it.
 Source: Utilities/procedure.lua:1948
 
 ●void Auxiliary.EnableReviveLimitPendulumSummonable(Card c, [int loc])
 Enables revive-limit handling for c while also allowing it to be Pendulum Summoned from loc.
-The helper stores loc on c's metatable and completes c's procedure when it is successfully Pendulum Summoned.
+The helper calls Card.EnableReviveLimit, stores loc on c's metatable as psummonable_location, and completes c's procedure when it is successfully Pendulum Summoned.
 Parameters:
-  c: Card
-  loc: int optional - default: 0xff
+  c: Card - Special Summon Monster that should be allowed to complete its procedure by Pendulum Summon.
+  loc: int optional - Location mask from which the card is allowed to be Pendulum Summoned. Defaults to 0xff.
 Source: Utilities/procedure.lua:2097
 
 ●bool Auxiliary.FCheckMix(Card c, Group mg, Group sg, Card fc, bool sub, function fun1, [function|nil fun2], ... function)
@@ -8908,10 +9003,13 @@ Returns:
   bool
 Source: Utilities/procedure.lua:2289
 
-●void Auxiliary.GetLinkCount(Card c)
-Returns 1 plus the Link Rating shifted into the high word for Link Monsters with Link Rating greater than 1; otherwise returns 1.
+●int Auxiliary.GetLinkCount(Card c)
+Returns the encoded material value used by Link procedure sum checks.
+Ordinary materials and Link-1 monsters count as 1. A Link Monster with Link Rating greater than 1 encodes the choice to count as either 1 or its Link Rating for Group.CheckWithSumEqual.
 Parameters:
-  c: Card
+  c: Card - Candidate Link Material.
+Returns:
+  int - 1, or an encoded 1-or-Link-Rating value for Link Monsters with Link Rating greater than 1.
 Source: Utilities/procedure.lua:2158
 
 ●Group Auxiliary.GetLinkMaterials(int tp, function|nil f, Card lc, Effect e)
@@ -9020,6 +9118,7 @@ Source: Utilities/procedure.lua:2191
 
 ●function Auxiliary.LinkCondition(function|nil f, int minct, int maxct, function|nil gf)
 Returns the condition function for Link Summon procedures.
+The returned function rejects face-up Pendulum Link Monsters in the Extra Deck, builds or filters the material pool, applies runtime min/max limits, includes required lmat material when supplied, checks EFFECT_MUST_BE_LMATERIAL, and asks whether a valid subgroup exists.
 Parameters:
   f: function|nil
   minct: int
@@ -9041,7 +9140,8 @@ Returns:
 Source: Utilities/procedure.lua:2309
 
 ●function Auxiliary.LinkOperation(function|nil f, int minct, int maxct, function|nil gf)
-Returns the operation function for Link Summon procedures; it sets the materials, consumes extra-material count limits, and sends the materials to the Graveyard.
+Returns the operation function for Link Summon procedures.
+The returned function reads the selected group from the effect label object, records it with Card.SetMaterial, consumes valid extra-material count limits, sends the materials to the GY with REASON_MATERIAL+REASON_LINK, and deletes the kept-alive group.
 Parameters:
   f: function|nil
   minct: int
@@ -9052,7 +9152,8 @@ Returns:
 Source: Utilities/procedure.lua:2263
 
 ●function Auxiliary.LinkTarget(function|nil f, int minct, int maxct, function|nil gf)
-Returns the target function for Link Summon procedures; it selects a valid Link Material subgroup and stores it on the effect.
+Returns the target function for Link Summon procedures.
+The returned function selects a Link Material subgroup with Group.SelectSubGroup and Auxiliary.LCheckGoal, keeps that group alive, and stores it on the effect for LinkOperation.
 Parameters:
   f: function|nil
   minct: int
@@ -9150,17 +9251,19 @@ Returns:
 Source: Utilities/procedure.lua:1991
 
 ●bool Auxiliary.PendCondition(Effect e, Card|nil c, Group|nil og)
-Condition function for the shared Pendulum Summon procedure. It checks the two Pendulum Zones, available locations and zones, once-per-turn state, and valid summonable monsters.
+Condition function for the shared Pendulum Summon procedure.
+It checks the two Pendulum Zones, current scales, hand and face-up Extra Deck candidate pools, available Monster Zones, once-per-turn state, extra Pendulum Summon effects, and whether at least one candidate can be Pendulum Summoned.
 Parameters:
   e: Effect
-  c: Card|nil
-  og: Group|nil
+  c: Card|nil - Procedure handler. When nil, the helper returns true for the core's availability probe.
+  og: Group|nil - Optional candidate group supplied by the core or another helper; nil uses the player's hand/Extra Deck candidates.
 Returns:
   bool - true if a Pendulum Summon is available.
 Source: Utilities/procedure.lua:2004
 
 ●void Auxiliary.PendOperation(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp, Card c, Group sg, Group|nil og)
-Operation function for the shared Pendulum Summon procedure. It chooses the regular or extra Pendulum Summon effect, selects monsters within hand/Extra Deck zone limits, updates the checklist, and merges the selection into sg.
+Operation function for the shared Pendulum Summon procedure.
+It chooses the regular or extra Pendulum Summon option, computes hand, Extra Deck, and total Monster Zone limits, selects a legal subgroup, updates the shared checklist or consumes the extra effect's count limit, and merges the selected cards into sg for the core group Summon path.
 Parameters:
   e: Effect
   tp: int
@@ -9170,17 +9273,18 @@ Parameters:
   re: Effect
   r: int
   rp: int
-  c: Card
-  sg: Group
-  og: Group|nil
+  c: Card - Left Pendulum Zone card whose procedure is being used.
+  sg: Group - Core-provided group that receives the selected Pendulum Summon monsters.
+  og: Group|nil - Optional candidate group; nil rebuilds candidates from the player's hand and face-up Extra Deck.
 Source: Utilities/procedure.lua:2033
 
 ●function Auxiliary.PendOperationCheck(int ft1, int ft2, int ft)
-Returns a group check that enforces the hand, Extra Deck, and total zone limits for a Pendulum Summon selection.
+Returns a group check that enforces the hand, Extra Deck, and total Monster Zone limits for a Pendulum Summon selection.
+The returned function counts selected Extra Deck cards separately from non-Extra Deck cards before accepting the subgroup.
 Parameters:
-  ft1: int
-  ft2: int
-  ft: int
+  ft1: int - Maximum selected monsters from non-Extra Deck locations, usually the hand.
+  ft2: int - Maximum selected monsters from the face-up Extra Deck.
+  ft: int - Maximum total selected monsters.
 Returns:
   function - Group check for Pendulum Summon zone limits.
 Source: Utilities/procedure.lua:2026
@@ -9200,8 +9304,9 @@ Source: Utilities/procedure.lua:1977
 
 ●bool Auxiliary.PendulumSummonableBool(Card c)
 Returns true if c has a psummonable_location flag that includes its current location.
+The shared Pendulum candidate filter passes this result as the nocheck and nolimit values for Card.IsCanBeSpecialSummoned, allowing revive-limit Pendulum Summonable monsters only from configured locations.
 Parameters:
-  c: Card
+  c: Card - Card previously configured by Auxiliary.EnableReviveLimitPendulumSummonable.
 Returns:
   bool - true if c's current location is Pendulum Summonable by its flag.
 Source: Utilities/procedure.lua:2111
@@ -9218,7 +9323,8 @@ Returns:
 Source: Utilities/procedure.lua:2305
 
 ●void Auxiliary.PSSCompleteProcedure(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
-Completes the procedure for monsters that were Special Summoned by Pendulum Summon through the revive-limit helper.
+Completes the procedure for monsters configured by Auxiliary.EnableReviveLimitPendulumSummonable after they are successfully Pendulum Summoned.
+The operation checks Card.IsSummonType(SUMMON_TYPE_PENDULUM) before calling Card.CompleteProcedure.
 Parameters:
   e: Effect
   tp: int

@@ -118,23 +118,24 @@ Parameters:
   cancel: bool optional - default: true
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3651
 
-●Effect,Group|nil,int|nil,int|nil,Effect|nil,int|nil,int|nil Card.CheckActivateEffect(Card c, bool neglect_con, bool neglect_cost, bool copy_info)
-返回c的可以发动时机正确的“卡的发动”的效果，neglect_con=true则无视发动条件，neglect_cost=true则无视发动cost
-copy_info=false或者自由时点的效果则只返回这个效果 e
-否则还返回这个效果的触发时点的信息 e,eg,ep,ev,re,r,rp
+●Effect|nil,Group|nil,int|nil,int|nil,Effect|nil,int|nil,int|nil Card.CheckActivateEffect(Card c, bool neglect_con, bool neglect_cost, bool copy_info)
+检查c是否有当前可以发动的卡片发动效果。
+neglect_con为true时跳过Condition检查；neglect_cost为true时跳过Cost检查。
+copy_info为true且匹配的发动效果不是自由时点发动时，返回值会包含触发时点信息：eg、ep、ev、re、r、rp。
+没有可用发动效果时不返回Lua值，因此本地脚本通常检查第一个返回值是否不为nil。
 Parameters:
   c: Card
-  neglect_con: bool
-  neglect_cost: bool
-  copy_info: bool
+  neglect_con: bool - 为true时跳过该发动效果的Condition检查。
+  neglect_cost: bool - 为true时跳过该发动效果的Cost检查。
+  copy_info: bool - 为true时，对非自由时点发动复制触发时点信息。
 Returns:
-  Effect
-  Group|nil
-  int|nil
-  int|nil
-  Effect|nil
-  int|nil
-  int|nil
+  Effect|nil - 可用的发动效果；当前没有可用发动效果时为nil/不返回值。
+  Group|nil - copy_info返回事件信息时的eg。
+  int|nil - copy_info返回事件信息时的ep。
+  int|nil - copy_info返回事件信息时的ev。
+  Effect|nil - copy_info返回事件信息时的re。
+  int|nil - copy_info返回事件信息时的r。
+  int|nil - copy_info返回事件信息时的rp。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3545
 
 ●bool Card.CheckEquipTarget(Card c1, Card c2)
@@ -211,8 +212,10 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3561
 
 ●void Card.CompleteProcedure(Card c)
 把c标记为已经完成正规召唤手续。
+当效果处理成功执行了带苏生限制怪兽的正规召唤时使用，例如效果处理中的仪式、融合、同调、超量、连接或特殊召唤怪兽自身的正规召唤。
+不要把普通苏生效果标记为正规召唤。由EFFECT_SPSUMMON_PROC登记的规则召唤手续成功后会由核心完成该状态。
 Parameters:
-  c: Card
+  c: Card - 要标记正规召唤手续已完成的卡。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3569
 
 ●int Card.CopyEffect(Card c, int code, int reset, [int count])
@@ -254,26 +257,29 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3631
 
 ●void Card.EnableDualState(Card c)
-给c登记带客户端提示的EFFECT_DUAL_STATUS效果。
+给c登记EFFECT_DUAL_STATUS，使本地二重/Gemini检查将其视为已获得效果。
+这不会进行通常召唤，也不会消耗通常召唤。只有在效果明确让二重怪兽当作再次通常召唤过时才使用。
+登记的状态效果带有本地客户端提示，并按通常卡片事件重置。
 Parameters:
-  c: Card
+  c: Card - 要立即获得二重状态的二重怪兽。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3511
 
 ●void Card.EnableReviveLimit(Card c)
-为c添加苏生限制
-##实际上是不可复制、不会被无效的EFFECT_UNSUMMONABLE_CARD和EFFECT_REVIVE_LIMIT效果
+给c设置苏生限制，使普通特殊召唤效果在其未正规召唤前不能从公开区域把它特殊召唤回来。
+核心会在c上登记EFFECT_REVIVE_LIMIT效果。应与该卡的正规召唤手续配合使用，或在效果成功执行正规召唤后调用CompleteProcedure。
+本地核心在该卡移动到手牌或卡组时会清除正规召唤手续已完成状态。
 Parameters:
-  c: Card
+  c: Card - 需要先正规召唤，之后普通苏生效果才能特殊召唤的卡。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3568
 
-●Effect,...? Card.GetActivateEffect(Card c)
-返回c的“卡片发动”的效果，即类型为EFFECT_TYPE_ACTIVATE的效果
-仅对魔法和陷阱有效
+●Effect|nil Card.GetActivateEffect(Card c)
+返回c的发动效果，即类型包含EFFECT_TYPE_ACTIVATE的效果；主要用于魔法/陷阱卡。
+如果该卡没有登记发动效果则返回nil，因此调用Effect方法前应先检查返回值。
+当其他效果要移动或处理场地魔法等魔法/陷阱的发动时，可用返回的Effect先检查其是否可以发动。
 Parameters:
   c: Card
 Returns:
-  Effect
-  ...? - Effect
+  Effect|nil - c上登记的发动效果；没有登记时返回nil。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3544
 
 ●int Card.GetAttack(Card c)
@@ -606,10 +612,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3475
 
 ●int Card.GetLeftScale(Card c)
 返回c当前的左灵摆刻度数值。
+c在灵摆区域时，核心会应用EFFECT_UPDATE_LSCALE和EFFECT_CHANGE_LSCALE修正；不在灵摆区域时返回卡片数据中的左刻度。
 Parameters:
   c: Card
 Returns:
-  int
+  int - 当前左灵摆刻度数值。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3413
 
 ●int Card.GetLevel(Card c)
@@ -648,10 +655,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3390
 
 ●Group Card.GetLinkedGroup(Card c)
 返回当前位于c连接区域中的卡。
+当效果关心c的连接标记所指向区域中的实际卡时使用。
 Parameters:
   c: Card
 Returns:
-  Group
+  Group - 当前位于c连接区域中的卡。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3419
 
 ●int Card.GetLinkedGroupCount(Card c)
@@ -664,12 +672,13 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3420
 
 ●int Card.GetLinkedZone(Card c, [int player])
 返回c产生的连接区域位掩码。
-默认从c控制者视角返回。传入对方玩家作为player时，会交换自己/对方两部分位掩码，转换为该玩家视角。
+默认从c的控制者视角返回。传入player时，会把掩码转换为该玩家视角。
+检查特定序号是否被连接标记指向时，通常配合bit.extract或bit.band等位运算辅助函数。
 Parameters:
   c: Card
-  player: int optional - default: c's controller
+  player: int optional - 返回区域掩码时使用的视角玩家。默认值：c的控制者。
 Returns:
-  int
+  int - 指定视角下的连接区域位掩码。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3421
 
 ●int Card.GetLinkRace(Card c, [int player])
@@ -1052,10 +1061,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3461
 
 ●int Card.GetRightScale(Card c)
 返回c当前的右灵摆刻度数值。
+c在灵摆区域时，核心会应用EFFECT_UPDATE_RSCALE和EFFECT_CHANGE_RSCALE修正；不在灵摆区域时返回卡片数据中的右刻度。
 Parameters:
   c: Card
 Returns:
-  int
+  int - 当前右灵摆刻度数值。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3415
 
 ●int Card.GetRitualLevel(Card c, Card rc)
@@ -1201,12 +1211,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3399
 
 ●int,int Card.GetUnionCount(Card c)
-返回c当前的新式同盟数量和旧式同盟数量。
+返回c的两个值：装备在其上的新式同盟数量，以及装备在其上的旧式同盟数量。
+本地核心会统计带TYPE_UNION且带EFFECT_UNION_STATUS或EFFECT_OLDUNION_STATUS的装备卡。
 Parameters:
-  c: Card
+  c: Card - 要统计其装备同盟卡数量的怪兽。
 Returns:
-  int - Modern Union count.
-  int - Old Union count.
+  int - 装备的新式同盟卡数量。
+  int - 装备的旧式同盟卡数量。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3523
 
 ●int Card.GetXyzType(Card c)
@@ -1463,11 +1474,12 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3639
 
 ●bool Card.IsCanBeLinkMaterial(Card c, [Card scard])
 检查c能否作为连接素材；可选地指定连接怪兽scard。
+标准连接召唤手续会在应用自身素材筛选前调用此检查。
 Parameters:
   c: Card
-  scard: Card optional
+  scard: Card optional - 要把c作为素材使用的连接怪兽。
 Returns:
-  bool
+  bool - 若c当前可以作为scard的连接素材，或通过通用连接素材检查，则返回true。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3643
 
 ●bool Card.IsCanBePlacedOnField(Card c, [int toplayer], [int tolocation])
@@ -1482,7 +1494,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3583
 
 ●bool Card.IsCanBeRitualMaterial(Card c, [Card|nil sc])
-检查c是否可以作为[仪式怪兽sc的]仪式素材,没有指定sc的场合，必须填nil
+检查c能否作为sc的仪式素材。
+仪式脚本通常在选定仪式怪兽后，用Card.IsCanBeRitualMaterial过滤Duel.GetRitualMaterial取得的组，以遵守该怪兽自身的素材限制。
+只有在尚未确定具体仪式怪兽、只检查通用素材池时，才对sc传入nil。
 Parameters:
   c: Card
   sc: Card|nil optional
@@ -1492,14 +1506,15 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3641
 
 ●bool Card.IsCanBeSpecialSummoned(Card c, Effect e, int sumtype, int sumplayer, bool nocheck, bool nolimit, [int sumpos], [int toplayer], [int zone])
 检查c能否通过效果e，以给定的召唤类型、召唤玩家、表示形式、目标玩家和可选区域进行特殊召唤。
-nocheck为true时跳过召唤条件检查；nolimit为true时跳过苏生限制或正规召唤限制检查。
+这里的nocheck、nolimit、表示形式、目标玩家和区域限制应与之后的Duel.SpecialSummon调用保持一致。
+nocheck为true时跳过召唤条件检查；nolimit为true时跳过苏生限制或正规召唤限制检查。除非卡片文本和本地脚本模式明确需要绕过这些检查，否则两者都应保持false。
 Parameters:
   c: Card - Card being checked.
   e: Effect - Effect that would perform the Special Summon.
   sumtype: int - Summon type value recorded for the Special Summon.
   sumplayer: int - Player treated as performing the Special Summon.
-  nocheck: bool - If true, skips c's Summoning-condition check.
-  nolimit: bool - If true, skips c's revive-limit or proper-Summon limit check.
+  nocheck: bool - 为true时跳过c的召唤条件检查，包括类似EFFECT_SPSUMMON_CONDITION的限制。
+  nolimit: bool - 为true时跳过c的苏生限制或正规召唤手续完成检查。
   sumpos: int optional - Summon position mask checked by the core; default: POS_FACEUP.
   toplayer: int optional - Player whose field c would be Summoned to; default: sumplayer.
   zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
@@ -1981,14 +1996,16 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3425
 ●bool Card.IsLinkSummonable(Card c, Group|nil materials, [Card|nil lcard], [int minc], [int maxc])
 检查连接怪兽c能否由当前原因玩家进行连接召唤。
 可选的materials、lcard、minc、maxc会限制核心检查使用的连接素材池和素材数量。
+通常在效果的target和operation分支中，于调用Duel.LinkSummon前使用。minc和maxc省略时默认为0，由已登记手续自身的数量规则决定。
+核心在伤害步骤中会拒绝这个检查。
 Parameters:
-  c: Card
-  materials: Group|nil
-  lcard: Card|nil optional
-  minc: int optional - default: 0
-  maxc: int optional - default: 0
+  c: Card - 要检查的连接怪兽。
+  materials: Group|nil - 可选的临时素材池。nil表示让已登记手续收集通常素材池。
+  lcard: Card|nil optional - 可选的固定素材；最终选择的Group必须包含它。
+  minc: int optional - 运行时素材卡数量下限。默认值：0
+  maxc: int optional - 运行时素材卡数量上限。默认值：0
 Returns:
-  bool
+  bool - 若c在给定临时限制下存在合法连接召唤，则返回true。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3578
 
 ●bool Card.IsLinkType(Card c, int type)
@@ -2254,21 +2271,22 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3393
 
 ●bool Card.IsSpecialSummonable(Card c, [int sum_type])
-检查c能否由当前原因玩家以sum_type特殊召唤；sum_type默认0。
+检查c当前能否由当前原因玩家以sum_type特殊召唤；sum_type默认0。
+这是较宽泛的核心检查。用于效果处理或发动筛选时，通常优先使用Card.IsCanBeSpecialSummoned，以便效果、目标玩家、表示形式、nocheck、nolimit和区域与之后的Duel.SpecialSummon一致。
 Parameters:
-  c: Card
-  sum_type: int optional
+  c: Card - 要检查的卡。
+  sum_type: int optional - 要检查的召唤类型值；默认值：0。
 Returns:
-  bool
+  bool - 若核心当前认为c在该召唤类型下可以特殊召唤则为true。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3575
 
 ●bool Card.IsSpecialSummonableCard(Card c)
-检查c是否能以正规方法特殊召唤。
-c必须有可特殊召唤的方式。
+检查c能否通过正规手续特殊召唤。
+c必须有可用的特殊召唤手续。这个检查适合用于寻找已经满足苏生限制、并且仍有合法手续型特殊召唤路径的墓地怪兽。
 Parameters:
-  c: Card
+  c: Card - 要检查的卡。
 Returns:
-  bool
+  bool - 若c在当前局面有可用的正规特殊召唤手续则为true。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3573
 
 ●bool Card.IsSpecialSummonSetCard(Card c, ... int)
@@ -2291,11 +2309,12 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3581
 
 ●bool Card.IsStatus(Card c, int status)
 判断c当前状态是否包含status中的至少一个标志。
+常见合法性检查会用它判断STATUS_BATTLE_DESTROYED等临时核心状态，再决定伤害步骤的Quick效果能否发动。
 Parameters:
-  c: Card
-  status: int
+  c: Card - 要检查当前状态标志的卡。
+  status: int - 状态标志或组合状态掩码，例如STATUS_BATTLE_DESTROYED。
 Returns:
-  bool
+  bool - 若c具有status中的任意标志则为true。
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3504
 
 ●bool Card.IsSummonable(Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
@@ -2401,11 +2420,13 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3412
 
 ●bool Card.IsXyzSummonable(Card c, [Group|nil materials], [int minc], [int maxc])
 检查超量怪兽c能否由当前原因玩家用可选素材组和min/max限制进行超量召唤。
+通常在效果的target和operation分支中，于调用Duel.XyzSummon前使用。minc和maxc省略时默认为0，由已登记手续自身的数量规则决定。
+核心在伤害步骤中会拒绝这个检查。
 Parameters:
-  c: Card
-  materials: Group|nil optional
-  minc: int optional
-  maxc: int optional
+  c: Card - 要检查的超量怪兽。
+  materials: Group|nil optional - 效果提供的可选素材范围或指定素材Group。
+  minc: int optional - 可选的素材数量下限覆盖值。默认为0。
+  maxc: int optional - 可选的素材数量上限覆盖值。默认为0。
 Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3577
@@ -2432,10 +2453,11 @@ Source: D:\Programs\GitHub\ygopro-core\libcard.cpp:3548
 ●Effect Card.RegisterFlagEffect(Card c, int code, int reset_flag, int property, int reset_count, [int label], [int desc])
 在c上登记单卡标记效果，并返回创建的Effect。
 标记效果是脚本用的标记：其code与普通效果code分开保存，不能被无效，且count=0会按1处理。
+当reset_flag包含RESET_PHASE且没有指定RESET_SELF_TURN或RESET_OPPO_TURN时，核心会补上双方回合。完整模式参见Reset Flags And Effect Duration学习指南。
 Parameters:
   c: Card - Card that receives the marker.
   code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
-  reset_flag: int - RESET_* mask controlling when the marker expires.
+  reset_flag: int - RESET_* mask controlling when the marker expires; phase resets without an explicit turn side apply to both players' turns.
   property: int - Effect property flags stored on the created marker; EFFECT_FLAG_CANNOT_DISABLE is always added.
   reset_count: int - Reset counter for the created marker; 0 is treated as 1.
   label: int optional - Optional integer payload stored on the marker.
@@ -2920,12 +2942,13 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4894
 
 ●bool Duel.CheckLocation(int player, int location, int sequence)
 检查player能否使用location中的sequence位置。
+检查灵摆区域时，使用LOCATION_PZONE；sequence 0表示左侧灵摆区域，sequence 1表示右侧灵摆区域。
 Parameters:
   player: int
-  location: int
-  sequence: int
+  location: int - 要检查的位置常量，例如LOCATION_MZONE、LOCATION_SZONE或LOCATION_PZONE。
+  sequence: int - 该位置内的序号。
 Returns:
-  bool
+  bool - 该具体位置序号可使用时返回true。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4944
 
 ●bool|nil Duel.CheckLPCost(int player, int cost, [bool must_pay])
@@ -3019,11 +3042,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4994
 
 ●bool Duel.CheckTiming(int timing)
-检查timing是否存在于任一玩家当前的hint timing掩码中。
+检查当前核心提示时机掩码中，任一玩家侧是否包含timing。
+这是提示窗口辅助检查，不是完整的发动合法性检查；当前索引的本地卡片脚本没有直接调用它。
+真正的发动合法性仍应由Type/Code/Range、Condition、Cost与Target检查决定。完整模式参见Chain Timing And Activation Windows学习指南。
 Parameters:
-  timing: int
+  timing: int - 要与当前核心提示时机比较的TIMING_*掩码。
 Returns:
-  bool
+  bool - 若任一玩家当前提示时机掩码包含timing，则返回true。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4897
 
 ●bool Duel.CheckTribute(Card c, int min, [int max], [Group|nil mg], [int toplayer], [int zone])
@@ -3054,17 +3079,18 @@ Returns:
   bool
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4996
 
-●bool Duel.CheckXyzMaterial(Card c, [function|nil f], int lv, int min, int max, [Group|nil mg])
-检查scard是否存在合法的超量素材选择，使用等级lv、素材数量范围、可选筛选函数和可选素材Group。
+●bool Duel.CheckXyzMaterial(Card scard, function|nil f, int lv, int minc, int maxc, [Group|nil materials])
+检查scard是否存在合法的超量素材选择，使用素材超量等级lv、素材数量范围、可选筛选函数和可选素材Group。
+这是超量手续target使用的布尔检查；不会选择或移动卡。
 Parameters:
-  c: Card
-  f: function|nil optional
-  lv: int
-  min: int
-  max: int
-  mg: Group|nil optional
+  scard: Card - 要检查素材手续的超量怪兽。
+  f: function|nil - 可选的单张素材筛选函数。
+  lv: int - 要求的素材超量等级。
+  minc: int - 素材数量下限。
+  maxc: int - 素材数量上限。
+  materials: Group|nil optional - 可选的候选素材Group。省略时，手续代码通常提供玩家怪兽区域的Group。
 Returns:
-  bool
+  bool - 存在合法超量素材选择时为true。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5012
 
 ●void Duel.ClearOperationInfo(int ct)
@@ -3480,10 +3506,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5020
 
 ●Group|nil Duel.GetLinkedGroup(int player, int s, int o)
 返回player视角下s和o位置中处于连接状态区域的卡组成的Group。
+检查单个连接怪兽时使用Card.GetLinkedGroup；需要按场上位置掩码进行全场检查时使用此Duel辅助函数。
 Parameters:
-  player: int
-  s: int
-  o: int
+  player: int - 视角玩家。
+  s: int - player自己场上的位置掩码。
+  o: int - 从player视角看对方场上的位置掩码。
 Returns:
   Group|nil - Linked cards, or nil if player is invalid.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4940
@@ -3500,10 +3527,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4941
 
 ●int Duel.GetLinkedZone(int player)
 返回从player视角看当前被连接标记指向的区域位掩码。
+检查单个区域时配合位运算。若只检查一只连接怪兽的连接标记，使用Card.GetLinkedZone。
 Parameters:
-  player: int
+  player: int - 返回区域掩码时使用的视角玩家。
 Returns:
-  int
+  int - player视角下的连接区域位掩码。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4942
 
 ●int,int Duel.GetLocationCount(int player, int location, [int use_player], [int reason], [int zone])
@@ -3609,19 +3637,19 @@ Returns:
   int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5010
 
-●bool,Group,int,int,int Duel.GetOperationInfo(int chainc, int category)
-返回连锁chainc的category分类的操作信息，存在的话，则返回值为5个， chainc=0 则是表示当前连锁
-第一个返回值是false的话表示不存在该分类
-后4个返回值对应Duel.SetOperationInfo的后4个参数：Card|Group targets, int count, int target_player, int target_param
+●bool,Group|nil,int|nil,int|nil,int|nil Duel.GetOperationInfo(int chainc, int category)
+返回chainc上为category记录的操作信息。
+如果该分类没有记录，第一个返回值为false。否则后续返回值对应Duel.SetOperationInfo记录的targets、count、target_player和target_param。
+常用于响应类检查，用来判断某个连锁宣告了什么操作，例如预计破坏卡片或从某个位置移动卡片。
 Parameters:
-  chainc: int
-  category: int
+  chainc: int - 要检查的连锁编号。0表示当前连锁。
+  category: int - 要读取其操作信息的CATEGORY_*分类。
 Returns:
-  bool
-  Group - may be nil
-  int - may be nil
-  int - may be nil
-  int - may be nil
+  bool - 存在该category的操作信息时返回true；否则返回false。
+  Group|nil - 记录的目标卡组；如果只记录了数量、玩家和参数则为nil。
+  int|nil - 记录的预计数量。
+  int|nil - 记录的目标玩家。
+  int|nil - 记录的分类专用参数，常见为位置或数值。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5009
 
 ●int|nil Duel.GetOverlayCount(int player, int s, int o)
@@ -3671,8 +3699,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4975
 
 ●Group Duel.GetRitualMaterial(int player)
-返回玩家player可用的用于仪式召唤素材的卡片组
-包含手上，场上可解放的以及墓地的仪式魔人等卡
+返回player可作为基础仪式素材使用的卡。
+该组包含手牌或场上可被解放的卡，也包含仪式素材例外，例如合适的墓地卡。
+这只是起始素材池。选定仪式怪兽后，仍应使用Card.IsCanBeRitualMaterial过滤，并继续检查素材合计是否正好相等或大于等于需求。
 Parameters:
   player: int
 Returns:
@@ -3680,7 +3709,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4997
 
 ●Group Duel.GetRitualMaterialEx(int player)
-Duel.GetRitualMaterial并包含无等级怪兽
+返回扩展仪式素材池，其中包含没有等级的怪兽。
+本地Drytron风格脚本在仪式手续比较普通等级以外的数值时使用它，例如基于攻击力的数值。
+取得该组后，仍需继续套用脚本自身的种族、卡片文本以及仪式怪兽素材检查。
 Parameters:
   player: int
 Returns:
@@ -3815,14 +3846,14 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4953
 
 ●bool Duel.IsCanAddCounter(int player, [int countertype], [int count], [Card c])
 只提供player时，检查player是否未被禁止放置指示物。
-提供countertype、count和c时，检查player能否在c上放置该数量的countertype指示物。
+提供countertype、count和c时，检查该玩家针对该卡片目标的玩家层面放置限制。它不能替代Card.IsCanAddCounter；若需要确认卡片自身许可、表侧状态、所在位置和指示物上限，请使用Card.IsCanAddCounter。
 Parameters:
-  player: int
-  countertype: int optional
-  count: int optional
-  c: Card optional
+  player: int - Player attempting to place counters.
+  countertype: int optional - Counter type to test when the card-target overload is used.
+  count: int optional - Number of counters to test when the card-target overload is used.
+  c: Card optional - Card target passed to player-level counter-placement restriction effects.
 Returns:
-  bool
+  bool - true when the player-level placement check passes; this does not by itself prove c can hold or receive the counters.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4876
 
 ●bool Duel.IsCanRemoveCounter(int player, int s, int o, int countertype, int count, int reason)
@@ -3859,10 +3890,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5063
 ●bool Duel.IsChainNegatable(int chainc)
 用于兼容的连锁发动可否被无效检查。
 在当前MDPro3核心绑定中，此函数对任意连锁序号都会返回true。
+本地脚本仍会在无效发动的条件中调用它，用来表达预期的发动合法性检查。
 Parameters:
-  chainc: int
+  chainc: int - 要检查的连锁序号，通常是EVENT_CHAINING条件中的ev参数。
 Returns:
-  bool
+  bool - 若当前绑定认为该连锁环节的发动可以被无效则为true。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5061
 
 ●bool Duel.IsChainSolving()
@@ -3873,8 +3905,9 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5060
 
 ●bool Duel.IsDamageCalculated()
 返回当前战斗/伤害步骤状态中是否已经进行过伤害计算。
+在伤害步骤条件中可与Duel.GetCurrentPhase搭配使用，尤其适用于伤害计算后不能再发动的ATK/DEF变更效果。
 Returns:
-  bool
+  bool - 当前战斗时点已经进行过伤害计算时为true。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4956
 
 ●bool Duel.IsEnvironment(int code, [int player], [int loc])
@@ -4122,15 +4155,16 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4848
 
 ●void Duel.LinkSummon(int player, Card c, Group|nil materials, [Card|nil lcard], [int minc], [int maxc])
-为player开始对c进行规则连接召唤。
-materials、lcard、minc、maxc会成为临时连接召唤限制；该绑定交给核心处理并且不返回Lua值。
+为player和c执行规则连接召唤，可使用可选素材Group、固定素材和min/max限制。
+通常在效果operation中先检查Card.IsLinkSummonable，再调用此函数。被选择连接怪兽已登记的手续仍负责最终素材选择，并把素材送去墓地。
+核心在伤害步骤中会拒绝调用；处理召唤时会让脚本等待，且没有Lua返回值。
 Parameters:
-  player: int
-  c: Card
-  materials: Group|nil
-  lcard: Card|nil optional
-  minc: int optional - default: 0
-  maxc: int optional - default: 0
+  player: int - 进行连接召唤的玩家。
+  c: Card - 要连接召唤的连接怪兽。
+  materials: Group|nil - 可选的临时素材池。nil表示使用该连接怪兽手续的通常素材池。
+  lcard: Card|nil optional - 可选的固定素材；选择的Group必须包含它。
+  minc: int optional - 运行时素材卡数量下限。默认值：0
+  maxc: int optional - 运行时素材卡数量上限。默认值：0
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4869
 
 ●void Duel.MajesticCopy(Card c1, Card c2)
@@ -4149,19 +4183,20 @@ Parameters:
   seq: int
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4884
 
-●bool Duel.MoveToField(Card c, int move_player, int target_player, int dest, int pos, bool enable, [int zone])
-让玩家move_player把c移动的target_player的场上，返回值表示是否成功
-dest只能是LOCATION_MZONE或者LOCATION_SZONE，pos表示可选表示形式， enable 表示是否立刻适用c的效果
+●bool Duel.MoveToField(Card c, int move_player, int target_player, int dest, int positions, bool enable, [int zone])
+把c移动到target_player的场上，并返回移动是否成功。
+dest通常为LOCATION_MZONE或LOCATION_SZONE。LOCATION_FZONE和LOCATION_PZONE也可传入，核心会把它们转换为对应的魔法与陷阱区域处理。
+使用LOCATION_PZONE时，核心要求目标为灵摆卡，并让玩家选择可用的灵摆区域；如果没有符合条件的灵摆区域可用，该卡会按规则送去GY。
 Parameters:
-  c: Card
-  move_player: int
-  target_player: int
-  dest: int
-  pos: int
-  enable: bool
-  zone: int optional
+  c: Card - 要移动的卡。
+  move_player: int - 进行放置选择的玩家。
+  target_player: int - 接收该卡的场地区域所属玩家。
+  dest: int - 目的地位置。LOCATION_PZONE可用于放置到灵摆区域。
+  positions: int - 允许的表示形式掩码；放置到灵摆区域时通常使用POS_FACEUP。
+  enable: bool - 移动后是否启用该卡的场上效果。本地放置灵摆卡的脚本通常传true。
+  zone: int optional - 可选区域掩码。对LOCATION_PZONE而言，低位第0位允许左侧灵摆区域，低位第1位允许右侧灵摆区域；省略时默认两边都允许。
 Returns:
-  bool
+  bool - 移动成功时返回true；移动无效或没有可用区域时返回false。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4882
 
 ●void Duel.MSet(int player, Card c, bool ignore_count, [Effect|nil e], [int min], [int zone])
@@ -4178,11 +4213,12 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4870
 
 ●bool Duel.NegateActivation(int chainc)
-尝试把chainc的发动无效，并返回是否成功。
+尝试无效一个连锁的发动；只有发动确实被无效时才返回true。
+通常在无效效果的操作处理中使用，并先用Duel.IsChainNegatable等方式确认发动可以被无效。破坏、除外、送去墓地等后续处理应放在返回值为true之后。
 Parameters:
-  chainc: int
+  chainc: int - 要无效的连锁编号，通常是在EVENT_CHAINING操作中的ev。
 Returns:
-  bool
+  bool - 发动被无效时返回true；该连锁不能被无效或无效失败时返回false。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4929
 
 ●bool Duel.NegateAttack()
@@ -4193,12 +4229,13 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4960
 
 ●bool Duel.NegateEffect(int chainc, [bool forced])
-尝试把chainc的效果无效，并返回是否成功。forced表示请求强制无效。
+尝试无效一个连锁的效果，不一定无效其发动；效果确实被无效时返回true。
+用于“把那个效果无效”等文本。可选的forced参数表示请求强制无效。
 Parameters:
-  chainc: int
-  forced: bool optional
+  chainc: int - 要无效其效果的连锁编号。
+  forced: bool optional - 可选的强制无效请求。
 Returns:
-  bool
+  bool - 该连锁的效果被无效时返回true；不能被无效或无效失败时返回false。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4930
 
 ●void Duel.NegateRelatedChain(Card c, int reset_flag)
@@ -4217,11 +4254,13 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4932
 
 ●void Duel.Overlay(Card c, Card|Group ocard, [bool adjust])
-把ocard作为c的叠放卡叠放
+把ocard叠放在c下方作为超量素材。
+这会把一张卡或一个Group移动到c下方；它本身不会执行正规超量召唤，也不会把怪兽标记为已完成正规手续。
+默认会在叠放后调整场地。只有在更大的手续稍后会统一调整时，才传入adjust=false。
 Parameters:
-  c: Card
-  ocard: Card|Group
-  adjust: bool optional - default: true
+  c: Card - 接收超量素材的卡。
+  ocard: Card|Group - 要叠放到c下方的卡或Group。
+  adjust: bool optional - 叠放后是否调整场地。默认为true。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5014
 
 ●void Duel.PayLPCost(int player, int cost, [bool must_pay])
@@ -4289,10 +4328,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4852
 ●Effect|nil Duel.RegisterFlagEffect(int player, int code, int reset_flag, int property, int reset_count, [int label])
 为player登记玩家/全局标记效果，并返回创建的Effect。
 该标记效果以玩家为对象、只作为场地效果存在、不能被无效，且count=0会按1处理。
+当reset_flag包含RESET_PHASE且没有指定RESET_SELF_TURN或RESET_OPPO_TURN时，核心会补上双方回合。完整模式参见Reset Flags And Effect Duration学习指南。
 Parameters:
   player: int - Player that receives the marker; invalid players make the core return no values.
   code: int - Flag-effect code; the core masks it with MAX_CARD_ID and adds EFFECT_FLAG_EFFECT.
-  reset_flag: int - RESET_* mask controlling when the marker expires.
+  reset_flag: int - RESET_* mask controlling when the marker expires; phase resets without an explicit turn side apply to both players' turns.
   property: int - Effect property flags stored on the created marker; player-target, field-only, and cannot-disable flags are always added.
   reset_count: int - Reset counter for the created marker; 0 is treated as 1.
   label: int optional - Optional integer payload stored on the marker.
@@ -4313,7 +4353,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4881
 
 ●void Duel.ReleaseRitualMaterial(Group g)
-解放仪式用的素材g，如果是墓地的仪式魔人等卡则除外
+按照仪式素材规则移动g中选定的仪式素材。
+通常的手牌或场上素材会被解放，而合适的墓地仪式素材等会改为除外。
+调用此函数前应先调用Card.SetMaterial；之后以SUMMON_TYPE_RITUAL特殊召唤，并在召唤成功后调用Card.CompleteProcedure。本函数不返回数量。
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4999
@@ -4577,18 +4619,19 @@ Returns:
   Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4995
 
-●Group Duel.SelectXyzMaterial(int player, Card c, [function|nil f], int lv, int min, int max, [Group|nil mg])
-让player为scard选择等级lv和素材数量范围对应的超量素材，可带可选筛选函数和素材Group。
+●Group Duel.SelectXyzMaterial(int player, Card scard, function|nil f, int lv, int minc, int maxc, [Group|nil materials])
+让player为scard选择素材超量等级lv和素材数量范围对应的超量素材，可带可选筛选函数和素材Group。
+只应在对应的Duel.CheckXyzMaterial检查成功后使用。它会让脚本等待选择并返回选择的Group。
 Parameters:
-  player: int
-  c: Card
-  f: function|nil optional
-  lv: int
-  min: int
-  max: int
-  mg: Group|nil optional
+  player: int - 选择超量素材的玩家。
+  scard: Card - 正在选择素材的超量怪兽。
+  f: function|nil - 可选的单张素材筛选函数。
+  lv: int - 要求的素材超量等级。
+  minc: int - 素材数量下限。
+  maxc: int - 素材数量上限。
+  materials: Group|nil optional - 可选的候选素材Group。
 Returns:
-  Group
+  Group - 被选择的超量素材Group。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5013
 
 ●bool Duel.SelectYesNo(int player, int desc)
@@ -4692,7 +4735,9 @@ Returns:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4856
 
 ●void Duel.SetFusionMaterial(Group g)
-把核心当前的融合素材集合替换为g中的卡。
+用g中的卡替换核心当前保存的融合素材组。
+融合素材手续的操作函数在选出合法素材组后使用它，使之后的融合召唤操作可以读取所选素材。
+本函数只记录选择；不会移动素材，也不返回值。
 Parameters:
   g: Group
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4990
@@ -4724,9 +4769,11 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:5002
 
 ●void Duel.SetSynchroMaterial(Group g)
-把g保存为当前召唤手续使用的同调素材组。
+把g保存为当前同调素材自定义手续使用的同调素材组。
+本地标准同调辅助函数通常把已选择素材组保存在手续效果上；此函数多见于花札卫等自定义同调素材提供脚本。
+它只把已选择的素材组登记给核心使用；不会移动这些卡，也没有返回值。
 Parameters:
-  g: Group
+  g: Group - Selected Synchro Material group to store for the custom procedure.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4991
 
 ●void Duel.SetTargetCard(Card|Group targets)
@@ -4801,13 +4848,14 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4893
 ●int Duel.SpecialSummon(Card|Group targets, int sumtype, int sumplayer, int target_player, bool nocheck, bool nolimit, int pos, [int zone])
 以pos表示形式把targets特殊召唤到target_player场上，并返回成功特殊召唤的数量。
 sumplayer是执行召唤的玩家，sumtype记录召唤类型；nocheck跳过召唤条件检查，nolimit跳过苏生限制检查。
+对于有苏生限制的怪兽，Duel.SpecialSummon成功本身不会自动把该卡标记为正规召唤完成。只有当这个效果处理本身就是该卡的正规召唤方式时，才调用Card.CompleteProcedure。
 Parameters:
   targets: Card|Group - Card or Group to Special Summon.
   sumtype: int - Summon type value recorded for the Summon.
   sumplayer: int - Player treated as performing the Special Summon.
   target_player: int - Player whose field receives the Summoned cards.
-  nocheck: bool - If true, skips Summoning-condition checks.
-  nolimit: bool - If true, skips revive-limit checks.
+  nocheck: bool - 为true时跳过召唤条件检查，包括类似EFFECT_SPSUMMON_CONDITION的限制。
+  nolimit: bool - 为true时跳过苏生限制和正规召唤手续完成检查。
   pos: int - POS_* position mask for the Summon.
   zone: int optional - Allowed Monster Zone bitmask; default: 0xff.
 Returns:
@@ -4822,10 +4870,11 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4875
 
 ●void Duel.SpecialSummonRule(int player, Card c, [int sumtype])
 为player按规则特殊召唤c，可带召唤类型sumtype；核心处于效果伤害步骤处理时不会执行。
+多数普通卡片脚本会登记EFFECT_SPSUMMON_PROC，而不是直接调用此函数。除非本地脚本模式明确需要这个核心入口，否则优先使用既有手续辅助函数。
 Parameters:
-  player: int
-  c: Card
-  sumtype: int optional - default: 0
+  player: int - 执行规则特殊召唤的玩家。
+  c: Card - 要按规则特殊召唤的卡。
+  sumtype: int optional - 为这次规则召唤记录的召唤类型值；默认值：0。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4866
 
 ●bool Duel.SpecialSummonStep(Card c, int sumtype, int sumplayer, int target_player, bool nocheck, bool nolimit, int pos, [int zone])
@@ -4899,14 +4948,15 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4885
 
 ●void Duel.SynchroSummon(int player, Card c, [Card|nil tuner], [Group|nil mg], [int minc], [int maxc])
 为player进行c的同调召唤；可以指定必须使用的tuner，并可从mg中选择素材。
+通常在效果操作处理中先用Card.IsSynchroSummonable检查后再调用；被选择的同调怪兽登记的同调手续仍然决定素材是否合法。
 minc和maxc可以限制该手续使用的非调整素材数量。
 Parameters:
-  player: int
-  c: Card
-  tuner: Card|nil optional
-  mg: Group|nil optional
-  minc: int optional - default: 0
-  maxc: int optional - default: 0
+  player: int - Player performing the Synchro Summon.
+  c: Card - Synchro Monster to Summon.
+  tuner: Card|nil optional - Optional required Tuner material.
+  mg: Group|nil optional - Optional material pool to select from.
+  minc: int optional - Optional minimum non-Tuner material count override; default: 0.
+  maxc: int optional - Optional maximum non-Tuner material count override; default: 0.
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4867
 
 ●int,...? Duel.TossCoin(int player, int count)
@@ -4941,12 +4991,14 @@ Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4899
 
 ●void Duel.XyzSummon(int player, Card c, [Group|nil materials], [int minc], [int maxc])
 为player和c执行规则超量召唤，可使用可选素材组和min/max限制。
+通常在效果operation中先检查Card.IsXyzSummonable，再调用此函数。被选择超量怪兽已登记的手续仍负责最终素材合法性和叠放处理。
+核心在伤害步骤中会拒绝调用；处理召唤时会让脚本等待，且没有Lua返回值。
 Parameters:
-  player: int
-  c: Card
-  materials: Group|nil optional
-  minc: int optional
-  maxc: int optional
+  player: int - 进行超量召唤的玩家。
+  c: Card - 要召唤的超量怪兽。
+  materials: Group|nil optional - 效果提供的可选素材Group。
+  minc: int optional - 可选的素材数量下限覆盖值。默认为0。
+  maxc: int optional - 可选的素材数量上限覆盖值。默认为0。
 Source: D:\Programs\GitHub\ygopro-core\libduel.cpp:4868
 
 ========== Effect ==========
@@ -5295,11 +5347,13 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:612
 
 ●void Effect.SetHintTiming(Effect e, int s_time, [int o_time])
-设置提示时点，第二个和第三个参数分别表示 自己 和对方的回合
+设置客户端应在何时向处理者的控制者提示或高亮e，也可以单独设置对手侧提示。
+若省略o_time，本地核心会把s_time复制到对手侧掩码；检查提示时，这两个掩码会按处理者控制者的相对方向解释。
+该函数只控制提示与显示时机；不能替代Condition、Cost或Target回调中的发动合法性检查。
 Parameters:
   e: Effect
-  s_time: int
-  o_time: int optional - default: s_time
+  s_time: int - 处理者控制者侧的提示时机掩码。
+  o_time: int optional - 对手侧的提示时机掩码；默认等于s_time。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:624
 
 ●void Effect.SetLabel(Effect e, ... int)
@@ -5333,11 +5387,13 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:630
 
 ●void Effect.SetProperty(Effect e, int prop1, [int prop2])
-设置效果e的Property属性。
+设置e的Property标志。prop1保存常规效果性质标志；需要第二组性质标志时使用prop2。
+替换prop1时会保留内部标志。
+学习时常见的标志包括：EFFECT_FLAG_CARD_TARGET用于正式取对象，EFFECT_FLAG_DAMAGE_STEP与EFFECT_FLAG_DAMAGE_CAL用于伤害步骤时点，EFFECT_FLAG_PLAYER_TARGET用于影响玩家的效果。
 Parameters:
-  e: Effect
-  prop1: int
-  prop2: int optional
+  e: Effect - 要设置Property标志的效果。
+  prop1: int - 主要效果性质位掩码。
+  prop2: int optional - 可选的第二组性质位掩码，用于保存在第二个Property字段中的标志。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:620
 
 ●void Effect.SetRange(Effect e, int range)
@@ -5348,11 +5404,13 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:614
 
 ●void Effect.SetReset(Effect e, int reset_flag, [int reset_count])
-设置效果e的reset参数和可选的reset次数。
+设置e何时重置，以及它能经过多少次对应的重置检查。
+如果reset_count为0或省略，核心会按1保存。使用阶段重置但没有显式指定自己/对方回合时，核心会同时应用RESET_SELF_TURN和RESET_OPPO_TURN。
+对于绑定在卡上的临时效果，通常要把卡片身份重置（如RESET_EVENT+RESETS_STANDARD）与卡片文本要求的阶段或持续时间重置组合起来。完整模式参见Reset Flags And Effect Duration学习指南。
 Parameters:
-  e: Effect
-  reset_flag: int
-  reset_count: int optional
+  e: Effect - Effect whose reset mask is replaced.
+  reset_flag: int - RESET_* mask describing the events or phases that can reset e.
+  reset_count: int optional - Number of matching reset checks before e resets; omitted or 0 is treated as 1.
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:618
 
 ●void Effect.SetTarget(Effect e, function targ_func)
@@ -5364,11 +5422,12 @@ Parameters:
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:626
 
 ●void Effect.SetTargetRange(Effect e, int s_range, int o_range)
-设置效果e的Target Range属性。
+设置效果e的Target Range字段，并清除EFFECT_FLAG_ABSOLUTE_TARGET。
+对多数场地效果来说，s_range是处理者控制者一侧受影响的位置，o_range是对方一侧受影响的位置。带有EFFECT_FLAG_SPSUM_PARAM时，这两个字段改为保存特殊召唤的表示形式和召唤到哪一方场上。
 Parameters:
-  e: Effect
-  s_range: int
-  o_range: int
+  e: Effect - 要设置Target Range字段的效果。
+  s_range: int - 通常表示处理者控制者一侧受影响的位置。带EFFECT_FLAG_SPSUM_PARAM时表示允许的特殊召唤表示形式。
+  o_range: int - 通常表示对方一侧受影响的位置。带EFFECT_FLAG_SPSUM_PARAM时表示特殊召唤到哪一方场上的玩家值。
 Source: D:\Programs\GitHub\ygopro-core\libeffect.cpp:615
 
 ●void Effect.SetType(Effect e, int type)
@@ -5678,8 +5737,9 @@ Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:919
 
 ●void Group.KeepAlive(Group g)
 阻止g被Lua自动释放，直到调用Group.DeleteGroup。
+当选中的Group要通过SetLabelObject存到Effect上，或需要在之后的回调中继续使用时使用。延迟效果结束时应配合Group.DeleteGroup释放。
 Parameters:
-  g: Group
+  g: Group - 要保留到调用DeleteGroup为止的Group。
 Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:901
 
 ●void Group.Merge(Group g1, Group g2)
@@ -5742,6 +5802,7 @@ Source: D:\Programs\GitHub\ygopro-core\libgroup.cpp:915
 ●Card|nil Group.SelectUnselect(Group cg, [Group|nil sg], int player, [bool finishable], [bool cancelable], [int min], [int max])
 让player从cg中选择1张卡加入当前选择，或从sg中选择1张卡移出当前选择，并返回被选择的那张卡。
 sg可以为nil。finishable控制当前数量下能否结束选择，cancelable允许取消；取消时返回nil。min和max默认均为1。
+这是逐步构建素材或手续选择的底层组件。普通的一次性选择通常使用Group.Select、Group.FilterSelect或Duel.SelectMatchingCard更清晰。
 Parameters:
   cg: Group
   sg: Group|nil optional
@@ -6212,13 +6273,14 @@ Parameters:
 Source: Utilities/utility.lua:1314
 
 ●bool Auxiliary.CheckUnionEquip(Card uc, Card tc, [int exclude_modern_count])
-检查同盟怪兽uc与对象tc之间的同盟装备数量兼容性，可选择忽略部分新式同盟数量。
+检查同盟怪兽uc是否能按本地新式/旧式同盟数量规则装备给对象tc。
+替换式效果会先移除已经装备的新式同盟再装备另一张同盟时，可使用exclude_modern_count忽略相应数量。
 Parameters:
-  uc: Card
-  tc: Card
-  exclude_modern_count: int optional
+  uc: Card - 将要变成装备卡的同盟怪兽。
+  tc: Card - 将要装备该同盟卡的怪兽。
+  exclude_modern_count: int optional - 检查对象时忽略的新式同盟数量；替换当前装备的同盟时通常为1。
 Returns:
-  bool
+  bool - 若按数量兼容规则该对象可以装备这张同盟卡，则为true。
 Source: Utilities/utility.lua:335
 
 ●table Auxiliary.CreateChecks(function f, table list)
@@ -6477,6 +6539,12 @@ Source: Utilities/utility.lua:433
 ●void Auxiliary.EnableExtraDeckSummonCountLimit()
 初始化共通的额外卡组召唤次数表，双方各为1次，并登记每个抽卡阶段开始时重置的全局效果。此辅助函数只管理计数，具体卡片脚本仍需自行检查并扣除次数。
 Source: Utilities/utility.lua:482
+
+●void Auxiliary.EnableMulcharmyGlobalCheck()
+为「Mulcharmy」共通发动次数检查安装一次全局监听。
+该监听检查EVENT_CHAINING；玩家发动0x1b2字段的怪兽效果时，给该玩家登记到结束阶段为止的84192580标记。
+Mulcharmy怪兽脚本在initial_effect中调用此函数，然后用Duel.GetFlagEffect(tp,84192580)<=1作为手牌发动条件的一部分。
+Source: Utilities/utility.lua:2041
 
 ●void Auxiliary.EnableNeosReturn(Card c, function operation, any set_category)
 为c登记「元素英雄 新宇侠」融合怪兽共通的结束阶段返回效果；会创建强制返回效果，以及受编号42015635效果影响时使用的可选版本，并返回这两个效果。
@@ -7027,6 +7095,21 @@ Parameters:
 Returns:
   function
 Source: Utilities/utility.lua:2028
+
+●void Auxiliary.MulcharmyGlobalCheck(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
+Auxiliary.EnableMulcharmyGlobalCheck安装的EVENT_CHAINING内部处理。
+触发效果是0x1b2字段怪兽的怪兽效果时，给发动该效果的玩家登记到结束阶段为止的84192580标记。
+卡片脚本应调用Auxiliary.EnableMulcharmyGlobalCheck，而不是直接登记这个处理函数。
+Parameters:
+  e: Effect - 接收EVENT_CHAINING的全局永续效果。
+  tp: int - 全局效果的控制者；此辅助函数使用rp表示发动玩家。
+  eg: Group - EVENT_CHAINING提供的事件Group。
+  ep: int - EVENT_CHAINING提供的事件玩家。
+  ev: int - EVENT_CHAINING提供的事件值。
+  re: Effect - 正在连锁中发动的效果。
+  r: int - EVENT_CHAINING提供的原因标志。
+  rp: int - 发动re的玩家；Mulcharmy检查匹配时，此玩家获得84192580标记。
+Source: Utilities/utility.lua:2050
 
 ●bool Auxiliary.mzctcheck(Group g, int tp)
 判断tp在解放g之后是否会有可用怪兽区域。
@@ -7833,6 +7916,7 @@ Source: Utilities/utility.lua:1338
 
 ●Group|nil Group.SelectSubGroup(Group g, int tp, function f, bool cancelable, [int min], [int max], ... any)
 让tp从g中选择数量在min到max之间且满足f的子组。会考虑已有选择；若不能完成有效选择则返回nil。
+先用Group.CheckSubGroup进行合法性检查，再在实际让玩家选择时调用SelectSubGroup。如果选中的Group要保存到之后的回调中使用，应调用KeepAlive并在之后DeleteGroup。
 Parameters:
   g: Group
   tp: int
@@ -7948,14 +8032,15 @@ Returns:
 Source: Utilities/procedure.lua:1687
 
 ●Effect Auxiliary.AddFusionEffectProc(Card c, function filter, int mat_location, [function|nil mat_filter], [function|nil mat_operation], [table|nil params])
-Auxiliary.AddFusionEffectProcUltimate的便捷包装；用常用参数构造params表，并返回创建的融合效果。
+Auxiliary.AddFusionEffectProcUltimate的便捷包装。
+它会根据常用的融合召唤参数构造params表：额外卡组过滤、素材位置、素材过滤、素材移动操作以及可选的高级params。
 Parameters:
   c: Card
-  filter: function
-  mat_location: int
-  mat_filter: function|nil optional
-  mat_operation: function|nil optional
-  params: table|nil optional
+  filter: function - Fusion Monster filter for the Extra Deck candidate.
+  mat_location: int - Base material locations, commonly LOCATION_HAND+LOCATION_MZONE.
+  mat_filter: function|nil optional - Optional candidate material filter.
+  mat_operation: function|nil optional - Optional operation that moves the selected material group.
+  params: table|nil optional - Optional advanced params forwarded to AddFusionEffectProcUltimate.
 Returns:
   Effect - The created Fusion effect.
 Source: Utilities/procedure.lua:1677
@@ -7963,6 +8048,7 @@ Source: Utilities/procedure.lua:1677
 ●Effect Auxiliary.AddFusionEffectProcUltimate(Card c, table params)
 创建由params描述的可配置融合召唤发动效果。
 缺省的素材位置、素材筛选、素材操作、特殊召唤nocheck和Category字段会填入MDPro3默认值。除非params.reg为false，否则该效果会作为发动效果登记给c。
+生成的效果会检查额外卡组中的融合怪兽、取得并过滤融合素材、支持Chain Material后备流程、选择素材、按配置操作移动素材、以SUMMON_TYPE_FUSION特殊召唤，并完成正规手续。
 Parameters:
   c: Card
   params: table
@@ -8141,17 +8227,18 @@ Parameters:
   attr: int
 Source: Utilities/procedure.lua:1342
 
-●Effect Auxiliary.AddLinkProcedure(Card c, [function|nil f], int min, [int max], [function gf])
+●Effect Auxiliary.AddLinkProcedure(Card c, function|nil f, int min, [int max], [function|nil gf])
 为c登记标准连接召唤手续，并返回创建的Effect。
-f筛选素材，min/max限制素材数量，gf可额外检查选中的素材组。
+f筛选每张连接素材，min/max限制选择的素材卡数量，gf可额外检查被选择的整组素材。
+该辅助函数会建立额外卡组中的EFFECT_SPSUMMON_PROC并设为SUMMON_TYPE_LINK，使用Auxiliary.GetLinkCount匹配连接值，用Card.SetMaterial记录素材，并以REASON_MATERIAL+REASON_LINK送去墓地。
 Parameters:
-  c: Card
-  f: function|nil optional
-  min: int
-  max: int optional
-  gf: function optional
+  c: Card - 要登记手续的连接怪兽。
+  f: function|nil - 可选的逐素材筛选函数。nil表示除通常连接素材合法性外没有额外筛选。
+  min: int - 必须选择的素材卡数量下限。
+  max: int optional - 素材卡数量上限。省略时默认为c:GetLink()。
+  gf: function|nil optional - 可选的整组素材检查函数，以gf(被选择的Group, 连接怪兽, 玩家)调用。
 Returns:
-  Effect
+  Effect - 已登记的特殊召唤手续Effect。
 Source: Utilities/procedure.lua:2128
 
 ●void Auxiliary.AddRitualProcEqual(Card c, function filter, any summon_location, any grave_filter, any mat_filter, Effect pause, any extra_operation, any extra_target)
@@ -8301,24 +8388,27 @@ Returns:
 Source: Utilities/procedure.lua:1909
 
 ●Effect Auxiliary.AddRitualProcUltimate(Card c, function filter, function level_function, string greater_or_equal, [int summon_location], [function|nil grave_filter], [function|nil mat_filter], [bool pause], [function|nil extra_operation], [function|nil extra_target])
-为c创建可配置的仪式召唤发动效果并返回它。该效果可选择不立即登记，可使用墓地素材，并可执行额外的目标/操作回调。
+为c创建可配置的仪式召唤发动效果并返回它。
+生成的效果会检查仪式怪兽、取得仪式素材、确认素材等级合计正好相等或大于等于需求、解放仪式素材、以SUMMON_TYPE_RITUAL特殊召唤，并完成正规手续。
+普通仪式魔法通常使用包装辅助函数；需要墓地素材、素材过滤、不立即登记或额外目标/操作回调时，可直接调用此函数。
 Parameters:
   c: Card
-  filter: function
-  level_function: function
-  greater_or_equal: string
-  summon_location: int optional
-  grave_filter: function|nil optional
-  mat_filter: function|nil optional
-  pause: bool optional
-  extra_operation: function|nil optional
-  extra_target: function|nil optional
+  filter: function - Ritual Monster filter. It receives the candidate Ritual Monster plus the helper's extra arguments and should return true for monsters this effect can Summon.
+  level_function: function - Function used to get the required value from the Ritual Monster, commonly Card.GetOriginalLevel or Card.GetLevel.
+  greater_or_equal: string - Use "Greater" for equal-or-higher material totals or "Equal" for exact totals.
+  summon_location: int optional - Location to search for the Ritual Monster. Defaults to LOCATION_HAND.
+  grave_filter: function|nil optional - Optional filter for extra Graveyard materials that the helper may merge into the material pool.
+  mat_filter: function|nil optional - Optional filter applied to candidate Ritual Materials before the material subgroup is selected.
+  pause: bool optional - If true, returns the effect without registering it to c.
+  extra_operation: function|nil optional - Optional callback run after the Ritual Summon operation. Local wrappers pass the Summoned monster and selected material group to this callback.
+  extra_target: function|nil optional - Optional callback run during the target branch for extra operation info or activation checks.
 Returns:
-  Effect - The created Ritual Summon activation effect.
+  Effect - The created Ritual Summon activation effect. If pause is false or nil, the helper also registers it to c.
 Source: Utilities/procedure.lua:1750
 
 ●void Auxiliary.AddSynchroMixProcedure(Card c, function|nil f1, function|nil f2, function|nil f3, function|nil f4, int minc, int maxc, [function gc])
 登记混合同调召唤手续：最多3个固定素材筛选条件，加上f4重复minc到maxc次。
+该辅助函数会建立位于额外卡组的EFFECT_SPSUMMON_PROC，并使用SUMMON_TYPE_SYNCHRO；它会检查同调等级合计，并处理必须使用素材、手卡同调、调整限制以及可选的素材组检查。
 最大数量会按c的等级扣除必要固定素材后进行上限限制。
 Parameters:
   c: Card
@@ -8332,13 +8422,15 @@ Parameters:
 Source: Utilities/procedure.lua:135
 
 ●void Auxiliary.AddSynchroProcedure(Card c, [function|nil f1], [function|nil f2], int minc, [int maxc])
-Synchro monster, 1 tuner + min to max monsters
+为c登记标准同调召唤手续。
+f1筛选调整素材，f2筛选非调整素材，minc/maxc设置需要的非调整素材数量。
+建立的手续在额外卡组生效，通过核心同调辅助函数检查素材，在操作处理中读取已选择的素材组，并以REASON_MATERIAL+REASON_SYNCHRO送去GY。
 Parameters:
-  c: Card
-  f1: function|nil optional
-  f2: function|nil optional
-  minc: int
-  maxc: int optional
+  c: Card - Synchro Monster that receives the procedure.
+  f1: function|nil optional - Optional Tuner filter. nil accepts any legal Tuner.
+  f2: function|nil optional - Optional non-Tuner filter, commonly built with Auxiliary.NonTuner.
+  minc: int - Minimum number of non-Tuner materials.
+  maxc: int optional - Maximum number of non-Tuner materials. If omitted, the helper caps it by c's Level minus 1.
 Source: Utilities/procedure.lua:60
 
 ●void Auxiliary.AddSynchroProcedure2(Card c, [function|nil f1], [function|nil f2])
@@ -8350,31 +8442,35 @@ Parameters:
   f2: function|nil optional
 Source: Utilities/procedure.lua:123
 
-●void Auxiliary.AddXyzProcedure(Card c, [function|nil f], int lv, int ct, [function alterf], [string alterdesc], [int maxct], [function alterop])
-Xyz monster, lv k*n
+●void Auxiliary.AddXyzProcedure(Card c, function|nil f, int lv, int ct, [function|nil alterf], [int alterdesc], [int maxct], [function|nil alterop])
+给c登记标准超量召唤手续。
+f筛选素材，lv是要求的素材超量等级，ct是素材下限，maxct可限制素材上限。
+该辅助函数会建立额外卡组中的EFFECT_SPSUMMON_PROC并设为SUMMON_TYPE_XYZ，使用核心超量素材辅助函数检查和选择素材，用Card.SetMaterial记录素材，并用Duel.Overlay叠放为超量素材。
+alterf、alterdesc和alterop用于定义可选的单卡替代超量召唤路线。
 Parameters:
-  c: Card
-  f: function|nil optional
-  lv: int
-  ct: int
-  alterf: function optional
-  alterdesc: string optional
-  maxct: int optional
-  alterop: function optional
+  c: Card - 要登记手续的超量怪兽。
+  f: function|nil - 可选的单张素材筛选函数。nil表示除通常超量检查外没有额外素材限制。
+  lv: int - 要求的素材超量等级。
+  ct: int - 素材数量下限。
+  alterf: function|nil optional - 可选的单卡替代超量召唤路线筛选函数。
+  alterdesc: int optional - 可以选择替代路线时显示的提示文本id。
+  maxct: int optional - 素材数量上限。省略时默认为ct。
+  alterop: function|nil optional - 可选的替代路线检查/应用回调。本地辅助函数在合法性检查时以chk==0调用，选择后以chk==1调用。
 Source: Utilities/procedure.lua:485
 
 ●void Auxiliary.AddXyzProcedureLevelFree(Card c, function|nil f, function|nil gf, int minc, int maxc, [function|nil alterf], [int alterdesc], [function|nil alterop])
 给c登记不检查等级的超量召唤手续。
-该辅助函数使用f、gf、minc、maxc以及可选的替代召唤设置，且没有显式返回值。
+f筛选每张候选素材，gf可以检查被选择的整组素材，例如要求所有素材具有相同阶级。
+本地辅助函数仍会检查Card.IsCanBeXyzMaterial、区域可用性和EFFECT_XYZ_MIN_COUNT，但procedure.lua注明此路线不支持EFFECT_DOUBLE_XMATERIAL。
 Parameters:
-  c: Card
-  f: function|nil
-  gf: function|nil
-  minc: int
-  maxc: int
-  alterf: function|nil optional
-  alterdesc: int optional
-  alterop: function|nil optional
+  c: Card - 要登记不检查等级手续的超量怪兽。
+  f: function|nil - 可选的单张素材筛选函数。
+  gf: function|nil - 可选的整组素材检查函数，会对选择后的素材Group调用。
+  minc: int - 素材数量下限。
+  maxc: int - 素材数量上限。
+  alterf: function|nil optional - 可选的单卡替代超量召唤路线筛选函数。
+  alterdesc: int optional - 可以选择替代路线时显示的提示文本id。
+  alterop: function|nil optional - 可选的替代路线检查/应用回调。
 Source: Utilities/procedure.lua:700
 
 ●bool Auxiliary.AssaultModeLimit(Effect e, Effect se, int sp, int st)
@@ -8473,19 +8569,20 @@ Parameters:
 Source: Utilities/procedure.lua:22
 
 ●void Auxiliary.EnablePendulumAttribute(Card c, [bool|nil reg])
-为灵摆怪兽c登记灵摆召唤手续。
-除非reg为false，否则也会登记从手牌发动该灵摆卡的效果。
+为灵摆怪兽c登记标准灵摆召唤手续。
+该手续是在LOCATION_PZONE生效的EFFECT_SPSUMMON_PROC_G，召唤类型为SUMMON_TYPE_PENDULUM，并使用Auxiliary.PendCondition和Auxiliary.PendOperation。
+除非reg为false，否则此辅助函数还会登记从手牌发动该灵摆卡的简易发动效果。
 Parameters:
-  c: Card
-  reg: bool|nil optional
+  c: Card - 要登记共通灵摆召唤手续的灵摆怪兽。
+  reg: bool|nil optional - 为false时不登记默认的手牌发动效果；nil或true时登记。
 Source: Utilities/procedure.lua:1948
 
 ●void Auxiliary.EnableReviveLimitPendulumSummonable(Card c, [int loc])
 给c启用苏生限制处理，同时允许其从loc对应位置进行灵摆召唤。
-该辅助函数会把loc保存到c的metatable，并在c成功灵摆召唤时完成正规手续。
+该辅助函数会调用Card.EnableReviveLimit，把loc以psummonable_location保存到c的metatable，并在c成功灵摆召唤时完成正规手续。
 Parameters:
-  c: Card
-  loc: int optional - default: 0xff
+  c: Card - 可通过灵摆召唤完成正规手续的特殊召唤怪兽。
+  loc: int optional - 允许该卡进行灵摆召唤的位置掩码。默认值为0xff。
 Source: Utilities/procedure.lua:2097
 
 ●bool Auxiliary.FCheckMix(Card c, Group mg, Group sg, Card fc, bool sub, function fun1, [function|nil fun2], ... function)
@@ -8943,10 +9040,13 @@ Returns:
   bool
 Source: Utilities/procedure.lua:2289
 
-●void Auxiliary.GetLinkCount(Card c)
-连接怪兽且连接值大于1时，返回1加上连接值左移到高16位后的值；其他情况返回1。
+●int Auxiliary.GetLinkCount(Card c)
+返回连接召唤手续求和检查使用的素材数值编码。
+通常素材和LINK-1怪兽按1计算。连接值大于1的连接怪兽会编码为可按1或自身连接值计算，供Group.CheckWithSumEqual使用。
 Parameters:
-  c: Card
+  c: Card - 候选连接素材。
+Returns:
+  int - 1；连接值大于1的连接怪兽则返回可表示1或自身连接值的编码。
 Source: Utilities/procedure.lua:2158
 
 ●Group Auxiliary.GetLinkMaterials(int tp, function|nil f, Card lc, Effect e)
@@ -9055,6 +9155,7 @@ Source: Utilities/procedure.lua:2191
 
 ●function Auxiliary.LinkCondition(function|nil f, int minct, int maxct, function|nil gf)
 返回连接召唤手续的条件函数。
+返回的函数会拒绝额外卡组中表侧表示的灵摆连接怪兽，建立或筛选素材池，应用运行时min/max限制，在提供lmat时加入必需素材，检查EFFECT_MUST_BE_LMATERIAL，并确认是否存在合法素材子组。
 Parameters:
   f: function|nil
   minct: int
@@ -9076,7 +9177,8 @@ Returns:
 Source: Utilities/procedure.lua:2309
 
 ●function Auxiliary.LinkOperation(function|nil f, int minct, int maxct, function|nil gf)
-返回连接召唤手续的操作函数；设置素材，消耗额外素材次数限制，并把素材送去墓地。
+返回连接召唤手续的操作函数。
+返回的函数从效果的LabelObject读取被选择的Group，用Card.SetMaterial记录素材，消耗合法的额外素材次数限制，以REASON_MATERIAL+REASON_LINK把素材送去墓地，并删除KeepAlive的Group。
 Parameters:
   f: function|nil
   minct: int
@@ -9087,7 +9189,8 @@ Returns:
 Source: Utilities/procedure.lua:2263
 
 ●function Auxiliary.LinkTarget(function|nil f, int minct, int maxct, function|nil gf)
-返回连接召唤手续的目标函数；选择有效连接素材子组并保存在效果上。
+返回连接召唤手续的目标函数。
+返回的函数使用Group.SelectSubGroup和Auxiliary.LCheckGoal选择连接素材子组，使该Group保持存在，并保存在效果上供LinkOperation使用。
 Parameters:
   f: function|nil
   minct: int
@@ -9184,17 +9287,19 @@ Returns:
 Source: Utilities/procedure.lua:1991
 
 ●bool Auxiliary.PendCondition(Effect e, Card|nil c, Group|nil og)
-共通灵摆召唤手续的条件函数；检查2个灵摆区域、可用位置和区域、每回合状态，以及可召唤怪兽。
+共通灵摆召唤手续的条件函数。
+它会检查2个灵摆区域、当前刻度、手牌和表侧额外卡组的候选范围、可用怪兽区域、每回合状态、额外灵摆召唤效果，以及是否至少有1只候选怪兽可以灵摆召唤。
 Parameters:
   e: Effect
-  c: Card|nil
-  og: Group|nil
+  c: Card|nil - 手续的处理卡。为nil时，此辅助函数会为核心的可用性探测返回true。
+  og: Group|nil - 核心或其他辅助函数提供的可选候选Group；为nil时使用玩家手牌/额外卡组候选。
 Returns:
   bool - true if a Pendulum Summon is available.
 Source: Utilities/procedure.lua:2004
 
 ●void Auxiliary.PendOperation(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp, Card c, Group sg, Group|nil og)
-共通灵摆召唤手续的操作函数；选择通常或额外灵摆召唤效果，在手牌/额外卡组区域限制内选择怪兽，更新检查标记，并把选择合并到sg。
+共通灵摆召唤手续的操作函数。
+它会选择通常或额外灵摆召唤选项，计算手牌、额外卡组和总怪兽区域限制，选择合法子组，更新共通检查标记或消耗额外效果次数限制，并把所选卡合并到sg供核心的组召唤流程处理。
 Parameters:
   e: Effect
   tp: int
@@ -9204,17 +9309,18 @@ Parameters:
   re: Effect
   r: int
   rp: int
-  c: Card
-  sg: Group
-  og: Group|nil
+  c: Card - 正在使用其手续的左侧灵摆区域卡。
+  sg: Group - 核心提供的Group，用于接收选择的灵摆召唤怪兽。
+  og: Group|nil - 可选候选Group；为nil时从玩家手牌和表侧额外卡组重新取得候选。
 Source: Utilities/procedure.lua:2033
 
 ●function Auxiliary.PendOperationCheck(int ft1, int ft2, int ft)
-返回组检查函数，用于限制一次灵摆召唤选择中的手牌数量、额外卡组数量和总区域数量。
+返回组检查函数，用于限制一次灵摆召唤选择中的手牌数量、额外卡组数量和总怪兽区域数量。
+返回的函数会分别统计所选额外卡组卡和非额外卡组卡，再判断该子组是否合法。
 Parameters:
-  ft1: int
-  ft2: int
-  ft: int
+  ft1: int - 非额外卡组位置的最多选择数量，通常是手牌。
+  ft2: int - 表侧额外卡组的最多选择数量。
+  ft: int - 总共最多选择数量。
 Returns:
   function - Group check for Pendulum Summon zone limits.
 Source: Utilities/procedure.lua:2026
@@ -9234,8 +9340,9 @@ Source: Utilities/procedure.lua:1977
 
 ●bool Auxiliary.PendulumSummonableBool(Card c)
 c具有psummonable_location标记且当前位置包含在其中时返回true。
+共通灵摆候选筛选会把此结果作为Card.IsCanBeSpecialSummoned的nocheck和nolimit值，因此只有位于已设置位置的复活限制怪兽才会被允许按该方式灵摆召唤。
 Parameters:
-  c: Card
+  c: Card - 先前由Auxiliary.EnableReviveLimitPendulumSummonable设置的卡。
 Returns:
   bool - true if c's current location is Pendulum Summonable by its flag.
 Source: Utilities/procedure.lua:2111
@@ -9252,7 +9359,8 @@ Returns:
 Source: Utilities/procedure.lua:2305
 
 ●void Auxiliary.PSSCompleteProcedure(Effect e, int tp, Group eg, int ep, int ev, Effect re, int r, int rp)
-对通过复活限制辅助函数设置、并以灵摆召唤特殊召唤的怪兽完成正规手续。
+对由Auxiliary.EnableReviveLimitPendulumSummonable设置、并成功灵摆召唤的怪兽完成正规手续。
+该操作会先检查Card.IsSummonType(SUMMON_TYPE_PENDULUM)，再调用Card.CompleteProcedure。
 Parameters:
   e: Effect
   tp: int

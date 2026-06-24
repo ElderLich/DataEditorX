@@ -638,6 +638,7 @@ EFFECT_XYZ_MIN_COUNT	=372	--Can only be used for an Xyz Summon with at least X m
 EFFECT_SYNCHRO_LEVEL_EX	=373	--Allows monsters without Levels to be used as Synchro Material
 EFFECT_RITUAL_LEVEL_EX	=374	--Allows monsters without Levels to be used as Ritual Material
 EFFECT_DOUBLE_XMATERIAL	=375	--Counts as 2 materials when Xyz Summoning a monster that requires 3 or more materials
+EFFECT_REVEAL_ONFIELD	=376	--Affected face-down cards on the field can be inspected by the effect controller
 EFFECT_FLAG_EFFECT	=0x20000000	--Flag effect created by RegisterFlagEffect()
 
 --Trigger events and timings. TYPE_SINGLE reacts to events involving itself; TYPE_FIELD reacts to matching events involving any card on the field.

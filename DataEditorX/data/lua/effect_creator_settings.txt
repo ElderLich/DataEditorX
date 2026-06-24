@@ -145,6 +145,7 @@ EFFECT_EXTRA_RELEASE					The target player must Tribute specified cards instead 
 EFFECT_EXTRA_RELEASE_SUM				The target player can Tribute specified cards instead of their own monsters when Tributing for a Summon
 EFFECT_EXTRA_RELEASE_NONSUM				The target player can Tribute specified cards instead of other cards when paying a Tribute cost for an effect
 EFFECT_PUBLIC							The target card is revealed/public
+EFFECT_REVEAL_ONFIELD						Affected face-down cards on the field can be inspected by the effect controller
 EFFECT_COUNTER_PERMIT					Marks the target card as able to hold the specified counter type
 EFFECT_COUNTER_LIMIT					Sets the maximum number of a specified counter type the target card can hold
 EFFECT_RCOUNTER_REPLACE					Provides a substitute action when the target player would remove counters
