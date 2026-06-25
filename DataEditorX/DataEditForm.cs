@@ -2038,6 +2038,12 @@ namespace DataEditorX
             string txt = tb_cardtext.Text;
             if ((GetCheck(pl_cardtype) & 0x1000000) > 0)
             {
+                if (string.IsNullOrWhiteSpace(txt))
+                {
+                    tb_cardtext.Text = "";
+                    return;
+                }
+
                 GetTexts(txt, out string[] tmp);
                 if (!IsFormattedPendulumText(txt))
                 {
