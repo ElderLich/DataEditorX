@@ -130,6 +130,7 @@ namespace DataEditorX.Core
                     return false;
                 }
                 string sql;
+                bool oldCardDeleted = false;
                 if (c.id != oldCard.id)//ID was changed
                 {
                     sql = DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetInsertSQL(c, false) : DataBase.GetInsertSQL(c, false);// Restore by inserting the card.
@@ -146,6 +147,7 @@ namespace DataEditorX.Core
                         else
                         {//Delete succeeded; add restore SQL
                             undoSQL = DataBase.GetDeleteSQL(c) + (DataBase.IsOmegaDatabase(dataform.GetOpenFile()) ? DataBase.OmegaGetInsertSQL(oldCard, false) : DataBase.GetInsertSQL(oldCard, false));
+                            oldCardDeleted = true;
                         }
                     }
                     else
@@ -178,8 +180,8 @@ namespace DataEditorX.Core
                 if (DataBase.Command(dataform.GetOpenFile(), sql) > 0)
                 {
                     MyMsg.Show(LMSG.ModifySucceed);
-                    dataform.Search(true);
                     dataform.SetCard(c);
+                    dataform.RefreshModifiedCard(oldCard, c, oldCardDeleted);
                     return true;
                 }
                 else

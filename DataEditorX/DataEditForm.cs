@@ -79,6 +79,7 @@ namespace DataEditorX
 
         //Setcode input is being edited
         readonly bool[] setcodeIsedit = new bool[5];
+        bool scriptTextIsUpdating;
         readonly CommandManager cmdManager = new();
         const string PendulumScalePrefix = "Pendulum Scale = ";
         const string PendulumEffectHeader = "[ Pendulum Effect ]";
@@ -702,9 +703,17 @@ namespace DataEditorX
 
             strs = new string[c.Str.Length];
             Array.Copy(c.Str, strs, Card.STR_MAX);
-            lb_scripttext.Items.Clear();
-            lb_scripttext.Items.AddRange(c.Str);
-            tb_edittext.Text = "";
+            scriptTextIsUpdating = true;
+            try
+            {
+                lb_scripttext.Items.Clear();
+                lb_scripttext.Items.AddRange(c.Str);
+                tb_edittext.Text = "";
+            }
+            finally
+            {
+                scriptTextIsUpdating = false;
+            }
             //data
             SetSelect(cb_cardrule, c.ot);
             SetSelect(cb_cardattribute, c.attribute);
@@ -759,6 +768,39 @@ namespace DataEditorX
             SetImage(c.id.ToString());
         }
         #endregion
+
+        public void RefreshModifiedCard(Card oldCard, Card newCard, bool oldCardDeleted)
+        {
+            int oldIndex = cardlist.FindIndex(card => card.id == oldCard.id);
+            int newIndex = cardlist.FindIndex(card => card.id == newCard.id);
+
+            if (oldIndex >= 0)
+            {
+                if (oldCardDeleted || oldCard.id == newCard.id)
+                {
+                    cardlist[oldIndex] = newCard;
+                }
+                else if (newIndex >= 0)
+                {
+                    cardlist[newIndex] = newCard;
+                }
+                else
+                {
+                    cardlist.Insert(oldIndex + 1, newCard);
+                }
+            }
+            else if (newIndex >= 0)
+            {
+                cardlist[newIndex] = newCard;
+            }
+            else
+            {
+                return;
+            }
+
+            UpdateCardListPaging();
+            AddListView(page);
+        }
 
         #region Build card from UI
         public Card GetCard()
@@ -1179,11 +1221,20 @@ namespace DataEditorX
             }
             if (index >= 0)
             {
+                str ??= "";
                 strs[index] = str;
-
-                lb_scripttext.Items.Clear();
-                lb_scripttext.Items.AddRange(strs);
-                lb_scripttext.SelectedIndex = index;
+                if (index < lb_scripttext.Items.Count)
+                {
+                    scriptTextIsUpdating = true;
+                    try
+                    {
+                        lb_scripttext.Items[index] = str;
+                    }
+                    finally
+                    {
+                        scriptTextIsUpdating = false;
+                    }
+                }
             }
         }
 
@@ -1211,17 +1262,35 @@ namespace DataEditorX
         //Script text
         void Lb_scripttextSelectedIndexChanged(object sender, EventArgs e)
         {
-            tb_edittext.Text = Getscripttext();
-            if (lb_scripttext.SelectedIndex >= 0)
+            if (scriptTextIsUpdating)
             {
-                tb_edittext.Focus();
-                tb_edittext.SelectAll();
+                return;
+            }
+
+            scriptTextIsUpdating = true;
+            try
+            {
+                tb_edittext.Text = Getscripttext();
+                if (lb_scripttext.SelectedIndex >= 0)
+                {
+                    tb_edittext.Focus();
+                    tb_edittext.SelectAll();
+                }
+            }
+            finally
+            {
+                scriptTextIsUpdating = false;
             }
         }
 
         //Script text
         void Tb_edittextTextChanged(object sender, EventArgs e)
         {
+            if (scriptTextIsUpdating)
+            {
+                return;
+            }
+
             Setscripttext(tb_edittext.Text);
         }
         #endregion
