@@ -403,6 +403,23 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and datas.type & 1 = 1 and datas.def = " + c.def.ToString());
             }
         }
+        static string GetNameLikePattern(string name)
+        {
+            if (name.Contains("%%", StringComparison.CurrentCulture))
+            {
+                return name.Replace("/", "//").Replace("%%", "%");
+            }
+
+            return "%" + name.Replace("/", "//").Replace("%", "/%").Replace("_", "/_") + "%";
+        }
+        static void AppendNameCondition(StringBuilder sb, string name)
+        {
+            if (!string.IsNullOrEmpty(name))
+            {
+                string pattern = GetNameLikePattern(name).Replace("'", "''");
+                _ = sb.Append(" and texts.name like '" + pattern + "' escape '/' ");
+            }
+        }
         public static string OmegaGetSelectSQL(Card c)
         {
             StringBuilder sb = new();
@@ -412,19 +429,7 @@ namespace DataEditorX.Core
                 return sb.ToString();
             }
 
-            if (!string.IsNullOrEmpty(c.name))
-            {
-                if (c.name.Contains("%%", StringComparison.CurrentCulture))
-                {
-                    c.name = c.name.Replace("%%", "%");
-                }
-                else
-                {
-                    c.name = "%" + c.name.Replace("%", "/%").Replace("_", "/_") + "%";
-                }
-
-                _ = sb.Append(" and texts.name like '" + c.name.Replace("'", "''") + "' ");
-            }
+            AppendNameCondition(sb, c.name);
             if (!string.IsNullOrEmpty(c.desc))
             {
                 _ = sb.Append(" and texts.desc like '%" + c.desc.Replace("'", "''") + "%' ");
@@ -501,19 +506,7 @@ namespace DataEditorX.Core
                 return sb.ToString();
             }
 
-            if (!string.IsNullOrEmpty(c.name))
-            {
-                if (c.name.Contains("%%", StringComparison.CurrentCulture))
-                {
-                    c.name = c.name.Replace("%%", "%");
-                }
-                else
-                {
-                    c.name = "%" + c.name.Replace("%", "/%").Replace("_", "/_") + "%";
-                }
-
-                _ = sb.Append(" and texts.name like '" + c.name.Replace("'", "''") + "' ");
-            }
+            AppendNameCondition(sb, c.name);
             if (!string.IsNullOrEmpty(c.desc))
             {
                 _ = sb.Append(" and texts.desc like '%" + c.desc.Replace("'", "''") + "%' ");
