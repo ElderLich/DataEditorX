@@ -74,7 +74,7 @@ namespace DataEditorX.Core
                 {
                     MyMsg.Show(LMSG.AddSucceed);
                     undoSQL = DataBase.GetDeleteSQL(c);
-                    dataform.Search(true);
+                    dataform.RefreshAddedCard(c);
                     dataform.SetCard(c);
                     return true;
                 }

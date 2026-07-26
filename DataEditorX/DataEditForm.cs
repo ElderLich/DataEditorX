@@ -769,6 +769,41 @@ namespace DataEditorX
         }
         #endregion
 
+        public void RefreshAddedCard(Card newCard)
+        {
+            // Comparison results depend on another database and still require a
+            // complete refresh. Normal search results can be updated without
+            // re-entering the initial form layout/search cycle.
+            if (tmpCodes.Count > 0)
+            {
+                Search(true);
+                return;
+            }
+
+            string sql = DataBase.IsOmegaDatabase(nowCdbFile)
+                ? DataBase.OmegaGetSelectSQL(srcCard)
+                : DataBase.GetSelectSQL(srcCard);
+            sql += " and datas.id = " + newCard.id;
+            Card[] matches = DataBase.Read(nowCdbFile, true, sql);
+            if (matches == null || matches.Length == 0 || !CardFilter(newCard, srcCard))
+            {
+                return;
+            }
+
+            int existingIndex = cardlist.FindIndex(card => card.id == newCard.id);
+            if (existingIndex >= 0)
+            {
+                cardlist[existingIndex] = newCard;
+            }
+            else
+            {
+                cardlist.Add(newCard);
+            }
+
+            UpdateCardListPaging();
+            AddListView(page);
+        }
+
         public void RefreshModifiedCard(Card oldCard, Card newCard, bool oldCardDeleted)
         {
             int oldIndex = cardlist.FindIndex(card => card.id == oldCard.id);
