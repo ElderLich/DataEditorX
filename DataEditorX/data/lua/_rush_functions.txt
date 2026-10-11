@@ -168,17 +168,17 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDSummon.lua:382
 
-●any RushDuel.AddHandToGraveSpecialSummonProcedure(any card, any desc, any filter, any count, any value, any position)
+●Effect RushDuel.AddHandToGraveSpecialSummonProcedure(Card card, int desc, function filter, int count, [int|function value], [int position])
 添加手卡特殊召唤手续: 把手卡送去墓地
 Parameters:
-  card: any
-  desc: any
-  filter: any
-  count: any
-  value: any
-  position: any
+  card: Card - Monster receiving the procedure.
+  desc: int - Summon option description identifier.
+  filter: function - Hand-card predicate; receives candidate, effect, player. The summoning card is excluded.
+  count: int - Exact number of other hand cards to send.
+  value: int|function optional - Optional summon-procedure value.
+  position: int optional - Optional summon position; supplied through EFFECT_FLAG_SPSUM_PARAM.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  Effect - Registered hand Special Summon procedure.
 Source: Rush/Utilities/RDSummon.lua:448
 
 ●any RushDuel.AddHealthySummonProcedure(any card, any desc, any attack)
@@ -900,7 +900,7 @@ Parameters:
   including_self: any
   self_leave: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - No reliable completion contract in the stock environment because of the unresolved card reference.
 Source: Rush/Utilities/RDRitual.lua:416
 
 ●Group|nil RushDuel.CanSelect(any desc, any hint, any player, any group, any check, any min, any max, ... any)
@@ -952,23 +952,23 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDAction.lua:196
 
-●any RushDuel.CanSelectAndSpecialSummon(any desc, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any pos, any break_effect, any target_player)
+●int RushDuel.CanSelectAndSpecialSummon(int desc, function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, Effect e, int pos, [bool break_effect], [int target_player])
 可选操作: 选择怪兽特殊召唤
 Parameters:
-  desc: any
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  e: any
-  pos: any
-  break_effect: any
-  target_player: any
+  desc: int - Yes/no prompt description identifier.
+  filter: function - Candidate predicate; receives card,e,tp,pos,break_effect,target_player. Include per-card summon legality.
+  tp: int - Selecting and summoning player.
+  s_range: int - Source locations on tp side.
+  o_range: int - Source locations on the opponent side.
+  min: int - Minimum selected count.
+  max: int - Maximum count, capped by the destination zone count.
+  expect: Card|Group|nil - Excluded Card(s), or nil.
+  e: Effect - Source effect passed to the filter.
+  pos: int - Required summon position mask.
+  break_effect: bool optional - Call Duel.BreakEffect immediately before summoning; default false.
+  target_player: int optional - Destination player; defaults to tp. Does not change which player makes the choice.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  int - Actual summon count, or 0 when declined/unavailable.
 Source: Rush/Utilities/RDAction.lua:131
 
 ●any RushDuel.CanSelectAndToHandOrSpecialSummon(any desc, any hint, any filter, any tp, any s_range, any o_range, any expect, any e, any pos, any break_effect, any target_player)
@@ -2257,23 +2257,23 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDBase.lua:136
 
-●Effect RushDuel.CreateFusionEffect(any card, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any mat_move, any target_action, any operation_action, any limit_action, any sum_pos, any including_self, any self_leave)
+●Effect RushDuel.CreateFusionEffect(Card card, [function|nil matfilter], [function|nil spfilter], [function|nil exfilter], [int s_range], [int o_range], [function|nil mat_check], [function mat_move], [function|nil target_action], [function|nil operation_action], [function|nil limit_action], [int sum_pos], [bool including_self], [bool self_leave])
 创建效果: 融合术/结合 召唤
 Parameters:
-  card: any
-  matfilter: any
-  spfilter: any
-  exfilter: any
-  s_range: any
-  o_range: any
-  mat_check: any
-  mat_move: any
-  target_action: any
-  operation_action: any
-  limit_action: any
-  sum_pos: any
-  including_self: any
-  self_leave: any
+  card: Card - Card receiving the unregistered summoning Effect.
+  matfilter: function|nil optional - Filter for the ordinary material pool, called with a Card.
+  spfilter: function|nil optional - Summon-candidate filter receiving card, effect, player, material Group, optional route filter and check flags.
+  exfilter: function|nil optional - Filter for extra material locations; separate from matfilter.
+  s_range: int optional - Extra material locations on the player side; default 0. These add to the ordinary pool.
+  o_range: int optional - Extra material locations on the opponent side; default 0.
+  mat_check: function|nil optional - Whole-material-Group restriction evaluated with player, selected Group and summon candidate (plus Fusion check flags for Fusion).
+  mat_move: function optional - Material-movement callback (player, selected Group, effect); defaults to the matching FusionToGrave or RitualToGrave helper.
+  target_action: function|nil optional - Additional target-stage action; not called for chk==0.
+  operation_action: function|nil optional - Additional resolution callback (e,tp,eg,ep,ev,re,r,rp,materials,summon_card) after the executor returns; not proof of a positive summon count.
+  limit_action: function|nil optional - Runs after resolution cleanup even when no candidate remains.
+  sum_pos: int optional - Allowed summon positions; defaults to POS_FACEUP.
+  including_self: bool optional - Require the handler among selected materials; default false.
+  self_leave: bool optional - Exclude the handler from materials and account for its departure when checking zones; default false.
 Returns:
   Effect - Configured but unregistered effect.
 Source: Rush/Utilities/RDFusion.lua:365
@@ -2467,23 +2467,23 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDLimit.lua:45
 
-●Effect RushDuel.CreateRitualEffect(any card, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any mat_move, any target_action, any operation_action, any limit_action, any including_self, any self_leave)
+●Effect RushDuel.CreateRitualEffect(Card card, int type, [function|nil matfilter], [function|nil spfilter], [function|nil exfilter], [int s_range], [int o_range], [function|nil mat_check], [function mat_move], [function|nil target_action], [function|nil operation_action], [function|nil limit_action], [bool including_self], [bool self_leave])
 创建效果: 仪式术/仪式 召唤
 Parameters:
-  card: any
-  type: any
-  matfilter: any
-  spfilter: any
-  exfilter: any
-  s_range: any
-  o_range: any
-  mat_check: any
-  mat_move: any
-  target_action: any
-  operation_action: any
-  limit_action: any
-  including_self: any
-  self_leave: any
+  card: Card - Card receiving the unregistered summoning Effect.
+  type: int - RITUAL_* comparison mode; required.
+  matfilter: function|nil optional - Filter for the ordinary material pool, called with a Card.
+  spfilter: function|nil optional - Summon-candidate filter receiving card, effect, player, material Group, optional route filter and check flags.
+  exfilter: function|nil optional - Filter for extra material locations; separate from matfilter.
+  s_range: int optional - Extra material locations on the player side; default 0. These add to the ordinary pool.
+  o_range: int optional - Extra material locations on the opponent side; default 0.
+  mat_check: function|nil optional - Whole-material-Group restriction evaluated with player, selected Group and summon candidate (plus Fusion check flags for Fusion).
+  mat_move: function optional - Material-movement callback (player, selected Group, effect); defaults to the matching FusionToGrave or RitualToGrave helper.
+  target_action: function|nil optional - Additional target-stage action; not called for chk==0.
+  operation_action: function|nil optional - Additional resolution callback (e,tp,eg,ep,ev,re,r,rp,materials,summon_card) after the executor returns; not proof of a positive summon count.
+  limit_action: function|nil optional - Runs after resolution cleanup even when no candidate remains.
+  including_self: bool optional - Require the handler among selected materials; default false.
+  self_leave: bool optional - Exclude the handler from materials and account for its departure when checking zones; default false.
 Returns:
   Effect - Configured but unregistered effect.
 Source: Rush/Utilities/RDRitual.lua:46
@@ -2628,34 +2628,36 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDEquip.lua:32
 
-●any RushDuel.ExecuteFusionSummon(any e, any tp, any pos, any list, any chkf, any gc, any mat_move, any cancelable)
+●Card|nil,Group|nil RushDuel.ExecuteFusionSummon(Effect e, int tp, int pos, table list, int chkf, Card|nil gc, function mat_move, [bool cancelable])
 融合召唤 - 进行融合召唤
 Parameters:
-  e: any
-  tp: any
-  pos: any
-  list: any
-  chkf: any
-  gc: any
-  mat_move: any
-  cancelable: any
+  e: Effect - Source effect.
+  tp: int - Selecting and summoning player.
+  pos: int - Summon position mask; normally POS_FACEUP.
+  list: table - Prepared material-route entries from the matching Get*SummonData helper.
+  chkf: int - Check flags from the route builder.
+  gc: Card|nil - Required material, if any.
+  mat_move: function - Movement callback (player, materials, effect) for the ordinary route; alternative routes use their own operation.
+  cancelable: bool optional - Allow cancellation at the monster-choice step; default false.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  Card|nil - Chosen summon candidate, or nil on permitted monster-selection cancellation; not a success count.
+  Group|nil - Selected materials when execution reaches the return statement.
 Source: Rush/Utilities/RDFusion.lua:457
 
-●any RushDuel.ExecuteRitualSummon(any e, any tp, any type, any list, any chkf, any gc, any mat_move, any cancelable)
+●Card|nil,Group|nil RushDuel.ExecuteRitualSummon(Effect e, int tp, int type, table list, int chkf, Card|nil gc, function mat_move, [bool cancelable])
 仪式召唤 - 进行仪式召唤
 Parameters:
-  e: any
-  tp: any
-  type: any
-  list: any
-  chkf: any
-  gc: any
-  mat_move: any
-  cancelable: any
+  e: Effect - Source effect.
+  tp: int - Selecting and summoning player.
+  type: int - RITUAL_* material comparison mode matching the prepared route list.
+  list: table - Prepared material-route entries from the matching Get*SummonData helper.
+  chkf: int - Check flags from the route builder.
+  gc: Card|nil - Required material, if any.
+  mat_move: function - Movement callback (player, materials, effect) for the ordinary route; alternative routes use their own operation.
+  cancelable: bool optional - Allow cancellation at the monster-choice step; default false.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  Card|nil - Chosen summon candidate, or nil on permitted monster-selection cancellation; not a success count.
+  Group|nil - Selected materials when execution reaches the return statement.
 Source: Rush/Utilities/RDRitual.lua:262
 
 ●function RushDuel.Filter(function filter, ... any)
@@ -3457,15 +3459,15 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDRitual.lua:111
 
-●any RushDuel.IsCanBeSpecialSummoned(any card, any effect, any player, any position)
+●bool RushDuel.IsCanBeSpecialSummoned(Card card, Effect effect, int player, int position)
 条件: 可否特殊召唤
 Parameters:
-  card: any
-  effect: any
-  player: any
-  position: any
+  card: Card - Monster to check.
+  effect: Effect - Summoning effect.
+  player: int - Summoning player and default destination player.
+  position: int - Position mask to match the later summon.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether the native per-card summon check passes.
 Source: Rush/Utilities/RDCondition.lua:126
 
 ●any RushDuel.IsCanBeUnionFusionMaterial(any card, any code)
@@ -3541,7 +3543,7 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDCondition.lua:380
 
-●any RushDuel.IsCanFusionSummon(any e, any tp, any pos, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
+●bool RushDuel.IsCanFusionSummon(any e, any tp, any pos, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
 判断条件: 是否可以进行融合召唤
 Parameters:
   e: any
@@ -3557,10 +3559,10 @@ Parameters:
   self_leave: any
   except: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether at least one supported summon route exists.
 Source: Rush/Utilities/RDFusion.lua:528
 
-●any RushDuel.IsCanRitualSummon(any e, any tp, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
+●bool RushDuel.IsCanRitualSummon(any e, any tp, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
 判断条件: 是否可以进行仪式召唤
 Parameters:
   e: any
@@ -3576,7 +3578,7 @@ Parameters:
   self_leave: any
   except: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether at least one supported summon route exists.
 Source: Rush/Utilities/RDRitual.lua:339
 
 ●any RushDuel.IsDefense(any card, any def)
@@ -4260,7 +4262,7 @@ Parameters:
   including_self: any
   self_leave: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - No reliable completion contract in the stock environment because of the unresolved card reference.
 Source: Rush/Utilities/RDRitual.lua:395
 
 ●any RushDuel.RitualTarget(any card, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any action)
@@ -4364,22 +4366,22 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDAction.lua:188
 
-●any RushDuel.SelectAndSpecialSummon(any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any pos, any break_effect, any target_player)
+●int RushDuel.SelectAndSpecialSummon(function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, Effect e, int pos, [bool break_effect], [int target_player])
 操作: 选择怪兽特殊召唤
 Parameters:
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  e: any
-  pos: any
-  break_effect: any
-  target_player: any
+  filter: function - Candidate predicate; receives card,e,tp,pos,break_effect,target_player. Include per-card summon legality.
+  tp: int - Selecting and summoning player.
+  s_range: int - Source locations on tp side.
+  o_range: int - Source locations on the opponent side.
+  min: int - Minimum selected count.
+  max: int - Maximum count, capped by the destination zone count.
+  expect: Card|Group|nil - Excluded Card(s), or nil.
+  e: Effect - Source effect passed to the filter.
+  pos: int - Required summon position mask.
+  break_effect: bool optional - Call Duel.BreakEffect immediately before summoning; default false.
+  target_player: int optional - Destination player; defaults to tp. Does not change which player makes the choice.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  int - Actual summon count, or 0 if capacity/candidates/selection do not permit the operation.
 Source: Rush/Utilities/RDAction.lua:123
 
 ●any RushDuel.SelectAndToHandOrSpecialSummon(any hint, any filter, any tp, any s_range, any o_range, any expect, any e, any pos, any break_effect, any target_player)
@@ -4642,18 +4644,18 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDAction.lua:299
 
-●any RushDuel.SendToHandAndExists(any target, any effect, any player, any reason, any filter, any count, any expect)
+●bool RushDuel.SendToHandAndExists(Card|Group|Effect target, Effect effect, int player, int reason, [function|nil filter], [int count], [Card|Group|nil expect])
 操作: 加入/返回手卡, 并给对方确认加入自己手卡的卡
 Parameters:
-  target: any
-  effect: any
-  player: any
-  reason: any
-  filter: any
-  count: any
-  expect: any
+  target: Card|Group|Effect - Cards to move; Effect input means its handler.
+  effect: Effect - Source effect used by Rush protection checks; required.
+  player: int - Player used for protection and confirmation context.
+  reason: int - Reason passed to protection checks; actual movement is always REASON_EFFECT in this snapshot.
+  filter: function|nil optional - Optional predicate checked against the operated Group.
+  count: int optional - Required match count when filter is supplied.
+  expect: Card|Group|nil optional - Exclusion for the operated-Group check.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether movement was nonzero and the optional operated-Group check passed.
 Source: Rush/Utilities/RDAction.lua:277
 
 ●any RushDuel.SetBaseAtkDef(any e, any card, any atk, any def, any reset, any forced)
@@ -5268,17 +5270,17 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDSummon.lua:382
 
-●any RD.AddHandToGraveSpecialSummonProcedure(any card, any desc, any filter, any count, any value, any position)
+●Effect RD.AddHandToGraveSpecialSummonProcedure(Card card, int desc, function filter, int count, [int|function value], [int position])
 添加手卡特殊召唤手续: 把手卡送去墓地
 Parameters:
-  card: any
-  desc: any
-  filter: any
-  count: any
-  value: any
-  position: any
+  card: Card - Monster receiving the procedure.
+  desc: int - Summon option description identifier.
+  filter: function - Hand-card predicate; receives candidate, effect, player. The summoning card is excluded.
+  count: int - Exact number of other hand cards to send.
+  value: int|function optional - Optional summon-procedure value.
+  position: int optional - Optional summon position; supplied through EFFECT_FLAG_SPSUM_PARAM.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  Effect - Registered hand Special Summon procedure.
 Source: Rush/Utilities/RDSummon.lua:448
 
 ●any RD.AddHealthySummonProcedure(any card, any desc, any attack)
@@ -6000,7 +6002,7 @@ Parameters:
   including_self: any
   self_leave: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - No reliable completion contract in the stock environment because of the unresolved card reference.
 Source: Rush/Utilities/RDRitual.lua:416
 
 ●Group|nil RD.CanSelect(any desc, any hint, any player, any group, any check, any min, any max, ... any)
@@ -6052,23 +6054,23 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDAction.lua:196
 
-●any RD.CanSelectAndSpecialSummon(any desc, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any pos, any break_effect, any target_player)
+●int RD.CanSelectAndSpecialSummon(int desc, function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, Effect e, int pos, [bool break_effect], [int target_player])
 可选操作: 选择怪兽特殊召唤
 Parameters:
-  desc: any
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  e: any
-  pos: any
-  break_effect: any
-  target_player: any
+  desc: int - Yes/no prompt description identifier.
+  filter: function - Candidate predicate; receives card,e,tp,pos,break_effect,target_player. Include per-card summon legality.
+  tp: int - Selecting and summoning player.
+  s_range: int - Source locations on tp side.
+  o_range: int - Source locations on the opponent side.
+  min: int - Minimum selected count.
+  max: int - Maximum count, capped by the destination zone count.
+  expect: Card|Group|nil - Excluded Card(s), or nil.
+  e: Effect - Source effect passed to the filter.
+  pos: int - Required summon position mask.
+  break_effect: bool optional - Call Duel.BreakEffect immediately before summoning; default false.
+  target_player: int optional - Destination player; defaults to tp. Does not change which player makes the choice.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  int - Actual summon count, or 0 when declined/unavailable.
 Source: Rush/Utilities/RDAction.lua:131
 
 ●any RD.CanSelectAndToHandOrSpecialSummon(any desc, any hint, any filter, any tp, any s_range, any o_range, any expect, any e, any pos, any break_effect, any target_player)
@@ -7357,23 +7359,23 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDBase.lua:136
 
-●Effect RD.CreateFusionEffect(any card, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any mat_move, any target_action, any operation_action, any limit_action, any sum_pos, any including_self, any self_leave)
+●Effect RD.CreateFusionEffect(Card card, [function|nil matfilter], [function|nil spfilter], [function|nil exfilter], [int s_range], [int o_range], [function|nil mat_check], [function mat_move], [function|nil target_action], [function|nil operation_action], [function|nil limit_action], [int sum_pos], [bool including_self], [bool self_leave])
 创建效果: 融合术/结合 召唤
 Parameters:
-  card: any
-  matfilter: any
-  spfilter: any
-  exfilter: any
-  s_range: any
-  o_range: any
-  mat_check: any
-  mat_move: any
-  target_action: any
-  operation_action: any
-  limit_action: any
-  sum_pos: any
-  including_self: any
-  self_leave: any
+  card: Card - Card receiving the unregistered summoning Effect.
+  matfilter: function|nil optional - Filter for the ordinary material pool, called with a Card.
+  spfilter: function|nil optional - Summon-candidate filter receiving card, effect, player, material Group, optional route filter and check flags.
+  exfilter: function|nil optional - Filter for extra material locations; separate from matfilter.
+  s_range: int optional - Extra material locations on the player side; default 0. These add to the ordinary pool.
+  o_range: int optional - Extra material locations on the opponent side; default 0.
+  mat_check: function|nil optional - Whole-material-Group restriction evaluated with player, selected Group and summon candidate (plus Fusion check flags for Fusion).
+  mat_move: function optional - Material-movement callback (player, selected Group, effect); defaults to the matching FusionToGrave or RitualToGrave helper.
+  target_action: function|nil optional - Additional target-stage action; not called for chk==0.
+  operation_action: function|nil optional - Additional resolution callback (e,tp,eg,ep,ev,re,r,rp,materials,summon_card) after the executor returns; not proof of a positive summon count.
+  limit_action: function|nil optional - Runs after resolution cleanup even when no candidate remains.
+  sum_pos: int optional - Allowed summon positions; defaults to POS_FACEUP.
+  including_self: bool optional - Require the handler among selected materials; default false.
+  self_leave: bool optional - Exclude the handler from materials and account for its departure when checking zones; default false.
 Returns:
   Effect - Configured but unregistered effect.
 Source: Rush/Utilities/RDFusion.lua:365
@@ -7567,23 +7569,23 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDLimit.lua:45
 
-●Effect RD.CreateRitualEffect(any card, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any mat_move, any target_action, any operation_action, any limit_action, any including_self, any self_leave)
+●Effect RD.CreateRitualEffect(Card card, int type, [function|nil matfilter], [function|nil spfilter], [function|nil exfilter], [int s_range], [int o_range], [function|nil mat_check], [function mat_move], [function|nil target_action], [function|nil operation_action], [function|nil limit_action], [bool including_self], [bool self_leave])
 创建效果: 仪式术/仪式 召唤
 Parameters:
-  card: any
-  type: any
-  matfilter: any
-  spfilter: any
-  exfilter: any
-  s_range: any
-  o_range: any
-  mat_check: any
-  mat_move: any
-  target_action: any
-  operation_action: any
-  limit_action: any
-  including_self: any
-  self_leave: any
+  card: Card - Card receiving the unregistered summoning Effect.
+  type: int - RITUAL_* comparison mode; required.
+  matfilter: function|nil optional - Filter for the ordinary material pool, called with a Card.
+  spfilter: function|nil optional - Summon-candidate filter receiving card, effect, player, material Group, optional route filter and check flags.
+  exfilter: function|nil optional - Filter for extra material locations; separate from matfilter.
+  s_range: int optional - Extra material locations on the player side; default 0. These add to the ordinary pool.
+  o_range: int optional - Extra material locations on the opponent side; default 0.
+  mat_check: function|nil optional - Whole-material-Group restriction evaluated with player, selected Group and summon candidate (plus Fusion check flags for Fusion).
+  mat_move: function optional - Material-movement callback (player, selected Group, effect); defaults to the matching FusionToGrave or RitualToGrave helper.
+  target_action: function|nil optional - Additional target-stage action; not called for chk==0.
+  operation_action: function|nil optional - Additional resolution callback (e,tp,eg,ep,ev,re,r,rp,materials,summon_card) after the executor returns; not proof of a positive summon count.
+  limit_action: function|nil optional - Runs after resolution cleanup even when no candidate remains.
+  including_self: bool optional - Require the handler among selected materials; default false.
+  self_leave: bool optional - Exclude the handler from materials and account for its departure when checking zones; default false.
 Returns:
   Effect - Configured but unregistered effect.
 Source: Rush/Utilities/RDRitual.lua:46
@@ -7728,34 +7730,36 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDEquip.lua:32
 
-●any RD.ExecuteFusionSummon(any e, any tp, any pos, any list, any chkf, any gc, any mat_move, any cancelable)
+●Card|nil,Group|nil RD.ExecuteFusionSummon(Effect e, int tp, int pos, table list, int chkf, Card|nil gc, function mat_move, [bool cancelable])
 融合召唤 - 进行融合召唤
 Parameters:
-  e: any
-  tp: any
-  pos: any
-  list: any
-  chkf: any
-  gc: any
-  mat_move: any
-  cancelable: any
+  e: Effect - Source effect.
+  tp: int - Selecting and summoning player.
+  pos: int - Summon position mask; normally POS_FACEUP.
+  list: table - Prepared material-route entries from the matching Get*SummonData helper.
+  chkf: int - Check flags from the route builder.
+  gc: Card|nil - Required material, if any.
+  mat_move: function - Movement callback (player, materials, effect) for the ordinary route; alternative routes use their own operation.
+  cancelable: bool optional - Allow cancellation at the monster-choice step; default false.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  Card|nil - Chosen summon candidate, or nil on permitted monster-selection cancellation; not a success count.
+  Group|nil - Selected materials when execution reaches the return statement.
 Source: Rush/Utilities/RDFusion.lua:457
 
-●any RD.ExecuteRitualSummon(any e, any tp, any type, any list, any chkf, any gc, any mat_move, any cancelable)
+●Card|nil,Group|nil RD.ExecuteRitualSummon(Effect e, int tp, int type, table list, int chkf, Card|nil gc, function mat_move, [bool cancelable])
 仪式召唤 - 进行仪式召唤
 Parameters:
-  e: any
-  tp: any
-  type: any
-  list: any
-  chkf: any
-  gc: any
-  mat_move: any
-  cancelable: any
+  e: Effect - Source effect.
+  tp: int - Selecting and summoning player.
+  type: int - RITUAL_* material comparison mode matching the prepared route list.
+  list: table - Prepared material-route entries from the matching Get*SummonData helper.
+  chkf: int - Check flags from the route builder.
+  gc: Card|nil - Required material, if any.
+  mat_move: function - Movement callback (player, materials, effect) for the ordinary route; alternative routes use their own operation.
+  cancelable: bool optional - Allow cancellation at the monster-choice step; default false.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  Card|nil - Chosen summon candidate, or nil on permitted monster-selection cancellation; not a success count.
+  Group|nil - Selected materials when execution reaches the return statement.
 Source: Rush/Utilities/RDRitual.lua:262
 
 ●function RD.Filter(function filter, ... any)
@@ -8557,15 +8561,15 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDRitual.lua:111
 
-●any RD.IsCanBeSpecialSummoned(any card, any effect, any player, any position)
+●bool RD.IsCanBeSpecialSummoned(Card card, Effect effect, int player, int position)
 条件: 可否特殊召唤
 Parameters:
-  card: any
-  effect: any
-  player: any
-  position: any
+  card: Card - Monster to check.
+  effect: Effect - Summoning effect.
+  player: int - Summoning player and default destination player.
+  position: int - Position mask to match the later summon.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether the native per-card summon check passes.
 Source: Rush/Utilities/RDCondition.lua:126
 
 ●any RD.IsCanBeUnionFusionMaterial(any card, any code)
@@ -8641,7 +8645,7 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDCondition.lua:380
 
-●any RD.IsCanFusionSummon(any e, any tp, any pos, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
+●bool RD.IsCanFusionSummon(any e, any tp, any pos, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
 判断条件: 是否可以进行融合召唤
 Parameters:
   e: any
@@ -8657,10 +8661,10 @@ Parameters:
   self_leave: any
   except: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether at least one supported summon route exists.
 Source: Rush/Utilities/RDFusion.lua:528
 
-●any RD.IsCanRitualSummon(any e, any tp, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
+●bool RD.IsCanRitualSummon(any e, any tp, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any except)
 判断条件: 是否可以进行仪式召唤
 Parameters:
   e: any
@@ -8676,7 +8680,7 @@ Parameters:
   self_leave: any
   except: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether at least one supported summon route exists.
 Source: Rush/Utilities/RDRitual.lua:339
 
 ●any RD.IsDefense(any card, any def)
@@ -9360,7 +9364,7 @@ Parameters:
   including_self: any
   self_leave: any
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - No reliable completion contract in the stock environment because of the unresolved card reference.
 Source: Rush/Utilities/RDRitual.lua:395
 
 ●any RD.RitualTarget(any card, any type, any matfilter, any spfilter, any exfilter, any s_range, any o_range, any mat_check, any including_self, any self_leave, any action)
@@ -9464,22 +9468,22 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDAction.lua:188
 
-●any RD.SelectAndSpecialSummon(any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any pos, any break_effect, any target_player)
+●int RD.SelectAndSpecialSummon(function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, Effect e, int pos, [bool break_effect], [int target_player])
 操作: 选择怪兽特殊召唤
 Parameters:
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  e: any
-  pos: any
-  break_effect: any
-  target_player: any
+  filter: function - Candidate predicate; receives card,e,tp,pos,break_effect,target_player. Include per-card summon legality.
+  tp: int - Selecting and summoning player.
+  s_range: int - Source locations on tp side.
+  o_range: int - Source locations on the opponent side.
+  min: int - Minimum selected count.
+  max: int - Maximum count, capped by the destination zone count.
+  expect: Card|Group|nil - Excluded Card(s), or nil.
+  e: Effect - Source effect passed to the filter.
+  pos: int - Required summon position mask.
+  break_effect: bool optional - Call Duel.BreakEffect immediately before summoning; default false.
+  target_player: int optional - Destination player; defaults to tp. Does not change which player makes the choice.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  int - Actual summon count, or 0 if capacity/candidates/selection do not permit the operation.
 Source: Rush/Utilities/RDAction.lua:123
 
 ●any RD.SelectAndToHandOrSpecialSummon(any hint, any filter, any tp, any s_range, any o_range, any expect, any e, any pos, any break_effect, any target_player)
@@ -9742,18 +9746,18 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDAction.lua:299
 
-●any RD.SendToHandAndExists(any target, any effect, any player, any reason, any filter, any count, any expect)
+●bool RD.SendToHandAndExists(Card|Group|Effect target, Effect effect, int player, int reason, [function|nil filter], [int count], [Card|Group|nil expect])
 操作: 加入/返回手卡, 并给对方确认加入自己手卡的卡
 Parameters:
-  target: any
-  effect: any
-  player: any
-  reason: any
-  filter: any
-  count: any
-  expect: any
+  target: Card|Group|Effect - Cards to move; Effect input means its handler.
+  effect: Effect - Source effect used by Rush protection checks; required.
+  player: int - Player used for protection and confirmation context.
+  reason: int - Reason passed to protection checks; actual movement is always REASON_EFFECT in this snapshot.
+  filter: function|nil optional - Optional predicate checked against the operated Group.
+  count: int optional - Required match count when filter is supplied.
+  expect: Card|Group|nil optional - Exclusion for the operated-Group check.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  bool - Whether movement was nonzero and the optional operated-Group check passed.
 Source: Rush/Utilities/RDAction.lua:277
 
 ●any RD.SetBaseAtkDef(any e, any card, any atk, any def, any reset, any forced)
