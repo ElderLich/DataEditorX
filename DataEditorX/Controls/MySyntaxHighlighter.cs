@@ -39,6 +39,8 @@ namespace FastColoredTextBoxNS
                 ["Effect"] = new(StringComparer.Ordinal),
                 ["Debug"] = new(StringComparer.Ordinal),
                 ["Auxiliary"] = new(StringComparer.Ordinal),
+                ["RushDuel"] = new(StringComparer.Ordinal),
+                ["RD"] = new(StringComparer.Ordinal),
                 ["bit"] = new(StringComparer.Ordinal)
             };
 
@@ -175,6 +177,8 @@ namespace FastColoredTextBoxNS
             }
 
             SetOwnerStyle(range, "bit");
+            SetOwnerStyle(range, "RushDuel");
+            SetOwnerStyle(range, "RD");
         }
 
         private void SetOwnerStyle(Range range, string owner)
