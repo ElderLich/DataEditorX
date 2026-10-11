@@ -32,7 +32,6 @@ DataEditForm.pl_main.splitContainer..lb_types	Card Type
 DataEditForm.pl_main.splitContainer..lb_markers	Link Markers
 DataEditForm.pl_main.splitContainer..lb_tiptexts	Strings
 DataEditForm.pl_main.splitContainer..lb_edittext_hint	Selected String Text
-DataEditForm.pl_main.splitContainer..lb_support	Support
 DataEditForm.pl_main.splitContainer..lb_categorys	Genre
 DataEditForm.pl_main.splitContainer..lb_flags	Flags
 DataEditForm.pl_main.splitContainer..lb_cardcode	Passcode

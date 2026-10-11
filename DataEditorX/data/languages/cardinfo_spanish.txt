@@ -140,7 +140,6 @@
 0x1000000	Péndulo
 0x2000000	Invocación Especial
 0x4000000	Enlace
-##flags (category)
 
 ##setname
 -1	Custom

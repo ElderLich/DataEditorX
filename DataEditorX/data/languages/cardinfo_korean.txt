@@ -140,7 +140,6 @@
 0x1000000	펜듈럼
 0x2000000	특수 소환
 0x4000000	링크
-##flags (category)
 
 ##setname
 -1	Custom

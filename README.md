@@ -83,7 +83,7 @@ Choose **Rush** in the top Rule selector to search or edit MDPro3 Rush cards. Th
 
 Use **Legend** (`0x8`) and **Maximum** (`0x8000`) in Card Types. Rush races, including Cyborg, round-trip without signed integer truncation. Preserve the `RD/...` pack line and any `MAXIMUM ATK = ...` line at the beginning of the description; MDPro3 reads those display details from the text. Maximum summoning behavior still belongs in the Lua script.
 
-Rush Duel uses the top **Rule** selector. There is no separate Rush checkbox; existing Omega metadata is preserved when saving cards.
+Rush Duel uses the top **Rule** selector. Card editing shows the standard and Rush card fields without a separate flags or Support panel.
 
 Run the editor regressions with `dotnet run --project tests/DataEditorX.RegressionTests.csproj` on Windows. They use temporary databases and do not edit the game's data.
 
