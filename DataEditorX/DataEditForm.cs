@@ -878,7 +878,7 @@ namespace DataEditorX
                 tb_setcode4.Text);
 
             c.type = GetCheck(pl_cardtype) | (oldCard.type & ~GetCheckMask(pl_cardtype));
-            c.category = GetCheck(pl_category);
+            c.category = GetCheck(pl_category) | (oldCard.category & ~GetCheckMask(pl_category));
 
             c.omega = new long[5];
             if (DataBase.IsOmegaDatabase(GetOpenFile())) {

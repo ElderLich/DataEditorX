@@ -54,6 +54,7 @@ internal static class Program
             Assert(!editor.Selection.ColumnSelectionMode, "Normal text selection must be the default");
             Console.WriteLine("PASS: bounded scrollable code help and normal text selection.");
             VerifyCardTypeCoverage(root);
+            VerifyGenreCoverage(root);
             VerifyReferenceCompletions(root);
             VerifyOmegaMetadataWithoutRushCheckbox(root);
             VerifyThemeReadability();
@@ -82,6 +83,30 @@ internal static class Program
         Assert(form.GetCard().type == (unexposedType | 0x1),
             "Editing a known type must preserve noneditable type bits without restoring its checkbox");
         Console.WriteLine("PASS: all 27 standard/Rush types are present in every language; unexposed type bits survive edits.");
+    }
+
+    private static void VerifyGenreCoverage(string root)
+    {
+        foreach (string file in Directory.GetFiles(Path.Combine(root, "languages"), "cardinfo_*.txt"))
+        {
+            var config = new DataConfig(file);
+            long genres = config.dicCardcategorys.Keys.Aggregate(0L, (combined, value) => combined | value);
+            long races = config.dicCardRaces.Keys.Aggregate(0L, (combined, value) => combined | value);
+            Assert(genres == 0xfffffffffL && config.dicCardcategorys.Count == 36,
+                $"All 36 existing editor Genre flags must load, including its four extended flags: {file}");
+            Assert(races == 0xffffffffL && config.dicCardRaces.Count == 33,
+                $"All 32 standard/Rush race bits and the empty option must load: {file}");
+        }
+        using var form = new DataEditForm(root);
+        form.InitControl(new DataConfig(Path.Combine(root, "languages/cardinfo_chinese.txt")));
+        const long unexposedGenre = 0x10000000000L;
+        form.SetCard(new Card(42) { category = unexposedGenre | 0x800000001L });
+        var first = Control<FlowLayoutPanel>(form, "pl_category").Controls.OfType<CheckBox>()
+            .Single(box => (long)box.Tag == 1L);
+        first.Checked = false;
+        Assert(form.GetCard().category == (unexposedGenre | 0x800000000L),
+            "Genre editing must retain both existing extended and noneditable metadata bits");
+        Console.WriteLine("PASS: every locale loads all 36 editor Genre flags and 32 races; hidden Genre metadata survives editing.");
     }
 
     private static void VerifyThemePreview()
