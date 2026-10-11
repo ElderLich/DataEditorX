@@ -58,6 +58,7 @@ internal static class Program
             VerifyGenreCoverage(root);
             VerifyMetadataLayout(root);
             VerifyResizePaging(root);
+            VerifyDockedMetadataLayout(root);
             VerifyReferenceCompletions(root);
             VerifyOmegaMetadataWithoutRushCheckbox(root);
             VerifyThemeReadability();
@@ -65,6 +66,68 @@ internal static class Program
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifyDockedMetadataLayout(string root)
+    {
+        using var host = new MainForm { Opacity = 0, ShowInTaskbar = false };
+        // Exercise the real MainForm/DockPanel geometry without loading user
+        // databases, preferences or automatic startup actions in this regression.
+        var startup = typeof(MainForm).GetMethod("MainForm_Load", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        host.Load -= (EventHandler)Delegate.CreateDelegate(typeof(EventHandler), host, startup);
+        var dock = (WeifenLuo.WinFormsUI.Docking.DockPanel)typeof(MainForm)
+            .GetProperty("dockPanel", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(host)!;
+        using var form = new DataEditForm(root);
+        form.InitControl(new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt")));
+        DataEditorX.Language.LanguageHelper.SetFormLabel(form);
+        host.Show();
+        form.Show(dock, WeifenLuo.WinFormsUI.Docking.DockState.Document);
+        string output = Environment.GetEnvironmentVariable("DATAEDITORX_LAYOUT_PREVIEW_DIR");
+        foreach (var scenario in new[] { ("DockedMinimum", 992, 697), ("DockedDefault", 992, 749),
+            ("DockedWide", 1400, 749), ("DockedShrunk", 992, 697) })
+        {
+            host.ClientSize = new System.Drawing.Size(scenario.Item2, scenario.Item3);
+            Application.DoEvents();
+            ThemeManager.ApplyControlTree(host, ThemeManager.GetPalette(ThemeManager.ProfilePaper));
+            var column = Control<Panel>(form, "metadataColumn");
+            var genres = Control<FlowLayoutPanel>(form, "pl_category");
+            var hostView = host.RectangleToScreen(host.ClientRectangle);
+            Assert(hostView.Contains(column.RectangleToScreen(column.ClientRectangle)),
+                scenario.Item1 + ": the entire metadata column and its right-hand scrollbars must fit in MainForm");
+            var delete = Control<Button>(form, "btn_del");
+            Assert(hostView.Contains(delete.RectangleToScreen(delete.ClientRectangle)),
+                scenario.Item1 + ": the rightmost action button must stay on screen");
+            var last = genres.Controls[genres.Controls.Count - 1];
+            genres.ScrollControlIntoView(last);
+            Application.DoEvents();
+            Assert(last.Bottom <= genres.ClientSize.Height && last.Top >= 0,
+                scenario.Item1 + ": the final Genre entry must remain reachable in the actual docked editor");
+            if (!string.IsNullOrEmpty(output))
+            {
+                Directory.CreateDirectory(output);
+                using var bitmap = new System.Drawing.Bitmap(host.Width, host.Height);
+                host.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, host.Width, host.Height));
+                bitmap.Save(Path.Combine(output, scenario.Item1 + ".png"));
+                using var editorBitmap = new System.Drawing.Bitmap(form.Width, form.Height);
+                form.DrawToBitmap(editorBitmap, new System.Drawing.Rectangle(0, 0, form.Width, form.Height));
+                editorBitmap.Save(Path.Combine(output, scenario.Item1.Replace("Docked", "DockedEditor") + ".png"));
+            }
+        }
+        form.Show(dock, new System.Drawing.Rectangle(-20000, -20000, 600, 400));
+        var floating = form.Pane.FloatWindow;
+        floating.Opacity = 0;
+        floating.Size = new System.Drawing.Size(600, 400);
+        Application.DoEvents();
+        Assert(floating.Width >= 1007 && floating.Height >= 640 && form.MinimumSize.IsEmpty,
+            "Floating host keeps a usable minimum without enforcing an oversized docked child");
+        form.DockState = WeifenLuo.WinFormsUI.Docking.DockState.Document;
+        Application.DoEvents();
+        Assert(host.RectangleToScreen(host.ClientRectangle).Contains(
+            Control<Panel>(form, "metadataColumn").RectangleToScreen(Control<Panel>(form, "metadataColumn").ClientRectangle)),
+            "Redocking after floating must still fit the actual host viewport");
+        form.Close();
+        host.Close();
+        Console.WriteLine("PASS: actual MainForm docking keeps metadata scrollbars, final Genre row and rightmost actions visible at minimum/default/wide/shrunk sizes.");
+    }
+
     private static void VerifyResizePaging(string root)
     {
         string database = Path.Combine(Path.GetTempPath(), $"dataeditor-resize-{Guid.NewGuid():N}.cdb");

@@ -168,6 +168,12 @@ namespace DataEditorX
             splitContainer.Panel2.Controls.Add(rushHelp);
             InitializeMetadataLayout();
             lv_cardlist.SizeChanged += DataEditFormSizeChanged;
+            DockStateChanged += (_, _) =>
+            {
+                // Constrain the floating window, never its docked document child.
+                if (DockState == DockState.Float && Pane?.FloatWindow is Form window)
+                    window.MinimumSize = new Size(1007, 640);
+            };
             cb_cardrule.SelectedIndexChanged += (_, _) => UpdateFormatControls();
             var formatTips = new ToolTip(components ??= new System.ComponentModel.Container());
             formatTips.SetToolTip(cb_cardrule,

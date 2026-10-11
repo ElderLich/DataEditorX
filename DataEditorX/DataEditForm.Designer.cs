@@ -1086,7 +1086,6 @@ namespace DataEditorX
             Controls.Add(mainMenu);
             Font = new Font("SimSun", 9F, FontStyle.Regular, GraphicsUnit.Point);
             FormBorderStyle = FormBorderStyle.Sizable;
-            MinimumSize = new Size(1007, 640);
             MainMenuStrip = mainMenu;
             MaximizeBox = true;
             Name = "DataEditForm";
