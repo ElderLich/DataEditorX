@@ -639,6 +639,9 @@ EFFECT_SYNCHRO_LEVEL_EX	=373	--Allows monsters without Levels to be used as Sync
 EFFECT_RITUAL_LEVEL_EX	=374	--Allows monsters without Levels to be used as Ritual Material
 EFFECT_DOUBLE_XMATERIAL	=375	--Counts as 2 materials when Xyz Summoning a monster that requires 3 or more materials
 EFFECT_REVEAL_ONFIELD	=376	--Affected face-down cards on the field can be inspected by the effect controller
+EFFECT_ADD_CARD_TYPE	=377	--Adds TYPE_* bits to the card type used by Card.GetCardType (distinct from ordinary EFFECT_ADD_TYPE)
+EFFECT_REMOVE_CARD_TYPE	=378	--Removes TYPE_* bits from the card type used by Card.GetCardType
+EFFECT_CHANGE_CARD_TYPE	=379	--Replaces the card type used by Card.GetCardType with the supplied TYPE_* bitmask
 EFFECT_FLAG_EFFECT	=0x20000000	--Flag effect created by RegisterFlagEffect()
 
 --Trigger events and timings. TYPE_SINGLE reacts to events involving itself; TYPE_FIELD reacts to matching events involving any card on the field.
@@ -843,8 +846,10 @@ HINTMSG_POSITION	=561	--Select a position
 HINTMSG_ATTRIBUTE	=562	--Select an attribute to declare
 HINTMSG_RACE	=563	--Select a race to declare
 HINTMSG_CODE	=564	--Declare a card name
-HINGMSG_NUMBER	=565	--Select a number
-HINGMSG_LVRANK	=567	--Declare a Level
+HINTMSG_NUMBER	=565	--Select a number
+HINTMSG_LVRANK	=567	--Declare a Level
+HINGMSG_NUMBER	=565	--Deprecated spelling retained for compatibility; use HINTMSG_NUMBER
+HINGMSG_LVRANK	=567	--Deprecated spelling retained for compatibility; use HINTMSG_LVRANK
 HINTMSG_RESOLVECARD	=568	--Select a card to resolve its effect
 HINTMSG_ZONE	=569	--Select the position for [%ls]
 HINTMSG_DISABLEZONE	=570	--Select a zone to make unusable
