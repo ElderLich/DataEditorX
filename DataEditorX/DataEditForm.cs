@@ -825,7 +825,7 @@ namespace DataEditorX
             c.ot = (int)GetSelect(cb_cardrule);
             c.attribute = (int)GetSelect(cb_cardattribute);
             c.level = (int)GetSelect(cb_cardlevel);
-            c.race = (int)GetSelect(cb_cardrace);
+            c.race = GetSelect(cb_cardrace);
             //Archetype/setcode
             c.SetSetCode(
                 tb_setcode1.Text,

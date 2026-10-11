@@ -165,7 +165,7 @@ namespace DataEditorX.Core
                 atk = reader.GetInt32(reader.GetOrdinal("atk")),
                 def = reader.GetInt32(reader.GetOrdinal("def")),
                 level = reader.GetInt64(reader.GetOrdinal("level")),
-                race = reader.GetInt64(reader.GetOrdinal("race")),
+                race = NormalizeRace(reader.GetInt64(reader.GetOrdinal("race"))),
                 attribute = reader.GetInt32(reader.GetOrdinal("attribute"))
             };
             try
@@ -420,6 +420,20 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and texts.name like '" + pattern + "' escape '/' ");
             }
         }
+        // Older Rush databases wrote Cyborg through a signed 32-bit integer.
+        static long NormalizeRace(long race)
+        {
+            return race < 0 && race >= int.MinValue ? unchecked((uint)race) : race;
+        }
+
+        static void AppendRaceCondition(StringBuilder sb, long race)
+        {
+            if (race == 0x80000000L)
+                sb.Append(" and datas.race in (2147483648,-2147483648)");
+            else if (race > 0)
+                sb.Append(" and datas.race = " + ToInt(race));
+        }
+
         public static string OmegaGetSelectSQL(Card c)
         {
             StringBuilder sb = new();
@@ -460,10 +474,7 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and (datas.level & 16711680) = " + ToInt(c.level & 0xff0000));
             }
 
-            if (c.race > 0)
-            {
-                _ = sb.Append(" and datas.race = " + ToInt(c.race));
-            }
+            AppendRaceCondition(sb, c.race);
 
             AppendTypeCondition(sb, c.type);
 
@@ -537,10 +548,7 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and (datas.level & 16711680) = " + ToInt(c.level & 0xff0000));
             }
 
-            if (c.race > 0)
-            {
-                _ = sb.Append(" and datas.race = " + ToInt(c.race));
-            }
+            AppendRaceCondition(sb, c.race);
 
             AppendTypeCondition(sb, c.type);
 
