@@ -113,6 +113,9 @@ EFFECT_CHANGE_CODE						The target card's name becomes the specified card name
 EFFECT_ADD_TYPE							The target card also has the specified card type. Useful for granting monster types to summoned non-Effect monsters or Special Summoned Spell/Trap cards.
 EFFECT_REMOVE_TYPE						The target card is no longer treated as the specified card type
 EFFECT_CHANGE_TYPE						The target card becomes the specified card type and may move immediately; used by effects that place cards as Continuous Spells/Traps.
+EFFECT_ADD_CARD_TYPE				Adds TYPE_* bits to the card type read by Card.GetCardType/Card.IsCardType. Example: e:SetValue(TYPE_NORMAL). This is the card-type layer, before current-type effects such as EFFECT_ADD_TYPE.
+EFFECT_REMOVE_CARD_TYPE			Removes the TYPE_* bits supplied by e:SetValue from the card type read by Card.GetCardType/Card.IsCardType; other card-type bits remain.
+EFFECT_CHANGE_CARD_TYPE			Replaces the card-type bitmask read by Card.GetCardType/Card.IsCardType with e:SetValue. Supply the complete intended TYPE_* mask; current-type effects are applied afterward by Card.GetType.
 EFFECT_ADD_RACE							The target card is also treated as the specified race
 EFFECT_REMOVE_RACE						The target card is no longer treated as the specified race
 EFFECT_CHANGE_RACE						The target card is treated as the specified race
