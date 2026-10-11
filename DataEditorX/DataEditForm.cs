@@ -1009,7 +1009,9 @@ namespace DataEditorX
             cardlist.Clear();
             //Ensure required tables exist
             _ = DataBase.CheckTable(file);
-            srcCard = new Card();
+            // Card is a struct: default construction uses ATK/DEF = 0, which turns
+            // the first refresh into an unintended zero-stat search.
+            srcCard = new Card(0);
             SetCards(DataBase.Read(file, true, ""), false);
             return true;
         }
@@ -1799,7 +1801,9 @@ namespace DataEditorX
             }
 
             tmpCodes.Clear();
-            srcCard = new Card();
+            // Card is a struct: default construction uses ATK/DEF = 0, which turns
+            // the first refresh into an unintended zero-stat search.
+            srcCard = new Card(0);
             Card[] mcards = DataBase.Read(nowCdbFile, true, "");
             Card[] cards = DataBase.Read(cdbfile, true, "");
             foreach (Card card in mcards)
