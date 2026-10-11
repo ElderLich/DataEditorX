@@ -55,9 +55,47 @@ internal static class Program
             Console.WriteLine("PASS: bounded scrollable code help and normal text selection.");
             VerifyReferenceCompletions(root);
             VerifyOmegaMetadataWithoutRushCheckbox(root);
+            VerifyThemeReadability();
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifyThemeReadability()
+    {
+        using var editor = new FastColoredTextBoxNS.FastColoredTextBoxEx();
+        var highlighter = (FastColoredTextBoxNS.MySyntaxHighlighter)editor.SyntaxHighlighter;
+        highlighter.SetKnownFunctions(["RD.Draw", "RushDuel.Draw"]);
+        editor.Text = "local text = \"Ready\"\n-- comment\nRD.Draw()\nRushDuel.Draw()\n123";
+        highlighter.LuaSyntaxHighlight(editor.Range);
+        foreach (string name in ThemeManager.ProfileNames.Where(n => n != ThemeManager.ProfileCustom))
+        {
+            var palette = ThemeManager.GetPalette(name);
+            ThemeManager.ApplyControlTree(editor, palette);
+            foreach ((int line, int column) in new[] { (0, 0), (0, 14), (1, 0), (2, 0), (3, 0), (4, 0) })
+            {
+                int styles = (int)editor[line][column].style;
+                var ink = editor.Styles.Select((style, index) => (style, index))
+                    .Where(pair => (styles & (1 << pair.index)) != 0)
+                    .Select(pair => pair.style).OfType<FastColoredTextBoxNS.TextStyle>().FirstOrDefault();
+                Assert(ink?.ForeBrush is System.Drawing.SolidBrush, $"{name}: Lua/Rush token must be highlighted");
+                var foreground = ((System.Drawing.SolidBrush)ink!.ForeBrush).Color;
+                Assert(Contrast(foreground, editor.BackColor) >= 4.5, $"{name}: syntax text must remain readable after switching palettes");
+            }
+            Assert(Contrast(editor.CaretColor, editor.BackColor) >= 4.5, $"{name}: caret must contrast with editor background");
+        }
+        Console.WriteLine("PASS: theme switching retains Lua/Rush highlighting, readable syntax and a visible caret without saving preferences.");
+    }
+
+    private static double Contrast(System.Drawing.Color a, System.Drawing.Color b)
+    {
+        double Luminance(System.Drawing.Color color)
+        {
+            double Linear(byte component) { double v = component / 255.0; return v <= .04045 ? v / 12.92 : Math.Pow((v + .055) / 1.055, 2.4); }
+            return .2126 * Linear(color.R) + .7152 * Linear(color.G) + .0722 * Linear(color.B);
+        }
+        double x = Luminance(a), y = Luminance(b);
+        return (Math.Max(x, y) + .05) / (Math.Min(x, y) + .05);
+    }
+
     private static void VerifyOmegaMetadataWithoutRushCheckbox(string root)
     {
         foreach (string file in Directory.GetFiles(Path.Combine(root, "languages"), "cardinfo_*.txt"))

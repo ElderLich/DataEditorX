@@ -29,6 +29,20 @@ namespace FastColoredTextBoxNS
         {
         }
 
+        // Keep existing style objects so already-highlighted text updates immediately.
+        public void ApplyTheme(Color background)
+        {
+            bool dark = background.GetBrightness() < 0.5f;
+            mNumberStyle.ForeBrush = dark ? Brushes.SandyBrown : Brushes.Sienna;
+            mStrStyle.ForeBrush = dark ? Brushes.Khaki : Brushes.Brown;
+            conStyle.ForeBrush = dark ? Brushes.Plum : Brushes.DarkViolet;
+            mKeywordStyle.ForeBrush = dark ? Brushes.LightSkyBlue : Brushes.Blue;
+            mGrayStyle.ForeBrush = dark ? Brushes.Silver : Brushes.DimGray;
+            mFunStyle.ForeBrush = dark ? Brushes.MediumAquamarine : Brushes.Teal;
+            mErrorStyle.ForeBrush = dark ? Brushes.Salmon : Brushes.Firebrick;
+            mErrorStyle2.ForeBrush = mErrorStyle.ForeBrush;
+        }
+
         public void SetKnownFunctions(IEnumerable<string> functionNames)
         {
             Dictionary<string, SortedSet<string>> functions = new(StringComparer.Ordinal)

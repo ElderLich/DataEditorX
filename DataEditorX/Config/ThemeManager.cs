@@ -261,7 +261,8 @@ namespace DataEditorX.Config
             ApplyToolStripItem(item, CurrentPalette);
         }
 
-        private static void ApplyControlTree(Control control, ThemePalette palette)
+        // Apply an in-memory palette without changing the saved user preference.
+        public static void ApplyControlTree(Control control, ThemePalette palette)
         {
             if (control == null)
             {
@@ -389,6 +390,11 @@ namespace DataEditorX.Config
             textBox.LineNumberColor = palette.CodeLineNumberColor;
             textBox.SelectionColor = Color.FromArgb(80, palette.AccentColor);
             textBox.DisabledColor = Color.FromArgb(100, palette.MutedTextColor);
+            textBox.CaretColor = palette.TextColor;
+            textBox.CurrentLineColor = Color.FromArgb(18, palette.AccentColor);
+            if (textBox.SyntaxHighlighter is MySyntaxHighlighter highlighter)
+                highlighter.ApplyTheme(textBox.BackColor);
+            textBox.Invalidate();
         }
 
         private static void RestoreFastTextBox(FastColoredTextBox textBox)
@@ -400,6 +406,11 @@ namespace DataEditorX.Config
             textBox.LineNumberColor = state.LineNumberColor;
             textBox.SelectionColor = state.SelectionColor;
             textBox.DisabledColor = state.DisabledColor;
+            textBox.CaretColor = state.ForeColor;
+            textBox.CurrentLineColor = state.CurrentLineColor;
+            if (textBox.SyntaxHighlighter is MySyntaxHighlighter highlighter)
+                highlighter.ApplyTheme(textBox.BackColor);
+            textBox.Invalidate();
         }
 
         private static FastTextBoxThemeState CreateFastTextBoxState(FastColoredTextBox textBox)
@@ -411,6 +422,7 @@ namespace DataEditorX.Config
                 IndentBackColor = textBox.IndentBackColor,
                 LineNumberColor = textBox.LineNumberColor,
                 SelectionColor = textBox.SelectionColor,
+                CurrentLineColor = textBox.CurrentLineColor,
                 DisabledColor = textBox.DisabledColor
             };
         }
@@ -643,6 +655,7 @@ namespace DataEditorX.Config
             public Color LineNumberColor { get; init; }
             public Color SelectionColor { get; init; }
             public Color DisabledColor { get; init; }
+            public Color CurrentLineColor { get; init; }
         }
 
         private sealed class ThemedColorTable : ProfessionalColorTable
