@@ -56,9 +56,39 @@ internal static class Program
             VerifyReferenceCompletions(root);
             VerifyOmegaMetadataWithoutRushCheckbox(root);
             VerifyThemeReadability();
+            VerifyThemePreview();
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifyThemePreview()
+    {
+        string savedProfile = ThemeManager.CurrentProfileName;
+        using var dialog = new ThemeSettingsForm();
+        var profile = (ComboBox)typeof(ThemeSettingsForm).GetField("cbProfile", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(dialog)!;
+        var code = (FastColoredTextBoxNS.FastColoredTextBoxEx)typeof(ThemeSettingsForm).GetField("previewCode", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(dialog)!;
+        foreach (string name in new[] { ThemeManager.ProfileMidnight, ThemeManager.ProfilePaper, ThemeManager.ProfileForest })
+        {
+            profile.SelectedItem = name;
+            Assert(code.BackColor == ThemeManager.GetPalette(name).CodeBackColor, "Preview must update immediately when a preset is selected");
+            Assert(ThemeManager.CurrentProfileName == savedProfile, "Preview selection must not persist a new theme");
+            string output = Environment.GetEnvironmentVariable("DATAEDITORX_THEME_PREVIEW_DIR");
+            if (!string.IsNullOrEmpty(output))
+            {
+                Directory.CreateDirectory(output);
+                dialog.Opacity = 0;
+                dialog.Show();
+                Application.DoEvents();
+                dialog.PerformLayout();
+                using var bitmap = new System.Drawing.Bitmap(dialog.Width, dialog.Height);
+                dialog.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, dialog.Width, dialog.Height));
+                bitmap.Save(Path.Combine(output, name + ".png"));
+            }
+        }
+        dialog.DialogResult = DialogResult.Cancel;
+        Assert(ThemeManager.CurrentProfileName == savedProfile, "Cancel must leave the saved theme unchanged");
+        Console.WriteLine("PASS: live theme previews update without saving; Cancel preserves the active theme.");
+    }
+
     private static void VerifyThemeReadability()
     {
         using var editor = new FastColoredTextBoxNS.FastColoredTextBoxEx();

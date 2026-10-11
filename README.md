@@ -92,3 +92,5 @@ Rush autocomplete is optional and separate from the standard API: place `_rush_f
 ## Theme presets
 
 Choose a palette from **View > Theme**: **Midnight** (deep navy/cyan), **Nord** (slate/ice), **Plum** (violet/lavender), **Forest** (pine/mint), **Sandstone** (warm ivory), or **Paper** (neutral light/blue). The existing Light, Dark, Alice Light and Custom choices remain available. Presets apply to card editing, list rows, menus, inputs and the code editor.
+
+Use **View > Theme > Customize...** to preview presets beside sample card rows and highlighted Lua. Changing a color creates a Custom palette. **OK** saves the choice; **Cancel** keeps your current theme. The dialog can be resized to show more color controls.

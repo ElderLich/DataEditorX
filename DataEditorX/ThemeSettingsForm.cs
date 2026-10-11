@@ -10,20 +10,31 @@ namespace DataEditorX
         private readonly List<ColorBinding> bindings = new();
         private ThemePalette palette;
         private bool changingProfile;
+        private readonly Panel preview = new() { Dock = DockStyle.Fill, Padding = new Padding(12) };
+        private readonly Label previewTitle = new() { Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft };
+        private readonly ListView previewCards = new() { Dock = DockStyle.Fill, View = View.Details, FullRowSelect = true, HideSelection = false };
+        private readonly FastColoredTextBoxNS.FastColoredTextBoxEx previewCode = new()
+        {
+            Dock = DockStyle.Fill, ReadOnly = true, Language = FastColoredTextBoxNS.Language.Lua,
+            BackColor = Color.FromArgb(64, 64, 64), ForeColor = Color.GhostWhite,
+            ShowLineNumbers = true, AccessibleName = "Lua theme preview"
+        };
 
         public ThemeSettingsForm()
         {
             Text = "Theme";
             StartPosition = FormStartPosition.CenterParent;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
+            FormBorderStyle = FormBorderStyle.Sizable;
             MinimizeBox = false;
             MaximizeBox = false;
             ShowInTaskbar = false;
-            ClientSize = new Size(420, 560);
+            ClientSize = new Size(900, 620);
+            MinimumSize = new Size(800, 520);
 
             palette = CurrentPalette.Clone(CurrentProfileName);
             InitializeBindings();
             InitializeControls();
+            ThemeManager.ApplyControlTree(this);
             LoadProfile(CurrentProfileName);
         }
 
@@ -41,6 +52,7 @@ namespace DataEditorX
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
 
+            cbProfile.AccessibleName = "Theme preset";
             cbProfile.DropDownStyle = ComboBoxStyle.DropDownList;
             cbProfile.Dock = DockStyle.Fill;
             cbProfile.Items.AddRange(ProfileNames.Select(name => (object)name).ToArray());
@@ -55,6 +67,7 @@ namespace DataEditorX
                 {
                     EnsureCustomProfile();
                     palette.IsDark = chkDarkStyle.Checked;
+                    RefreshPreview();
                 }
             };
             root.Controls.Add(chkDarkStyle, 0, 1);
@@ -129,7 +142,56 @@ namespace DataEditorX
 
             AcceptButton = ok;
             CancelButton = cancel;
-            Controls.Add(root);
+            TableLayoutPanel shell = new() { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1 };
+            shell.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 370));
+            shell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            shell.Controls.Add(root, 0, 0);
+            shell.Controls.Add(preview, 1, 0);
+            InitializePreview();
+            Controls.Add(shell);
+        }
+
+        private void InitializePreview()
+        {
+            TableLayoutPanel samples = new() { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 5 };
+            samples.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
+            samples.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+            samples.RowStyles.Add(new RowStyle(SizeType.Absolute, 125));
+            samples.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            samples.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
+            previewTitle.Font = new Font(Font, FontStyle.Bold);
+            samples.Controls.Add(previewTitle, 0, 0);
+            samples.Controls.Add(new TextBox { Text = "Search cards: Spellcaster", ReadOnly = true, Dock = DockStyle.Fill, AccessibleName = "Card search preview" }, 0, 1);
+            previewCards.Columns.Add("Card", 190);
+            previewCards.Columns.Add("ATK", 65);
+            previewCards.Columns.Add("DEF", 65);
+            previewCards.Items.Add(new ListViewItem(new[] { "Dark Magician", "2500", "2100" }));
+            previewCards.Items.Add(new ListViewItem(new[] { "Mystic Dealer", "1000", "0" }));
+            previewCards.Items.Add(new ListViewItem(new[] { "Sevens Road Magician", "2100", "1500" }));
+            samples.Controls.Add(previewCards, 0, 2);
+            ((FastColoredTextBoxNS.MySyntaxHighlighter)previewCode.SyntaxHighlighter)
+                .SetKnownFunctions(new[] { "Duel.Draw", "RD.Draw" });
+            previewCode.Text = "-- Lua colors and line numbers\nlocal s,id=GetID()\nlocal title=\"Draw a card\"\n\nfunction s.operation(e,tp)\n    Duel.Draw(tp,1,REASON_EFFECT)\nend\n\n-- Rush helper reference\n-- RD.Draw()";
+            samples.Controls.Add(previewCode, 0, 3);
+            samples.Controls.Add(new Label
+            {
+                Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft,
+                Text = "Preview only. Choose OK to save; Cancel keeps your current theme."
+            }, 0, 4);
+            preview.Controls.Add(samples);
+        }
+
+        private void RefreshPreview()
+        {
+            ThemeManager.ApplyControlTree(preview, palette);
+            previewTitle.Text = palette.Name + " — Preview";
+            previewTitle.BackColor = palette.HeaderBackColor;
+            foreach (ListViewItem item in previewCards.Items)
+            {
+                item.BackColor = item.Index % 2 == 0 ? palette.ListEvenBackColor : palette.ListOddBackColor;
+                item.ForeColor = palette.TextColor;
+            }
+            preview.Invalidate(true);
         }
 
         private void InitializeBindings()
@@ -172,6 +234,7 @@ namespace DataEditorX
             cbProfile.SelectedItem = profile;
             chkDarkStyle.Checked = palette.IsDark;
             RefreshButtons();
+            RefreshPreview();
             changingProfile = false;
         }
 
@@ -184,13 +247,13 @@ namespace DataEditorX
 
             changingProfile = true;
             palette = palette.Clone(ProfileCustom);
+            palette.UsesOriginalColors = false;
             cbProfile.SelectedItem = ProfileCustom;
             changingProfile = false;
         }
 
         private void PickColor(ColorBinding binding)
         {
-            EnsureCustomProfile();
             using ColorDialog dialog = new()
             {
                 FullOpen = true,
@@ -202,8 +265,10 @@ namespace DataEditorX
                 return;
             }
 
+            EnsureCustomProfile();
             binding.Set(palette, dialog.Color);
             RefreshButtons();
+            RefreshPreview();
         }
 
         private void RefreshButtons()
