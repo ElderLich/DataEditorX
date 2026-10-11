@@ -37,9 +37,21 @@ internal static class Program
             Card[] found = DataBase.Read(db, true, DataBase.GetSelectSQL(raceFilter));
             Assert(found.Length == 1 && found[0].race == 0x80000000L, "Legacy signed Cyborg rows must be found and normalized");
             Console.WriteLine("PASS: Cyborg UI round-trip and legacy signed-race search.");
+            Card rush = new(120000010) { name = "Rush Legend", ot = 4, type = 0x29, desc = "RD/KP01-JP001\n[REQUIREMENT] None.\n[EFFECT] Draw 1 card." };
+            form.SetCard(rush);
+            Assert(Control<ComboBox>(form, "cb_cardrule").Text == "Rush", "Rush card IDs must display the Rush rule");
+            Assert(form.GetCard().ot == 4 && form.GetCard().type == rush.type && form.GetCard().desc == rush.desc,
+                "Rush editing must preserve OT, Legend bits and metadata text");
+            DataBase.Command(db, DataBase.GetInsertSQL(rush, true));
+            Card[] rushMatches = DataBase.Read(db, true, DataBase.GetSelectSQL(new Card(0) { ot = 0x100 }));
+            Assert(rushMatches.Length == 2 && rushMatches.All(c => c.IsRushDuelCard), "Rush searches must use the ID range, including upstream OT=4 cards");
+            Console.WriteLine("PASS: Rush selector, metadata round-trip and ID-range filtering.");
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static T Control<T>(DataEditForm form, string name) where T : System.Windows.Forms.Control
+        => (T)typeof(DataEditForm).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(form)!;
+
     private static void Assert(bool condition, string message)
     {
         if (!condition) throw new Exception(message);

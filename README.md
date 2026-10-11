@@ -76,3 +76,13 @@ Each line in `language_english.txt` and `cardinfo_english.txt` is separated by a
 * Based on the [Lyris12 fork](https://github.com/Lyris12/DataEditorX).
 * Project Manager co-created with BullyWiiPlaza.
 * Maintained for MDPro3 custom card workflows by [ElderLich](https://github.com/ElderLich/DataEditorX).
+
+## Rush Duel cards
+
+Choose **Rush** in the top Rule selector to search or edit MDPro3 Rush cards. The selector follows MDPro3's card ID range (`120000000`–`129999999`). Source Rush databases use `ot = 4`; existing OT values are preserved and newly created Rush cards use 4. The editor does not write the client-only `0x100` pool filter into official card records.
+
+Use **Legend** (`0x8`) and **Maximum** (`0x8000`) in Card Types. Rush races, including Cyborg, round-trip without signed integer truncation. Preserve the `RD/...` pack line and any `MAXIMUM ATK = ...` line at the beginning of the description; MDPro3 reads those display details from the text. Maximum summoning behavior still belongs in the Lua script.
+
+The **Rush Duel (Omega)** checkbox belongs to the separate Omega database schema. It is shown only for Omega databases and is not required by MDPro3 `.cdb` files.
+
+Run the editor regressions with `dotnet run --project tests/DataEditorX.RegressionTests.csproj` on Windows. They use temporary databases and do not edit the game's data.

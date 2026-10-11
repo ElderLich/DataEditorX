@@ -13,6 +13,8 @@ namespace DataEditorX.Core.Info
         OCGTCG = 3,
         /// <summary>DIY/original cards</summary>
         DIY = 4,
+        /// <summary>Editor Rush filter; MDPro3 identifies Rush by the card ID range.</summary>
+        RUSH = 0x100,
         /// <summary>Simplified Chinese</summary>
         CCG = 9,
         /// <summary>Simplified Chinese/TCG</summary>

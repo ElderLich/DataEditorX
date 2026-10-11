@@ -434,6 +434,14 @@ namespace DataEditorX.Core
                 sb.Append(" and datas.race = " + ToInt(race));
         }
 
+        static void AppendRuleCondition(StringBuilder sb, int rule)
+        {
+            if (rule == (int)Info.CardRule.RUSH)
+                sb.Append(" and datas.id >= 120000000 and datas.id < 130000000");
+            else if (rule > 0)
+                sb.Append(" and datas.ot = " + rule);
+        }
+
         public static string OmegaGetSelectSQL(Card c)
         {
             StringBuilder sb = new();
@@ -449,10 +457,7 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and texts.desc like '%" + c.desc.Replace("'", "''") + "%' ");
             }
 
-            if (c.ot > 0)
-            {
-                _ = sb.Append(" and datas.ot = " + c.ot.ToString());
-            }
+            AppendRuleCondition(sb, c.ot);
 
             if (c.attribute > 0)
             {
@@ -523,10 +528,7 @@ namespace DataEditorX.Core
                 _ = sb.Append(" and texts.desc like '%" + c.desc.Replace("'", "''") + "%' ");
             }
 
-            if (c.ot > 0)
-            {
-                _ = sb.Append(" and datas.ot = " + c.ot.ToString());
-            }
+            AppendRuleCondition(sb, c.ot);
 
             if (c.attribute > 0)
             {

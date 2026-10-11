@@ -90,6 +90,7 @@ namespace DataEditorX
             RegexOptions.Multiline);
 
         Image cover;
+        Label rushHelp;
 
         string datapath, confcover;
 
@@ -146,6 +147,23 @@ namespace DataEditorX
             ygopath = new YgoPath(Application.StartupPath);
             InitPath(datapath);
             InitializeComponent();
+            rushHelp = new Label
+            {
+                Anchor = pl_flags.Anchor,
+                Location = pl_flags.Location,
+                Size = pl_flags.Size,
+                Padding = new Padding(4),
+                Visible = false,
+                Text = "MDPro3 Rush IDs: 120000000–129999999.\r\n" +
+                       "Use Legend (0x8) and Maximum (0x8000) in Card Types.\r\n" +
+                       "Keep the RD/... pack line and MAXIMUM ATK line in the description."
+            };
+            splitContainer.Panel2.Controls.Add(rushHelp);
+            cb_cardrule.SelectedIndexChanged += (_, _) => UpdateFormatControls();
+            var formatTips = new ToolTip(components ??= new System.ComponentModel.Container());
+            formatTips.SetToolTip(cb_cardrule,
+                "Rush selects the MDPro3 Rush ID range. Existing OT values are preserved; new Rush cards use Custom (4), matching the Rush database.");
+            formatTips.SetToolTip(pl_flags, "Omega database category flags only. MDPro3 .cdb cards do not need this Rush flag.");
             title = Text;
             nowCdbFile = "";
             cmdManager.UndoStateChanged += delegate (bool val)
@@ -341,6 +359,7 @@ namespace DataEditorX
                 path = Path.GetDirectoryName(cdb);
             }
             ygopath.SetPath(path);
+            UpdateFormatControls();
         }
         //Initialize file paths
         void InitPath(string datapath)
@@ -388,6 +407,18 @@ namespace DataEditorX
             {
                 _ = MessageBox.Show(ex.ToString(), "启动错误");
             }
+        }
+
+        void UpdateFormatControls()
+        {
+            bool omega = DataBase.IsOmegaDatabase(nowCdbFile);
+            bool rush = GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH;
+            pl_flags.Visible = omega;
+            lb_flags.Visible = omega || rush;
+            lb_flags.Text = omega ? "Card Flags (Omega)" : "Rush Duel";
+            tb_support.Visible = omega;
+            lb_support.Visible = omega;
+            if (rushHelp != null) rushHelp.Visible = rush && !omega;
         }
 
         //Initialize FlowLayoutPanel
@@ -690,7 +721,8 @@ namespace DataEditorX
                 scriptTextIsUpdating = false;
             }
             //data
-            SetSelect(cb_cardrule, c.ot);
+            SetSelect(cb_cardrule, c.IsRushDuelCard ? (long)Core.Info.CardRule.RUSH : c.ot);
+            UpdateFormatControls();
             SetSelect(cb_cardattribute, c.attribute);
             SetSelect(cb_cardlevel, c.level & 0xff);
             SetSelect(cb_cardrace, c.race);
@@ -823,6 +855,8 @@ namespace DataEditorX
             Array.Copy(strs, c.Str, Card.STR_MAX);
 
             c.ot = (int)GetSelect(cb_cardrule);
+            if (c.ot == (int)Core.Info.CardRule.RUSH)
+                c.ot = oldCard.IsRushDuelCard ? oldCard.ot : (int)Core.Info.CardRule.DIY;
             c.attribute = (int)GetSelect(cb_cardattribute);
             c.level = (int)GetSelect(cb_cardlevel);
             c.race = GetSelect(cb_cardrace);
@@ -1077,17 +1111,31 @@ namespace DataEditorX
         void Btn_serachClick(object sender, EventArgs e)
         {
             tmpCodes.Clear();//Clear temporary results
-            Search(GetCard(), false);
+            Card filter = GetCard();
+            if (GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH)
+                filter.ot = (int)Core.Info.CardRule.RUSH;
+            Search(filter, false);
         }
         //Reset card
         void Btn_resetClick(object sender, EventArgs e)
         {
             Reset();
         }
+        bool ValidateRushId()
+        {
+            if (GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH && !GetCard().IsRushDuelCard)
+            {
+                MyMsg.Warning("MDPro3 identifies Rush cards by IDs from 120000000 to 129999999. Enter an ID in that range to save a Rush card.");
+                tb_cardcode.Focus();
+                return false;
+            }
+            return true;
+        }
+
         //Add
         void Btn_addClick(object sender, EventArgs e)
         {
-            if (cardedit != null)
+            if (cardedit != null && ValidateRushId())
             {
                 cmdManager.ExcuteCommand(cardedit.addCard);
             }
@@ -1095,7 +1143,7 @@ namespace DataEditorX
         //Modify
         void Btn_modClick(object sender, EventArgs e)
         {
-            if (cardedit != null)
+            if (cardedit != null && ValidateRushId())
             {
                 cmdManager.ExcuteCommand(cardedit.modCard, menuitem_operacardsfile.Checked);
             }

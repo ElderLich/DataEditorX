@@ -14,6 +14,7 @@ namespace DataEditorX.Core
         public const int STR_MAX = 0x10;
         public const int SETCODE_MAX = 4;
         public static Card Empty => new(0);
+        public bool IsRushDuelCard => id >= 120000000 && id < 130000000;
 
         #region Constructors
         /// <summary>
