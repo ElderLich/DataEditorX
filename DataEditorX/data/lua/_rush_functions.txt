@@ -386,17 +386,15 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDFusion.lua:653
 
-●any RushDuel.AttachAtkDef(any e, any card, any atk, any def, any reset, any forced)
+●void RushDuel.AttachAtkDef(Effect e, Card card, int|function|nil atk, int|function|nil def, [int reset], [bool forced])
 赋予: 攻守升降
 Parameters:
-  e: any
-  card: any
-  atk: any
-  def: any
-  reset: any
-  forced: any
-Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  e: Effect - Resolving source effect; its handler owns the modifiers.
+  card: Card - Card receiving the modifiers.
+  atk: int|function|nil - ATK delta or value callback; nil and numeric 0 skip this branch.
+  def: int|function|nil - DEF delta or value callback; nil and numeric 0 skip this branch, and RD.IsCanChangeDef must pass.
+  reset: int optional - Explicit reset mask shared by both modifiers. Omitting it adds no reset policy.
+  forced: bool optional - Passed to Card.RegisterEffect. Normally omit it rather than bypassing immunity.
 Source: Rush/Utilities/RDAttach.lua:5
 
 ●any RushDuel.AttachAttackAll(any e, any card, any value, any desc, any reset, any forced)
@@ -920,21 +918,21 @@ Returns:
   Group|nil - Selected Group, or nil when the player declines.
 Source: Rush/Utilities/RDFunction.lua:45
 
-●any RushDuel.CanSelectAndDoAction(any desc, any hint, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any action)
+●any RushDuel.CanSelectAndDoAction(int desc, int hint, function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, function action)
 可选操作: 选择匹配卡片
 Parameters:
-  desc: any
-  hint: any
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  action: any
+  desc: int - Yes/no question description identifier.
+  hint: int - Card-selection prompt identifier.
+  filter: function - Card predicate including required action-legality checks.
+  tp: int - Selecting player; 0 or 1.
+  s_range: int - Locations on tp's side.
+  o_range: int - Locations on the opponent's side.
+  min: int - Minimum selected count.
+  max: int - Maximum selected count.
+  expect: Card|Group|nil - Card(s) excluded from matching; pass nil for none.
+  action: function - Called as action(selected_group) after the player accepts and completes selection.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - Exactly the callback's return values when invoked; otherwise numeric 0. A callback may return no values.
 Source: Rush/Utilities/RDAction.lua:107
 
 ●any RushDuel.CanSelectAndSet(any desc, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any break_effect)
@@ -4334,20 +4332,20 @@ Returns:
   Group|nil - Selected cards; nil on cancellation.
 Source: Rush/Utilities/RDFunction.lua:32
 
-●any RushDuel.SelectAndDoAction(any hint, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any action)
+●any RushDuel.SelectAndDoAction(int hint, function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, function action)
 操作: 选择匹配卡片
 Parameters:
-  hint: any
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  action: any
+  hint: int - Selection prompt identifier, such as HINTMSG_TOGRAVE or aux.Stringid(id, n).
+  filter: function - Card predicate. Include the needed operation-legality checks.
+  tp: int - Selecting player; 0 or 1.
+  s_range: int - Locations on tp's side.
+  o_range: int - Locations on the opponent's side.
+  min: int - Minimum selected count.
+  max: int - Maximum selected count.
+  expect: Card|Group|nil - Card(s) excluded from matching; pass nil for no exclusion. The upstream parameter is spelled expect.
+  action: function - Called as action(selected_group) immediately after a nonempty selection.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - Exactly the callback's return values when invoked; otherwise numeric 0. A callback may return no values.
 Source: Rush/Utilities/RDAction.lua:102
 
 ●any RushDuel.SelectAndSet(any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any break_effect)
@@ -5488,17 +5486,15 @@ Returns:
   any - Return contract has not been reviewed; inspect the source below.
 Source: Rush/Utilities/RDFusion.lua:653
 
-●any RD.AttachAtkDef(any e, any card, any atk, any def, any reset, any forced)
+●void RD.AttachAtkDef(Effect e, Card card, int|function|nil atk, int|function|nil def, [int reset], [bool forced])
 赋予: 攻守升降
 Parameters:
-  e: any
-  card: any
-  atk: any
-  def: any
-  reset: any
-  forced: any
-Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  e: Effect - Resolving source effect; its handler owns the modifiers.
+  card: Card - Card receiving the modifiers.
+  atk: int|function|nil - ATK delta or value callback; nil and numeric 0 skip this branch.
+  def: int|function|nil - DEF delta or value callback; nil and numeric 0 skip this branch, and RD.IsCanChangeDef must pass.
+  reset: int optional - Explicit reset mask shared by both modifiers. Omitting it adds no reset policy.
+  forced: bool optional - Passed to Card.RegisterEffect. Normally omit it rather than bypassing immunity.
 Source: Rush/Utilities/RDAttach.lua:5
 
 ●any RD.AttachAttackAll(any e, any card, any value, any desc, any reset, any forced)
@@ -6022,21 +6018,21 @@ Returns:
   Group|nil - Selected Group, or nil when the player declines.
 Source: Rush/Utilities/RDFunction.lua:45
 
-●any RD.CanSelectAndDoAction(any desc, any hint, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any action)
+●any RD.CanSelectAndDoAction(int desc, int hint, function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, function action)
 可选操作: 选择匹配卡片
 Parameters:
-  desc: any
-  hint: any
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  action: any
+  desc: int - Yes/no question description identifier.
+  hint: int - Card-selection prompt identifier.
+  filter: function - Card predicate including required action-legality checks.
+  tp: int - Selecting player; 0 or 1.
+  s_range: int - Locations on tp's side.
+  o_range: int - Locations on the opponent's side.
+  min: int - Minimum selected count.
+  max: int - Maximum selected count.
+  expect: Card|Group|nil - Card(s) excluded from matching; pass nil for none.
+  action: function - Called as action(selected_group) after the player accepts and completes selection.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - Exactly the callback's return values when invoked; otherwise numeric 0. A callback may return no values.
 Source: Rush/Utilities/RDAction.lua:107
 
 ●any RD.CanSelectAndSet(any desc, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any break_effect)
@@ -9436,20 +9432,20 @@ Returns:
   Group|nil - Selected cards; nil on cancellation.
 Source: Rush/Utilities/RDFunction.lua:32
 
-●any RD.SelectAndDoAction(any hint, any filter, any tp, any s_range, any o_range, any min, any max, any expect, any action)
+●any RD.SelectAndDoAction(int hint, function filter, int tp, int s_range, int o_range, int min, int max, Card|Group|nil expect, function action)
 操作: 选择匹配卡片
 Parameters:
-  hint: any
-  filter: any
-  tp: any
-  s_range: any
-  o_range: any
-  min: any
-  max: any
-  expect: any
-  action: any
+  hint: int - Selection prompt identifier, such as HINTMSG_TOGRAVE or aux.Stringid(id, n).
+  filter: function - Card predicate. Include the needed operation-legality checks.
+  tp: int - Selecting player; 0 or 1.
+  s_range: int - Locations on tp's side.
+  o_range: int - Locations on the opponent's side.
+  min: int - Minimum selected count.
+  max: int - Maximum selected count.
+  expect: Card|Group|nil - Card(s) excluded from matching; pass nil for no exclusion. The upstream parameter is spelled expect.
+  action: function - Called as action(selected_group) immediately after a nonempty selection.
 Returns:
-  any - Return contract has not been reviewed; inspect the source below.
+  any - Exactly the callback's return values when invoked; otherwise numeric 0. A callback may return no values.
 Source: Rush/Utilities/RDAction.lua:102
 
 ●any RD.SelectAndSet(any filter, any tp, any s_range, any o_range, any min, any max, any expect, any e, any break_effect)
