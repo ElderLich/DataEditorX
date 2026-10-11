@@ -60,7 +60,7 @@ internal static class Program
             VerifyResizePaging(root);
             VerifyDockedMetadataLayout(root);
             VerifyReferenceCompletions(root);
-            VerifyOmegaMetadataWithoutRushCheckbox(root);
+            VerifyLegacyMetadataWithoutExtraControls(root);
             VerifyThemeReadability();
             VerifyThemePreview();
         }
@@ -269,32 +269,8 @@ internal static class Program
             Assert(checkPanel.Controls.Cast<System.Windows.Forms.Control>().All(box =>
                 box.Bottom <= checkPanel.ClientSize.Height && box.Right <= checkPanel.ClientSize.Width),
                 "Expanded splitter view must fit every checkbox and its label");
-        string omega = Path.Combine(Path.GetTempPath(), $"dataeditor-layout-{Guid.NewGuid():N}.bytes");
-        try
-        {
-            DataBase.Create(omega);
-            form.Open(omega);
-            config.dicCardflags.Add(0x40000L, "Custom metadata");
-            config.dicCardflags.Add(0x80000L, "Another custom flag");
-            form.InitControl(config);
-            form.SetCard(new Card(42) { name = "Omega layout check", type = 0x21, omega = [1L, 0x40100L, 0L] });
-            Application.DoEvents();
-            var flags = Control<FlowLayoutPanel>(form, "pl_flags");
-            Assert(flags.Visible && !Control<Label>(form, "rushHelp").Visible,
-                "Omega custom flags must have their own visible section, without Rush help overlapping");
-            Assert(flags.Bottom < Control<Label>(form, "lb_tiptexts").Top && column.ClientRectangle.Contains(flags.Bounds),
-                "Omega custom flags must stay between Genre and Strings");
-            Assert(form.GetCard().omega[1] == 0x40100L, "Reflow must preserve custom and noneditable Omega flags");
-            if (!string.IsNullOrEmpty(output))
-            {
-                using var bitmap = new System.Drawing.Bitmap(form.Width, form.Height);
-                form.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, form.Width, form.Height));
-                bitmap.Save(Path.Combine(output, "Omega.png"));
-            }
-        }
-        finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(omega); }
         form.Close();
-        Console.WriteLine("PASS: responsive layout, scrolling, splitter changes, Omega flags and legacy localization work across nine size/format scenarios.");
+        Console.WriteLine("PASS: responsive layout, scrolling, splitter changes and legacy localization work across nine size/format scenarios.");
     }
 
     private static void VerifyCardTypeCoverage(string root)
@@ -411,32 +387,31 @@ internal static class Program
         return (Math.Max(x, y) + .05) / (Math.Min(x, y) + .05);
     }
 
-    private static void VerifyOmegaMetadataWithoutRushCheckbox(string root)
+    private static void VerifyLegacyMetadataWithoutExtraControls(string root)
     {
         foreach (string file in Directory.GetFiles(Path.Combine(root, "languages"), "cardinfo_*.txt"))
-            Assert(new DataConfig(file).dicCardflags.Count == 0, $"Bundled flag controls must be empty after removing Rush: {file}");
-        string database = Path.Combine(Path.GetTempPath(), $"dataeditor-omega-{Guid.NewGuid():N}.bytes");
+            Assert(!File.ReadAllText(file).Contains("##flags"), "Removed flag configuration must not remain in bundled languages");
+        string database = Path.Combine(Path.GetTempPath(), $"dataeditor-legacy-{Guid.NewGuid():N}.bytes");
         try
         {
-            Assert(DataBase.Create(database), "Temporary Omega database must be created");
-            Card legacy = new(42) { name = "Legacy Omega card", ot = 4, omega = [1L, 0x40100L, 0L] };
-            Assert(DataBase.Command(database, DataBase.OmegaGetInsertSQL(legacy, true)) == 2, "Temporary Omega card must be inserted");
-            var config = new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt"));
+            Assert(DataBase.Create(database), "Temporary legacy database must be created");
+            Card legacy = new(42) { name = "Legacy card", ot = 4, omega = [1L, 0x40100L, 0x11223344L], script = "-- preserved legacy script" };
+            Assert(DataBase.Command(database, DataBase.OmegaGetInsertSQL(legacy, true)) == 2, "Legacy sample must be inserted");
             using var form = new DataEditForm(root);
-            form.InitControl(config);
+            form.InitControl(new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt")));
             form.Open(database);
             form.SetCard(DataBase.Read(database, true, "").Single());
-            Assert(Control<FlowLayoutPanel>(form, "pl_flags").Controls.Count == 0, "The obsolete Rush checkbox must not be created");
+            foreach (string name in new[] { "pl_flags", "lb_flags", "tb_support", "lb_support" })
+                Assert(form.Controls.Find(name, true).Length == 0, "Removed simulator-specific control must not be constructed: " + name);
+            Control<TextBox>(form, "tb_cardname").Text = "Edited common field";
             Card edited = form.GetCard();
-            Assert(edited.omega[1] == legacy.omega[1], "Editing with no flag controls must preserve every stored Omega metadata bit");
-            Assert(DataBase.Command(database, DataBase.OmegaGetUpdateSQL(edited)) > 0, "Edited Omega card must save");
-            Assert(DataBase.Read(database, true, "").Single().omega[1] == legacy.omega[1], "Saving must retain legacy Rush and unrelated Omega flags");
-            config.dicCardflags.Add(0x40000L, "Custom metadata");
-            form.InitControl(config);
-            form.SetCard(legacy);
-            Control<FlowLayoutPanel>(form, "pl_flags").Controls.OfType<CheckBox>().Single().Checked = false;
-            Assert(form.GetCard().omega[1] == 0x100L, "Custom flag controls must edit only their own bits and preserve hidden metadata");
-            Console.WriteLine("PASS: removed Rush checkbox in every locale; Omega metadata survives edit/save and custom flag controls remain scoped.");
+            Assert(edited.omega.SequenceEqual(legacy.omega) && edited.script == legacy.script,
+                "Editing common fields must retain all hidden legacy flags, support and script data");
+            Assert(DataBase.Command(database, DataBase.OmegaGetUpdateSQL(edited)) > 0, "Edited legacy card must save");
+            Card saved = DataBase.Read(database, true, "").Single();
+            Assert(saved.name == "Edited common field" && saved.omega.SequenceEqual(legacy.omega) && saved.script == legacy.script,
+                "Saving after UI removal must retain legacy metadata while applying the common-field edit");
+            Console.WriteLine("PASS: simulator-specific controls/config are removed; legacy metadata and scripts survive common-field editing.");
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(database); }
     }

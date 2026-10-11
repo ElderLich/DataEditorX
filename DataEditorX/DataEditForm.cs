@@ -11,7 +11,6 @@ using DataEditorX.Core;
 using DataEditorX.Language;
 using System.Globalization;
 using WeifenLuo.WinFormsUI.Docking;
-using Microsoft.Data.Sqlite;
 using System.Text.RegularExpressions;
 using System.Text;
 
@@ -91,10 +90,10 @@ namespace DataEditorX
 
         Image cover;
         Label rushHelp;
+        Label rushHeading;
         Panel cardFields;
         Panel metadataColumn;
         bool arrangingMetadata;
-        bool showMetadataFlags;
         bool showRushMetadata;
         bool restoringResizeSelection;
 
@@ -104,31 +103,6 @@ namespace DataEditorX
         public DataEditForm(string datapath, string cdbfile, DataConfig datacfg = null)
         {
             Initialize(datapath);
-            if (datacfg != null && File.Exists(cdbfile) && DataBase.IsOmegaDatabase(cdbfile))
-            {
-                Dictionary<long, string> d = datacfg.dicSetnames;
-                if (!d.ContainsKey(0)) d.Add(0L, "Archetype");
-                using SqliteConnection con = new(@"Data Source=" + cdbfile);
-                con.Open();
-                using SqliteCommand cmd = con.CreateCommand();
-                using SqliteDataReader reader = cmd.ExecuteReader();
-                try
-                {
-                    while (reader.Read())
-                    {
-                        int c = reader.GetInt32(reader.GetOrdinal("officialcode"));
-                        if (c == 0)
-                            c = reader.GetInt32(reader.GetOrdinal("betacode"));
-                        string n = reader.GetString(reader.GetOrdinal("name"));
-                        if (c > 0 && d.ContainsKey(c))
-                            d[c] = n;
-                        else d.Add(c, n);
-                    }
-                }
-                catch { }
-                con.Close();
-                SqliteConnection.ClearAllPools();
-            }
             nowCdbFile = cdbfile;
         }
 
@@ -156,16 +130,21 @@ namespace DataEditorX
             InitializeComponent();
             rushHelp = new Label
             {
-                Anchor = pl_flags.Anchor,
-                Location = pl_flags.Location,
-                Size = pl_flags.Size,
+                Name = "rushHelp",
                 Padding = new Padding(4),
                 Visible = false,
                 Text = "MDPro3 Rush IDs: 120000000–129999999.\r\n" +
                        "Use Legend (0x8) and Maximum (0x8000) in Card Types.\r\n" +
                        "Keep the RD/... pack line and MAXIMUM ATK line in the description."
             };
+            rushHeading = new Label
+            {
+                Name = "lb_rushHelp", Text = "Rush Duel", Visible = false,
+                BackColor = lb_types.BackColor, Padding = new Padding(4, 0, 0, 0),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
             splitContainer.Panel2.Controls.Add(rushHelp);
+            splitContainer.Panel2.Controls.Add(rushHeading);
             InitializeMetadataLayout();
             lv_cardlist.SizeChanged += DataEditFormSizeChanged;
             DockStateChanged += (_, _) =>
@@ -411,7 +390,6 @@ namespace DataEditorX
                 InitCheckPanel(pl_cardtype, datacfg.dicCardTypes);
                 InitCheckPanel(pl_markers, datacfg.dicLinkMarkers);
                 InitCheckPanel(pl_category, datacfg.dicCardcategorys);
-                InitCheckPanel(pl_flags, datacfg.dicCardflags);
                 InitComboBox(cb_setname1, setcodes, setnames);
                 InitComboBox(cb_setname2, setcodes, setnames);
                 InitComboBox(cb_setname3, setcodes, setnames);
@@ -426,18 +404,9 @@ namespace DataEditorX
 
         void UpdateFormatControls()
         {
-            bool omega = DataBase.IsOmegaDatabase(nowCdbFile);
-            bool rush = GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH;
-            bool hasEditableFlags = omega && GetCheckMask(pl_flags) != 0;
-            bool showRushHelp = rush && !omega;
-            showMetadataFlags = hasEditableFlags;
-            showRushMetadata = showRushHelp;
-            pl_flags.Visible = hasEditableFlags;
-            lb_flags.Visible = hasEditableFlags || showRushHelp;
-            lb_flags.Text = hasEditableFlags ? "Card Flags (Omega)" : "Rush Duel";
-            tb_support.Visible = omega;
-            lb_support.Visible = omega;
-            if (rushHelp != null) rushHelp.Visible = showRushHelp;
+            showRushMetadata = GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH;
+            if (rushHelp != null) rushHelp.Visible = showRushMetadata;
+            if (rushHeading != null) rushHeading.Visible = showRushMetadata;
             ArrangeMetadata();
         }
 
@@ -447,8 +416,8 @@ namespace DataEditorX
         {
             var metadata = new HashSet<Control>
             {
-                lb_types, pl_cardtype, lb_categorys, pl_category, lb_flags,
-                pl_flags, rushHelp, lb_tiptexts, lb_scripttext, lb_edittext_hint, tb_edittext
+                lb_types, pl_cardtype, lb_categorys, pl_category, rushHeading,
+                rushHelp, lb_tiptexts, lb_scripttext, lb_edittext_hint, tb_edittext
             };
             Control[] fields = splitContainer.Panel2.Controls.Cast<Control>()
                 .Where(control => !metadata.Contains(control)).ToArray();
@@ -520,7 +489,7 @@ namespace DataEditorX
                 cardFields.SetBounds(0, 0, fieldsWidth, height);
                 metadataColumn.SetBounds(fieldsWidth + 4, 0, width, height);
                 var scrollPositions = new Dictionary<FlowLayoutPanel, Point>();
-                foreach (var flow in new[] { pl_cardtype, pl_category, pl_flags })
+                foreach (var flow in new[] { pl_cardtype, pl_category })
                 {
                     scrollPositions[flow] = flow.AutoScrollPosition;
                     flow.AutoScrollPosition = Point.Empty;
@@ -531,9 +500,7 @@ namespace DataEditorX
                 }
                 int typesWanted = MeasureCheckRows(pl_cardtype, width);
                 int genresWanted = MeasureCheckRows(pl_category, width);
-                int optionalHeight = showMetadataFlags
-                    ? Math.Clamp(MeasureCheckRows(pl_flags, width), 24, 100)
-                    : showRushMetadata ? rushHelp.GetPreferredSize(new Size(width, 0)).Height : 0;
+                int optionalHeight = showRushMetadata ? rushHelp.GetPreferredSize(new Size(width, 0)).Height : 0;
                 // Three 20px headings, one 17px heading, 8 gaps and outer padding,
                 // plus at least 48px each for the string list and selected text.
                 int fixedHeight = 203 + (optionalHeight > 0 ? optionalHeight + 26 : 0);
@@ -573,8 +540,8 @@ namespace DataEditorX
                 Place(pl_category, genresHeight);
                 if (optionalHeight > 0)
                 {
-                    Place(lb_flags, 20);
-                    Place(showMetadataFlags ? pl_flags : rushHelp, optionalHeight);
+                    Place(rushHeading, 20);
+                    Place(rushHelp, optionalHeight);
                 }
                 Place(lb_tiptexts, 20);
                 Place(lb_scripttext, stringsHeight);
@@ -920,17 +887,6 @@ namespace DataEditorX
                 SetCheck(pl_markers, 0);
             }
             SetCheck(pl_category, c.category);
-            //MDPro3-exclusive
-            if (DataBase.IsOmegaDatabase(GetOpenFile()))
-            {
-                SetCheck(pl_flags, c.omega[1]);
-                tb_support.Text = c.omega[2].ToString("x");
-            }
-            else
-            {
-                SetCheck(pl_flags, 0);
-                tb_support.Text = "0";
-            }
             //Pendulum
             tb_pleft.Text = ((c.level >> 24) & 0xff).ToString();
             tb_pright.Text = ((c.level >> 16) & 0xff).ToString();
@@ -1046,14 +1002,14 @@ namespace DataEditorX
             c.type = GetCheck(pl_cardtype) | (oldCard.type & ~GetCheckMask(pl_cardtype));
             c.category = GetCheck(pl_category) | (oldCard.category & ~GetCheckMask(pl_category));
 
-            c.omega = new long[5];
-            if (DataBase.IsOmegaDatabase(GetOpenFile())) {
+            // Legacy file metadata has no editing controls. Carry it through
+            // unchanged rather than clearing it when common card fields are saved.
+            c.omega = oldCard.omega == null ? new long[3] : (long[])oldCard.omega.Clone();
+            if (DataBase.IsOmegaDatabase(GetOpenFile()))
+            {
                 c.script = oldCard.script;
                 c.omega[0] = 1L;
-                // Only exposed controls may change flags; preserve all other stored metadata.
-                c.omega[1] = GetCheck(pl_flags) | ((oldCard.omega?[1] ?? 0) & ~GetCheckMask(pl_flags));
-                c.SetSupport(tb_support.Text);
-            } else for (byte i = 0; i < 3; i++) c.omega[i] = 0L;
+            }
 
             _ = int.TryParse(tb_pleft.Text, out int temp);
             c.level += temp << 24;
@@ -2312,7 +2268,7 @@ namespace DataEditorX
                 if (!IsFormattedPendulumText(txt))
                 {
                     string scale = tb_pleft.Text + (tb_pleft.Text != tb_pright.Text ? "/" + tb_pright.Text : "");
-                    string pendulumText = (GetCheck(pl_flags) & 0x800000) > 0 ? "" : tmp[0];
+                    string pendulumText = tmp[0];
                     tb_cardtext.Text = PendulumScalePrefix + scale
                         + Environment.NewLine + PendulumEffectHeader
                         + Environment.NewLine + pendulumText
@@ -2476,11 +2432,6 @@ namespace DataEditorX
         private void Pl_categoryScroll(object sender, MouseEventArgs e)
         {
             ScrollCheckPanel(pl_category, e);
-        }
-
-        private void Pl_flagsScroll(object sender, MouseEventArgs e)
-        {
-            ScrollCheckPanel(pl_flags, e);
         }
 
         private static void ScrollCheckPanel(FlowLayoutPanel panel, MouseEventArgs e)

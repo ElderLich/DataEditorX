@@ -166,10 +166,6 @@ namespace DataEditorX.Config
         /// </summary>
         public const string TAG_CATEGORY = "category \\(genre\\)";
         /// <summary>
-        /// Omega-exclusive
-        /// </summary>
-        public const string TAG_FLAGS = "flags \\(category\\)";
-        /// <summary>
         /// Types
         /// </summary>
         public const string TAG_TYPE = "type";

@@ -35,7 +35,6 @@ namespace DataEditorX.Config
                 dicCardTypes = new Dictionary<long, string>();
                 dicLinkMarkers = new Dictionary<long, string>();
                 dicCardcategorys = new Dictionary<long, string>();
-                dicCardflags = new Dictionary<long, string>();
                 dicCardAttributes = new Dictionary<long, string>();
                 dicCardRaces = new Dictionary<long, string>();
                 dicCardLevels = new Dictionary<long, string>();
@@ -48,7 +47,6 @@ namespace DataEditorX.Config
             dicCardTypes = DataManager.Read(text, DEXConfig.TAG_TYPE);
             dicLinkMarkers = DataManager.Read(text, DEXConfig.TAG_MARKER);
             dicCardcategorys = DataManager.Read(text, DEXConfig.TAG_CATEGORY);
-            dicCardflags = DataManager.Read(text, DEXConfig.TAG_FLAGS);
             dicCardAttributes = DataManager.Read(text, DEXConfig.TAG_ATTRIBUTE);
             dicCardRaces = DataManager.Read(text, DEXConfig.TAG_RACE);
             dicCardLevels = DataManager.Read(text, DEXConfig.TAG_LEVEL);
@@ -86,9 +84,5 @@ namespace DataEditorX.Config
         /// Effect categories
         /// </summary>
         public Dictionary<long, string> dicCardcategorys = null;
-        /// <summary>
-        /// Omega-exclusive
-        /// </summary>
-        public Dictionary<long, string> dicCardflags = null;
     }
 }

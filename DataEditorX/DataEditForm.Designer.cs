@@ -111,15 +111,11 @@ namespace DataEditorX
             lv_cardlist = new DListView();
             ch_cardcode = new ColumnHeader();
             ch_cardname = new ColumnHeader();
-            tb_support = new TextBox();
             pl_markers = new DFlowLayoutPanel();
             pl_cardtype = new DFlowLayoutPanel();
-            pl_flags = new DFlowLayoutPanel();
             pl_category = new DFlowLayoutPanel();
             lb_scripttext = new DListBox();
-            lb_flags = new Label();
             lb_name = new Label();
-            lb_support = new Label();
             mainMenu.SuspendLayout();
             pl_bottom.SuspendLayout();
             pl_main.SuspendLayout();
@@ -886,14 +882,12 @@ namespace DataEditorX
             // 
             // splitContainer.Panel2
             // 
-            splitContainer.Panel2.Controls.Add(tb_support);
             splitContainer.Panel2.Controls.Add(pl_markers);
             splitContainer.Panel2.Controls.Add(pl_cardtype);
             splitContainer.Panel2.Controls.Add(tb_cardtext);
             splitContainer.Panel2.Controls.Add(tb_cardname);
             splitContainer.Panel2.Controls.Add(lb_tiptexts);
             splitContainer.Panel2.Controls.Add(cb_cardrule);
-            splitContainer.Panel2.Controls.Add(pl_flags);
             splitContainer.Panel2.Controls.Add(pl_category);
             splitContainer.Panel2.Controls.Add(cb_setname4);
             splitContainer.Panel2.Controls.Add(lb_edittext_hint);
@@ -903,7 +897,6 @@ namespace DataEditorX
             splitContainer.Panel2.Controls.Add(cb_setname2);
             splitContainer.Panel2.Controls.Add(lb_scripttext);
             splitContainer.Panel2.Controls.Add(cb_setname1);
-            splitContainer.Panel2.Controls.Add(lb_flags);
             splitContainer.Panel2.Controls.Add(lb_categorys);
             splitContainer.Panel2.Controls.Add(cb_cardlevel);
             splitContainer.Panel2.Controls.Add(cb_setname3);
@@ -922,7 +915,6 @@ namespace DataEditorX
             splitContainer.Panel2.Controls.Add(lb_cardcode);
             splitContainer.Panel2.Controls.Add(lb_pleft_right);
             splitContainer.Panel2.Controls.Add(lb_name);
-            splitContainer.Panel2.Controls.Add(lb_support);
             splitContainer.Panel2.Controls.Add(lb_cardalias);
             splitContainer.Panel2.Controls.Add(lb2);
             splitContainer.Panel2.Controls.Add(pl_image);
@@ -962,18 +954,6 @@ namespace DataEditorX
             ch_cardname.Text = "Card Name";
             ch_cardname.Width = 1294;
             // 
-            // tb_support
-            // 
-            tb_support.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            tb_support.Location = new Point(195, 260);
-            tb_support.MaxLength = 20;
-            tb_support.Name = "tb_support";
-            tb_support.Size = new Size(81, 21);
-            tb_support.TabIndex = 114;
-            tb_support.Text = "0";
-            tb_support.TextAlign = HorizontalAlignment.Right;
-            tb_support.TextChanged += Tb_setcode4_TextChanged;
-            // 
             // pl_markers
             // 
             pl_markers.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -999,20 +979,6 @@ namespace DataEditorX
             pl_cardtype.Size = new Size(301, 120);
             pl_cardtype.TabIndex = 12;
             pl_cardtype.Leave += TextToPendulum;
-            // 
-            // pl_flags
-            // 
-            pl_flags.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            pl_flags.AutoScroll = true;
-            pl_flags.Font = new Font("SimSun", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            pl_flags.Location = new Point(348, 300);
-            pl_flags.Margin = new Padding(1, 2, 1, 2);
-            pl_flags.MaximumSize = new Size(360, 175);
-            pl_flags.Name = "pl_flags";
-            pl_flags.Padding = new Padding(2);
-            pl_flags.Size = new Size(301, 105);
-            pl_flags.TabIndex = 13;
-            pl_flags.MouseWheel += Pl_flagsScroll;
             // 
             // pl_category
             // 
@@ -1043,19 +1009,6 @@ namespace DataEditorX
             lb_scripttext.TabIndex = 6;
             lb_scripttext.SelectedIndexChanged += Lb_scripttextSelectedIndexChanged;
             // 
-            // lb_flags
-            // 
-            lb_flags.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            lb_flags.BackColor = Color.FromArgb(192, 192, 255);
-            lb_flags.Location = new Point(348, 277);
-            lb_flags.Margin = new Padding(3, 3, 3, 0);
-            lb_flags.Name = "lb_flags";
-            lb_flags.Padding = new Padding(4, 0, 0, 0);
-            lb_flags.Size = new Size(303, 20);
-            lb_flags.TabIndex = 11;
-            lb_flags.Text = "Card Flags";
-            lb_flags.TextAlign = ContentAlignment.MiddleLeft;
-            // 
             // lb_name
             // 
             lb_name.AutoSize = true;
@@ -1065,16 +1018,6 @@ namespace DataEditorX
             lb_name.Size = new Size(29, 12);
             lb_name.TabIndex = 7;
             lb_name.Text = "Name";
-            // 
-            // lb_support
-            // 
-            lb_support.AutoSize = true;
-            lb_support.Location = new Point(195, 245);
-            lb_support.Margin = new Padding(3);
-            lb_support.Name = "lb_support";
-            lb_support.Size = new Size(47, 12);
-            lb_support.TabIndex = 7;
-            lb_support.Text = "Support";
             // 
             // DataEditForm
             // 
@@ -1128,7 +1071,6 @@ namespace DataEditorX
         private System.Windows.Forms.Label lb_categorys;
         private System.Windows.Forms.Label lb_types;
         private DFlowLayoutPanel pl_category;
-        private DFlowLayoutPanel pl_flags;
         private DFlowLayoutPanel pl_cardtype;
         private System.Windows.Forms.Button btn_serach;
         private System.Windows.Forms.Button btn_reset;
@@ -1190,9 +1132,6 @@ namespace DataEditorX
         private System.Windows.Forms.ToolStripMenuItem menuitem_default_script;
         private System.Windows.Forms.SplitContainer splitContainer;
         private DFlowLayoutPanel pl_markers;
-        private System.Windows.Forms.Label lb_flags;
-        private System.Windows.Forms.TextBox tb_support;
-        private System.Windows.Forms.Label lb_support;
         private System.Windows.Forms.Label lb_name;
         private ToolStripMenuItem menuitem_addarchetype;
         private ToolStripMenuItem menuitem_addcounter;
