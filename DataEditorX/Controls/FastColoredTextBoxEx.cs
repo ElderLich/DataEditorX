@@ -1,190 +1,141 @@
-/*
- * Created with SharpDevelop.
- * User: Acer
- * Date: 2014-10-24
- * Time: 7:19
- * 
- */
-
 namespace FastColoredTextBoxNS
 {
     public class FastColoredTextBoxEx : FastColoredTextBox
     {
         public Label lbTooltip;
-        private Label lbSizeController;
+        private Panel tooltipPanel;
         Point lastMouseCoord;
+
         public FastColoredTextBoxEx() : base()
         {
             SyntaxHighlighter = new MySyntaxHighlighter(this);
-            TextChanged += FctbTextChanged;
-            ToolTipDelay = 1;
-            DelayedEventsInterval = 1;
-            DelayedTextChangedInterval = 1;
-            Selection.ColumnSelectionMode = true;
-            InitializeComponent();
+            // Folding walks the whole document; wait until typing pauses.
+            TextChangedDelayed += FctbTextChanged;
+            TextChanged += (_, _) => HideTooltip();
+            ToolTipDelay = 350;
+            DelayedEventsInterval = 150;
+            DelayedTextChangedInterval = 250;
+            InitializeTooltip();
         }
+
         public new event EventHandler<ToolTipNeededEventArgs> ToolTipNeeded;
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
             lastMouseCoord = e.Location;
         }
-        //Function hover tooltip
+
         protected override void OnToolTip()
         {
-            if (ToolTip == null)
-            {
-                return;
-            }
-
-            if (ToolTipNeeded == null)
-            {
-                return;
-            }
-
-            //get place under mouse
+            if (ToolTip == null || ToolTipNeeded == null) return;
             Place place = PointToPlace(lastMouseCoord);
-
-            //check distance
             Point p = PlaceToPoint(place);
             if (Math.Abs(p.X - lastMouseCoord.X) > CharWidth * 2 ||
                 Math.Abs(p.Y - lastMouseCoord.Y) > CharHeight * 2)
             {
+                HideTooltip();
                 return;
             }
-            //get word under mouse
-            var r = new Range(this, place, place);
-            string hoveredWord = r.GetFragment("[a-zA-Z0-9_]").Text;
-            //event handler
-            var ea = new ToolTipNeededEventArgs(place, hoveredWord);
-            ToolTipNeeded(this, ea);
+            var range = new Range(this, place, place);
+            string hoveredWord = range.GetFragment("[a-zA-Z0-9_]").Text;
+            var args = new ToolTipNeededEventArgs(place, hoveredWord);
+            ToolTipNeeded(this, args);
+            if (!string.IsNullOrWhiteSpace(args.ToolTipText))
+                ShowTooltipWithLabel(args.ToolTipTitle, args.ToolTipText);
+            else
+                HideTooltip();
+        }
 
-            if (ea.ToolTipText != null)
-            {
-                ShowTooltipWithLabel(ea.ToolTipTitle, ea.ToolTipText);
-            }
-        }
         public void ShowTooltipWithLabel(AutocompleteItem item)
-        {
-            ShowTooltipWithLabel(item.ToolTipTitle, item.ToolTipText);
-        }
-        public void ShowTooltipWithLabel(string title, string text, int height)
-        {
-            lbTooltip.Visible = true;
-            lbTooltip.Text = $"{title}\r\n\r\n{text}";
-            lbTooltip.Location = new Point(Size.Width - 500, height);
-        }
+            => ShowTooltipWithLabel(item.ToolTipTitle, item.ToolTipText);
 
         public void ShowTooltipWithLabel(string title, string text)
+            => ShowTooltipWithLabel(title, text, lastMouseCoord.Y + CharHeight);
+
+        public void ShowTooltipWithLabel(string title, string text, int height)
         {
-            ShowTooltipWithLabel(title, text, lastMouseCoord.Y + CharHeight);
+            if (string.IsNullOrWhiteSpace(title) && string.IsNullOrWhiteSpace(text))
+            {
+                HideTooltip();
+                return;
+            }
+            int width = Math.Max(1, Math.Min(520, ClientSize.Width - 16));
+            int maxHeight = Math.Max(1, Math.Min(320, ClientSize.Height - 16));
+            tooltipPanel.AutoScrollPosition = Point.Empty;
+            lbTooltip.MaximumSize = new Size(Math.Max(1, width - SystemInformation.VerticalScrollBarWidth - 16), 0);
+            lbTooltip.Text = $"{title}\r\n\r\n{text}";
+            tooltipPanel.BackColor = lbTooltip.BackColor;
+            tooltipPanel.Size = new Size(width, Math.Min(maxHeight, lbTooltip.PreferredHeight + 16));
+            int y = height + tooltipPanel.Height <= ClientSize.Height - 8
+                ? height : height - tooltipPanel.Height - CharHeight;
+            tooltipPanel.Location = new Point(Math.Max(0, ClientSize.Width - width - 8),
+                Math.Clamp(y, 0, Math.Max(0, ClientSize.Height - tooltipPanel.Height)));
+            tooltipPanel.Visible = true;
+            tooltipPanel.BringToFront();
         }
 
-        //Highlight the current word
+        public void HideTooltip()
+        {
+            if (tooltipPanel != null) tooltipPanel.Visible = false;
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape) HideTooltip();
+            base.OnKeyDown(e);
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            if (tooltipPanel != null && !tooltipPanel.RectangleToScreen(tooltipPanel.ClientRectangle).Contains(Cursor.Position))
+                HideTooltip();
+            base.OnMouseLeave(e);
+        }
+
         void FctbTextChanged(object sender, TextChangedEventArgs e)
         {
-            //delete all markers
             Range.ClearFoldingMarkers();
-
-            var currentIndent = 0;
-            var lastNonEmptyLine = 0;
-
+            int currentIndent = 0;
+            int lastNonEmptyLine = 0;
             for (int i = 0; i < LinesCount; i++)
             {
                 var line = this[i];
-                var spacesCount = line.StartSpacesCount;
-                if (spacesCount == line.Count) //empty line
-                {
-                    continue;
-                }
-
+                int spacesCount = line.StartSpacesCount;
+                if (spacesCount == line.Count) continue;
                 if (currentIndent < spacesCount)
-                {
-                    //append start folding marker
                     this[lastNonEmptyLine].FoldingStartMarker = "m" + currentIndent;
-                }
                 else if (currentIndent > spacesCount)
-                {
-                    //append end folding marker
                     this[lastNonEmptyLine].FoldingEndMarker = "m" + spacesCount;
-                }
-
                 currentIndent = spacesCount;
                 lastNonEmptyLine = i;
             }
         }
 
-        private void InitializeComponent()
+        private void InitializeTooltip()
         {
-            lbTooltip = new System.Windows.Forms.Label();
-            lbSizeController = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)this).BeginInit();
-            SuspendLayout();
-            // 
-            // lbTooltip
-            // 
-            lbTooltip.AutoSize = true;
-            lbTooltip.BackColor = SystemColors.Desktop;
-            lbTooltip.Font = new System.Drawing.Font("微软雅黑", 15.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            lbTooltip.ForeColor = SystemColors.Control;
-            lbTooltip.Location = new System.Drawing.Point(221, 117);
-            lbTooltip.MaximumSize = new System.Drawing.Size(480, 0);
-            lbTooltip.Name = "lbTooltip";
-            lbTooltip.Size = new System.Drawing.Size(0, 28);
-            lbTooltip.TabIndex = 1;
-            lbTooltip.MouseMove += new System.Windows.Forms.MouseEventHandler(lbTooltip_MouseMove);
-            // 
-            // lbSizeController
-            // 
-            lbSizeController.AutoSize = true;
-            lbSizeController.BackColor = Color.Transparent;
-            lbSizeController.ForeColor = Color.Transparent;
-            lbSizeController.Location = new System.Drawing.Point(179, 293);
-            lbSizeController.Name = "lbSizeController";
-            lbSizeController.Size = new System.Drawing.Size(136, 16);
-            lbSizeController.TabIndex = 2;
-            lbSizeController.Text = "lbSizeController";
-            // 
-            // FastColoredTextBoxEx
-            // 
-            AutoScrollMinSize = new System.Drawing.Size(27, 14);
-            BackColor = SystemColors.Control;
-            Controls.Add(lbSizeController);
-            Controls.Add(lbTooltip);
-            Name = "FastColoredTextBoxEx";
-            Size = new System.Drawing.Size(584, 327);
-            Load += new System.EventHandler(FastColoredTextBoxEx_Load);
-            Scroll += new System.Windows.Forms.ScrollEventHandler(FastColoredTextBoxEx_Scroll);
-            SizeChanged += new System.EventHandler(FastColoredTextBoxEx_SizeChanged);
-            ((System.ComponentModel.ISupportInitialize)this).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
-
-        }
-
-        private void FastColoredTextBoxEx_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void lbTooltip_MouseMove(object sender, MouseEventArgs e)
-        {
-            lbTooltip.Visible = false;
-        }
-        private void ResizeWindow()
-        {
-            lbSizeController.Location = new Point(0, Height);
-            lbSizeController.Text = "\r\n\r\n";
-        }
-        private void FastColoredTextBoxEx_SizeChanged(object sender, EventArgs e)
-        {
-            lbTooltip.Visible = false;
-            ResizeWindow();
-        }
-
-        private void FastColoredTextBoxEx_Scroll(object sender, ScrollEventArgs e)
-        {
-            ResizeWindow();
+            lbTooltip = new Label
+            {
+                AutoSize = true,
+                BackColor = SystemColors.Info,
+                ForeColor = SystemColors.InfoText,
+                Font = SystemFonts.MessageBoxFont,
+                Location = new Point(6, 6),
+                MaximumSize = new Size(480, 0),
+                Name = "lbTooltip"
+            };
+            tooltipPanel = new Panel
+            {
+                AutoScroll = true,
+                BorderStyle = BorderStyle.FixedSingle,
+                Visible = false,
+                Name = "functionHelp",
+                Padding = new Padding(6)
+            };
+            tooltipPanel.Controls.Add(lbTooltip);
+            Controls.Add(tooltipPanel);
+            SizeChanged += (_, _) => HideTooltip();
+            Scroll += (_, _) => HideTooltip();
         }
     }
 }

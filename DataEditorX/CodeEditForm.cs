@@ -129,20 +129,19 @@ namespace DataEditorX
         }
         private void AdjustPopupMenuSize()
         {
-            if (!popupMenu.Visible || popupMenu.Items.FocussedItem == null)
+            int availableWidth = Math.Max(120, Math.Min(fctb.ClientSize.Width,
+                Screen.FromControl(fctb).WorkingArea.Width - 32));
+            int desiredWidth = 300;
+            if (popupMenu.Visible && popupMenu.Items.FocussedItem != null)
             {
-                popupMenu.Size = new Size(300, 0);
-                popupMenu.MinimumSize = new Size(300, 0);
-                return;
+                desiredWidth = Math.Max(desiredWidth, TextRenderer.MeasureText(
+                    popupMenu.Items.FocussedItem.ToolTipTitle, popupMenu.Items.Font,
+                    Size.Empty, TextFormatFlags.NoPadding).Width + 50);
             }
-            Size s = TextRenderer.MeasureText(popupMenu.Items.FocussedItem.ToolTipTitle,
-                popupMenu.Items.Font, new Size(0, 0), TextFormatFlags.NoPadding);
-            s = new Size(s.Width + 50, popupMenu.Size.Height);
-            if (popupMenu.Size.Width < s.Width)
-            {
-                popupMenu.Size = s;
-                popupMenu.MinimumSize = s;
-            }
+            int width = Math.Min(availableWidth, desiredWidth);
+            popupMenu.MinimumSize = new Size(width, 0);
+            popupMenu.MaximumSize = new Size(availableWidth, 0);
+            popupMenu.Size = new Size(width, popupMenu.Height);
         }
         private void Items_FocussedItemIndexChanged(object sender, EventArgs e)
         {
@@ -157,6 +156,7 @@ namespace DataEditorX
 
         void PopupMenu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
         {
+            fctb.HideTooltip();
             popupMenu.Items.SetAutocompleteItems(items);
         }
         #endregion

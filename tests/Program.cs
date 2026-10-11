@@ -46,6 +46,13 @@ internal static class Program
             Card[] rushMatches = DataBase.Read(db, true, DataBase.GetSelectSQL(new Card(0) { ot = 0x100 }));
             Assert(rushMatches.Length == 2 && rushMatches.All(c => c.IsRushDuelCard), "Rush searches must use the ID range, including upstream OT=4 cards");
             Console.WriteLine("PASS: Rush selector, metadata round-trip and ID-range filtering.");
+            using var editor = new FastColoredTextBoxNS.FastColoredTextBoxEx { Size = new System.Drawing.Size(280, 160) };
+            editor.ShowTooltipWithLabel("Card.IsRace", string.Join("\n", Enumerable.Repeat("Function details and an example.", 40)), 150);
+            var help = editor.Controls["functionHelp"]!;
+            Assert(editor.ClientRectangle.Contains(help.Bounds), "Function help must stay inside a narrow editor viewport");
+            Assert(((Panel)help).AutoScroll && editor.lbTooltip.Height > help.Height, "Long function help must remain scrollable");
+            Assert(!editor.Selection.ColumnSelectionMode, "Normal text selection must be the default");
+            Console.WriteLine("PASS: bounded scrollable code help and normal text selection.");
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
