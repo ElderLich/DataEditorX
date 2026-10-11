@@ -87,7 +87,7 @@ internal static class Program
             host.ClientSize = new System.Drawing.Size(scenario.Item2, scenario.Item3);
             Application.DoEvents();
             ThemeManager.ApplyControlTree(host, ThemeManager.GetPalette(ThemeManager.ProfilePaper));
-            VerifyLinkMarkerLabel(form, scenario.Item1);
+            VerifyCardLabels(form, scenario.Item1);
             var column = Control<Panel>(form, "metadataColumn");
             var genres = Control<FlowLayoutPanel>(form, "pl_category");
             var hostView = host.RectangleToScreen(host.ClientRectangle);
@@ -192,7 +192,7 @@ internal static class Program
                 "Layout wrappers must preserve existing localized field keys");
             Assert(Control<Label>(form, "lb_tiptexts").Text == (language == "chinese" ? "脚本提示文字" : "Strings"),
                 "String-list localization must survive reparenting");
-            VerifyLinkMarkerLabel(form, language);
+            VerifyCardLabels(form, language);
             var markerLabel = Control<Label>(form, "lb_markers");
             Console.WriteLine($"MARKER {language}: text={TextRenderer.MeasureText(markerLabel.Text, markerLabel.Font)}; available={markerLabel.ClientSize}");
             if (!string.IsNullOrEmpty(output))
@@ -221,7 +221,7 @@ internal static class Program
                 { name = "Layout check", type = scenario.Item4 ? 0x8029 : 0x21, category = 0x800000001L });
             Application.DoEvents();
             form.PerformLayout();
-            VerifyLinkMarkerLabel(form, scenario.Item1);
+            VerifyCardLabels(form, scenario.Item1);
             Assert(split.Panel2.ClientRectangle.Contains(column.Bounds), scenario.Item1 + ": metadata column must fit its pane");
             Assert(fields.Right < column.Left, scenario.Item1 + ": field and metadata columns must not overlap");
             Assert(types.Controls.Cast<System.Windows.Forms.Control>().SequenceEqual(originalCheckboxes),
@@ -285,7 +285,7 @@ internal static class Program
         Console.WriteLine("PASS: responsive layout, scrolling, splitter changes and legacy localization work across nine size/format scenarios.");
     }
 
-    private static void VerifyLinkMarkerLabel(DataEditForm form, string scenario)
+    private static void VerifyCardLabels(DataEditForm form, string scenario)
     {
         var label = Control<Label>(form, "lb_markers");
         var markers = Control<FlowLayoutPanel>(form, "pl_markers");
@@ -297,6 +297,19 @@ internal static class Program
             scenario + ": Link Markers must be centered beside its checkbox grid");
         Assert(!label.Bounds.IntersectsWith(Control<Label>(form, "lb_cardalias").Bounds),
             scenario + ": Link Markers must not overlap the Alias row");
+        foreach (string field in new[] { "cardalias", "cardcode" })
+        {
+            var fieldLabel = Control<Label>(form, "lb_" + field);
+            var input = Control<TextBox>(form, "tb_" + field);
+            var fieldText = TextRenderer.MeasureText(fieldLabel.Text, fieldLabel.Font);
+            Assert(fieldText.Width <= fieldLabel.Width && fieldText.Height <= fieldLabel.Height,
+                scenario + ": " + fieldLabel.Text + " must fit on one line");
+            Assert(fieldLabel.Right + 4 == input.Left && fieldLabel.Top == input.Top && fieldLabel.Height == input.Height,
+                scenario + ": card identifier labels must align with their inputs with a consistent gap");
+            Assert(!fieldLabel.Bounds.IntersectsWith(Control<Panel>(form, "pl_image").Bounds)
+                && !fieldLabel.Bounds.IntersectsWith(markers.Bounds),
+                scenario + ": card identifier labels must not overlap the cover or marker grid");
+        }
     }
 
     private static void VerifyCardTypeCoverage(string root)

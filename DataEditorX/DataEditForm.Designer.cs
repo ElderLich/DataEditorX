@@ -587,12 +587,12 @@ namespace DataEditorX
             // lb_cardalias
             // 
             lb_cardalias.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            lb_cardalias.AutoSize = true;
-            lb_cardalias.Location = new Point(212, 311);
+            lb_cardalias.Location = new Point(192, 306);
             lb_cardalias.Name = "lb_cardalias";
-            lb_cardalias.Size = new Size(65, 12);
+            lb_cardalias.Size = new Size(81, 21);
             lb_cardalias.TabIndex = 7;
             lb_cardalias.Text = "Alias Card";
+            lb_cardalias.TextAlign = ContentAlignment.MiddleRight;
             // 
             // tb_cardalias
             // 
@@ -806,12 +806,12 @@ namespace DataEditorX
             // lb_cardcode
             // 
             lb_cardcode.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            lb_cardcode.AutoSize = true;
-            lb_cardcode.Location = new Point(212, 335);
+            lb_cardcode.Location = new Point(192, 330);
             lb_cardcode.Name = "lb_cardcode";
-            lb_cardcode.Size = new Size(59, 12);
+            lb_cardcode.Size = new Size(81, 21);
             lb_cardcode.TabIndex = 7;
             lb_cardcode.Text = "Card Code";
+            lb_cardcode.TextAlign = ContentAlignment.MiddleRight;
             // 
             // lb_markers
             // 
