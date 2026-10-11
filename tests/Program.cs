@@ -87,6 +87,7 @@ internal static class Program
             host.ClientSize = new System.Drawing.Size(scenario.Item2, scenario.Item3);
             Application.DoEvents();
             ThemeManager.ApplyControlTree(host, ThemeManager.GetPalette(ThemeManager.ProfilePaper));
+            VerifyLinkMarkerLabel(form, scenario.Item1);
             var column = Control<Panel>(form, "metadataColumn");
             var genres = Control<FlowLayoutPanel>(form, "pl_category");
             var hostView = host.RectangleToScreen(host.ClientRectangle);
@@ -179,6 +180,8 @@ internal static class Program
         var config = new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt"));
         form.InitControl(config);
         form.Show();
+        ThemeManager.ApplyControlTree(form, ThemeManager.GetPalette(ThemeManager.ProfilePaper));
+        string output = Environment.GetEnvironmentVariable("DATAEDITORX_LAYOUT_PREVIEW_DIR");
         foreach (string language in new[] { "chinese", "english" })
         {
             DataEditorX.Language.LanguageHelper.LoadFormLabels(Path.Combine(root, $"languages/language_{language}.txt"));
@@ -189,8 +192,17 @@ internal static class Program
                 "Layout wrappers must preserve existing localized field keys");
             Assert(Control<Label>(form, "lb_tiptexts").Text == (language == "chinese" ? "脚本提示文字" : "Strings"),
                 "String-list localization must survive reparenting");
+            VerifyLinkMarkerLabel(form, language);
+            var markerLabel = Control<Label>(form, "lb_markers");
+            Console.WriteLine($"MARKER {language}: text={TextRenderer.MeasureText(markerLabel.Text, markerLabel.Font)}; available={markerLabel.ClientSize}");
+            if (!string.IsNullOrEmpty(output))
+            {
+                Directory.CreateDirectory(output);
+                using var bitmap = new System.Drawing.Bitmap(form.Width, form.Height);
+                form.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, form.Width, form.Height));
+                bitmap.Save(Path.Combine(output, "Labels-" + language + ".png"));
+            }
         }
-        ThemeManager.ApplyControlTree(form, ThemeManager.GetPalette(ThemeManager.ProfilePaper));
         Application.DoEvents();
         var split = Control<SplitContainer>(form, "splitContainer");
         var column = Control<Panel>(form, "metadataColumn");
@@ -198,7 +210,6 @@ internal static class Program
         var types = Control<FlowLayoutPanel>(form, "pl_cardtype");
         var genres = Control<FlowLayoutPanel>(form, "pl_category");
         var originalCheckboxes = types.Controls.Cast<System.Windows.Forms.Control>().ToArray();
-        string output = Environment.GetEnvironmentVariable("DATAEDITORX_LAYOUT_PREVIEW_DIR");
         foreach (var scenario in new[] {
             ("Default", 991, 617, false), ("Narrow", 991, 601, false),
             ("Tall", 991, 900, false), ("Wide", 1400, 750, false),
@@ -210,6 +221,7 @@ internal static class Program
                 { name = "Layout check", type = scenario.Item4 ? 0x8029 : 0x21, category = 0x800000001L });
             Application.DoEvents();
             form.PerformLayout();
+            VerifyLinkMarkerLabel(form, scenario.Item1);
             Assert(split.Panel2.ClientRectangle.Contains(column.Bounds), scenario.Item1 + ": metadata column must fit its pane");
             Assert(fields.Right < column.Left, scenario.Item1 + ": field and metadata columns must not overlap");
             Assert(types.Controls.Cast<System.Windows.Forms.Control>().SequenceEqual(originalCheckboxes),
@@ -271,6 +283,20 @@ internal static class Program
                 "Expanded splitter view must fit every checkbox and its label");
         form.Close();
         Console.WriteLine("PASS: responsive layout, scrolling, splitter changes and legacy localization work across nine size/format scenarios.");
+    }
+
+    private static void VerifyLinkMarkerLabel(DataEditForm form, string scenario)
+    {
+        var label = Control<Label>(form, "lb_markers");
+        var markers = Control<FlowLayoutPanel>(form, "pl_markers");
+        var text = TextRenderer.MeasureText(label.Text, label.Font);
+        Assert(text.Width <= label.ClientSize.Width - label.Padding.Horizontal
+            && text.Height <= label.ClientSize.Height - label.Padding.Vertical,
+            scenario + ": Link Markers must fit on one line without clipping");
+        Assert(label.Right < markers.Left && Math.Abs(label.Top + label.Height / 2 - markers.Top - markers.Height / 2) <= 1,
+            scenario + ": Link Markers must be centered beside its checkbox grid");
+        Assert(!label.Bounds.IntersectsWith(Control<Label>(form, "lb_cardalias").Bounds),
+            scenario + ": Link Markers must not overlap the Alias row");
     }
 
     private static void VerifyCardTypeCoverage(string root)

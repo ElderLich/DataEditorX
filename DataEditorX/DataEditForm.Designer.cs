@@ -817,14 +817,13 @@ namespace DataEditorX
             // 
             lb_markers.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lb_markers.BackColor = Color.FromArgb(192, 192, 255);
-            lb_markers.Location = new Point(203, 285);
+            lb_markers.Location = new Point(192, 264);
             lb_markers.Margin = new Padding(3, 3, 3, 0);
             lb_markers.Name = "lb_markers";
-            lb_markers.Padding = new Padding(4, 0, 0, 0);
-            lb_markers.Size = new Size(81, 21);
+            lb_markers.Size = new Size(89, 20);
             lb_markers.TabIndex = 19;
             lb_markers.Text = "Link Markers";
-            lb_markers.TextAlign = ContentAlignment.MiddleLeft;
+            lb_markers.TextAlign = ContentAlignment.MiddleRight;
             // 
             // tb_link
             // 
