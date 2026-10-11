@@ -586,31 +586,6 @@ namespace DataEditorX
             return number;
         }
 
-        static long GetDatabaseFlags(long flags)
-        {
-            return flags & ~SpecialCardsJsonService.AllFrameFlags;
-        }
-
-        private long GetSelectedFrameFlags()
-        {
-            return GetCheck(pl_flags) & SpecialCardsJsonService.AllFrameFlags;
-        }
-
-        private long GetSavedFrameFlags(uint cardId, bool warn)
-        {
-            if (!SpecialCardsJsonService.TryGetFrameFlags(cardId, out long flags, out string message))
-            {
-                if (warn)
-                {
-                    MyMsg.Warning(message);
-                }
-
-                return 0;
-            }
-
-            return flags;
-        }
-
         private void UpdateCardListPaging()
         {
             cardcount = cardlist.Count;
@@ -737,16 +712,15 @@ namespace DataEditorX
                 SetCheck(pl_markers, 0);
             }
             SetCheck(pl_category, c.category);
-            long savedFrameFlags = GetSavedFrameFlags(c.id, false);
             //MDPro3-exclusive
             if (DataBase.IsOmegaDatabase(GetOpenFile()))
             {
-                SetCheck(pl_flags, GetDatabaseFlags(c.omega[1]) | savedFrameFlags);
+                SetCheck(pl_flags, c.omega[1]);
                 tb_support.Text = c.omega[2].ToString("x");
             }
             else
             {
-                SetCheck(pl_flags, savedFrameFlags);
+                SetCheck(pl_flags, 0);
                 tb_support.Text = "0";
             }
             //Pendulum
@@ -866,7 +840,7 @@ namespace DataEditorX
             if (DataBase.IsOmegaDatabase(GetOpenFile())) {
                 c.script = oldCard.script;
                 c.omega[0] = 1L;
-                c.omega[1] = GetDatabaseFlags(GetCheck(pl_flags));
+                c.omega[1] = GetCheck(pl_flags) | ((oldCard.omega?[1] ?? 0) & ~0x100L);
                 c.SetSupport(tb_support.Text);
             } else for (byte i = 0; i < 3; i++) c.omega[i] = 0L;
 
@@ -1115,15 +1089,7 @@ namespace DataEditorX
         {
             if (cardedit != null)
             {
-                Card card = GetCard();
-                long frameFlags = GetSelectedFrameFlags();
-                if (cmdManager.ExcuteCommand(cardedit.addCard))
-                {
-                    if (SyncSpecialCardFrameFlags(card.id, 0, frameFlags))
-                    {
-                        SetCard(card);
-                    }
-                }
+                cmdManager.ExcuteCommand(cardedit.addCard);
             }
         }
         //Modify
@@ -1131,31 +1097,7 @@ namespace DataEditorX
         {
             if (cardedit != null)
             {
-                Card card = GetCard();
-                uint previousId = GetOldCard().id;
-                long frameFlags = GetSelectedFrameFlags();
-                if (card.Equals(GetOldCard()))
-                {
-                    long savedFrameFlags = GetSavedFrameFlags(previousId, true);
-                    if (frameFlags != savedFrameFlags)
-                    {
-                        if (SyncSpecialCardFrameFlags(card.id, previousId, frameFlags))
-                        {
-                            MyMsg.Show("SpecialCards.json updated.");
-                            SetCard(card);
-                        }
-
-                        return;
-                    }
-                }
-
-                if (cmdManager.ExcuteCommand(cardedit.modCard, menuitem_operacardsfile.Checked))
-                {
-                    if (SyncSpecialCardFrameFlags(card.id, previousId, frameFlags))
-                    {
-                        SetCard(card);
-                    }
-                }
+                cmdManager.ExcuteCommand(cardedit.modCard, menuitem_operacardsfile.Checked);
             }
         }
         //Open script
@@ -1186,17 +1128,6 @@ namespace DataEditorX
                 cmdManager.Undo();
                 Search(true);
             }
-        }
-
-        private bool SyncSpecialCardFrameFlags(uint cardId, uint previousId, long frameFlags)
-        {
-            if (!SpecialCardsJsonService.Sync(cardId, previousId, frameFlags, out string message))
-            {
-                MyMsg.Warning(message);
-                return false;
-            }
-
-            return true;
         }
 
         //Import card art

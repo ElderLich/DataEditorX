@@ -15,7 +15,6 @@ Install the [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/en-us/download
 * Switch between light, dark, and custom theme profiles from `View -> Theme`; theme choices are saved.
 * Manage MDPro3 custom card projects from `Workspace -> Project Manager`.
 * Add custom archetypes and counters through the editor menu, with duplicate ID checks against bundled and project `strings.conf` files.
-* Sync special-frame card IDs such as Egyptian Gods, Sacred Beasts, and Dark Synchro cards to MDPro3 `SpecialCards.json`.
 * Check for updates in-app and install downloaded release zips without manually replacing files.
 
 ## Project Manager
@@ -27,7 +26,7 @@ Open `Workspace -> Project Manager` to configure:
 
 Directory fields keep the latest five paths for faster switching between projects.
 
-The Custom Project tab can install, uninstall, restart MDPro3, open the current custom `.cdb`, and enable active sync. The resolved path list shows where card databases, scripts, pictures, overframe images, and `SpecialCards.json` will be read or written.
+The Custom Project tab can install, uninstall, restart MDPro3, open the current custom `.cdb`, and enable active sync. The resolved path list shows where card databases, scripts, pictures and overframe images will be read or written.
 
 The integrated Project Manager was co-created with BullyWiiPlaza, bringing the custom-card manager workflow directly into DataEditorX.
 
