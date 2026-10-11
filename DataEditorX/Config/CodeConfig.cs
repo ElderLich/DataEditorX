@@ -23,6 +23,8 @@ namespace DataEditorX.Config
         readonly List<AutocompleteItem> items;
         readonly HashSet<(string Key, string Value)> shortTooltipEntries = new();
         readonly HashSet<(string Key, string Value)> longTooltipEntries = new();
+        static readonly Regex FunctionSignature = new(
+            @"^●.+?\s+([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*\(");
         static readonly Regex ConstantAssignment = new(
             @"^\s*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*=\s*(.+)$");
         /// <summary>
@@ -118,16 +120,10 @@ namespace DataEditorX.Config
                 {
                     //add
                     AddToolIipDic(name, desc);
-                    int w = line.IndexOf("(");
-                    int t = line.IndexOf(" ");
-
-                    if (t < w && t > 0)
-                    {
-                        //Found function
-                        name = line.Substring(t + 1, w - t - 1);
-                        isFind = true;
-                        desc = line;
-                    }
+                    Match signature = FunctionSignature.Match(line);
+                    isFind = signature.Success;
+                    name = isFind ? signature.Groups[1].Value : string.Empty;
+                    desc = isFind ? line : string.Empty;
                 }
                 else if (isFind)
                 {
