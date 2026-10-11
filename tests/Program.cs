@@ -53,6 +53,7 @@ internal static class Program
             Assert(((Panel)help).AutoScroll && editor.lbTooltip.Height > help.Height, "Long function help must remain scrollable");
             Assert(!editor.Selection.ColumnSelectionMode, "Normal text selection must be the default");
             Console.WriteLine("PASS: bounded scrollable code help and normal text selection.");
+            VerifyCardTypeCoverage(root);
             VerifyReferenceCompletions(root);
             VerifyOmegaMetadataWithoutRushCheckbox(root);
             VerifyThemeReadability();
@@ -60,6 +61,29 @@ internal static class Program
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifyCardTypeCoverage(string root)
+    {
+        // MDPro3 CardType contains 25 standard bits; RDLegend/RDMaximum supply
+        // the two otherwise-unused bits, covering every flag from 0x1 to 0x4000000.
+        foreach (string file in Directory.GetFiles(Path.Combine(root, "languages"), "cardinfo_*.txt"))
+        {
+            var config = new DataConfig(file);
+            long mask = config.dicCardTypes.Keys.Aggregate(0L, (combined, value) => combined | value);
+            Assert(mask == 0x7ffffffL && config.dicCardTypes.Count == 27,
+                $"All standard and Rush type flags must be available: {file}");
+        }
+        using var form = new DataEditForm(root);
+        form.InitControl(new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt")));
+        const long unexposedType = 0x8000000L;
+        form.SetCard(new Card(42) { type = unexposedType | 0x21 });
+        var effect = Control<FlowLayoutPanel>(form, "pl_cardtype").Controls.OfType<CheckBox>()
+            .Single(box => (long)box.Tag == 0x20);
+        effect.Checked = false;
+        Assert(form.GetCard().type == (unexposedType | 0x1),
+            "Editing a known type must preserve noneditable type bits without restoring its checkbox");
+        Console.WriteLine("PASS: all 27 standard/Rush types are present in every language; unexposed type bits survive edits.");
+    }
+
     private static void VerifyThemePreview()
     {
         string savedProfile = ThemeManager.CurrentProfileName;
