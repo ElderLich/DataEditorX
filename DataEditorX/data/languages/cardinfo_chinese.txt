@@ -140,7 +140,7 @@
 0x2000000	特殊召唤
 0x4000	衍生物
 ##flags (category)
-0x100	Rush Duel (Omega)
+
 ##setname
 -1	自定义
 0x0	无字段

@@ -54,9 +54,40 @@ internal static class Program
             Assert(!editor.Selection.ColumnSelectionMode, "Normal text selection must be the default");
             Console.WriteLine("PASS: bounded scrollable code help and normal text selection.");
             VerifyReferenceCompletions(root);
+            VerifyOmegaMetadataWithoutRushCheckbox(root);
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifyOmegaMetadataWithoutRushCheckbox(string root)
+    {
+        foreach (string file in Directory.GetFiles(Path.Combine(root, "languages"), "cardinfo_*.txt"))
+            Assert(new DataConfig(file).dicCardflags.Count == 0, $"Bundled flag controls must be empty after removing Rush: {file}");
+        string database = Path.Combine(Path.GetTempPath(), $"dataeditor-omega-{Guid.NewGuid():N}.bytes");
+        try
+        {
+            Assert(DataBase.Create(database), "Temporary Omega database must be created");
+            Card legacy = new(42) { name = "Legacy Omega card", ot = 4, omega = [1L, 0x40100L, 0L] };
+            Assert(DataBase.Command(database, DataBase.OmegaGetInsertSQL(legacy, true)) == 2, "Temporary Omega card must be inserted");
+            var config = new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt"));
+            using var form = new DataEditForm(root);
+            form.InitControl(config);
+            form.Open(database);
+            form.SetCard(DataBase.Read(database, true, "").Single());
+            Assert(Control<FlowLayoutPanel>(form, "pl_flags").Controls.Count == 0, "The obsolete Rush checkbox must not be created");
+            Card edited = form.GetCard();
+            Assert(edited.omega[1] == legacy.omega[1], "Editing with no flag controls must preserve every stored Omega metadata bit");
+            Assert(DataBase.Command(database, DataBase.OmegaGetUpdateSQL(edited)) > 0, "Edited Omega card must save");
+            Assert(DataBase.Read(database, true, "").Single().omega[1] == legacy.omega[1], "Saving must retain legacy Rush and unrelated Omega flags");
+            config.dicCardflags.Add(0x40000L, "Custom metadata");
+            form.InitControl(config);
+            form.SetCard(legacy);
+            Control<FlowLayoutPanel>(form, "pl_flags").Controls.OfType<CheckBox>().Single().Checked = false;
+            Assert(form.GetCard().omega[1] == 0x100L, "Custom flag controls must edit only their own bits and preserve hidden metadata");
+            Console.WriteLine("PASS: removed Rush checkbox in every locale; Omega metadata survives edit/save and custom flag controls remain scoped.");
+        }
+        finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(database); }
+    }
+
     private static void VerifyReferenceCompletions(string root)
     {
         var config = new CodeConfig();

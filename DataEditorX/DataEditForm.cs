@@ -163,7 +163,6 @@ namespace DataEditorX
             var formatTips = new ToolTip(components ??= new System.ComponentModel.Container());
             formatTips.SetToolTip(cb_cardrule,
                 "Rush selects the MDPro3 Rush ID range. Existing OT values are preserved; new Rush cards use Custom (4), matching the Rush database.");
-            formatTips.SetToolTip(pl_flags, "Omega database category flags only. MDPro3 .cdb cards do not need this Rush flag.");
             title = Text;
             nowCdbFile = "";
             cmdManager.UndoStateChanged += delegate (bool val)
@@ -402,6 +401,7 @@ namespace DataEditorX
                 InitComboBox(cb_setname2, setcodes, setnames);
                 InitComboBox(cb_setname3, setcodes, setnames);
                 InitComboBox(cb_setname4, setcodes, setnames);
+                UpdateFormatControls();
             }
             catch (Exception ex)
             {
@@ -413,12 +413,14 @@ namespace DataEditorX
         {
             bool omega = DataBase.IsOmegaDatabase(nowCdbFile);
             bool rush = GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH;
-            pl_flags.Visible = omega;
-            lb_flags.Visible = omega || rush;
-            lb_flags.Text = omega ? "Card Flags (Omega)" : "Rush Duel";
+            bool hasEditableFlags = omega && GetCheckMask(pl_flags) != 0;
+            bool showRushHelp = rush && !omega;
+            pl_flags.Visible = hasEditableFlags;
+            lb_flags.Visible = hasEditableFlags || showRushHelp;
+            lb_flags.Text = hasEditableFlags ? "Card Flags (Omega)" : "Rush Duel";
             tb_support.Visible = omega;
             lb_support.Visible = omega;
-            if (rushHelp != null) rushHelp.Visible = rush && !omega;
+            if (rushHelp != null) rushHelp.Visible = showRushHelp;
         }
 
         //Initialize FlowLayoutPanel
@@ -615,6 +617,14 @@ namespace DataEditorX
                 }
             }
             return number;
+        }
+
+        static long GetCheckMask(FlowLayoutPanel panel)
+        {
+            long mask = 0;
+            foreach (CheckBox checkbox in panel.Controls.OfType<CheckBox>())
+                if (checkbox.Tag is long flag) mask |= flag;
+            return mask;
         }
 
         private void UpdateCardListPaging()
@@ -874,7 +884,8 @@ namespace DataEditorX
             if (DataBase.IsOmegaDatabase(GetOpenFile())) {
                 c.script = oldCard.script;
                 c.omega[0] = 1L;
-                c.omega[1] = GetCheck(pl_flags) | ((oldCard.omega?[1] ?? 0) & ~0x100L);
+                // Only exposed controls may change flags; preserve all other stored metadata.
+                c.omega[1] = GetCheck(pl_flags) | ((oldCard.omega?[1] ?? 0) & ~GetCheckMask(pl_flags));
                 c.SetSupport(tb_support.Text);
             } else for (byte i = 0; i < 3; i++) c.omega[i] = 0L;
 
