@@ -88,3 +88,7 @@ Rush Duel uses the top **Rule** selector. There is no separate Rush checkbox; ex
 Run the editor regressions with `dotnet run --project tests/DataEditorX.RegressionTests.csproj` on Windows. They use temporary databases and do not edit the game's data.
 
 Rush autocomplete is optional and separate from the standard API: place `_rush_function_english.txt` (English), `_rush_functions.txt` (Chinese) and `rush_constant.lua` in `data/lua`. The UI language chooses the function documentation, with fallback to the other file. These are editor reference files; game scripts still load the Rush helper library themselves.
+
+## Theme presets
+
+Choose a palette from **View > Theme**: **Midnight** (deep navy/cyan), **Nord** (slate/ice), **Plum** (violet/lavender), **Forest** (pine/mint), **Sandstone** (warm ivory), or **Paper** (neutral light/blue). The existing Light, Dark, Alice Light and Custom choices remain available. Presets apply to card editing, list rows, menus, inputs and the code editor.

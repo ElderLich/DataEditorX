@@ -10,6 +10,12 @@ namespace DataEditorX.Config
         public const string ProfileLight = "Light";
         public const string ProfileDark = "Dark";
         public const string ProfileAliceLight = "Alice Light";
+        public const string ProfileMidnight = "Midnight";
+        public const string ProfileNord = "Nord";
+        public const string ProfilePlum = "Plum";
+        public const string ProfileForest = "Forest";
+        public const string ProfileSandstone = "Sandstone";
+        public const string ProfilePaper = "Paper";
         public const string ProfileCustom = "Custom";
 
         private static readonly Color LightHeaderBackColor = Color.FromArgb(192, 192, 255);
@@ -20,7 +26,7 @@ namespace DataEditorX.Config
         private static readonly ConditionalWeakTable<FastColoredTextBox, FastTextBoxThemeState> FastTextBoxStates = new();
 
         public static IReadOnlyList<string> ProfileNames { get; } =
-            new[] { ProfileLight, ProfileDark, ProfileAliceLight, ProfileCustom };
+            new[] { ProfileLight, ProfileDark, ProfileAliceLight, ProfileMidnight, ProfileNord, ProfilePlum, ProfileForest, ProfileSandstone, ProfilePaper, ProfileCustom };
 
         public static ThemePalette LightPalette { get; } = new()
         {
@@ -89,6 +95,42 @@ namespace DataEditorX.Config
             IsDark = false
         };
 
+        public static ThemePalette MidnightPalette { get; } = CreatePalette(
+            ProfileMidnight, true, "#111827", "#1B263B", "#202E46", "#304666", "#E5EDF9", "#A9B8D0", "#7DCFFF", "#48617D", "#131D30");
+
+        public static ThemePalette NordPalette { get; } = CreatePalette(
+            ProfileNord, true, "#2E3440", "#353E4B", "#3B4554", "#465669", "#ECEFF4", "#C1CEDD", "#88C0D0", "#61738A", "#2E3440");
+
+        public static ThemePalette PlumPalette { get; } = CreatePalette(
+            ProfilePlum, true, "#241D30", "#30273E", "#392F49", "#4D3C65", "#F4EAFB", "#C4B4D2", "#C7A5FF", "#78628B", "#282033");
+
+        public static ThemePalette ForestPalette { get; } = CreatePalette(
+            ProfileForest, true, "#142923", "#1C352C", "#244136", "#305846", "#E5F4E9", "#AECBB8", "#7BDFC0", "#537F68", "#152B24");
+
+        public static ThemePalette SandstonePalette { get; } = CreatePalette(
+            ProfileSandstone, false, "#F2EBDD", "#FAF5EB", "#FFFDF7", "#E4D5BB", "#332D23", "#6C5B45", "#946022", "#BDA987", "#FFFBF2");
+
+        public static ThemePalette PaperPalette { get; } = CreatePalette(
+            ProfilePaper, false, "#EEF0F4", "#F5F6F9", "#FFFFFF", "#DDE5F2", "#243247", "#58677C", "#245EAA", "#A7B6CC", "#FFFFFF");
+
+        private static ThemePalette CreatePalette(string name, bool dark, string background,
+            string surface, string input, string elevated, string text, string muted,
+            string accent, string border, string code)
+        {
+            Color C(string hex) => ColorTranslator.FromHtml(hex);
+            return new ThemePalette
+            {
+                Name = name, IsDark = dark,
+                FormBackColor = C(background), DockBackColor = C(background),
+                SurfaceBackColor = C(surface), MenuBackColor = C(surface),
+                InputBackColor = C(input), ButtonBackColor = C(elevated),
+                HeaderBackColor = C(elevated), TextColor = C(text),
+                MutedTextColor = C(muted), AccentColor = C(accent), BorderColor = C(border),
+                ListEvenBackColor = C(input), ListOddBackColor = C(surface),
+                CodeBackColor = C(code), CodeIndentBackColor = C(surface), CodeLineNumberColor = C(muted)
+            };
+        }
+
         public static bool IsDarkTheme => CurrentPalette.IsDark;
 
         public static ThemePalette CurrentPalette => GetPalette(CurrentProfileName);
@@ -117,6 +159,12 @@ namespace DataEditorX.Config
             {
                 ProfileDark => DarkPalette.Clone(),
                 ProfileAliceLight => AliceLightPalette.Clone(),
+                ProfileMidnight => MidnightPalette.Clone(),
+                ProfileNord => NordPalette.Clone(),
+                ProfilePlum => PlumPalette.Clone(),
+                ProfileForest => ForestPalette.Clone(),
+                ProfileSandstone => SandstonePalette.Clone(),
+                ProfilePaper => PaperPalette.Clone(),
                 ProfileCustom => LoadCustomPalette(),
                 _ => LightPalette.Clone()
             };
