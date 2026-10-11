@@ -96,6 +96,7 @@ namespace DataEditorX
         bool arrangingMetadata;
         bool showMetadataFlags;
         bool showRushMetadata;
+        bool restoringResizeSelection;
 
 
         string datapath, confcover;
@@ -166,6 +167,7 @@ namespace DataEditorX
             };
             splitContainer.Panel2.Controls.Add(rushHelp);
             InitializeMetadataLayout();
+            lv_cardlist.SizeChanged += DataEditFormSizeChanged;
             cb_cardrule.SelectedIndexChanged += (_, _) => UpdateFormatControls();
             var formatTips = new ToolTip(components ??= new System.ComponentModel.Container());
             formatTips.SetToolTip(cb_cardrule,
@@ -1096,7 +1098,7 @@ namespace DataEditorX
         //List selection
         void Lv_cardlistSelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lv_cardlist.SelectedItems.Count > 0)
+            if (!restoringResizeSelection && lv_cardlist.SelectedItems.Count > 0)
             {
                 int sel = lv_cardlist.SelectedItems[0].Index;
                 int index = (page - 1) * maxRow + sel;
@@ -2344,9 +2346,28 @@ namespace DataEditorX
         }
         void DataEditFormSizeChanged(object sender, EventArgs e)
         {
+            int previousRows = maxRow;
+            int firstIndex = (page - 1) * previousRows;
+            int selectedIndex = lv_cardlist.SelectedItems.Count > 0
+                ? (int)lv_cardlist.SelectedItems[0].Tag : -1;
             InitListRows();
+            if (maxRow == previousRows) return;
+            page = (Math.Max(0, selectedIndex >= 0 ? selectedIndex : firstIndex) / maxRow) + 1;
             UpdateCardListPaging();
-            AddListView(page);
+            restoringResizeSelection = true;
+            try
+            {
+                AddListView(page);
+                if (selectedIndex >= 0)
+                    foreach (ListViewItem item in lv_cardlist.Items)
+                        if ((int)item.Tag == selectedIndex)
+                        {
+                            item.Selected = true;
+                            item.Focused = true;
+                            break;
+                        }
+            }
+            finally { restoringResizeSelection = false; }
         }
         private void AddArchetypeToolStripMenuItem_Click(object sender, EventArgs e)
         {

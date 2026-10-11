@@ -10,7 +10,8 @@ internal static class Program
     private static void Main()
     {
         Application.EnableVisualStyles();
-        string root = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../DataEditorX/data"));
+        string root = Environment.GetEnvironmentVariable("DATAEDITORX_TEST_DATA_DIR")
+            ?? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../DataEditorX/data"));
         string db = Path.Combine(Path.GetTempPath(), $"dataeditor-regression-{Guid.NewGuid():N}.cdb");
         try
         {
@@ -56,6 +57,7 @@ internal static class Program
             VerifyCardTypeCoverage(root);
             VerifyGenreCoverage(root);
             VerifyMetadataLayout(root);
+            VerifyResizePaging(root);
             VerifyReferenceCompletions(root);
             VerifyOmegaMetadataWithoutRushCheckbox(root);
             VerifyThemeReadability();
@@ -63,6 +65,51 @@ internal static class Program
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifyResizePaging(string root)
+    {
+        string database = Path.Combine(Path.GetTempPath(), $"dataeditor-resize-{Guid.NewGuid():N}.cdb");
+        try
+        {
+            DataBase.Create(database);
+            for (uint id = 1; id <= 80; id++)
+                DataBase.Command(database, DataBase.GetInsertSQL(new Card(id) { name = "Card " + id }, true));
+            using var form = new DataEditForm(root) { Opacity = 0, ShowInTaskbar = false };
+            form.InitControl(new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt")));
+            form.Show();
+            form.Open(database);
+            Application.DoEvents();
+            var list = Control<ListView>(form, "lv_cardlist");
+            var name = Control<TextBox>(form, "tb_cardname");
+            list.Items[10].Selected = true;
+            Application.DoEvents();
+            var selected = list.SelectedItems[0];
+            uint cardId = form.GetOldCard().id;
+            name.Text = "Unsaved resize draft";
+            var size = form.ClientSize;
+            for (int width = size.Width + 10; width <= size.Width + 200; width += 10)
+                form.ClientSize = new System.Drawing.Size(width, size.Height);
+            Application.DoEvents();
+            Assert(ReferenceEquals(selected, list.SelectedItems[0]),
+                "Width-only resizing must retain the selected ListViewItem without rebuilding rows");
+            Assert(name.Text == "Unsaved resize draft" && form.GetOldCard().id == cardId,
+                "Width-only resizing must preserve the active card and its unsaved draft");
+            int oldCount = list.Items.Count;
+            form.ClientSize = new System.Drawing.Size(form.ClientSize.Width, size.Height + 160);
+            Application.DoEvents();
+            Assert(list.Items.Count > oldCount, "A taller card list must recalculate rows after its viewport changes");
+            Assert(list.SelectedItems.Count == 1 && list.SelectedItems[0].Text == cardId.ToString(),
+                "Repaging after a height change must preserve the selected card");
+            Assert(name.Text == "Unsaved resize draft", "Restoring resize selection must not reload the database card over a draft");
+            form.ClientSize = size;
+            Application.DoEvents();
+            Assert(list.SelectedItems.Count == 1 && list.SelectedItems[0].Text == cardId.ToString()
+                && name.Text == "Unsaved resize draft", "Shrinking must retain selection and draft too");
+            form.Close();
+        }
+        finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(database); }
+        Console.WriteLine("PASS: width-only resize reuses rows; height repaging retains selection and unsaved edits.");
+    }
+
     private static void VerifyMetadataLayout(string root)
     {
         using var form = new DataEditForm(root) { Opacity = 0, ShowInTaskbar = false };

@@ -1094,7 +1094,6 @@ namespace DataEditorX
             Text = "DataEditorX";
             FormClosing += DataEditFormFormClosing;
             Load += DataEditFormLoad;
-            SizeChanged += DataEditFormSizeChanged;
             DragDrop += OnDragDrop;
             DragEnter += OnDragEnter;
             Enter += DataEditFormEnter;
