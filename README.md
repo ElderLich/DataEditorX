@@ -86,3 +86,5 @@ Use **Legend** (`0x8`) and **Maximum** (`0x8000`) in Card Types. Rush races, inc
 The **Rush Duel (Omega)** checkbox belongs to the separate Omega database schema. It is shown only for Omega databases and is not required by MDPro3 `.cdb` files.
 
 Run the editor regressions with `dotnet run --project tests/DataEditorX.RegressionTests.csproj` on Windows. They use temporary databases and do not edit the game's data.
+
+Rush autocomplete is optional and separate from the standard API: place `_rush_function_english.txt` (English), `_rush_functions.txt` (Chinese) and `rush_constant.lua` in `data/lua`. The UI language chooses the function documentation, with fallback to the other file. These are editor reference files; game scripts still load the Rush helper library themselves.

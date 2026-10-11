@@ -335,10 +335,16 @@ namespace DataEditorX.Config
         }
 
         public static string GetFunctionFile(string path)
+            => GetLocalizedFunctionFile(path, FILE_FUNCTION, FILE_FUNCTION_ENGLISH);
+
+        public static string GetRushFunctionFile(string path)
+            => GetLocalizedFunctionFile(path, "_rush_functions.txt", "_rush_function_english.txt");
+
+        static string GetLocalizedFunctionFile(string path, string chineseFile, string englishFile)
         {
             string fileName = IsChineseLanguage(GetAppConfig(TAG_LANGUAGE))
-                ? FILE_FUNCTION
-                : FILE_FUNCTION_ENGLISH;
+                ? chineseFile
+                : englishFile;
 
             string functionFile = MyPath.FindFile(path, fileName, "lua");
             if (File.Exists(functionFile))
@@ -348,9 +354,9 @@ namespace DataEditorX.Config
 
             string fallbackFile = MyPath.FindFile(
                 path,
-                fileName.Equals(FILE_FUNCTION, StringComparison.OrdinalIgnoreCase)
-                    ? FILE_FUNCTION_ENGLISH
-                    : FILE_FUNCTION,
+                fileName.Equals(chineseFile, StringComparison.OrdinalIgnoreCase)
+                    ? englishFile
+                    : chineseFile,
                 "lua");
             return File.Exists(fallbackFile) ? fallbackFile : functionFile;
         }

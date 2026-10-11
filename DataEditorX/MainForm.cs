@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Created with SharpDevelop.
  * User: Acer
  * Date: 2014-10-20
@@ -101,11 +101,14 @@ namespace DataEditorX
             codecfg = new CodeConfig();
             // Add functions.
             codecfg.AddFunction(funtxt);
+            // Optional Rush documentation is kept separate from standard core APIs.
+            codecfg.AddFunction(DEXConfig.GetRushFunctionFile(datapath));
             // Add counters.
             codecfg.AddStrings(confstring);
             codecfg.AddStrings(ArchetypeStringsService.GetCustomStringsFile());
             // Add constants.
             codecfg.AddConstant(conlua);
+            codecfg.AddConstant(MyPath.FindFile(datapath, "rush_constant.lua", "lua"));
             codecfg.SetNames(datacfg.dicSetnames);
             // Build menus.
             codecfg.InitAutoMenus();
