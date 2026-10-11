@@ -1,4 +1,5 @@
 using FastColoredTextBoxNS;
+using System.Text.RegularExpressions;
 
 namespace DataEditorX.Config
 {
@@ -20,6 +21,10 @@ namespace DataEditorX.Config
         readonly SortedList<string, string> tooltipDic;
         readonly SortedList<string, string> longTooltipDic;
         readonly List<AutocompleteItem> items;
+        readonly HashSet<(string Key, string Value)> shortTooltipEntries = new();
+        readonly HashSet<(string Key, string Value)> longTooltipEntries = new();
+        static readonly Regex ConstantAssignment = new(
+            @"^\s*([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*=\s*(.+)$");
         /// <summary>
         /// Input hints
         /// </summary>
@@ -142,22 +147,12 @@ namespace DataEditorX.Config
                 return;
             }
 
-            string[] lines = File.ReadAllLines(conlua);
-            foreach (string line in lines)
+            foreach (string line in File.ReadLines(conlua))
             {
-                if (line.StartsWith("--"))
-                {
-                    continue;
-                }
-
-                int t = line.IndexOf("=");
-                _ = line.IndexOf("--");
-                //Constants = 0x1 ---Comment
-                string k = (t > 0) ? line[..t].TrimEnd([' ', '\t'])
-                    : line;
-                string desc = (t > 0) ? line[(t + 1)..].Replace("--", "\n")
-    : line;
-                AddToolIipDic(k, desc);
+                Match match = ConstantAssignment.Match(line);
+                if (!match.Success) continue;
+                AddToolIipDic(match.Groups[1].Value,
+                    match.Groups[2].Value.Replace("--", Environment.NewLine));
             }
         }
         #endregion
@@ -205,42 +200,28 @@ namespace DataEditorX.Config
         }
         void AddToolIipDic(string key, string val)
         {
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(val)) return;
+            key = key.Trim();
+            val = val.Trim();
             string skey = GetShortName(key);
-            if (tooltipDic.ContainsKey(skey))//Exists
-            {
-                string nval = tooltipDic[skey];
-                if (!nval.EndsWith(Environment.NewLine))
-                {
-                    nval += Environment.NewLine;
-                }
-
-                nval += Environment.NewLine + val;
-                tooltipDic[skey] = nval;
-            }
-            else
-            {
-                tooltipDic.Add(skey, val);
-            }
-            //
-            AddLongToolIipDic(key, val);
+            string canonicalKey = key.StartsWith("RD.", StringComparison.Ordinal)
+                ? "RushDuel." + key[3..]
+                : key.StartsWith("aux.", StringComparison.Ordinal) ? "Auxiliary." + key[4..] : key;
+            string canonicalValue = val.Replace(" " + key + "(", " " + canonicalKey + "(", StringComparison.Ordinal);
+            // Keep both qualified aliases in completion, but show their shared
+            // documentation once in the unqualified method tooltip.
+            if (shortTooltipEntries.Add((skey, canonicalValue)))
+                AppendTooltip(tooltipDic, skey, val);
+            if (longTooltipEntries.Add((key, val)))
+                AppendTooltip(longTooltipDic, key, val);
         }
-        void AddLongToolIipDic(string key, string val)
-        {
-            if (longTooltipDic.ContainsKey(key))//Exists
-            {
-                string nval = longTooltipDic[key];
-                if (!nval.EndsWith(Environment.NewLine))
-                {
-                    nval += Environment.NewLine;
-                }
 
-                nval += Environment.NewLine + val;
-                longTooltipDic[key] = nval;
-            }
+        static void AppendTooltip(SortedList<string, string> dictionary, string key, string value)
+        {
+            if (dictionary.TryGetValue(key, out string existing))
+                dictionary[key] = existing + Environment.NewLine + Environment.NewLine + value;
             else
-            {
-                longTooltipDic.Add(key, val);
-            }
+                dictionary.Add(key, value);
         }
         #endregion
     }
