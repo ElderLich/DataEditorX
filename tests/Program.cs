@@ -55,6 +55,7 @@ internal static class Program
             Console.WriteLine("PASS: bounded scrollable code help and normal text selection.");
             VerifyCardTypeCoverage(root);
             VerifyGenreCoverage(root);
+            VerifyMetadataLayout(root);
             VerifyReferenceCompletions(root);
             VerifyOmegaMetadataWithoutRushCheckbox(root);
             VerifyThemeReadability();
@@ -62,6 +63,130 @@ internal static class Program
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifyMetadataLayout(string root)
+    {
+        using var form = new DataEditForm(root) { Opacity = 0, ShowInTaskbar = false };
+        var config = new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt"));
+        form.InitControl(config);
+        form.Show();
+        foreach (string language in new[] { "chinese", "english" })
+        {
+            DataEditorX.Language.LanguageHelper.LoadFormLabels(Path.Combine(root, $"languages/language_{language}.txt"));
+            DataEditorX.Language.LanguageHelper.SetFormLabel(form);
+            Assert(Control<Label>(form, "lb_types").Text == (language == "chinese" ? "卡片类型" : "Card Type"),
+                "Layout wrappers must preserve existing localized heading keys");
+            Assert(Control<Label>(form, "lb_cardcode").Text == (language == "chinese" ? "卡片密码" : "Passcode"),
+                "Layout wrappers must preserve existing localized field keys");
+            Assert(Control<Label>(form, "lb_tiptexts").Text == (language == "chinese" ? "脚本提示文字" : "Strings"),
+                "String-list localization must survive reparenting");
+        }
+        ThemeManager.ApplyControlTree(form, ThemeManager.GetPalette(ThemeManager.ProfilePaper));
+        Application.DoEvents();
+        var split = Control<SplitContainer>(form, "splitContainer");
+        var column = Control<Panel>(form, "metadataColumn");
+        var fields = Control<Panel>(form, "cardFields");
+        var types = Control<FlowLayoutPanel>(form, "pl_cardtype");
+        var genres = Control<FlowLayoutPanel>(form, "pl_category");
+        var originalCheckboxes = types.Controls.Cast<System.Windows.Forms.Control>().ToArray();
+        string output = Environment.GetEnvironmentVariable("DATAEDITORX_LAYOUT_PREVIEW_DIR");
+        foreach (var scenario in new[] {
+            ("Default", 991, 617, false), ("Narrow", 991, 601, false),
+            ("Tall", 991, 900, false), ("Wide", 1400, 750, false),
+            ("Shrunk", 991, 601, false), ("Regrown", 1400, 750, false),
+            ("Rush", 991, 617, true), ("RushNarrow", 991, 601, true), ("RushWide", 1400, 750, true) })
+        {
+            form.ClientSize = new System.Drawing.Size(scenario.Item2, scenario.Item3);
+            form.SetCard(new Card(scenario.Item4 ? 120000010u : 42u)
+                { name = "Layout check", type = scenario.Item4 ? 0x8029 : 0x21, category = 0x800000001L });
+            Application.DoEvents();
+            form.PerformLayout();
+            Assert(split.Panel2.ClientRectangle.Contains(column.Bounds), scenario.Item1 + ": metadata column must fit its pane");
+            Assert(fields.Right < column.Left, scenario.Item1 + ": field and metadata columns must not overlap");
+            Assert(types.Controls.Cast<System.Windows.Forms.Control>().SequenceEqual(originalCheckboxes),
+                "Resizing must retain the same checkbox instances and handlers");
+            var visibleSections = column.Controls.Cast<System.Windows.Forms.Control>()
+                .Where(control => control.Visible).OrderBy(control => control.Top).ToArray();
+            foreach (var section in visibleSections)
+                Assert(column.ClientRectangle.Contains(section.Bounds), scenario.Item1 + ": section must remain visible: " + section.Name);
+            for (int i = 1; i < visibleSections.Length; i++)
+                Assert(visibleSections[i - 1].Bottom <= visibleSections[i].Top,
+                    scenario.Item1 + ": metadata sections must not overlap");
+            Assert(Control<ListBox>(form, "lb_scripttext").Height >= 48 && Control<TextBox>(form, "tb_edittext").Height >= 48,
+                "String list and selected-string editor must keep usable space");
+            Assert(form.GetCard().category == 0x800000001L, "High Genre bits must survive reflow");
+            if (scenario.Item4)
+            {
+                var help = Control<Label>(form, "rushHelp");
+                Assert(help.Height >= help.GetPreferredSize(new System.Drawing.Size(help.Width, 0)).Height,
+                    "Rush help must fit completely in the reserved section");
+            }
+            if (scenario.Item1 == "Default")
+                Assert(types.Height > 120 && genres.Height > 150,
+                    "Default layout must reclaim the empty flag region for Card Type and Genre");
+            if (scenario.Item1 is "Tall" or "Wide" or "Regrown" or "RushWide")
+            {
+                Assert(!types.VerticalScroll.Visible && !genres.VerticalScroll.Visible,
+                    scenario.Item1 + ": all checkbox rows should fit without nested scrolling");
+            }
+            if (!string.IsNullOrEmpty(output))
+            {
+                Directory.CreateDirectory(output);
+                using var bitmap = new System.Drawing.Bitmap(form.Width, form.Height);
+                form.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, form.Width, form.Height));
+                bitmap.Save(Path.Combine(output, scenario.Item1 + ".png"));
+            }
+            foreach (var checkPanel in new[] { types, genres })
+            {
+                var last = checkPanel.Controls[checkPanel.Controls.Count - 1];
+                checkPanel.ScrollControlIntoView(last);
+                Application.DoEvents();
+                Assert(last.Bottom <= checkPanel.ClientSize.Height && last.Top >= 0,
+                    $"{scenario.Item1}: {checkPanel.Name} final checkbox must be reachable: last={last.Bounds}, viewport={checkPanel.ClientSize}, scroll={checkPanel.AutoScrollPosition}, content={checkPanel.DisplayRectangle}");
+                Assert(checkPanel.Controls.Cast<System.Windows.Forms.Control>().All(box => box.Right <= checkPanel.ClientSize.Width),
+                    scenario.Item1 + ": rightmost checkbox labels must not be clipped");
+            }
+            Console.WriteLine($"LAYOUT {scenario.Item1}: column={column.Size}; types={types.Height}; genres={genres.Height}; scroll={types.VerticalScroll.Visible}/{genres.VerticalScroll.Visible}");
+        }
+        int wideColumn = column.Width;
+        split.SplitterDistance = split.Width - split.SplitterWidth - split.Panel2MinSize;
+        Application.DoEvents();
+        Assert(column.Width < wideColumn && fields.Right < column.Left, "Dragging the splitter must reflow both editing columns");
+        split.SplitterDistance = split.Panel1MinSize;
+        Application.DoEvents();
+        Assert(column.Width > wideColumn && !types.VerticalScroll.Visible && !genres.VerticalScroll.Visible,
+            "Expanding the edit pane with the splitter must remove unnecessary checkbox scrollbars");
+        foreach (var checkPanel in new[] { types, genres })
+            Assert(checkPanel.Controls.Cast<System.Windows.Forms.Control>().All(box =>
+                box.Bottom <= checkPanel.ClientSize.Height && box.Right <= checkPanel.ClientSize.Width),
+                "Expanded splitter view must fit every checkbox and its label");
+        string omega = Path.Combine(Path.GetTempPath(), $"dataeditor-layout-{Guid.NewGuid():N}.bytes");
+        try
+        {
+            DataBase.Create(omega);
+            form.Open(omega);
+            config.dicCardflags.Add(0x40000L, "Custom metadata");
+            config.dicCardflags.Add(0x80000L, "Another custom flag");
+            form.InitControl(config);
+            form.SetCard(new Card(42) { name = "Omega layout check", type = 0x21, omega = [1L, 0x40100L, 0L] });
+            Application.DoEvents();
+            var flags = Control<FlowLayoutPanel>(form, "pl_flags");
+            Assert(flags.Visible && !Control<Label>(form, "rushHelp").Visible,
+                "Omega custom flags must have their own visible section, without Rush help overlapping");
+            Assert(flags.Bottom < Control<Label>(form, "lb_tiptexts").Top && column.ClientRectangle.Contains(flags.Bounds),
+                "Omega custom flags must stay between Genre and Strings");
+            Assert(form.GetCard().omega[1] == 0x40100L, "Reflow must preserve custom and noneditable Omega flags");
+            if (!string.IsNullOrEmpty(output))
+            {
+                using var bitmap = new System.Drawing.Bitmap(form.Width, form.Height);
+                form.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, form.Width, form.Height));
+                bitmap.Save(Path.Combine(output, "Omega.png"));
+            }
+        }
+        finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(omega); }
+        form.Close();
+        Console.WriteLine("PASS: responsive layout, scrolling, splitter changes, Omega flags and legacy localization work across nine size/format scenarios.");
+    }
+
     private static void VerifyCardTypeCoverage(string root)
     {
         // MDPro3 CardType contains 25 standard bits; RDLegend/RDMaximum supply
@@ -72,6 +197,7 @@ internal static class Program
             long mask = config.dicCardTypes.Keys.Aggregate(0L, (combined, value) => combined | value);
             Assert(mask == 0x7ffffffL && config.dicCardTypes.Count == 27,
                 $"All standard and Rush type flags must be available: {file}");
+
         }
         using var form = new DataEditForm(root);
         form.InitControl(new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt")));

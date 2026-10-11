@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Created with SharpDevelop.
  * User: Acer
  * Date: July 8, Tuesday
@@ -66,6 +66,11 @@ namespace DataEditorX.Language
 
         static void SetControlLabel(Control c, string pName, string formName)
         {
+            if (c is EditorLayoutPanel)
+            {
+                foreach (Control child in c.Controls) SetControlLabel(child, pName, formName);
+                return;
+            }
             if (!string.IsNullOrEmpty(pName))
             {
                 pName += SEP_CONTROL;
@@ -172,6 +177,11 @@ namespace DataEditorX.Language
         void GetControlLabel(Control c, string pName,
             string formName)
         {
+            if (c is EditorLayoutPanel)
+            {
+                foreach (Control child in c.Controls) GetControlLabel(child, pName, formName);
+                return;
+            }
             if (!string.IsNullOrEmpty(pName))
             {
                 pName += SEP_CONTROL;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Created with SharpDevelop.
  * User: Acer
  * Date: May 18, Sunday
@@ -1085,9 +1085,10 @@ namespace DataEditorX
             Controls.Add(pl_bottom);
             Controls.Add(mainMenu);
             Font = new Font("SimSun", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
+            FormBorderStyle = FormBorderStyle.Sizable;
+            MinimumSize = new Size(1007, 640);
             MainMenuStrip = mainMenu;
-            MaximizeBox = false;
+            MaximizeBox = true;
             Name = "DataEditForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "DataEditorX";

@@ -91,6 +91,12 @@ namespace DataEditorX
 
         Image cover;
         Label rushHelp;
+        Panel cardFields;
+        Panel metadataColumn;
+        bool arrangingMetadata;
+        bool showMetadataFlags;
+        bool showRushMetadata;
+
 
         string datapath, confcover;
 
@@ -159,6 +165,7 @@ namespace DataEditorX
                        "Keep the RD/... pack line and MAXIMUM ATK line in the description."
             };
             splitContainer.Panel2.Controls.Add(rushHelp);
+            InitializeMetadataLayout();
             cb_cardrule.SelectedIndexChanged += (_, _) => UpdateFormatControls();
             var formatTips = new ToolTip(components ??= new System.ComponentModel.Container());
             formatTips.SetToolTip(cb_cardrule,
@@ -415,12 +422,163 @@ namespace DataEditorX
             bool rush = GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH;
             bool hasEditableFlags = omega && GetCheckMask(pl_flags) != 0;
             bool showRushHelp = rush && !omega;
+            showMetadataFlags = hasEditableFlags;
+            showRushMetadata = showRushHelp;
             pl_flags.Visible = hasEditableFlags;
             lb_flags.Visible = hasEditableFlags || showRushHelp;
             lb_flags.Text = hasEditableFlags ? "Card Flags (Omega)" : "Rush Duel";
             tb_support.Visible = omega;
             lb_support.Visible = omega;
             if (rushHelp != null) rushHelp.Visible = showRushHelp;
+            ArrangeMetadata();
+        }
+
+        // Keep the existing field controls and their event handlers, but give each
+        // column its own anchor coordinate system so both can share a wider window.
+        void InitializeMetadataLayout()
+        {
+            var metadata = new HashSet<Control>
+            {
+                lb_types, pl_cardtype, lb_categorys, pl_category, lb_flags,
+                pl_flags, rushHelp, lb_tiptexts, lb_scripttext, lb_edittext_hint, tb_edittext
+            };
+            Control[] fields = splitContainer.Panel2.Controls.Cast<Control>()
+                .Where(control => !metadata.Contains(control)).ToArray();
+            cardFields = new EditorLayoutPanel
+            {
+                Name = "cardFields", Size = new Size(348, splitContainer.Panel2.Height)
+            };
+            metadataColumn = new EditorLayoutPanel { Name = "metadataColumn" };
+            splitContainer.Panel2.SuspendLayout();
+            cardFields.SuspendLayout();
+            foreach (Control control in fields)
+            {
+                Rectangle bounds = control.Bounds;
+                cardFields.Controls.Add(control);
+                control.Bounds = bounds;
+            }
+            foreach (Control control in metadata)
+            {
+                control.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+                control.MaximumSize = Size.Empty;
+                metadataColumn.Controls.Add(control);
+            }
+            splitContainer.Panel2.Controls.Add(cardFields);
+            splitContainer.Panel2.Controls.Add(metadataColumn);
+            cardFields.ResumeLayout(false);
+            splitContainer.Panel2.ResumeLayout(false);
+            splitContainer.FixedPanel = FixedPanel.Panel1;
+            splitContainer.Panel1MinSize = 180;
+            splitContainer.Panel2MinSize = 640;
+            splitContainer.Panel2.SizeChanged += (_, _) => ArrangeMetadata();
+            ArrangeMetadata();
+        }
+
+        // Measure the same wrapping rows as FlowLayoutPanel without depending on
+        // its previous scrollbar state. No checkboxes are recreated during resize.
+        static int MeasureCheckRows(FlowLayoutPanel panel, int width)
+        {
+            int available = Math.Max(1, width - panel.Padding.Horizontal);
+            int rowWidth = 0, rowHeight = 0, height = panel.Padding.Vertical + 2;
+            foreach (Control control in panel.Controls)
+            {
+                Size preferred = control.GetPreferredSize(Size.Empty);
+                int itemWidth = preferred.Width + control.Margin.Horizontal;
+                int itemHeight = preferred.Height + control.Margin.Vertical;
+                if (rowWidth > 0 && rowWidth + itemWidth > available)
+                {
+                    height += rowHeight;
+                    rowWidth = 0;
+                    rowHeight = 0;
+                }
+                rowWidth += itemWidth;
+                rowHeight = Math.Max(rowHeight, itemHeight);
+            }
+            return height + rowHeight;
+        }
+
+        void ArrangeMetadata()
+        {
+            if (metadataColumn == null || arrangingMetadata) return;
+            arrangingMetadata = true;
+            metadataColumn.SuspendLayout();
+            cardFields.SuspendLayout();
+            try
+            {
+                int height = splitContainer.Panel2.ClientSize.Height;
+                int width = Math.Clamp((int)(splitContainer.Panel2.ClientSize.Width * .46), 280, 520);
+                int fieldsWidth = Math.Max(348, splitContainer.Panel2.ClientSize.Width - width - 4);
+                width = Math.Max(1, splitContainer.Panel2.ClientSize.Width - fieldsWidth - 4);
+                cardFields.SetBounds(0, 0, fieldsWidth, height);
+                metadataColumn.SetBounds(fieldsWidth + 4, 0, width, height);
+                var scrollPositions = new Dictionary<FlowLayoutPanel, Point>();
+                foreach (var flow in new[] { pl_cardtype, pl_category, pl_flags })
+                {
+                    scrollPositions[flow] = flow.AutoScrollPosition;
+                    flow.AutoScrollPosition = Point.Empty;
+                    flow.AutoScroll = false;
+                    flow.AutoScrollMinSize = Size.Empty;
+                    flow.Width = width;
+                    flow.PerformLayout();
+                }
+                int typesWanted = MeasureCheckRows(pl_cardtype, width);
+                int genresWanted = MeasureCheckRows(pl_category, width);
+                int optionalHeight = showMetadataFlags
+                    ? Math.Clamp(MeasureCheckRows(pl_flags, width), 24, 100)
+                    : showRushMetadata ? rushHelp.GetPreferredSize(new Size(width, 0)).Height : 0;
+                // Three 20px headings, one 17px heading, 8 gaps and outer padding,
+                // plus at least 48px each for the string list and selected text.
+                int fixedHeight = 203 + (optionalHeight > 0 ? optionalHeight + 26 : 0);
+                int budget = Math.Max(40, height - fixedHeight);
+                int wanted = Math.Max(1, typesWanted + genresWanted);
+                int typesHeight = typesWanted;
+                int genresHeight = genresWanted;
+                int extra = Math.Max(0, budget - wanted);
+                if (wanted > budget)
+                {
+                    typesHeight = typesWanted <= budget - 80 ? typesWanted : Math.Max(20, budget * 3 / 5);
+                    genresHeight = Math.Max(20, budget - typesHeight);
+                }
+                int stringsHeight = 48 + extra * 2 / 3;
+                int textHeight = 48 + extra - extra * 2 / 3;
+                int y = 3;
+                void Place(Control control, int controlHeight)
+                {
+                    var flow = control as FlowLayoutPanel;
+                    Point scroll = flow == null ? Point.Empty : scrollPositions[flow];
+                    control.SetBounds(0, y, width, controlHeight);
+                    if (flow != null && MeasureCheckRows(flow, width) > controlHeight)
+                    {
+                        // The scrollbar narrows wrapping width. Explicitly size
+                        // that content extent so the last row remains reachable.
+                        int scrollWidth = width - SystemInformation.VerticalScrollBarWidth;
+                        flow.AutoScrollMinSize = new Size(0, MeasureCheckRows(flow, scrollWidth));
+                        flow.AutoScroll = true;
+                        flow.PerformLayout();
+                        flow.AutoScrollPosition = new Point(-scroll.X, -scroll.Y);
+                    }
+                    y += controlHeight + 3;
+                }
+                Place(lb_types, 20);
+                Place(pl_cardtype, typesHeight);
+                Place(lb_categorys, 20);
+                Place(pl_category, genresHeight);
+                if (optionalHeight > 0)
+                {
+                    Place(lb_flags, 20);
+                    Place(showMetadataFlags ? pl_flags : rushHelp, optionalHeight);
+                }
+                Place(lb_tiptexts, 20);
+                Place(lb_scripttext, stringsHeight);
+                Place(lb_edittext_hint, 17);
+                Place(tb_edittext, textHeight);
+            }
+            finally
+            {
+                cardFields.ResumeLayout(true);
+                metadataColumn.ResumeLayout(true);
+                arrangingMetadata = false;
+            }
         }
 
         //Initialize FlowLayoutPanel
