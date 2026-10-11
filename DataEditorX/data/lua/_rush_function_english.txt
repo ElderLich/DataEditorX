@@ -387,7 +387,7 @@ Returns:
 Source: Rush/Utilities/RDFusion.lua:653
 
 ●void RushDuel.AttachAtkDef(Effect e, Card card, int|function|nil atk, int|function|nil def, [int reset], [bool forced])
-Registers a single-card EFFECT_UPDATE_ATTACK effect for nonzero, non-nil atk, and an EFFECT_UPDATE_DEFENSE effect for nonzero, non-nil def only when RD.IsCanChangeDef(card) passes. The DEF check excludes Maximum-mode monsters; it does not block the ATK branch.
+Registers a single-card EFFECT_UPDATE_ATTACK effect for nonzero, non-nil atk, and an EFFECT_UPDATE_DEFENSE effect for nonzero, non-nil def only when RD.IsCanChangeDef(card) passes. That predicate is card:IsDefenseAbove(0) and not RD.IsMaximumMode(card): it requires the core's valid, nonnegative DEF check and excludes Maximum-mode monsters. It does not block the ATK branch.
 Both modifiers are created through RD.CreateSingleEffect with e:GetHandler() as owner, FLAG_ATTACH_EFFECT as label, and the supplied reset/forced values. No automatic duration is added when reset is omitted. Pass RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END for the usual until-End-Phase card modifier.
 This helper returns no values and does not report whether the card's final stats changed. forced is passed to Card.RegisterEffect; leave it nil/false for normal effect-immunity handling.
 Parameters:
@@ -5496,7 +5496,7 @@ Returns:
 Source: Rush/Utilities/RDFusion.lua:653
 
 ●void RD.AttachAtkDef(Effect e, Card card, int|function|nil atk, int|function|nil def, [int reset], [bool forced])
-Registers a single-card EFFECT_UPDATE_ATTACK effect for nonzero, non-nil atk, and an EFFECT_UPDATE_DEFENSE effect for nonzero, non-nil def only when RD.IsCanChangeDef(card) passes. The DEF check excludes Maximum-mode monsters; it does not block the ATK branch.
+Registers a single-card EFFECT_UPDATE_ATTACK effect for nonzero, non-nil atk, and an EFFECT_UPDATE_DEFENSE effect for nonzero, non-nil def only when RD.IsCanChangeDef(card) passes. That predicate is card:IsDefenseAbove(0) and not RD.IsMaximumMode(card): it requires the core's valid, nonnegative DEF check and excludes Maximum-mode monsters. It does not block the ATK branch.
 Both modifiers are created through RD.CreateSingleEffect with e:GetHandler() as owner, FLAG_ATTACH_EFFECT as label, and the supplied reset/forced values. No automatic duration is added when reset is omitted. Pass RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END for the usual until-End-Phase card modifier.
 This helper returns no values and does not report whether the card's final stats changed. forced is passed to Card.RegisterEffect; leave it nil/false for normal effect-immunity handling.
 Parameters:
