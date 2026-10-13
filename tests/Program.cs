@@ -66,6 +66,7 @@ internal static class Program
             VerifyThemePreview();
             UpdateMetadataTests.Run();
             UpdateDialogTests.Run();
+            UpdateInstallerTests.Run();
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }

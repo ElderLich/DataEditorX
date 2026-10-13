@@ -202,8 +202,9 @@ namespace DataEditorX.Core
 
         private static string GetInstallFailureMessage()
         {
-            return "Update downloaded, but the installer could not start."
-                + "\n\nYou can still install manually from the downloaded archive.";
+            return "The update could not be prepared or the installer could not start."
+                + "\n\nDownload it again, or inspect the archive before installing manually."
+                + (string.IsNullOrWhiteSpace(CheckUpdate.LastInstallError) ? "" : "\n\nDetails: " + CheckUpdate.LastInstallError);
         }
 
         public static void OnCheckUpdate(bool showNew)

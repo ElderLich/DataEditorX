@@ -1,13 +1,11 @@
-﻿/*
+/*
  * Created with SharpDevelop.
  * User: Acer
  * Date: June 10, Tuesday
  * Time: 9:58
  * 
  */
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace DataEditorX.Common
 {
@@ -31,6 +29,7 @@ namespace DataEditorX.Common
         public static UpdateInfoStatus LastInfoStatus { get; private set; } = UpdateInfoStatus.Ok;
         public static string LastInfoError { get; private set; } = "";
         public static string LastDownloadError { get; private set; } = "";
+        public static string LastInstallError { get; private set; } = "";
         /// <summary>
         /// Default version when metadata cannot be read.
         /// </summary>
@@ -263,67 +262,24 @@ namespace DataEditorX.Common
             return true;
         }
 
-        public static bool InstallUpdate(string zipFile)
+        public static Task<bool> InstallUpdateAsync(string zipFile)
         {
-            try
-            {
-                if (!File.Exists(zipFile))
-                {
-                    return false;
-                }
-
-                string appDir = Application.StartupPath;
-                string exe = Application.ExecutablePath;
-                string script = Path.Combine(Path.GetTempPath(), $"DataEditorX_Update_{Guid.NewGuid():N}.ps1");
-                string content = $$"""
-$ErrorActionPreference = 'Stop'
-Wait-Process -Id {{Environment.ProcessId}} -ErrorAction SilentlyContinue
-Start-Sleep -Milliseconds 500
-$cleanupFiles = @(
-    'DataEditorX.deps.json',
-    'DataEditorX.dll',
-    'DataEditorX.pdb',
-    'DataEditorX.runtimeconfig.json',
-    'e_sqlite3.dll',
-    'FastColoredTextBox.dll',
-    'Microsoft.Data.Sqlite.dll',
-    'Neo.Lua.dll',
-    'Newtonsoft.Json.dll',
-    'SQLitePCLRaw.batteries_v2.dll',
-    'SQLitePCLRaw.core.dll',
-    'SQLitePCLRaw.provider.e_sqlite3.dll',
-    'WeifenLuo.WinFormsUI.Docking.dll',
-    'WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll'
-)
-foreach ($file in $cleanupFiles) {
-    Remove-Item -LiteralPath (Join-Path '{{EscapePowerShell(appDir)}}' $file) -Force -ErrorAction SilentlyContinue
-}
-Remove-Item -LiteralPath (Join-Path '{{EscapePowerShell(appDir)}}' 'de') -Recurse -Force -ErrorAction SilentlyContinue
-Expand-Archive -LiteralPath '{{EscapePowerShell(zipFile)}}' -DestinationPath '{{EscapePowerShell(appDir)}}' -Force
-Remove-Item -LiteralPath '{{EscapePowerShell(zipFile)}}' -Force -ErrorAction SilentlyContinue
-Start-Process -FilePath '{{EscapePowerShell(exe)}}' -WorkingDirectory '{{EscapePowerShell(appDir)}}'
-Remove-Item -LiteralPath $PSCommandPath -Force -ErrorAction SilentlyContinue
-""";
-                File.WriteAllText(script, content, new UTF8Encoding(false));
-
-                ProcessStartInfo info = new()
-                {
-                    FileName = "powershell.exe",
-                    Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{script}\"",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                return Process.Start(info) != null;
-            }
-            catch
-            {
-                return false;
-            }
+            // Archive extraction can take time on slow storage; keep the dialog responsive.
+            return Task.Run(() => InstallUpdate(zipFile));
         }
 
-        private static string EscapePowerShell(string text)
+        public static bool InstallUpdate(string zipFile)
         {
-            return (text ?? "").Replace("'", "''");
+            LastInstallError = "";
+            try
+            {
+                return UpdateInstaller.Start(zipFile, Application.StartupPath, Application.ExecutablePath, Environment.ProcessId);
+            }
+            catch (Exception ex)
+            {
+                LastInstallError = ex.GetBaseException().Message;
+                return false;
+            }
         }
 
         private static void TryDelete(string file)

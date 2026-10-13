@@ -53,7 +53,7 @@ Open `View -> Theme` to choose a built-in profile or open the theme editor. The 
 ## Version Info and Updates
 Open `Help -> Version Info` to see the app version, maintainer, original author, source fork, repository, runtime, and process architecture.
 
-Use `Help -> Check for Updates` to read the GitHub version metadata. If a newer version is available, DataEditorX downloads the matching win32 or win64 release zip, offers to install it, extracts the update, and restarts.
+Use `Help -> Check for Updates` to read the GitHub version metadata. If a newer version is available, DataEditorX downloads the matching win32 or win64 release zip, offers to install it, validates and stages the archive while the editor stays open, then restarts. Failed archive preparation leaves the editor open with the reason. If file replacement fails after shutdown, the installer attempts to restore the previous files and displays the recovery log location. Unrelated project files are retained.
 
 ## Data Folder Layout
 Bundled data files are grouped by purpose:

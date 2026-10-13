@@ -227,7 +227,7 @@ namespace DataEditorX
 
                 bool install = await WaitForActionAsync(
                     "Update downloaded",
-                    "The update archive is ready.",
+                    "The archive was downloaded. It will be checked before installation.",
                     $"Saved to:\n{zipFile}",
                     "Install and Restart");
                 if (!install || IsDisposed || Disposing)
@@ -236,7 +236,7 @@ namespace DataEditorX
                     return;
                 }
 
-                StartInstaller(zipFile, CheckUpdate.InstallUpdate, Application.Exit);
+                await StartInstaller(zipFile, CheckUpdate.InstallUpdateAsync, Application.Exit);
             }
             catch (Exception ex)
             {
@@ -250,12 +250,13 @@ namespace DataEditorX
             }
         }
 
-        private void StartInstaller(string zipFile, Func<string, bool> launchInstaller, Action exitApplication)
+        private async Task StartInstaller(string zipFile, Func<string, Task<bool>> launchInstaller, Action exitApplication)
         {
-            SetRunning(UpdateStage.StartingInstaller, "Starting installer", "DataEditorX will close and restart.", "");
+            SetRunning(UpdateStage.StartingInstaller, "Preparing installation", "Validating and preparing the update archive...", "DataEditorX will close only after the update is prepared.");
+            bool installerStarted = false;
             try
             {
-                if (!launchInstaller(zipFile))
+                if (!await launchInstaller(zipFile))
                 {
                     Complete("Installer could not start", GetInstallFailureMessage(), true);
                     return;
@@ -264,19 +265,43 @@ namespace DataEditorX
                 // Application.Exit raises FormClosing on this dialog too. The
                 // installer is already launched, so this is a successful handoff,
                 // not cancellation of an update check or download.
+                installerStarted = true;
                 stage = UpdateStage.InstallerStarted;
+                titleLabel.Text = "Starting installer";
                 statusLabel.Text = "Installer started. Waiting for DataEditorX to close...";
+                detailLabel.Text = "DataEditorX will close and restart.";
                 exitApplication();
                 if (!IsDisposed && !Disposing && Visible)
                 {
-                    Complete("Installer is waiting", "Finish any active tasks, then close DataEditorX. The installer will continue when the application closes.");
-                    statusLabel.Text = "DataEditorX is still open.";
+                    ShowInstallerWaiting();
                 }
             }
             catch (Exception ex)
             {
-                Complete("Installer could not start", GetInstallFailureMessage() + "\n\nDetails: " + ex.GetBaseException().Message, true);
+                if (installerStarted)
+                {
+                    ShowInstallerWaiting(ex.GetBaseException().Message);
+                }
+                else
+                {
+                    Complete("Installer could not start", GetInstallFailureMessage() + "\n\nDetails: " + ex.GetBaseException().Message, true);
+                }
             }
+        }
+
+        private void ShowInstallerWaiting(string? error = null)
+        {
+            if (IsDisposed || Disposing)
+            {
+                return;
+            }
+            string detail = "Finish any active tasks, then close DataEditorX. The installer will continue when the application closes.";
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                detail += "\n\nDetails: " + error;
+            }
+            Complete("Installer is waiting", detail);
+            statusLabel.Text = "DataEditorX is still open.";
         }
 
         private Task<bool> WaitForActionAsync(string title, string status, string detail, string actionText)
@@ -458,8 +483,11 @@ namespace DataEditorX
 
         private static string GetInstallFailureMessage()
         {
-            return "Update downloaded, but the installer could not start."
-                + "\n\nYou can still install manually from the downloaded archive.";
+            string message = "The update could not be prepared or the installer could not start."
+                + "\n\nDownload it again, or manually inspect the downloaded archive before installing.";
+            return string.IsNullOrWhiteSpace(CheckUpdate.LastInstallError)
+                ? message
+                : message + "\n\nDetails: " + CheckUpdate.LastInstallError;
         }
 
         private static string CleanVersion(string version)

@@ -14,10 +14,12 @@ internal static class UpdateDialogTests
         VerifyActionPrompts();
         VerifyDownloadFailure();
         VerifyInstallerHandoff();
+        VerifyAsynchronousPreparation();
+        VerifyExitFailureAfterHandoff();
         VerifyInstallerFailure(false);
         VerifyInstallerFailure(true);
         VerifyQuietCompletion();
-        Console.WriteLine("PASS: update dialog cancellation, stale progress, prompts, installer handoff/failure and quiet completion.");
+        Console.WriteLine("PASS: update dialog cancellation, stale progress, prompts, asynchronous preparation, installer handoff/failure and quiet completion.");
     }
 
     private static void VerifyCancellation(string stage)
@@ -81,14 +83,14 @@ internal static class UpdateDialogTests
         using var form = Open();
         bool launched = false;
         bool exited = false;
-        Call(form, "StartInstaller", "test-update.zip", new Func<string, bool>(path =>
+        RunInstaller(form, "test-update.zip", new Func<string, Task<bool>>(path =>
         {
             launched = path == "test-update.zip";
             Assert(!Field<Button>(form, "cancelButton").Enabled, "Starting an installer is not a cancellable download");
             Assert(form.AttemptClose(CloseReason.UserClosing), "The dialog must not close halfway through starting the installer");
             Assert(!Field<CancellationTokenSource>(form, "cancellation").IsCancellationRequested,
                 "Closing while starting the installer must not masquerade as download cancellation");
-            return true;
+            return Task.FromResult(true);
         }), new Action(() =>
         {
             exited = true;
@@ -105,7 +107,7 @@ internal static class UpdateDialogTests
             "A vetoed exit must leave a usable dialog");
 
         using var exiting = Open();
-        Call(exiting, "StartInstaller", "test-update.zip", new Func<string, bool>(_ => true), new Action(exiting.Close));
+        RunInstaller(exiting, "test-update.zip", new Func<string, Task<bool>>(_ => Task.FromResult(true)), new Action(exiting.Close));
         Assert(exiting.IsDisposed, "A successful close must not render a result into disposed controls");
     }
 
@@ -113,17 +115,61 @@ internal static class UpdateDialogTests
     {
         using var form = Open();
         bool exited = false;
-        Call(form, "StartInstaller", "test-update.zip", new Func<string, bool>(_ =>
+        RunInstaller(form, "test-update.zip", new Func<string, Task<bool>>(_ =>
         {
             if (throws) throw new IOException("Installer launch test failure");
-            return false;
+            return Task.FromResult(false);
         }), new Action(() => exited = true));
         Assert(!exited && Text(form, "titleLabel") == "Installer could not start",
             "Failed installer launch must report failure without exiting");
         Assert(Field<Button>(form, "cancelButton").Enabled && !form.AttemptClose(CloseReason.UserClosing),
             "Installer failures must leave the dialog closable");
-        Assert(Text(form, "detailLabel").Contains("manually"), "Installer failure must retain the manual installation fallback");
+        Assert(Text(form, "detailLabel").Contains("manually"), "Installer failure must explain how to inspect or download the archive again");
     }
+
+    private static void VerifyAsynchronousPreparation()
+    {
+        using var form = Open();
+        var prepared = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        bool exited = false;
+        var operation = (Task)Call(form, "StartInstaller", "test-update.zip",
+            new Func<string, Task<bool>>(_ => prepared.Task), new Action(() => exited = true));
+        Assert(!operation.IsCompleted && Text(form, "titleLabel") == "Preparing installation",
+            "Archive preparation must await background work without claiming the installer has started");
+        Assert(form.AttemptClose(CloseReason.UserClosing) && !Field<Button>(form, "cancelButton").Enabled,
+            "Preparing an archive must keep the dialog alive with cancellation disabled");
+        bool dispatched = false;
+        form.BeginInvoke(new Action(() => dispatched = true));
+        Application.DoEvents();
+        Assert(dispatched && !exited && !form.IsDisposed, "The UI must continue dispatching while archive preparation is incomplete");
+        Progress(form);
+        Assert(Text(form, "titleLabel") == "Preparing installation" && Text(form, "statusLabel").Contains("Validating"),
+            "Old download progress must not overwrite preparation status");
+        prepared.SetResult(false);
+        var deadline = System.Diagnostics.Stopwatch.StartNew();
+        while (!operation.IsCompleted && deadline.Elapsed < TimeSpan.FromSeconds(5))
+        {
+            Application.DoEvents();
+            Thread.Yield();
+        }
+        Assert(operation.IsCompleted, "Completed preparation must return to the UI thread");
+        operation.GetAwaiter().GetResult();
+        Assert(!exited && Text(form, "titleLabel") == "Installer could not start"
+            && Text(form, "detailLabel").Contains("Download it again"),
+            "A failed archive validation must leave the application open and recommend inspecting or downloading again");
+    }
+
+    private static void VerifyExitFailureAfterHandoff()
+    {
+        using var form = Open();
+        RunInstaller(form, "test-update.zip", new Func<string, Task<bool>>(_ => Task.FromResult(true)),
+            new Action(() => throw new IOException("Exit test failure")));
+        Assert(Text(form, "titleLabel") == "Installer is waiting" && Text(form, "detailLabel").Contains("Exit test failure"),
+            "An exception after installer launch must explain the pending shutdown instead of claiming launch failed");
+    }
+
+    private static void RunInstaller(UpdateProgressForm form, string archive, Func<string, Task<bool>> launch, Action exit)
+        => ((Task)Call(form, "StartInstaller", archive, launch, exit)).GetAwaiter().GetResult();
 
     private static void VerifyQuietCompletion()
     {
