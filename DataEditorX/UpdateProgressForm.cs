@@ -16,7 +16,19 @@ namespace DataEditorX
         private readonly Button primaryButton;
         private readonly Button cancelButton;
         private TaskCompletionSource<bool>? actionCompletion;
-        private bool isRunning;
+        private UpdateStage stage;
+
+        private enum UpdateStage
+        {
+            Idle,
+            Checking,
+            Downloading,
+            AwaitingAction,
+            StartingInstaller,
+            InstallerStarted,
+            Cancelling,
+            Complete
+        }
 
         public UpdateProgressForm(bool showNew = true)
         {
@@ -45,10 +57,17 @@ namespace DataEditorX
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (isRunning && !cancellation.IsCancellationRequested)
+            // Keep the controls alive until asynchronous network work settles,
+            // including repeated close attempts after cancellation was requested.
+            if (stage is UpdateStage.Checking or UpdateStage.Downloading or UpdateStage.Cancelling)
             {
                 e.Cancel = true;
                 RequestCancel();
+                return;
+            }
+            if (stage == UpdateStage.StartingInstaller)
+            {
+                e.Cancel = true;
                 return;
             }
 
@@ -60,8 +79,9 @@ namespace DataEditorX
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && !IsDisposed)
             {
+                cancellation.Cancel();
                 cancellation.Dispose();
             }
 
@@ -145,7 +165,7 @@ namespace DataEditorX
             string updateUrl = DEXConfig.ReadString(DEXConfig.TAG_UPDATE_URL);
             try
             {
-                SetRunning("Checking for updates", "Reading update metadata...", "");
+                SetRunning(UpdateStage.Checking, "Checking for updates", "Reading update metadata...", "");
                 string latestVersion = await CheckUpdate.GetNewVersionAsync(updateUrl, cancellation.Token);
                 if (cancellation.IsCancellationRequested)
                 {
@@ -183,7 +203,7 @@ namespace DataEditorX
                     $"DataEditorX {latestVersion} is available.",
                     $"Current version: {currentVersion}\nDownload URL:\n{CheckUpdate.URL}",
                     "Download");
-                if (!download)
+                if (!download || IsDisposed || Disposing)
                 {
                     CloseIfOpen();
                     return;
@@ -191,7 +211,7 @@ namespace DataEditorX
 
                 string zipFile = BuildDownloadPath(latestVersion);
                 Progress<CheckUpdate.DownloadProgress> progress = new(UpdateDownloadProgress);
-                SetRunning($"Downloading DataEditorX {latestVersion}", "Starting download...", "");
+                SetRunning(UpdateStage.Downloading, $"Downloading DataEditorX {latestVersion}", "Starting download...", "");
                 bool downloaded = await CheckUpdate.DownloadAsync(zipFile, progress, cancellation.Token);
                 if (cancellation.IsCancellationRequested)
                 {
@@ -210,20 +230,13 @@ namespace DataEditorX
                     "The update archive is ready.",
                     $"Saved to:\n{zipFile}",
                     "Install and Restart");
-                if (!install)
+                if (!install || IsDisposed || Disposing)
                 {
                     CloseIfOpen();
                     return;
                 }
 
-                SetRunning("Starting installer", "DataEditorX will close and restart.", "");
-                if (CheckUpdate.InstallUpdate(zipFile))
-                {
-                    Application.Exit();
-                    return;
-                }
-
-                Complete("Installer could not start", GetInstallFailureMessage(), true);
+                StartInstaller(zipFile, CheckUpdate.InstallUpdate, Application.Exit);
             }
             catch (Exception ex)
             {
@@ -237,9 +250,42 @@ namespace DataEditorX
             }
         }
 
+        private void StartInstaller(string zipFile, Func<string, bool> launchInstaller, Action exitApplication)
+        {
+            SetRunning(UpdateStage.StartingInstaller, "Starting installer", "DataEditorX will close and restart.", "");
+            try
+            {
+                if (!launchInstaller(zipFile))
+                {
+                    Complete("Installer could not start", GetInstallFailureMessage(), true);
+                    return;
+                }
+
+                // Application.Exit raises FormClosing on this dialog too. The
+                // installer is already launched, so this is a successful handoff,
+                // not cancellation of an update check or download.
+                stage = UpdateStage.InstallerStarted;
+                statusLabel.Text = "Installer started. Waiting for DataEditorX to close...";
+                exitApplication();
+                if (!IsDisposed && !Disposing && Visible)
+                {
+                    Complete("Installer is waiting", "Finish any active tasks, then close DataEditorX. The installer will continue when the application closes.");
+                    statusLabel.Text = "DataEditorX is still open.";
+                }
+            }
+            catch (Exception ex)
+            {
+                Complete("Installer could not start", GetInstallFailureMessage() + "\n\nDetails: " + ex.GetBaseException().Message, true);
+            }
+        }
+
         private Task<bool> WaitForActionAsync(string title, string status, string detail, string actionText)
         {
-            isRunning = false;
+            if (IsDisposed || Disposing)
+            {
+                return Task.FromResult(false);
+            }
+            stage = UpdateStage.AwaitingAction;
             titleLabel.Text = title;
             statusLabel.Text = status;
             detailLabel.Text = detail;
@@ -255,9 +301,13 @@ namespace DataEditorX
             return actionCompletion.Task;
         }
 
-        private void SetRunning(string title, string status, string detail)
+        private void SetRunning(UpdateStage stage, string title, string status, string detail)
         {
-            isRunning = true;
+            if (IsDisposed || Disposing)
+            {
+                return;
+            }
+            this.stage = stage;
             titleLabel.Text = title;
             statusLabel.Text = status;
             detailLabel.Text = detail;
@@ -265,13 +315,17 @@ namespace DataEditorX
             progressBar.Value = 0;
             primaryButton.Visible = false;
             cancelButton.Text = "Cancel";
-            cancelButton.Enabled = true;
+            cancelButton.Enabled = stage is UpdateStage.Checking or UpdateStage.Downloading;
             AcceptButton = null;
         }
 
         private void Complete(string title, string detail, bool isError = false)
         {
-            isRunning = false;
+            if (IsDisposed || Disposing)
+            {
+                return;
+            }
+            stage = UpdateStage.Complete;
             actionCompletion = null;
             titleLabel.Text = title;
             statusLabel.Text = isError ? "The update could not continue." : "Finished.";
@@ -291,6 +345,12 @@ namespace DataEditorX
 
         private void UpdateDownloadProgress(CheckUpdate.DownloadProgress progress)
         {
+            // Progress<T> posts to the UI queue; an old notification can arrive
+            // after cancellation, completion or the install prompt.
+            if (IsDisposed || Disposing || stage != UpdateStage.Downloading || cancellation.IsCancellationRequested)
+            {
+                return;
+            }
             if (progress.TotalBytes.HasValue && progress.TotalBytes.Value > 0)
             {
                 progressBar.Style = ProgressBarStyle.Blocks;
@@ -316,9 +376,13 @@ namespace DataEditorX
 
         private void CancelButtonClick(object sender, EventArgs e)
         {
-            if (isRunning)
+            if (stage is UpdateStage.Checking or UpdateStage.Downloading or UpdateStage.Cancelling)
             {
                 RequestCancel();
+                return;
+            }
+            if (stage is UpdateStage.StartingInstaller or UpdateStage.InstallerStarted)
+            {
                 return;
             }
 
@@ -330,11 +394,12 @@ namespace DataEditorX
 
         private void RequestCancel()
         {
-            if (cancellation.IsCancellationRequested)
+            if (stage is not (UpdateStage.Checking or UpdateStage.Downloading) || cancellation.IsCancellationRequested)
             {
                 return;
             }
 
+            stage = UpdateStage.Cancelling;
             cancelButton.Enabled = false;
             statusLabel.Text = "Cancelling...";
             cancellation.Cancel();
@@ -344,6 +409,9 @@ namespace DataEditorX
         {
             if (!IsDisposed && !Disposing)
             {
+                // Internal completion (including a silent up-to-date check) must
+                // not be interpreted by FormClosing as a user's cancellation.
+                stage = UpdateStage.Complete;
                 Close();
             }
         }
