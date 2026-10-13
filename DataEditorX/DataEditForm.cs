@@ -394,7 +394,7 @@ namespace DataEditorX
                 InitComboBox(cb_setname2, setcodes, setnames);
                 InitComboBox(cb_setname3, setcodes, setnames);
                 InitComboBox(cb_setname4, setcodes, setnames);
-                UpdateFormatControls();
+                UpdateFormatControls(forceLayout: true);
             }
             catch (Exception ex)
             {
@@ -402,9 +402,13 @@ namespace DataEditorX
             }
         }
 
-        void UpdateFormatControls()
+        void UpdateFormatControls(bool forceLayout = false)
         {
-            showRushMetadata = GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH;
+            bool rush = GetSelect(cb_cardrule) == (long)Core.Info.CardRule.RUSH;
+            // Card values do not affect checkbox wrapping. Reflow only when the
+            // Rush help changes; initialization must also measure new controls.
+            if (!forceLayout && showRushMetadata == rush) return;
+            showRushMetadata = rush;
             if (rushHelp != null) rushHelp.Visible = showRushMetadata;
             if (rushHeading != null) rushHeading.Visible = showRushMetadata;
             ArrangeMetadata();
@@ -495,7 +499,9 @@ namespace DataEditorX
                     flow.AutoScrollPosition = Point.Empty;
                     flow.AutoScroll = false;
                     flow.AutoScrollMinSize = Size.Empty;
-                    flow.Width = width;
+                    // Measure against the new viewport, not a previous short,
+                    // scrolled section whose cached wrap width includes a scrollbar.
+                    flow.Size = new Size(width, height);
                     flow.PerformLayout();
                 }
                 int typesWanted = MeasureCheckRows(pl_cardtype, width);
@@ -865,7 +871,6 @@ namespace DataEditorX
             }
             //data
             SetSelect(cb_cardrule, c.IsRushDuelCard ? (long)Core.Info.CardRule.RUSH : c.ot);
-            UpdateFormatControls();
             SetSelect(cb_cardattribute, c.attribute);
             SetSelect(cb_cardlevel, c.level & 0xff);
             SetSelect(cb_cardrace, c.race);

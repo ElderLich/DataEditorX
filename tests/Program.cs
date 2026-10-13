@@ -56,6 +56,7 @@ internal static class Program
             Console.WriteLine("PASS: bounded scrollable code help and normal text selection.");
             VerifyCardTypeCoverage(root);
             VerifyGenreCoverage(root);
+            VerifySelectionReusesMetadataLayout(root);
             VerifyMetadataLayout(root);
             VerifyResizePaging(root);
             VerifyDockedMetadataLayout(root);
@@ -66,6 +67,63 @@ internal static class Program
         }
         finally { Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools(); File.Delete(db); }
     }
+    private static void VerifySelectionReusesMetadataLayout(string root)
+    {
+        using var form = new DataEditForm(root) { Opacity = 0, ShowInTaskbar = false };
+        var config = new DataConfig(Path.Combine(root, "languages/cardinfo_english.txt"));
+        form.InitControl(config);
+        form.Show();
+        var first = new Card(10001) { name = "First selection", desc = "First text", ot = 1, type = 0x21, category = 1, atk = 1200, def = 800 };
+        var second = new Card(10002) { name = "Second selection", desc = "Second text", ot = 4, type = 0x11, category = 0x800000000L, atk = 1800, def = 900 };
+        first.Str[0] = "First prompt";
+        second.Str[0] = "Second prompt";
+        var rush = new Card(120000010) { name = "Rush selection", ot = 4, type = 0x8029, category = 0x100, atk = 2500, def = 1000 };
+        form.SetCards([first, second, rush], false);
+        var list = Control<ListView>(form, "lv_cardlist");
+        var genres = Control<FlowLayoutPanel>(form, "pl_category");
+        var types = Control<FlowLayoutPanel>(form, "pl_cardtype");
+        list.Items[0].Selected = true;
+        Application.DoEvents();
+        genres.ScrollControlIntoView(genres.Controls[genres.Controls.Count - 1]);
+        var scroll = genres.AutoScrollPosition;
+        var bounds = genres.Bounds;
+        var checkbox = types.Controls.OfType<CheckBox>().First();
+        int layouts = 0;
+        genres.Layout += (_, _) => layouts++;
+        for (int i = 0; i < 12; i++)
+        {
+            list.SelectedIndices.Clear();
+            int row = (i + 1) % 2;
+            list.Items[row].Selected = true;
+            var expected = row == 0 ? first : second;
+            var actual = form.GetCard();
+            Assert(actual.id == expected.id && actual.name == expected.name && actual.desc == expected.desc
+                && actual.ot == expected.ot && actual.type == expected.type && actual.category == expected.category
+                && actual.atk == expected.atk && actual.def == expected.def && actual.Str[0] == expected.Str[0],
+                "Card selection must synchronously load all current card values");
+        }
+        Assert(layouts == 0, $"Selecting cards in the same format must not rebuild the metadata layout ({layouts} layout events)");
+        Assert(genres.Bounds == bounds && genres.AutoScrollPosition == scroll && ReferenceEquals(checkbox, types.Controls[0]),
+            "Card selection must preserve metadata scroll position, bounds and checkbox controls");
+        list.SelectedIndices.Clear();
+        list.Items[2].Selected = true;
+        Assert(Control<Label>(form, "rushHelp").Visible && layouts > 0 && form.GetCard().type == rush.type,
+            "Entering Rush must still arrange and display its help and type bits");
+        layouts = 0;
+        form.SetCard(rush);
+        Assert(layouts == 0, "Selecting another Rush card must reuse the Rush layout");
+        list.SelectedIndices.Clear();
+        list.Items[1].Selected = true;
+        Assert(!Control<Label>(form, "rushHelp").Visible && layouts > 0,
+            "Leaving Rush must hide its help and reclaim the space");
+        layouts = 0;
+        form.InitControl(config);
+        Assert(layouts > 0 && genres.Controls.Count == config.dicCardcategorys.Count,
+            "Reloading language/configuration must still measure newly created checkboxes");
+        form.Close();
+        Console.WriteLine("PASS: card selection reuses stable metadata layout and scroll state; Rush transitions and configuration reloads still reflow.");
+    }
+
     private static void VerifyDockedMetadataLayout(string root)
     {
         using var host = new MainForm { Opacity = 0, ShowInTaskbar = false };
@@ -248,7 +306,7 @@ internal static class Program
             if (scenario.Item1 is "Tall" or "Wide" or "Regrown" or "RushWide")
             {
                 Assert(!types.VerticalScroll.Visible && !genres.VerticalScroll.Visible,
-                    scenario.Item1 + ": all checkbox rows should fit without nested scrolling");
+                    $"{scenario.Item1}: all checkbox rows should fit without nested scrolling: types={types.Size}/{types.VerticalScroll.Visible}/{types.DisplayRectangle}; genres={genres.Size}/{genres.VerticalScroll.Visible}/{genres.DisplayRectangle}; column={column.Size}");
             }
             if (!string.IsNullOrEmpty(output))
             {
