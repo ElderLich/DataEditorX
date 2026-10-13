@@ -171,27 +171,9 @@ namespace DataEditorX.Common
             return success ? content : "";
         }
 
-        private static async Task<(bool Success, string Content, string Error)> TryGetHtmlContentByUrlAsync(string url, CancellationToken cancellationToken)
+        private static Task<(bool Success, string Content, string Error)> TryGetHtmlContentByUrlAsync(string url, CancellationToken cancellationToken)
         {
-            try
-            {
-                using HttpResponseMessage response = await Http
-                    .GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-                    .ConfigureAwait(false);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return (false, "", $"HTTP {(int)response.StatusCode} {response.ReasonPhrase}");
-                }
-
-                await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-                using StreamReader streamReader = new(stream, Encoding.UTF8);
-                string htmlContent = await streamReader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-                return (true, htmlContent, "");
-            }
-            catch (Exception ex)
-            {
-                return (false, "", ex.GetBaseException().Message);
-            }
+            return UpdateMetadataReader.ReadAsync(Http, url, TimeSpan.FromSeconds(15), cancellationToken);
         }
         #endregion
 
