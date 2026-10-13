@@ -65,6 +65,7 @@ internal static class Program
             VerifyThemeReadability();
             VerifyThemePreview();
             UpdateMetadataTests.Run();
+            UpdateDownloadTests.Run();
             UpdateDialogTests.Run();
             UpdateInstallerTests.Run();
         }

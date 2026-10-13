@@ -231,19 +231,9 @@ namespace DataEditorX.Common
                         1024 * 128,
                         useAsync: true);
 
-                    long totalDownloadedByte = 0;
-                    byte[] buffer = new byte[1024 * 128];
-                    int bytesRead;
-                    while ((bytesRead = await source.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken).ConfigureAwait(false)) > 0)
-                    {
-                        await destination.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
-                        totalDownloadedByte += bytesRead;
-                        progress?.Report(new DownloadProgress
-                        {
-                            BytesReceived = totalDownloadedByte,
-                            TotalBytes = totalBytes
-                        });
-                    }
+                    await UpdateDownloadReader.CopyAsync(
+                        source, destination, totalBytes, TimeSpan.FromSeconds(30), progress, cancellationToken)
+                        .ConfigureAwait(false);
                 }
 
                 if (File.Exists(filename))
